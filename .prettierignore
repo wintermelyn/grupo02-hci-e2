@@ -1,0 +1,9 @@
+node_modules
+dist
+package-lock.json
+skills-lock.json
+PLAN.md
+docs/*
+!docs/registro-ia.md
+.claude/
+.agents/

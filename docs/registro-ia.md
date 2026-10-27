@@ -1,0 +1,8 @@
+# Registro de uso de IA
+
+Cada persona agrega una fila por prompt relevante. La IA se usa solo para código; los journeys y las justificaciones de diseño los escribe el equipo.
+
+| Fecha         | Herramienta                   | Prompt                                                                                             | Qué produjo                                                                                                                                                                                         | Qué cambiamos   |
+| ------------- | ----------------------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| 2026-10-26/27 | Claude Code (claude-opus-5-5) | Redactar `PLAN.md` y `docs/conceptos-hci.md`, y generar el bloque base del prototipo según el plan | `PLAN.md`, `docs/conceptos-hci.md` y el bloque base: proyecto Vite, tipos, store, rutas, páginas placeholder y datos iniciales mínimos                                                              | _Por completar_ |
+| 2026-10-27    | Claude Code (claude-opus-5-5) | Corregir los problemas que encontró la revisión automática del bloque base                         | Versión de `localStorage` repartida por seed, `selectBook`, relectura con `startedAt` nuevo, pausa del toast, `onLongPress` en `BookRow`, polyfill de `<dialog>` para tests y test de `BottomSheet` | _Por completar_ |

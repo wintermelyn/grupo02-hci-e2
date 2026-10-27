@@ -1,0 +1,71 @@
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { TOAST_DURATION_MS } from '../store/coreSlice'
+import { state } from '../test/store'
+import { Toast } from './Toast'
+
+beforeEach(() => {
+  vi.useFakeTimers()
+})
+
+describe('Toast', () => {
+  it('announces the message in a live region and hides it after the timeout', () => {
+    render(<Toast />)
+    act(() => state().showToast('Hola'))
+    expect(screen.getByRole('status')).toHaveTextContent('Hola')
+    expect(screen.queryByRole('button', { name: 'Deshacer' })).not.toBeInTheDocument()
+    act(() => vi.advanceTimersByTime(TOAST_DURATION_MS))
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
+  })
+
+  it('undoes the last library change', () => {
+    const before = state().library
+    render(<Toast />)
+    act(() => state().commit('Libros quitados', () => ({ library: {} })))
+    fireEvent.click(screen.getByRole('button', { name: 'Deshacer' }))
+    expect(state().library).toBe(before)
+    expect(screen.getByRole('status')).toHaveTextContent('Cambio deshecho')
+  })
+
+  it('waits while the toast is hovered, then gives the full time again', () => {
+    render(<Toast />)
+    act(() => state().commit('Libros quitados', () => ({ library: {} })))
+    const undoButton = screen.getByRole('button', { name: 'Deshacer' })
+    fireEvent.pointerEnter(undoButton, { pointerType: 'mouse' })
+    act(() => vi.advanceTimersByTime(TOAST_DURATION_MS * 2))
+    expect(undoButton).toBeInTheDocument()
+
+    fireEvent.pointerLeave(undoButton, { pointerType: 'mouse' })
+    act(() => vi.advanceTimersByTime(TOAST_DURATION_MS - 1))
+    expect(undoButton).toBeInTheDocument()
+    act(() => vi.advanceTimersByTime(1))
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
+  })
+
+  it('still hides after the timeout when a tap enters it, which never sends pointerleave', () => {
+    render(<Toast />)
+    act(() => state().commit('Libros quitados', () => ({ library: {} })))
+    const undoButton = screen.getByRole('button', { name: 'Deshacer' })
+    // A tap: pointerenter from the finger, then the browser's compatibility mouseenter.
+    fireEvent.pointerEnter(undoButton, { pointerType: 'touch' })
+    fireEvent.mouseEnter(undoButton)
+    act(() => vi.advanceTimersByTime(TOAST_DURATION_MS))
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
+    expect(state().undoSnapshot).toBeNull()
+  })
+
+  it('waits while Deshacer has keyboard focus, even after the mouse leaves', () => {
+    render(<Toast />)
+    act(() => state().commit('Libros quitados', () => ({ library: {} })))
+    const undoButton = screen.getByRole('button', { name: 'Deshacer' })
+    act(() => undoButton.focus())
+    fireEvent.pointerEnter(undoButton, { pointerType: 'mouse' })
+    fireEvent.pointerLeave(undoButton, { pointerType: 'mouse' })
+    act(() => vi.advanceTimersByTime(TOAST_DURATION_MS * 2))
+    expect(undoButton).toBeInTheDocument()
+
+    act(() => undoButton.blur())
+    act(() => vi.advanceTimersByTime(TOAST_DURATION_MS))
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
+  })
+})

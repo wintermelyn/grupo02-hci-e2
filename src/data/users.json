@@ -1,0 +1,102 @@
+[
+  {
+    "id": "me",
+    "name": "Alex Muñoz",
+    "username": "alexlee",
+    "code": "LEE-1024",
+    "avatarColor": "#7c4a2d",
+    "mutualFriends": 0,
+    "readingIds": [],
+    "readIds": []
+  },
+  {
+    "id": "diego",
+    "name": "Diego Fuentes",
+    "username": "diegolee",
+    "code": "LEE-2048",
+    "avatarColor": "#1d4ed8",
+    "mutualFriends": 2,
+    "readingIds": ["OL893414W"],
+    "readIds": ["OL1168083W", "OL46125W", "OL103123W", "OL2172356W", "OL17267881W"]
+  },
+  {
+    "id": "valentina",
+    "name": "Valentina Soto",
+    "username": "valelee",
+    "code": "LEE-3172",
+    "avatarColor": "#7c3aed",
+    "mutualFriends": 2,
+    "readingIds": ["OL20901051W"],
+    "readIds": ["OL17319533W", "OL81633W", "OL3171069W", "OL274505W", "OL1905255W"]
+  },
+  {
+    "id": "tomas",
+    "name": "Tomás Rojas",
+    "username": "tomasreads",
+    "code": "LEE-5307",
+    "avatarColor": "#166534",
+    "mutualFriends": 2,
+    "readingIds": ["OL17075811W"],
+    "readIds": ["OL1811898W", "OL1892617W", "OL15829966W", "OL1966488W"]
+  },
+  {
+    "id": "camila",
+    "name": "Camila Torres",
+    "username": "camitorres",
+    "code": "LEE-4821",
+    "avatarColor": "#be123c",
+    "mutualFriends": 3,
+    "readingIds": ["OL278437W"],
+    "readIds": ["OL14860424W", "OL1731119W", "OL10263W", "OL274518W"]
+  },
+  {
+    "id": "ctorres99",
+    "name": "Camila Torres",
+    "username": "ctorres_99",
+    "code": "LEE-7390",
+    "avatarColor": "#0f766e",
+    "mutualFriends": 0,
+    "readingIds": ["OL3140822W"],
+    "readIds": ["OL66554W"]
+  },
+  {
+    "id": "ignacio",
+    "name": "Ignacio Pérez",
+    "username": "nachoperez",
+    "code": "LEE-1357",
+    "avatarColor": "#4338ca",
+    "mutualFriends": 1,
+    "readingIds": ["OL52114W"],
+    "readIds": ["OL109524W", "OL59800W"]
+  },
+  {
+    "id": "fernanda",
+    "name": "Fernanda Castillo",
+    "username": "fercastillo",
+    "code": "LEE-2468",
+    "avatarColor": "#a21caf",
+    "mutualFriends": 1,
+    "readingIds": ["OL698173W"],
+    "readIds": ["OL266178W", "OL1268413W"]
+  },
+  {
+    "id": "martina",
+    "name": "Martina Vargas",
+    "username": "martireads",
+    "code": "LEE-3690",
+    "avatarColor": "#c2410c",
+    "mutualFriends": 0,
+    "readingIds": ["OL450063W"],
+    "readIds": ["OL85892W", "OL927199W"]
+  },
+  {
+    "id": "benjamin",
+    "name": "Benjamín Reyes",
+    "username": "benjareyes",
+    "code": "LEE-8024",
+    "avatarColor": "#475569",
+    "mutualFriends": 0,
+    "readingIds": ["OL468431W"],
+    "readIds": ["OL503666W", "OL498556W"]
+  }
+]

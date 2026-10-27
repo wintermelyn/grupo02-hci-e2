@@ -1,0 +1,28 @@
+@import 'tailwindcss';
+
+/* Each colour keeps white text at 4.5:1 or more (WCAG 1.4.3), and also works as text on white. */
+@theme {
+  --color-brand: #7c4a2d;
+  --color-want: #1d4ed8;
+  --color-reading: #b45309;
+  --color-read: #166534;
+  --color-danger: #b91c1c;
+  --container-app: 65rem;
+}
+
+@layer base {
+  body {
+    @apply bg-stone-50 text-gray-900 antialiased;
+  }
+
+  /* One visible focus style for every control, so keyboard users always know where they are. */
+  :focus-visible {
+    outline: 3px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  /* A modal <dialog> makes the page inert but still lets it scroll behind the sheet. */
+  body:has(dialog[open]) {
+    overflow: hidden;
+  }
+}
