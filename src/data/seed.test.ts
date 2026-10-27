@@ -5,7 +5,7 @@ import books from './books.json'
 import { buildInitialFolders, buildInitialLibrary } from './seedLibrary'
 import { buildInitialActivities, buildInitialFriendships, me, users } from './seedSocial'
 
-// These checks pin the seed to PLAN.md section 4 and to the task data listed in the README.
+// These checks pin the seed to PLAN.md section 4 and to the task data listed in docs/desarrollo/tareas.md.
 const T1_BOOK_ID = 'OL1811898W'
 const catalog: Book[] = books
 const bookIds = new Set(catalog.map((book) => book.id))

@@ -4,7 +4,7 @@ import type { Activity, Friendship, User } from '../types'
 import userList from './users.json'
 
 // users.json holds the whole directory. "camila" is the T3 person and "ctorres99" her homonym;
-// the README lists the details. Me's readingIds/readIds stay empty: my books live in the library.
+// docs/desarrollo/tareas.md lists the details. Me's readingIds/readIds stay empty: my books live in the library.
 const ME_ID = 'me'
 
 /**

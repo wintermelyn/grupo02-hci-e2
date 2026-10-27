@@ -28,7 +28,7 @@ Son las tareas que el prototipo debe permitir completar de principio a fin. Las 
 - **T3:** agregar como amigo a una persona que conozco.
   - **Resultado:** la persona aparece en Amigos, primero como "Solicitud enviada" y luego como amiga.
 
-El README del bloque base lista qué libros y qué persona concretos usa cada tarea, para que se puedan redactar las instrucciones de la E3.
+`docs/desarrollo/tareas.md` lista qué libros y qué persona concretos usa cada tarea, para que se puedan redactar las instrucciones de la E3.
 
 ---
 
@@ -246,15 +246,15 @@ Si alguien necesita cambiar algo compartido, le avisa al otro rol antes y lo sub
 ## 4. Reparto
 
 ### Bloque base (martes 27; todos dependen de él)
-- [ ] **Proyecto:** Vite + dependencias de la sección 3, `.nvmrc`, `.gitignore` (excluye `node_modules`, `dist` y `docs/clases/`), `vercel.json` y README con cómo correrlo y con los datos concretos de T1, T2 y T3.
-- [ ] **Store completo** según la sección 3: tipos, archivos, persistencia, deshacer, toast, acciones del bloque base y stubs con firma fija en los slices de A y B.
-- [ ] **`scripts/seed-books.mjs`**, con `books.json` y las portadas ya generados.
-- [ ] **Datos iniciales de la biblioteca:**
+- [x] **Proyecto:** Vite + dependencias de la sección 3, `.nvmrc`, `.gitignore` (excluye `node_modules`, `dist` y `docs/clases/`), `vercel.json`, README con cómo correrlo y `docs/desarrollo/` con los contratos, los tests, el catálogo y los datos concretos de T1, T2 y T3.
+- [x] **Store completo** según la sección 3: tipos, archivos, persistencia, deshacer, toast, acciones del bloque base y stubs con firma fija en los slices de A y B.
+- [x] **`scripts/seed-books.mjs`**, con `books.json` y las portadas ya generados.
+- [x] **Datos iniciales de la biblioteca:**
   - unos 35 libros, de ellos **22 en "Quiero"**;
   - **2 en "Leyendo"**, con `startedAt` hace 12 y 30 días; uno es el libro de T1;
   - 10 en "Leído";
   - carpetas: Próximos (fija, 2 libros), Terror, Novela, Ciencia ficción y Regalos.
-- [ ] **Datos iniciales sociales:**
+- [x] **Datos iniciales sociales:**
   - **Yo:** Alex Muñoz, @alexlee, código `LEE-1024`.
   - **3 amigos:** Diego Fuentes (@diegolee), Valentina Soto (@valelee) y Tomás Rojas (@tomasreads).
   - **Persona de T3:** Camila Torres, @camitorres, código `LEE-4821`, 3 amigos en común, todavía sin agregar.
@@ -262,11 +262,11 @@ Si alguien necesita cambiar algo compartido, le avisa al otro rol antes y lo sub
   - **4 personas más** en el directorio.
   - **Unas 10 actividades** de los amigos, con fechas relativas a hoy (`daysAgo`).
   - Cada `User` lleva sus `readingIds` y `readIds`.
-- [ ] **Componentes compartidos**, `routes.tsx`, `index.css` y `lib/dates.ts`.
-- [ ] **Una página placeholder por ruta**, con estos nombres:
+- [x] **Componentes compartidos**, `routes.tsx`, `index.css` y `lib/dates.ts`.
+- [x] **Una página placeholder por ruta**, con estos nombres:
   - **A:** `features/library/LibraryPage.tsx`, `FolderPage.tsx` y `features/book/BookPage.tsx`;
   - **B:** `features/home/HomePage.tsx`, `features/search/SearchPage.tsx`, `features/friends/FriendsPage.tsx`, `PersonPage.tsx` y `features/profile/ProfilePage.tsx`.
-- [ ] **`docs/registro-ia.md`** con su plantilla.
+- [x] **`docs/registro-ia.md`** con su plantilla.
 - [ ] **Repo privado** en GitHub, con la profesora y la ayudante invitadas, y **primer deploy en Vercel**.
 
 ### Rol A · Biblioteca (T1 + T2) · `src/features/library/`, `src/features/book/`, `librarySlice.ts`

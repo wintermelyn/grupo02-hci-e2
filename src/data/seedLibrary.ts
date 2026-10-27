@@ -1,7 +1,7 @@
 import { daysAgo } from '../lib/dates'
 import type { BookId, Folder, LibraryEntry } from '../types'
 
-// Book ids are Open Library work keys from books.json. The README lists which ones each task uses.
+// Book ids are Open Library work keys from books.json. docs/desarrollo/tareas.md lists which ones each task uses.
 
 /**
  * Add 1 whenever this file or the shape of library data changes, so browsers with stored data
