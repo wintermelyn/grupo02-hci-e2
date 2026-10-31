@@ -3,7 +3,7 @@ import { LedgerRow } from './LedgerRow'
 
 /** On a phone the cover and the title share a row, and what follows takes both columns. */
 export const BOOK_COLUMNS =
-  'grid grid-cols-[7rem_minmax(0,1fr)] gap-x-4 md:mt-3 md:grid-cols-[17.5rem_minmax(0,1fr)] md:items-start md:gap-x-8 lg:grid-cols-[minmax(16.5rem,4fr)_minmax(0,7fr)] lg:gap-x-12'
+  'grid grid-cols-[7rem_minmax(0,1fr)] gap-x-4 md:mt-3 md:grid-cols-[14rem_minmax(0,1fr)] md:items-start md:gap-x-8 lg:gap-x-12'
 
 /** The cover follows the reading on a long page. Its foot leaves room for the ribbon. */
 export const BOOK_COVER = 'pb-3 md:sticky md:top-4 md:pb-5'
