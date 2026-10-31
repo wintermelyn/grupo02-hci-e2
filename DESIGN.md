@@ -754,7 +754,7 @@ Las portadas no se tiñen ni se recortan en la ficha. `lg` mide 112 px en celula
 
 ### Navigation
 
-- **Scroll:** `AppShell` parte cada página arriba. Volver, con el botón del navegador o con `BackLink`, deja la lista donde estaba. Un filtro o una búsqueda no mueven la página. La barra lateral queda fija mientras la página se desplaza.
+- **Scroll:** `AppShell` parte cada página arriba. Volver, con el botón del navegador o con `BackLink`, deja la lista donde estaba. Un filtro no mueve la página. Una búsqueda nueva la lleva al comienzo de sus resultados, justo bajo el campo, solo si estaba más abajo. La barra lateral queda fija mientras la página se desplaza.
 - **Bajo `lg`:** `AppShell` fija una barra al borde inferior, de lado a lado, sobre `paper` sólido y sin desenfoque, de 65 px más el área segura, con una raya superior `edge` al 60 %. Va pegada al borde porque una barra flotante se movía con la barra del navegador en un celular real. Tiene cinco secciones repartidas por igual, hasta 448 px de ancho y centradas en una tablet, de 56 px de alto, con ícono de 21 px y etiqueta Caption. La presión es `sand`.
 - **Desde `lg`:** barra lateral de 232 px, sobre `paper`, con una raya `line` a la derecha. Arriba va "Goodreads" en serif de 24 px, que lleva a Inicio; abajo, "Prototipo de rediseño, proyecto de curso" en Caption. Las secciones miden 44 px, con ícono de 20 px, y van una sobre otra.
 - **Estados:** la sección activa es de tinta, con peso 700, ícono más grueso y relleno `sand`, y en la lateral también con cinta. Las demás son `muted`, con peso 500 en la lateral y 600 abajo. En la lateral, con el cursor, toman `shell` y tinta. "Más" sigue activa en Amigos y Mi perfil, e "Inicio" en `/actividad`, y esa página se anuncia con `aria-current="true"`.

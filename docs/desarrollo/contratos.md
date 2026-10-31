@@ -34,7 +34,7 @@ El detalle está en [`PLAN.md`](../../PLAN.md), sección 3 ("Store: archivos y d
 - **Animación:** solo responde a una acción (regla 14) y respeta la preferencia de reducir movimiento, que `index.css` aplica a toda la app. `useChanged(valor)` dice si un valor cambió después de montar, para no animar al cargar la página.
 - **Colores:** la paleta por defecto de Tailwind no existe, así que clases como `text-gray-700` no generan nada. Se usan los tokens de `index.css`.
 - **Volver desde la ficha:** `BookRow` pasa `state.from` con la lista de origen y sus filtros. La ficha vuelve ahí; sin ese dato, por ejemplo con un enlace compartido, vuelve a Mis libros.
-- **Scroll:** `AppShell` parte cada página nueva arriba y restaura la posición al volver, con el botón del navegador o con `BackLink`, que pasa `state.restoreScroll`. Solo un cambio de `pathname` mueve la página.
+- **Scroll:** `AppShell` parte cada página nueva arriba y restaura la posición al volver, con el botón del navegador o con `BackLink`, que pasa `state.restoreScroll`. Solo un cambio de `pathname` mueve la página. La excepción es Buscar: al cambiar la búsqueda, si la página estaba más abajo, la lleva al comienzo de los resultados.
 - **`TextField` y Enter:** evita la acción por defecto de la tecla, porque guardar puede devolver el foco a un botón y el navegador tomaría esa misma pulsación como un clic.
 - **Título de la pestaña:** `AppShell` lo toma del `h1` de la página y lo sigue cuando cambia, así que una página nueva no tiene que hacer nada.
 - **`SearchField` con `onClose`:** para un campo que el celular abre a pedido. Quien lo usa cierra el campo y devuelve el foco a lo que lo abrió. El campo sigue montado desde `md`, así que el foco al abrir se da a mano y `autoFocus` ya no existe.

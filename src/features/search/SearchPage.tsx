@@ -1,4 +1,12 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type RefObject,
+} from 'react'
 import { useSearchParams } from 'react-router'
 import { ErrorState, LoadingState, SearchField, Wordmark } from '../../components'
 import { useStore } from '../../store'
@@ -26,6 +34,25 @@ function useFocusOnWideScreen(enabled: boolean) {
   return field
 }
 
+/**
+ * A new search starts at its first result, right under the field, which stays at the top of the
+ * screen. With the page above that point the results are already in view, so nothing moves.
+ */
+function useStartAtResults(text: string, field: RefObject<HTMLElement | null>) {
+  const start = useRef<HTMLDivElement>(null)
+  const shown = useRef(text)
+  useLayoutEffect(() => {
+    if (shown.current === text) return
+    shown.current = text
+    if (!start.current || !field.current) return
+    const page = document.documentElement
+    const { top } = start.current.getBoundingClientRect()
+    const resultsTop = page.scrollTop + top - field.current.offsetHeight
+    if (page.scrollTop > resultsTop) page.scrollTop = resultsTop
+  }, [text, field])
+  return start
+}
+
 export function SearchPage() {
   // The field keeps its own value: if it waited for the URL, each letter would lose the caret.
   const { typed, search } = useListFilters()
@@ -36,6 +63,7 @@ export function SearchPage() {
   const friendsBooks = useFriendsBooks()
   const [recent, setRecent] = useState(readRecentSearches)
   const field = useFocusOnWideScreen(typed === '')
+  const resultsStart = useStartAtResults(text, field)
   const bookOf = useBookLookup()
   const booksHeading = useRef<HTMLHeadingElement>(null)
   const focusOnBooks = useRef(false)
@@ -96,6 +124,7 @@ export function SearchPage() {
           onChange={search}
         />
       </div>
+      <div ref={resultsStart} />
 
       {!text ? (
         <SearchStart

@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter, Routes, useNavigate } from 'react-router'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { appRoutes } from '../../routes'
 import { useStore } from '../../store'
 import { stubCatalog } from '../../test/catalog'
@@ -28,6 +28,7 @@ function renderAfterMas(path: string) {
 
 const search = () => screen.getByRole('searchbox', { name: 'Buscar libros y autores' })
 const type = (text: string) => fireEvent.change(search(), { target: { value: text } })
+const main = () => within(screen.getByRole('main'))
 const section = (name: string) => screen.getByRole('heading', { name }).closest('section')!
 const waitForSection = async (name: string) =>
   (await screen.findByRole('heading', { name })).closest('section')!
@@ -141,6 +142,62 @@ describe('before typing', () => {
     const shelf = within(section('Lo que leen tus amigos'))
     const dune = shelf.getByRole('link', { name: /Dune/ })
     expect(dune).toHaveTextContent('Diego')
+  })
+})
+
+describe('changing the search with the page scrolled', () => {
+  const page = document.documentElement
+  /** Where the results start, measured from the top of the page. */
+  const RESULTS_TOP = 120
+
+  beforeEach(() => {
+    catalog()
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(
+      () => ({ top: RESULTS_TOP - page.scrollTop }) as DOMRect,
+    )
+  })
+
+  afterEach(() => {
+    page.scrollTop = 0
+  })
+
+  async function renderScrolledTo(top: number) {
+    renderApp('/buscar?q=apocalipsis')
+    await screen.findByRole('link', { name: /Apocalipsis/ })
+    page.scrollTop = top
+    fireEvent.scroll(window)
+  }
+
+  it('takes the page to the start of the new results', async () => {
+    await renderScrolledTo(900)
+    type('dune')
+    expect(page.scrollTop).toBe(RESULTS_TOP)
+  })
+
+  it('does the same on clearing the search', async () => {
+    await renderScrolledTo(900)
+    type('')
+    expect(page.scrollTop).toBe(RESULTS_TOP)
+  })
+
+  it('leaves the page alone when the results are already in view', async () => {
+    await renderScrolledTo(50)
+    type('dune')
+    expect(page.scrollTop).toBe(50)
+  })
+
+  it('leaves the page alone when the search stays the same', async () => {
+    await renderScrolledTo(900)
+    type('apocalipsis ')
+    expect(page.scrollTop).toBe(900)
+  })
+
+  it('still comes back from a book to where the list was', async () => {
+    await renderScrolledTo(900)
+    fireEvent.click(screen.getByRole('link', { name: /Apocalipsis/ }))
+    expect(page.scrollTop).toBe(0)
+    fireEvent.click(main().getByRole('link', { name: 'Volver' }))
+    expect(page.scrollTop).toBe(900)
   })
 })
 
