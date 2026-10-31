@@ -51,7 +51,9 @@ interface WorkDoc {
 
 /** Punctuation breaks words too, so "Jean-Paul" starts at "paul" and "J. R. R." reads as initials. */
 function words(text: string): string {
-  return normalizeText(text).replace(/[^\p{L}\p{N}]+/gu, ' ').trim()
+  return normalizeText(text)
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim()
 }
 
 /** By the start of a word of the name, so "king" finds Stephen King and not Hawking. */
@@ -69,9 +71,7 @@ function matchesBook({ title, authors }: Book, query: string): boolean {
 
 function localMatches(query: string): Book[] {
   const { seedBooks, extraBooks } = useStore.getState()
-  return Object.values({ ...seedBooks, ...extraBooks }).filter((book) =>
-    matchesBook(book, query),
-  )
+  return Object.values({ ...seedBooks, ...extraBooks }).filter((book) => matchesBook(book, query))
 }
 
 const coverUrl = (coverId: number) => `${COVERS_URL}/${coverId}-L.jpg?default=false`
@@ -156,10 +156,7 @@ export async function searchBooks(query: string, signal: AbortSignal): Promise<B
     fields: SEARCH_FIELDS,
   })
   try {
-    const answer = await getJson<{ docs?: SearchDoc[] }>(
-      `${API_URL}/search.json?${params}`,
-      signal,
-    )
+    const answer = await getJson<{ docs?: SearchDoc[] }>(`${API_URL}/search.json?${params}`, signal)
     const live = (answer?.docs ?? []).flatMap((doc) => bookFromDoc(doc) ?? [])
     return { books: mergeResults(local, live), offline: false }
   } catch (error) {
