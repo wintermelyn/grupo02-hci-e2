@@ -172,7 +172,23 @@ export const createLibrarySlice: SliceCreator<LibraryActions> = (_set, get) => {
       }))
     },
 
-    // Stub from the base block: out of this phase. It goes through get().commit(label, mutator).
-    answerWantPrompt: () => {},
+    answerWantPrompt: (bookId, keep) => {
+      if (keep) {
+        const current = get().library[bookId]
+        if (!current) return
+        _set({
+          library: { ...get().library, [bookId]: { ...current, wantCheckedAt: today() } },
+          lastWantPromptOn: today(),
+        })
+        get().showToast('Sigue en tu lista')
+        return
+      }
+      get().commit('Quitado de tu lista', ({ library }) => {
+        const rest = { ...library }
+        delete rest[bookId]
+        return { library: rest }
+      })
+      _set({ lastWantPromptOn: today() })
+    },
   }
 }

@@ -1,0 +1,325 @@
+/* Solo /d/, /e/ y /f/: todo cuelga de html[data-modelo], así /a/, /b/ y /c/ no cambian. */
+
+@property --tono {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #1b1714;
+}
+
+html[data-modelo] {
+  --gut: 16px;
+  --sombra-libro: 0 1px 2px rgb(20 12 8 / 22%), 0 14px 28px -12px rgb(20 12 8 / 55%);
+}
+
+@media (min-width: 768px) {
+  html[data-modelo] {
+    --gut: 28px;
+  }
+}
+
+@media (min-width: 1024px) {
+  html[data-modelo] {
+    --gut: 44px;
+  }
+}
+
+/* D · oscuro: la tinta del sistema pasa a ser el suelo, y el papel, el texto. Se invierten los
+   mismos tokens, así las pantallas existentes lo heredan. Blanco pasa a ser la superficie. */
+html[data-modelo='d'] {
+  color-scheme: dark;
+  --color-white: #1d1a17;
+  --color-paper: #0f0d0c;
+  --color-shell: #181513;
+  --color-sand: #27231f;
+  --color-sand-deep: #332e29;
+  --color-sand-dark: #403a33;
+  --color-line: #2c2824;
+  --color-edge: #8f857a;
+  --color-ink: #f7f2ec;
+  --color-muted: #bcb2a7;
+  --color-ribbon: #e8657f;
+  --color-want: #a4bdf0;
+  --color-owned: #dcb0d4;
+  --color-reading: #ecb577;
+  --color-read: #8ad4ad;
+  --color-danger: #f29378;
+  --shadow-float: 0 2px 4px rgb(0 0 0 / 40%), 0 18px 34px -8px rgb(0 0 0 / 70%);
+}
+
+/* E · escalera de un solo tono: los pálidos del burdeo de la cinta hacen el trabajo de área. */
+html[data-modelo='e'],
+html[data-modelo='g'] {
+  --color-paper: #fdfafa;
+  --color-shell: #f9f1f2;
+  --color-sand: #f3e4e6;
+  --color-sand-deep: #ead4d8;
+  --color-sand-dark: #dfc2c8;
+  --color-line: #f0e4e6;
+  --color-edge: #8b7a7d;
+  --color-muted: #5e5251;
+}
+
+/* El carril propio de la barra lateral reemplaza al centrado por 50vw. */
+html[data-modelo] .full-bleed {
+  margin-inline: calc(var(--gut) * -1);
+  padding-inline: var(--gut);
+}
+
+html[data-modelo] body {
+  font-optical-sizing: auto;
+}
+
+/* Las pantallas heredadas pierden la banda: el título manda, sin caja detrás. */
+html[data-modelo] main header.full-bleed {
+  background: transparent;
+}
+
+.titulo-pagina {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+@media (min-width: 1024px) {
+  .titulo-pagina {
+    font-size: 2.5rem;
+  }
+}
+
+.titulo-seccion {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 1024px) {
+  .titulo-seccion {
+    font-size: 1.75rem;
+  }
+}
+
+/* Los botones secundarios heredados dejan de ser un rectángulo con relleno y borde duro. */
+html[data-modelo] main button.bg-sand-deep {
+  background-color: transparent;
+  border-radius: 999px;
+}
+
+html[data-modelo] main button.bg-sand-deep:hover {
+  background-color: var(--color-sand);
+}
+
+html[data-modelo] main button.bg-ink {
+  border-radius: 999px;
+}
+
+/* Una portada de libro: el canto y la sombra física, sobre cualquier fondo. */
+.sombra-portada > span > span {
+  box-shadow: var(--sombra-libro);
+}
+
+/* Las portadas de los rieles responden a la mano, sin moverse solas. */
+.portada-viva {
+  transition: translate 220ms var(--ease-quick);
+}
+
+@media (hover: hover) {
+  a:hover > .portada-viva,
+  a:focus-visible > .portada-viva {
+    translate: 0 -6px;
+  }
+}
+
+a:active > .portada-viva {
+  translate: 0 -1px;
+}
+
+.riel-sin-barra {
+  scrollbar-width: none;
+}
+
+.riel-sin-barra::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mientras se arrastra con el mouse el riel sigue a la mano: el imán vuelve al soltar. */
+.arrastrando {
+  scroll-snap-type: none !important;
+  cursor: grabbing;
+  user-select: none;
+}
+
+.arrastrando a {
+  pointer-events: none;
+}
+
+/* D · la portada central manda, y crece y baja según avanza el dedo, sin esperar al final. */
+.d-pieza {
+  transition: scale 260ms var(--ease-quick), opacity 260ms var(--ease-quick);
+  scale: 0.78;
+  opacity: 0.62;
+}
+
+.d-pieza[data-activo='true'] {
+  scale: 1;
+  opacity: 1;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .d-pieza {
+      transition: none;
+      animation: d-foco linear both;
+      animation-timeline: view(inline);
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+
+@keyframes d-foco {
+  0%,
+  28% {
+    scale: 0.76;
+    opacity: 0.55;
+  }
+
+  50% {
+    scale: 1;
+    opacity: 1;
+  }
+
+  72%,
+  100% {
+    scale: 0.76;
+    opacity: 0.55;
+  }
+}
+
+.d-escena {
+  background-color: var(--tono);
+  transition: --tono 420ms var(--ease-quick);
+}
+
+/* G · la estructura de D sobre papel: el color de la portada es apenas un tinte detrás de los libros
+   y nunca queda bajo el texto, así que no cambia ningún contraste. */
+.g-escena {
+  background-color: color-mix(in srgb, var(--tono) 12%, var(--color-paper));
+  transition: --tono 420ms var(--ease-quick);
+}
+
+.g-pieza {
+  transition: scale 260ms var(--ease-quick), opacity 260ms var(--ease-quick);
+  scale: 0.76;
+  opacity: 0.78;
+}
+
+.g-pieza[data-activo='true'] {
+  scale: 1;
+  opacity: 1;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .g-pieza {
+      transition: none;
+      animation: g-foco linear both;
+      animation-timeline: view(inline);
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+
+@keyframes g-foco {
+  0%,
+  28% {
+    scale: 0.76;
+    opacity: 0.78;
+  }
+
+  50% {
+    scale: 1;
+    opacity: 1;
+  }
+
+  72%,
+  100% {
+    scale: 0.76;
+    opacity: 0.78;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .g-escena {
+    transition: none;
+  }
+}
+
+/* E · el borde derecho avisa que el estante sigue, también sin mouse. */
+.e-sigue {
+  mask-image: linear-gradient(to right, #000 calc(100% - 72px), transparent);
+}
+
+.e-rotulo {
+  background-color: var(--color-sand);
+}
+
+/* La columna entera del rótulo tapa lo que pasa por debajo: la portada y también su leyenda. */
+.e-columna {
+  background-color: var(--color-paper);
+  transition: box-shadow 200ms ease-out;
+}
+
+.e-columna::before {
+  content: '';
+  position: absolute;
+  inset-block: -0.5rem -0.75rem;
+  left: calc(var(--gut) * -1);
+  width: calc(var(--gut) + 100%);
+  background: var(--color-paper);
+  z-index: -1;
+}
+
+.e-columna[data-desplazado='true'] {
+  box-shadow: 10px 0 16px -14px rgb(30 25 21 / 45%);
+}
+
+/* F · al pasar por una portada, las demás retroceden sin perder su texto. */
+@media (hover: hover) {
+  .f-mesa:has(a:hover) a:not(:hover) .f-imagen {
+    opacity: 0.45;
+  }
+}
+
+.f-imagen {
+  transition: opacity 180ms ease-out;
+}
+
+/* Inicio y Buscar: los rieles de tarjetas no muestran barra, y el foco no queda cortado. */
+.riel-foco {
+  scroll-padding-inline: var(--gut);
+}
+
+::view-transition-group(*) {
+  animation-duration: 320ms;
+  animation-timing-function: var(--ease-quick);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 160ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+
+  .d-escena {
+    transition: none;
+  }
+}
