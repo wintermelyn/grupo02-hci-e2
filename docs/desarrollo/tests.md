@@ -8,6 +8,8 @@ Cada test va junto al código que prueba (`*.test.ts` o `*.test.tsx`). `src/test
 - `renderApp(path)`: monta la app completa, con `AppShell`, en una URL.
 - `contrast(a, b)`: la razón de contraste WCAG entre dos colores hexadecimales.
 
+jsdom no tiene `ResizeObserver` y `src/test/setup.ts` lo reemplaza por uno que no hace nada, para que una página con `useRail` se pueda montar. Tampoco tiene `scrollBy` ni `setPointerCapture`: el test que los necesita los simula, como `src/components/useRail.test.tsx`.
+
 `src/routes.test.tsx` falla si se agrega una ruta sin agregarle una URL de ejemplo.
 
 **Tests que revisan tus páginas.** `src/routes.test.tsx` monta cada ruta y exige que cada página:

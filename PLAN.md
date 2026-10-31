@@ -230,27 +230,29 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 - Con el tag en "Leído", la ficha muestra inicio, fin y puntaje como filas editables, que guardan con `finishBook`. Con "Leyendo" muestra el inicio, que guarda con `setStartDate`.
 
 ### Componentes compartidos (`src/components/`, del bloque base)
-- **`AppShell`:** navegación inferior en celular y superior en computador, contenedor centrado, `<Toast/>` y memoria de scroll: cada página parte arriba y volver deja la lista donde estaba.
-- **`PageHeader`:** banda de la página con título, subtítulo, botón de volver y una acción a la derecha. Lo que recibe como hijo, como `TagFilter`, queda en el borde inferior. "Goodreads / prototipo" sigue visible en el celular, también con acción. `media` pone algo antes del título, como un `Avatar`.
-- **`BookCover`:** portada, con un placeholder de color e iniciales si no hay imagen. Con la prop `status`, muestra la cinta del tag bajo la portada.
+- **`AppShell`:** barra inferior pegada al borde bajo `lg` y barra lateral desde `lg`, `main` con su margen y su ancho, `<Toast/>` y memoria de scroll: cada página parte arriba y volver deja la lista donde estaba.
+- **`PageHeader`:** el comienzo de la página, sin caja detrás, con título, subtítulo, botón de volver y una acción a la derecha. Lo que recibe como hijo, como `TagFilter`, queda bajo el título. `Wordmark`, "Goodreads prototipo", se ve bajo `lg`, también con acción, y desde ahí lo dice la barra lateral. `media` pone algo antes del título, como un `Avatar`.
+- **`BookCover`:** portada, con un placeholder de color e iniciales si no hay imagen. Con la prop `status`, muestra la cinta del tag bajo la portada, y con `raised`, la sombra larga para un tono o un riel.
 - **`BookRow`:** portada con su cinta, título, `StatusTag` junto al autor, bajo el título (si el libro está en la biblioteca), y estrellas (si está en "Leído"). Acepta las props `trailing` y `note`, que reemplaza mi tag y mis estrellas en una lista sobre otra persona. Al abrir la ficha le pasa de dónde viene, para que vuelva a esa misma lista.
 - **`AnchoredMenu`:** el menú anclado reutilizable. Sirve para un cambio rápido y reversible con pocas opciones, junto a su control: `radio` para una opción actual, `checkbox` para varias y `action` para comandos. `actions` agrega comandos bajo una línea, con lo que cuestan.
 - **`TextField`:** un texto corto que se escribe donde se lee, con Enter para guardar, Escape para cancelar y `problem` para decir por qué no se puede guardar. Quien lo usa pone Guardar y Cancelar.
-- **`SearchField`:** campo de búsqueda que filtra mientras se escribe, con "Borrar". Con `onClose` suma "Cerrar", para un campo que el celular abre a pedido.
-- **`Avatar`:** círculo con las iniciales sobre `avatarColor`, siempre junto al nombre.
+- **`SearchField`:** campo de búsqueda que filtra mientras se escribe, con "Borrar". Con `onClose` suma "Cerrar", para un campo que el celular abre a pedido. `size="lg"` es para una pantalla cuyo primer trabajo es buscar.
+- **`Avatar`:** círculo con las iniciales sobre `avatarColor`, siempre junto al nombre. `xs` va dentro de una línea de texto.
 - **`StatusControl`:** el tag de la ficha con su lápiz (D2). Al tocarlo abre un `AnchoredMenu` junto al control, con las cuatro opciones de 48 px de alto. El menú no oscurece la pantalla y deja ver el libro. Funciona con foco, flechas, Inicio, Fin, Escape y clic afuera. El informe solo pide una "vista de selección de opciones de tags". Si el libro no está en la biblioteca, muestra "Agregar a Mis libros" y abre el mismo menú. Si está, el menú suma "Quitar de Mis libros" bajo una línea, con lo que se pierde, así que entrar y salir cuestan dos toques. Recibe `bookId` y `book`.
 - **`StatusTag`:** el tag en solo lectura, con ícono, texto y color, sin relleno. Tamaño `sm` para las listas.
 - **`TagFilter`:** los botones de tag (D3), con la cantidad de libros de cada uno. El activo se marca con la cinta. Lo usan Mis libros y la carpeta.
 - **`Ribbon`:** la cinta, la marca de lo activo.
 - **`Stars`:** muestra el puntaje, o permite elegirlo si recibe `onChange`.
 - **`InlineConfirm`:** pide confirmar dentro de la página, junto a lo que afecta. Solo para eliminar carpeta y Reiniciar demo.
-- **`Button`:** variantes `primary`, `secondary`, `quiet` y `danger`, y `compact` para una fila o una banda. Son bloques de relleno, para que no se confundan con un campo. `secondary` lleva borde `edge` para distinguirse de la banda, y un disparador de menú se invierte mientras el menú está abierto.
+- **`Button`:** variantes `primary`, `secondary`, `quiet` y `danger`, y `compact` para una fila o junto al título. Son píldoras. Solo `primary` y `danger` van rellenos, `secondary` se dibuja con su borde `edge`, y un disparador de menú se invierte mientras el menú está abierto.
 - **`EmptyState`, `LoadingState`, `ErrorState`.**
+- **`useRail` y `RailArrow`:** el riel horizontal nativo, con avance por páginas, arrastre con mouse y flechas del teclado, y su flecha para el mouse.
 
 También son compartidos y del bloque base:
 - **`src/routes.tsx`:** fija los nombres de las páginas, así que nadie tiene que editarlo después.
 - **`src/index.css`:** con `@theme`, que define los colores, las fuentes, la escala tipográfica, las sombras y las animaciones. La paleta por defecto de Tailwind no existe: solo hay estos tokens.
 - **`src/lib/dates.ts`.**
+- **`src/lib/coverTone.ts`:** el color de una portada, oscurecido para usarlo de fondo. `scripts/cover-colors.mjs` saca esos colores de `public/covers/` a `src/data/coverColors.json`.
 - **`DESIGN.md`:** el aspecto de la app. Se escribe en "Dirección visual".
 
 Si alguien necesita cambiar algo compartido, le avisa al otro rol antes y lo sube en un commit separado.
@@ -441,14 +443,14 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Descripción traducida | No aparece | Bajo la descripción, "Traducción hecha con IA" como dato de procedencia, sin cinta ni color de acento, si el libro trae `descriptionTranslated` |
 | Estrellas | No aparece | De tinta. El naranja de Goodreads compite con las portadas y como ícono llega a 3,03:1 |
 | Color de la cinta | No aparece | Burdeo `#7a2334`. Se parece al ciruela de "Lo tengo", pero el estado nunca se apoya solo en el color |
-| Nombre en el celular | No aparece | "Goodreads / prototipo" a la derecha del título en cada pantalla, porque el celular no tiene barra superior |
+| Nombre bajo `lg` | No aparece | "Goodreads prototipo" junto al título en cada pantalla, porque bajo `lg` no hay barra lateral. Con una acción sube a la fila de arriba, salvo en Mis libros, donde va apilado para caber a 320 px |
 | Confirmar Reiniciar demo y eliminar carpeta | No aparece. El plan pide confirmación sin decir con qué pieza | `InlineConfirm`, dentro de la página, con el foco en Cancelar. Reiniciar demo la usa cuando exista Mi perfil, en la fase 4 |
 | Agregar y quitar a una persona | El journey solo dice "+" y "Solicitud enviada" | Estado y acción no comparten control, porque la aceptación llega sola a los 4 s. "Solicitud enviada" y "Amigos" son texto, y Agregar, Cancelar y "Quitar de amigos" son el mismo botón: pesan lo mismo y cuestan un toque, como pide la regla 11. Quitar ofrece Deshacer, y solo está en Persona. Un toque a Cancelar que cae en Quitar justo al aceptarse termina igual: sin ser amigos |
 | Carpetas de un libro sin carpetas | No aparece | La fila dice "Sin carpetas" y el botón, "Agregar". Con carpetas dice "Agregar o quitar", sin ícono, porque el más diría solo la mitad |
 | Libros en común | Persona debe mostrarlos | Cada libro aparece una vez, en "Está leyendo" o "Últimos leídos", marcado "En común", y la cantidad va en el encabezado. Esas filas no muestran mi tag ni mis estrellas |
-| Buscador de la carpeta | "Buscador interno" | En la fila del título, dentro de la banda. Desde 768 px está siempre visible. En celular, "Buscar" lo abre sobre esa misma fila y "Cerrar" lo vacía y lo cierra, así aparece donde se tocó y ningún libro se mueve. En Amigos sigue siempre visible, porque es el camino de T3 |
+| Buscador de la carpeta | "Buscador interno" | En la fila del título. Desde 768 px está siempre visible. En celular, "Buscar" lo abre sobre esa misma fila y "Cerrar" lo vacía y lo cierra, así aparece donde se tocó y ningún libro se mueve. En Amigos sigue siempre visible, porque es el camino de T3 |
 | Quitar de Mis libros | No aparece | Dos toques en el menú del tag, que dice qué se pierde, con Deshacer y sin confirmación (reglas 10 y 11) |
-| Aspecto de los botones | No aparece | Bloques de relleno, como describe `DESIGN.md`. Se revisan otra vez en la auditoría con todas las vistas |
+| Aspecto de los botones | No aparece | Píldoras, como describe `DESIGN.md`. Solo el principal va relleno, y el secundario se dibuja con su borde |
 | Texto en agregar y quitar | Solo menciona "+" y un lápiz | Todo botón lleva texto (regla 1). Sin carpetas, el botón de la ficha dice "Agregar" |
 | Forma y color del avatar | No aparece | Círculo, para separarlo de una portada de un vistazo. Cinco fondos de la portada de reemplazo, sin el burdeo. Entre homónimos distingue el @usuario |
 | Menú de carpetas de un libro | No aparece | Se cierra al elegir, igual que el de tags, y cada cambio deja su Deshacer |

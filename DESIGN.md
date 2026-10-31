@@ -1,17 +1,17 @@
 ---
 name: Goodreads · Prototipo de rediseño
-description: Una biblioteca personal en neutros y tinta, donde una sola cinta marca lo activo, lo fijo y el estado de cada libro.
+description: Una biblioteca personal sobre pálidos del burdeo, con títulos serif grandes y formas redondeadas, donde una cinta marca lo activo, lo fijo y el estado de cada libro.
 colors:
   white: '#ffffff'
-  paper: '#faf8f6'
-  shell: '#f4f1ea'
-  sand: '#ebe2d7'
-  sand-deep: '#dfd3c4'
-  sand-dark: '#d3c4b1'
-  line: '#e9e2d8'
-  edge: '#857a6e'
+  paper: '#fdfafa'
+  shell: '#f9f1f2'
+  sand: '#f3e4e6'
+  sand-deep: '#ead4d8'
+  sand-dark: '#dfc2c8'
+  line: '#f0e4e6'
+  edge: '#8b7a7d'
   ink: '#1e1915'
-  muted: '#5f564d'
+  muted: '#5e5251'
   ribbon: '#7a2334'
   want: '#2f4a78'
   owned: '#6b3a63'
@@ -19,26 +19,45 @@ colors:
   read: '#2a6249'
   danger: '#a3341c'
 typography:
+  page-title:
+    fontFamily: 'Source Serif 4, Georgia, serif'
+    fontSize: '2rem'
+    fontWeight: 600
+    lineHeight: 1.1
+    letterSpacing: '-0.03em'
+  page-title-sm:
+    fontFamily: 'Source Serif 4, Georgia, serif'
+    fontSize: '1.75rem'
+    fontWeight: 600
+    lineHeight: 1.1
+    letterSpacing: '-0.03em'
+  page-title-lg:
+    fontFamily: 'Source Serif 4, Georgia, serif'
+    fontSize: '2.5rem'
+    fontWeight: 600
+    lineHeight: 1.1
+    letterSpacing: '-0.03em'
+  section-title:
+    fontFamily: 'Source Serif 4, Georgia, serif'
+    fontSize: '1.5rem'
+    fontWeight: 600
+    lineHeight: 1.2
+    letterSpacing: '-0.02em'
+  section-title-lg:
+    fontFamily: 'Source Serif 4, Georgia, serif'
+    fontSize: '1.75rem'
+    fontWeight: 600
+    lineHeight: 1.2
+    letterSpacing: '-0.02em'
   display:
     fontFamily: 'Source Serif 4, Georgia, serif'
     fontSize: '2rem'
     fontWeight: 600
     lineHeight: '2.375rem'
     letterSpacing: '-0.025em'
-  title:
-    fontFamily: 'Source Serif 4, Georgia, serif'
-    fontSize: '1.75rem'
-    fontWeight: 600
-    lineHeight: '2.125rem'
-    letterSpacing: '-0.025em'
   heading:
     fontFamily: 'Source Serif 4, Georgia, serif'
     fontSize: '1.375rem'
-    fontWeight: 600
-    lineHeight: '1.75rem'
-  subheading:
-    fontFamily: 'Source Serif 4, Georgia, serif'
-    fontSize: '1.25rem'
     fontWeight: 600
     lineHeight: '1.75rem'
   book-title:
@@ -73,9 +92,14 @@ typography:
     lineHeight: '1rem'
 rounded:
   cover: '2px 3px 3px 2px'
-  control: '6px'
-  card: '8px'
-  float: '10px'
+  control: '10px'
+  row: '14px'
+  card: '16px'
+  float: '16px'
+  tile: '20px'
+  tab: '22px'
+  stage: '24px'
+  pill: '9999px'
   avatar: '9999px'
 spacing:
   menu: '6px'
@@ -84,25 +108,30 @@ spacing:
   card: '12px'
   media: '14px'
   gutter: '16px'
+  gutter-md: '28px'
+  gutter-lg: '44px'
   grid-md: '16px'
-  section: '20px'
+  section: '28px'
+  section-lg: '40px'
 components:
   button-primary:
     backgroundColor: '{colors.ink}'
     textColor: '{colors.white}'
     typography: '{typography.control}'
-    rounded: '{rounded.control}'
+    rounded: '{rounded.pill}'
     padding: '0 16px'
     height: '44px'
   button-secondary:
-    backgroundColor: '{colors.sand-deep}'
     textColor: '{colors.ink}'
     typography: '{typography.control}'
-    rounded: '{rounded.control}'
+    rounded: '{rounded.pill}'
     padding: '0 16px'
     height: '44px'
   button-secondary-hover:
-    backgroundColor: '{colors.sand-dark}'
+    backgroundColor: '{colors.sand}'
+    textColor: '{colors.ink}'
+  button-secondary-pressed:
+    backgroundColor: '{colors.sand-deep}'
     textColor: '{colors.ink}'
   button-secondary-open:
     backgroundColor: '{colors.ink}'
@@ -110,12 +139,12 @@ components:
   button-quiet:
     textColor: '{colors.ink}'
     typography: '{typography.control}'
-    rounded: '{rounded.control}'
+    rounded: '{rounded.pill}'
     padding: '0 16px'
     height: '44px'
   button-quiet-hover:
     backgroundColor: '{colors.sand}'
-  button-quiet-active:
+  button-quiet-pressed:
     backgroundColor: '{colors.sand-deep}'
   button-compact:
     padding: '0 10px'
@@ -124,12 +153,18 @@ components:
     backgroundColor: '{colors.danger}'
     textColor: '{colors.white}'
     typography: '{typography.control}'
-    rounded: '{rounded.control}'
+    rounded: '{rounded.pill}'
     padding: '0 16px'
     height: '44px'
   button-disabled:
     backgroundColor: '{colors.sand}'
     textColor: '{colors.muted}'
+  rail-arrow:
+    backgroundColor: '{colors.white}'
+    textColor: '{colors.ink}'
+    rounded: '{rounded.pill}'
+    width: '48px'
+    height: '48px'
   status-control:
     textColor: '{colors.ink}'
     typography: '{typography.control}'
@@ -138,7 +173,7 @@ components:
     backgroundColor: '{colors.ink}'
     textColor: '{colors.white}'
     typography: '{typography.control}'
-    rounded: '{rounded.control}'
+    rounded: '{rounded.pill}'
     padding: '0 16px'
     height: '44px'
   anchored-menu:
@@ -149,7 +184,7 @@ components:
     rounded: '{rounded.control}'
     padding: '0 10px'
     height: '44px'
-  anchored-menu-item-selected:
+  anchored-menu-item-hover:
     backgroundColor: '{colors.sand}'
     rounded: '{rounded.control}'
     padding: '0 10px'
@@ -158,9 +193,26 @@ components:
     backgroundColor: '{colors.white}'
     textColor: '{colors.ink}'
     typography: '{typography.body}'
-    rounded: '{rounded.control}'
-    padding: '0 0 0 12px'
+    rounded: '{rounded.pill}'
+    padding: '0 0 0 16px'
     height: '44px'
+  search-field-lg:
+    backgroundColor: '{colors.white}'
+    textColor: '{colors.ink}'
+    rounded: '{rounded.pill}'
+    padding: '0 6px 0 20px'
+    height: '56px'
+  text-field:
+    backgroundColor: '{colors.white}'
+    textColor: '{colors.ink}'
+    rounded: '{rounded.control}'
+    padding: '0 12px'
+    height: '44px'
+  avatar-xs:
+    textColor: '{colors.white}'
+    rounded: '{rounded.avatar}'
+    width: '24px'
+    height: '24px'
   avatar-sm:
     textColor: '{colors.white}'
     typography: '{typography.small-label}'
@@ -174,19 +226,17 @@ components:
     width: '64px'
     height: '64px'
   page-header:
-    backgroundColor: '{colors.shell}'
     textColor: '{colors.ink}'
-    typography: '{typography.display}'
+    typography: '{typography.page-title}'
   tag-filter-item:
     textColor: '{colors.muted}'
     typography: '{typography.caption}'
-    rounded: '{rounded.card}'
+    rounded: '{rounded.control}'
     height: '56px'
   tag-filter-item-active:
-    backgroundColor: '{colors.paper}'
     textColor: '{colors.ink}'
     typography: '{typography.caption}'
-    rounded: '{rounded.card}'
+    rounded: '{rounded.control}'
     height: '56px'
   folder-card:
     backgroundColor: '{colors.white}'
@@ -208,32 +258,48 @@ components:
   ledger-row:
     textColor: '{colors.ink}'
     padding: '4px 0'
-  inline-confirm:
-    backgroundColor: '{colors.white}'
+  block:
+    backgroundColor: '{colors.shell}'
     textColor: '{colors.ink}'
-    rounded: '{rounded.card}'
-    padding: '12px'
+    rounded: '{rounded.tile}'
+    padding: '20px'
+  inline-confirm:
+    backgroundColor: '{colors.shell}'
+    textColor: '{colors.ink}'
+    rounded: '{rounded.tile}'
+    padding: '20px'
+  book-row:
+    textColor: '{colors.ink}'
+    rounded: '{rounded.row}'
+  book-row-hover:
+    backgroundColor: '{colors.shell}'
+    rounded: '{rounded.row}'
   nav-bar:
     backgroundColor: '{colors.paper}'
     textColor: '{colors.muted}'
     typography: '{typography.caption}'
-    height: '64px'
+    height: '65px'
+  nav-bar-item:
+    rounded: '{rounded.tab}'
+    height: '56px'
   nav-bar-active:
+    backgroundColor: '{colors.sand}'
     textColor: '{colors.ink}'
-  nav-top:
+    rounded: '{rounded.tab}'
+    height: '56px'
+  nav-sidebar:
     backgroundColor: '{colors.paper}'
-    height: '48px'
-  nav-top-item:
+    width: '232px'
+  nav-sidebar-item:
     textColor: '{colors.muted}'
-    typography: '{typography.small-label}'
     rounded: '{rounded.control}'
-    padding: '0 10px'
+    padding: '0 12px'
     height: '44px'
-  nav-top-item-active:
-    backgroundColor: '{colors.sand-deep}'
+  nav-sidebar-item-active:
+    backgroundColor: '{colors.sand}'
     textColor: '{colors.ink}'
     rounded: '{rounded.control}'
-    padding: '0 10px'
+    padding: '0 12px'
     height: '44px'
   toast:
     backgroundColor: '{colors.ink}'
@@ -256,12 +322,8 @@ components:
     width: '224px'
   ribbon-nav:
     backgroundColor: '{colors.ribbon}'
-    width: '9px'
-    height: '10px'
-  ribbon-nav-md:
-    backgroundColor: '{colors.ribbon}'
-    width: '9px'
-    height: '12px'
+    width: '10px'
+    height: '16px'
   ribbon-tag-filter:
     backgroundColor: '{colors.ribbon}'
     width: '9px'
@@ -290,34 +352,35 @@ components:
 
 **Creative North Star: "Cinta marcapáginas"**
 
-La biblioteca se ve como Goodreads en sus neutros y su tinta, sin color de marca: fondos de papel, títulos serif y portadas reales sin teñir. Sobre esa calma, una cinta con la punta cortada es el único gesto propio. Marca lo activo, lo fijo y el estado de un libro, y nada más. La app es para ordenar libros, así que los controles son estándar y las pantallas se reconocen primero como una herramienta de trabajo.
+La biblioteca vive sobre un papel apenas rosado, una escalera de pálidos que sale del burdeo de la cinta. El título de cada página es una serif grande sin nada detrás, y él solo dice dónde estás. Las formas son redondeadas: los botones son píldoras, las tarjetas tienen esquinas amplias y las portadas ponen casi todo el color de la pantalla. En Inicio y en Buscar, ese color salta a la tarjeta que carga el libro. Sobre esa calma, una cinta con la punta cortada sigue siendo el gesto propio: marca lo activo, lo fijo y el estado de un libro.
 
-La densidad es de app, no de página de lectura: márgenes de 16 px, tarjetas compactas y mucha información por pantalla. La jerarquía viene del fondo, las filas y el espacio, como en un libro mayor: solo el menú y el toast flotan con sombra. Lo blanco con borde es un campo y lo que se presiona es un bloque relleno, así que un campo y un botón nunca se confunden. No hay modales: lo que se edita se edita en su lugar. Las portadas ponen casi todo el color de la pantalla; por eso la interfaz casi no lo usa.
+La vara es que parezca un producto que alguien usaría hoy, despejado y con un orden evidente. La jerarquía viene del tamaño del título, del espacio y de pocos bloques de color, no de bandas ni de cajas. Un solo botón relleno por pantalla concentra la atención, y los demás se dibujan con su borde. En computador la navegación es una barra lateral, y en celular y tablet una barra sólida pegada al borde inferior. No hay modales: lo que se edita se edita en su lugar.
 
-Este documento fija tipografía, color, densidad, formas y el gesto de la cinta. Las pantallas, los flujos, los textos y las decisiones D1 a D6 salen de `docs/e2/informe-e2.pdf` y de `PLAN.md`. El orden de autoridad es el informe, después `PLAN.md` y después este documento. **Ante un choque con las 14 reglas de interfaz de `PLAN.md`, ganan las reglas.** Lo que el sistema no cubra se anota como decisión para el CP.
+Este documento fija tipografía, color, densidad, formas y el gesto de la cinta. Las pantallas, los flujos, los textos y las decisiones D1 a D6 salen de `docs/e2/informe-e2.pdf` y de `PLAN.md`. El orden de autoridad es el informe, después `PLAN.md` y después este documento. **Ante un choque con las 14 reglas de interfaz de `PLAN.md`, ganan las reglas**, salvo las excepciones aprobadas en su sección 6. Lo que el sistema no cubra se anota como decisión para el CP.
 
-Este sistema se escribió desde lo construido. Las páginas de referencia son Mis libros (`src/features/library/LibraryPage.tsx` y `FolderCard.tsx`) y la ficha (`src/features/book/BookPage.tsx`). Los tokens viven en `src/index.css`, y si este archivo y el código difieren, se corrige este archivo. Los títulos de sección quedan en inglés porque las herramientas de este formato los buscan por su nombre exacto.
+Los tokens viven en `src/index.css`, y si este archivo y el código difieren, se corrige este archivo. Los títulos de sección quedan en inglés porque las herramientas de este formato los buscan por su nombre exacto.
 
 **Key Characteristics:**
 
-- Neutros cálidos y tinta, sin color de marca ni acento que tiña la app.
-- Una cinta con punta cortada como única marca de lo activo, lo fijo y el estado.
-- Títulos en Source Serif 4 semibold e interfaz en Figtree.
+- Fondos de pálidos del burdeo y tinta para el texto.
+- Títulos serif grandes, sin banda ni caja detrás.
+- Barra lateral en computador, y barra sólida pegada al borde bajo 1024 px.
+- Píldoras para lo que se presiona: solo el botón principal va relleno.
+- Una cinta con punta cortada como marca de lo activo, lo fijo y el estado.
 - Tags sin relleno: ícono, texto y color, siempre juntos.
-- Jerarquía por fondo, filas y espacio; sombra solo en lo que flota y en las portadas.
-- Botones de relleno; lo blanco con borde es un campo.
+- El color de la portada como fondo de sus tarjetas, oscurecido hasta 8,5:1 con texto blanco.
+- Rieles nativos, con flechas solo para el mouse.
 - Lo que se edita se edita en su lugar, sin modales ni paneles.
-- Portadas sin teñir, con sombra física.
 - Movimiento corto y solo como respuesta a una acción.
 
 ## Colors
 
-La paleta es de papel y tinta, con cuatro colores de estado sobrios y una cinta burdeo. La paleta por defecto de Tailwind está borrada: solo existen estos tokens.
+La paleta es una escalera de un solo tono: los pálidos salen del burdeo de la cinta y hacen el trabajo de área. La paleta por defecto de Tailwind está borrada: solo existen estos tokens.
 
 ### Primary
 
-- **Tinta** (`ink`, #1e1915): texto principal, relleno del botón `primary`, del toast y de "Agregar a Mis libros", botón con su menú abierto, anillo de foco y estrellas llenas. Hace el trabajo que en otra app haría un color de marca.
-- **Cinta burdeo** (`ribbon`, #7a2334): el relleno de la cinta que marca lo activo y lo fijo. También es el color del cursor de texto (`caret-color`) y uno de los seis fondos de la portada de reemplazo, una imagen de libro que no se confunde con la interfaz. No se usa para nada más: tampoco en avatares.
+- **Tinta** (`ink`, #1e1915): texto principal, relleno del botón `primary`, del toast, de "Agregar a Mis libros" y de la opción elegida de un selector de listas, botón con su menú abierto, anillo de foco y estrellas llenas. Hace el trabajo que en otra app haría un color de marca.
+- **Cinta burdeo** (`ribbon`, #7a2334): el relleno de la cinta que marca lo activo y lo fijo. También es el color del cursor de texto (`caret-color`), uno de los seis fondos de la portada de reemplazo, el corazón de un "Me gusta" dado y la línea que explica una recomendación en Descubrir, como "Porque guardas Terror". No se usa para nada más: tampoco en avatares.
 
 ### Secondary
 
@@ -334,55 +397,69 @@ Los cuatro colores de estado se usan en el texto y el ícono de `StatusTag`, y e
 
 ### Neutral
 
-- **Papel** (`paper`, #faf8f6): el fondo de la app. También rellena el botón activo de `TagFilter`, que así se abre hacia la página.
-- **Concha** (`shell`, #f4f1ea): la banda superior de cada sección, el hover de las opciones del menú y de las filas de enlace, y la presión de las filas de libro y de persona. También es el `theme-color` del navegador.
-- **Blanco** (`white`, #ffffff): tarjetas, campo de búsqueda, menú e `InlineConfirm`.
-- **Arena** (`sand`, #ebe2d7): hover de las secciones de la barra superior y de los botones de texto del buscador, presión de `quiet`, presión de las filas de enlace, botón deshabilitado, huecos de portada, esqueletos de carga, selección de texto y el bloque de "+ Nueva carpeta".
-- **Arena profunda** (`sand-deep`, #dfd3c4): el relleno de `Button` `secondary` y de la sección activa de la barra superior, la presión de las opciones del menú y "+ Nueva carpeta" bajo el cursor. Solo da 1,47, 1,39 y 1,31:1 sobre blanco, papel y concha, así que `secondary` lleva además un borde `edge`.
-- **Arena oscura** (`sand-dark`, #d3c4b1): un paso más que arena profunda, para `secondary` bajo el cursor y al presionar
-- **Línea** (`line`, #e9e2d8): separadores de 1 px entre filas, borde de `FolderCard` y la raya del menú antes de sus comandos. Es decorativa (1,21:1 sobre papel), así que nunca es la única señal de un control o un estado.
-- **Borde** (`edge`, #857a6e): el borde de 1 px de `SearchField`, `InlineConfirm`, `Button` `secondary` y "+ Nueva carpeta", la raya de las dos barras y el hover de `FolderCard`. Llega a 3:1 para que un campo se vea sin depender de una sombra.
-- **Neutro** (`muted`, #5f564d): texto secundario, secciones inactivas, íconos y estrellas vacías.
+- **Papel** (`paper`, #fdfafa): el fondo de la app, de las dos barras y el `theme-color` del navegador.
+- **Concha** (`shell`, #f9f1f2): los bloques de la página, como `EmptyState`, `ErrorState`, `InlineConfirm`, una fila de actividad o un aviso. También el hover de las filas y de las secciones inactivas de la barra lateral.
+- **Blanco** (`white`, #ffffff): tarjetas, campos, menú, flechas de un riel y la píldora de un tag sobre una tarjeta de tono.
+- **Arena** (`sand`, #f3e4e6): la sección activa de las dos barras, el hover de `secondary`, `quiet` y las opciones del menú, la presión de las filas, el botón deshabilitado, los huecos de portada, los esqueletos de carga, la selección de texto, el fondo de un selector de listas y el bloque de "+ Nueva carpeta".
+- **Arena profunda** (`sand-deep`, #ead4d8): la presión de `secondary`, `quiet` y las opciones del menú, el resaltado de una coincidencia en Buscar y el hover de un selector de listas. Solo da 1,4:1 sobre papel, así que nunca es la única señal de un control.
+- **Arena oscura** (`sand-dark`, #dfc2c8): un paso más, solo para la presión dentro de un selector de listas.
+- **Línea** (`line`, #f0e4e6): separadores de 1 px entre filas, borde de `FolderCard` y de la barra lateral, y la raya del menú antes de sus comandos. Es decorativa (1,19:1 sobre papel), así que nunca es la única señal de un control o un estado.
+- **Borde** (`edge`, #8b7a7d): el borde de 1 px de `Button` `secondary`, `SearchField` y `TextField`, y el hover de `FolderCard`. Llega a 3:1 sobre blanco, papel, concha y arena. Al 60 % es la raya superior de la barra inferior, que es decorativa.
+- **Neutro** (`muted`, #5e5251): texto secundario, secciones inactivas, íconos y estrellas vacías.
+
+### Tono de portada
+
+`coverTone(bookId)`, de `src/lib/coverTone.ts`, toma el color dominante de la portada, que viene de `src/data/coverColors.json`, y lo oscurece hasta dar 8,5:1 con texto blanco. El texto secundario va en blanco al 88 %. Un azul que deriva a índigo se queda en azul y un amarillo, que oscuro se vuelve oliva, pasa a ámbar. Una portada sin color propio, o un libro de una búsqueda en vivo, toma un tono de tinta (`rgb(50 43 38)`).
+
+- **Inicio y Buscar:** el tono es el fondo de la tarjeta que carga ese libro o autor.
+- **Descubrir:** solo es un tinte al 12 % sobre papel detrás de los libros (`tone-scene`, con `--tone`), y nunca queda bajo el texto, así que no cambia ningún contraste.
+- **Ninguna otra superficie** se tiñe, y las portadas mismas nunca se tiñen.
 
 ### Contrastes medidos
 
-Calculados con la fórmula WCAG de `src/components/statusStyles.test.ts` sobre los tokens reales. Ese test vigila las columnas de blanco a arena y `ink` sobre arena profunda; el resto de esa columna, los estados con transparencia y los bordes se calcularon aparte para este documento.
+Calculados con la fórmula WCAG de `src/test/contrast.ts` sobre los tokens reales. `src/components/statusStyles.test.ts` vigila las columnas de blanco a arena, y `src/lib/coverTone.test.ts` vigila los tonos de portada de todo el catálogo. El recorrido de los cuatro dispositivos midió 6,09:1 como mínimo en todo el texto visible.
 
-| Texto sobre | `white` | `paper` | `shell` | `sand` | `sand-deep` |
-| ----------- | ------- | ------- | ------- | ------ | ----------- |
-| `ink`       | 17,43   | 16,45   | 15,45   | 13,60  | 11,83       |
-| `muted`     | 7,18    | 6,78    | 6,37    | 5,60   | 4,87        |
-| `want`      | 8,85    | 8,36    | 7,85    | 6,91   | 6,01        |
-| `owned`     | 8,71    | 8,22    | 7,72    | 6,80   | 5,91        |
-| `reading`   | 7,10    | 6,70    | 6,30    | 5,54   | 4,82        |
-| `read`      | 7,14    | 6,74    | 6,33    | 5,57   | 4,84        |
-| `danger`    | 6,85    | 6,47    | 6,07    | 5,35   | 4,65        |
+| Texto sobre | `white` | `paper` | `shell` | `sand` | `sand-deep` | `sand-dark` |
+| ----------- | ------- | ------- | ------- | ------ | ----------- | ----------- |
+| `ink`       | 17,43   | 16,79   | 15,68   | 14,15  | 12,37       | 10,53       |
+| `muted`     | 7,50    | 7,22    | 6,74    | 6,09   | 5,32        | 4,53        |
+| `want`      | 8,85    | 8,53    | 7,97    | 7,19   | 6,29        | 5,35        |
+| `owned`     | 8,71    | 8,39    | 7,84    | 7,07   | 6,18        | 5,26        |
+| `reading`   | 7,10    | 6,84    | 6,39    | 5,77   | 5,04        | 4,29        |
+| `read`      | 7,14    | 6,88    | 6,42    | 5,80   | 5,07        | 4,31        |
+| `danger`    | 6,85    | 6,60    | 6,16    | 5,56   | 4,86        | 4,14        |
+| `ribbon`    | 9,92    | 9,55    | 8,92    | 8,05   | 7,04        | 5,99        |
 
-| Texto en controles llenos                                        | Contraste    |
-| ---------------------------------------------------------------- | ------------ |
-| Blanco sobre `ink`                                               | 17,43        |
-| Blanco sobre `ink` al 90 % y al 80 %                             | 13,06 y 9,20 |
-| Blanco sobre `danger`                                            | 6,85         |
-| Blanco sobre `danger` al 90 % y al 80 %                          | 5,61 y 4,54  |
-| `shell` sobre `ink` (Deshacer)                                   | 15,45        |
-| `shell` sobre `ink` con blanco al 10 % y al 20 %                 | 11,57 y 8,15 |
-| `ink` sobre `sand-deep` (`secondary`)                            | 11,83        |
-| `muted` sobre `sand` (botón deshabilitado)                       | 5,60         |
-| Tags y `muted` sobre `ink` al 10 %, en `paper` (fila presionada) | 5,50 o más   |
+Sobre `sand-dark` los tags de ámbar y verde y `danger` no llegan a 4,5:1, así que ningún texto de color va ahí. Es solo la presión de un selector de listas, con texto de tinta.
 
-Los valores de `ink` y `danger` con transparencia son el peor caso, sobre blanco. Los de las filas se midieron sobre el fondo donde van. El mínimo de toda la tabla es 4,54:1, en `danger` presionado. Las cintas de los cuatro estados y la burdeo superan 4,6:1 sobre todos los fondos, por encima del 3:1 que pide una marca gráfica. Los seis fondos de la portada de reemplazo dan 7,10:1 o más con las iniciales blancas.
+| Texto en controles llenos                                        | Contraste       |
+| ---------------------------------------------------------------- | --------------- |
+| Blanco sobre `ink`                                               | 17,43           |
+| Blanco sobre `ink` al 90 % y al 80 %                             | 13,08 y 9,19    |
+| Blanco sobre `danger`                                            | 6,85            |
+| Blanco sobre `danger` al 90 % y al 80 %                          | 5,63 y 4,54     |
+| `shell` sobre `ink` (Deshacer)                                   | 15,68           |
+| `shell` sobre `ink` con blanco al 10 % y al 20 %                 | 11,77 y 8,27    |
+| `ink` sobre `sand` y `sand-deep` (`secondary` y `quiet`)         | 14,15 y 12,37   |
+| `muted` sobre `sand` (botón deshabilitado)                       | 6,09            |
+| Tags y `muted` sobre `ink` al 5 %, en `paper` (fila bajo cursor) | 6,21 o más      |
+| Tags y `muted` sobre `ink` al 10 %, en `paper` (fila presionada) | 5,61 o más      |
+| Blanco sobre un tono de portada, en los 54 libros                | de 8,50 a 13,92 |
+| Blanco al 88 % sobre un tono de portada                          | 6,90 o más      |
+
+Los valores de `ink` y `danger` con transparencia son el peor caso, sobre blanco. El mínimo de toda la tabla es 4,54:1, en `danger` presionado. Las cintas de los cuatro estados y la burdeo superan 4,6:1 sobre todos los fondos, por encima del 3:1 que pide una marca gráfica. Los seis fondos de la portada de reemplazo dan 7,10:1 o más con las iniciales blancas.
 
 | Borde sobre | `white` | `paper` | `shell` | `sand` |
 | ----------- | ------- | ------- | ------- | ------ |
-| `edge`      | 4,19    | 3,96    | 3,72    | 3,27   |
+| `edge`      | 4,06    | 3,91    | 3,65    | 3,29   |
 
-Todos superan el 3:1 que pide el borde de un control. Sobre `sand-deep` da 2,85:1, así que `edge` no va ahí. El borde de `secondary` da esos mismos valores contra el fondo; su relleno solo no llega a 3:1 con ninguno.
+Todos superan el 3:1 que pide el borde de un control. Sobre `sand-deep` da 2,88:1, así que `edge` no va ahí: un `secondary` presionado sigue siendo legible por su texto, y su forma ya se vio en reposo.
 
 ### Named Rules
 
-**La regla sin acento.** Ningún color tiñe la app. Encabezados, enlaces y botones se resuelven con tinta y neutros; el color vive en las portadas, los tags y las cintas.
+**La regla del tono.** El fondo de la app sale de un solo tono, el de la cinta. El único otro color de área es el de una portada, y solo en una tarjeta que carga ese libro. Encabezados, enlaces y botones se resuelven con tinta.
 
-**La regla del tag sin relleno.** Un estado es ícono, texto y color, nunca una píldora de color. Esta regla existe para que una lista de veinte libros no compita con sus portadas.
+**La regla del tag sin relleno.** Un estado es ícono, texto y color, nunca una píldora de color. Esta regla existe para que una lista de veinte libros no compita con sus portadas. Sobre una tarjeta de tono, donde su color no se leería, el tag va en una píldora blanca (`rounded-full bg-white px-2.5 py-1`) y conserva su color.
 
 **La regla de las estrellas de tinta.** Las estrellas son de tinta y las vacías son de neutro. No hay naranja en esta paleta.
 
@@ -395,74 +472,83 @@ Todos superan el 3:1 que pide el borde de un control. Sobre `sand-deep` da 2,85:
 
 ### Hierarchy
 
-- **Display** (600, 32 px, 38 px de línea, tracking -0,025 em): el h1 de cada sección desde 768 px, en `PageHeader`. También el título de la ficha desde 768 px.
-- **Title** (600, 28 px, 34 px de línea, tracking -0,025 em): el h1 de cada sección en celular, en `PageHeader`.
-- **Heading** (600, 22 px, 28 px de línea): títulos de sección dentro de la página, como "Mis carpetas", "Tus amigos" o "Está leyendo". También el título de la ficha en celular, ahí con tracking -0,025 em.
-- **Subheading** (600, 20 px, 28 px de línea): títulos de `EmptyState` y `ErrorState`.
-- **Book title** (600, 18 px): el nombre de un libro en `BookRow` (línea 1,375, máximo dos líneas), el de una persona en `PersonRow` y el de una carpeta en `FolderCard` (línea de 28 px). También "Sobre este libro" y el título de `InlineConfirm`.
-- **Body** (400, 16 px, 24 px de línea): texto de lectura y datos del libro. La descripción de la ficha llega a 34 rem (544 px) y, desde 1024 px, al ancho de su columna.
+- **Título de página** (600, 32 px, línea 1,1, tracking -0,03 em; 28 px bajo 360 px y 40 px desde 1024 px): el h1 de cada sección. Es la utilidad `page-title`, y `PageHeader` ya la usa.
+- **Título de sección** (600, 24 px, línea 1,2, tracking -0,02 em; 28 px desde 1024 px): títulos dentro de la página, como "Mis carpetas", "Tus amigos" o "Está leyendo". Es la utilidad `section-title`.
+- **Título de tarjeta** (600, 24 px y línea 1,12; 32 px desde 1024 px, tracking -0,02 em): el libro en una tarjeta de tono, con `font-serif text-[1.5rem]/[1.12] lg:text-[2rem]/[1.1]`.
+- **Título del libro en Descubrir** (600, tracking -0,02 em): 22 px en celular, 28 px desde 640 px y 44 px desde 1024 px.
+- **Display** (600, 32 px, 38 px de línea, tracking -0,025 em) y **Heading** (600, 22 px, 28 px de línea): quedan solo para el título de la ficha, hasta que esa pantalla pase a `page-title`.
+- **Subheading** (600, 20 px, 28 px de línea): las iniciales de `Avatar` `lg`, y el nombre en una tarjeta de autor desde 1024 px.
+- **Book title** (600, 18 px): el nombre de un libro en `BookRow` (línea 1,375, máximo dos líneas), el de una persona en `PersonRow`, el de una carpeta en `FolderCard` y el título de `EmptyState`, `ErrorState` e `InlineConfirm`.
+- **Fila compacta** (600, 17 px, línea 1,375): el libro en una fila de actividad o de resultados, con `font-serif text-[1.0625rem]/snug`.
+- **Body** (400, 16 px, 24 px de línea): texto de lectura y datos del libro.
 - **Control** (600, 16 px, 24 px de línea): botones y `StatusTag` en tamaño normal. Los enlaces de volver y de carpeta usan 500.
-- **Small** (400, 14 px, 20 px de línea): subtítulo de la banda, autores, cantidades, etiquetas de `LedgerRow` y procedencia de una descripción, en `muted`.
-- **Small label** (600, 14 px, 20 px de línea): `StatusTag` en listas, @usuario, estado de una persona, "En común" y secciones de la barra superior, en 700 la activa.
-- **Caption** (500, 12 px, 16 px de línea): etiquetas de `TagFilter`, y las de la barra inferior en 600. Las activas pasan a 700.
+- **Small** (400, 14 px, 20 px de línea): subtítulos, autores, cantidades y procedencia de una descripción, en `muted`.
+- **Small label** (600, 14 px, 20 px de línea): `StatusTag` en listas, @usuario, estado de una persona, "En común".
+- **Caption** (500, 12 px, 16 px de línea): etiquetas de `TagFilter`, el aviso de prototipo y la barra inferior en 600. Las activas pasan a 700.
 
-La cantidad de `TagFilter` usa la serif a 600, 16 px y 20 px de línea, con cifras tabulares.
+La marca "Goodreads" usa la serif a 600: 24 px en la barra lateral, 16 px en `Wordmark` y 14 px cuando va apilada. La cantidad de `TagFilter` usa la serif a 600, 16 px y 20 px de línea, con cifras tabulares.
 
 Todo `h1`, `h2` y `h3` usa `text-wrap: balance`.
 
 ### Named Rules
 
-**La regla de la serif que nombra.** La serif es para lo que nombra: secciones, libros, carpetas, la marca y las cantidades de `TagFilter`. Lo que se opera o se explica va en Figtree.
+**La regla de la serif que nombra.** La serif es para lo que nombra: páginas, secciones, libros, autores, carpetas, la marca y las cantidades de `TagFilter`. Lo que se opera o se explica va en Figtree.
 
-**La regla de la escala cerrada.** Usa solo los tamaños de esta lista. La única excepción son las iniciales de la portada de reemplazo, que crecen con la portada. No hay texto en mayúsculas sostenidas ni tamaños sueltos en el código.
+**La regla de la escala cerrada.** Usa solo los tamaños de esta lista. Las únicas excepciones son las iniciales de la portada de reemplazo, que crecen con la portada, y las de `Avatar` `xs`, de 10 px. No hay texto en mayúsculas sostenidas.
 
 ## Layout
 
-El diseño parte del celular. El contenido vive en una columna centrada de hasta 1040 px (`max-w-app`) con márgenes de 16 px, y la app no tiene barra lateral.
+El diseño parte del celular. `AppShell` pone el marco y cada pantalla solo llena `main`.
 
-- **Puntos de quiebre:** `md` (768 px) cambia de barra inferior a barra superior. `lg` (1024 px) da más aire a la barra superior, completa "Prototipo de rediseño", pasa el tablero de carpetas a 5 columnas y le da a la ficha su tercera columna.
-- **Banda:** `PageHeader` llena todo el ancho de la pantalla con `shell`, gracias a `full-bleed`, y deja el texto alineado con la columna. Tiene 8 px arriba, 16 px desde `md`, y 16 px abajo si no lleva nada en su borde inferior. El margen inferior de lo que lleva adentro queda en la banda, gracias a `flow-root`. La acción de la página, si la hay, va en la misma fila del título. Cada sección parte con esta banda, salvo la ficha.
-- **Espacio bajo el contenido:** `main` deja 144 px abajo en celular, para la barra y el toast, y 48 px desde `md`.
-- **Ritmo vertical:** 20 px entre bloques, 12 px bajo un título de sección y 4 px entre un título de bloque de la ficha y su contenido.
+- **Puntos de quiebre:** `lg` (1024 px) cambia la barra inferior por la lateral. `md` (768 px) cambia las grillas. `sm` (640 px) solo afina Descubrir.
+- **Barra lateral:** 232 px (`--sidebar`), fija al alto de la pantalla, desde `lg`.
+- **Margen:** `--gut` mide 16 px, 28 px desde `md` y 44 px desde `lg`. `main` lo pone siempre, así que una pantalla no agrega su propio margen lateral. Lo que deba llegar al borde de la columna, como un riel, usa `full-bleed`.
+- **Ancho:** Inicio, Descubrir, Buscar y `/actividad` usan todo el ancho que deja la barra lateral (`WIDE_PATHS` en `AppShell`). Las demás pantallas van en una columna de hasta 1040 px (`max-w-app`), centrada bajo `lg` y pegada a la barra lateral desde ahí.
+- **Inicio de página:** `PageHeader` deja 12 px arriba, 32 px desde `lg`, y 16 px abajo si no lleva nada bajo el título. El margen inferior de lo que lleva adentro queda en el encabezado, gracias a `flow-root`. La acción de la página, si la hay, va en la misma fila del título.
+- **Espacio bajo el contenido:** `main` deja 128 px abajo más el área segura bajo `lg`, para la barra de 65 px y el toast, y 64 px desde `lg`. Medido al final de cada pantalla, lo último queda a 63 px o más de la barra.
+- **Ritmo vertical:** 28 px entre secciones (40 px desde `lg`), 12 px bajo un título de sección y 16 px bajo un título de página.
 - **Tablero de tarjetas:** 2 columnas con 10 px de separación en celular, 4 columnas con 16 px desde `md` y 5 desde `lg`. Las tarjetas de una fila miden lo mismo, y un nombre llega a dos líneas. "+ Nueva carpeta" cierra el tablero: en celular ocupa lo que la última fila deja libre, y mientras se escribe toma dos celdas.
-- **Listas de libros:** una columna de `BookRow` en celular y dos desde `md`, con 32 px entre columnas. Cada fila va en un `li` con `border-b border-line last:border-b-0`, como en `BookList`. Esa lista es `BookList`. Desde `md`, las dos últimas filas pierden su línea si quedan una al lado de la otra, con `md:nth-last-2:odd:border-b-0`.
-- **Ficha:** sin banda, sobre el papel, con `BackLink` y `Wordmark` en la primera fila. Tiene la misma forma para todo libro, con o sin descripción.
+- **Listas de libros:** una columna de `BookRow` en celular y dos desde `md`, con 32 px entre columnas. Cada fila va en un `li` con `border-b border-line last:border-b-0`, como en `BookList`. Desde `md`, las dos últimas filas pierden su línea si quedan una al lado de la otra, con `md:nth-last-2:odd:border-b-0`.
+- **Ficha:** sin `PageHeader`, con `BackLink` y `Wordmark` en la primera fila. Tiene la misma forma para todo libro, con o sin descripción.
   - **Celular:** portada de 112 px a la izquierda, con el título y los datos a su lado. Debajo, a todo el ancho, el registro y "Sobre este libro".
   - **Desde 768 px:** una columna de 224 px para la portada y otra de hasta 34 rem, con 40 px entre ambas, para el título, el registro y "Sobre este libro". Este último sigue al registro aunque la portada sea más alta.
   - **Desde 1024 px:** tres columnas. El título cruza las dos de la derecha, y el registro y "Sobre este libro" quedan lado a lado, en proporción 1,2 a 1, para que dos carpetas y "Agregar o quitar" quepan en una línea.
-- **Áreas táctiles:** 44 px como mínimo en todo control. La barra inferior mide 64 px de alto y la superior 48 px, con secciones de 44 px; `TagFilter` mide 56 px y las opciones del menú 44 px. Las capturas actuales dan 62 × 64 px como mínimo en la barra a 320 px de ancho, sin etiquetas cortadas ni scroll horizontal en ninguno de los cuatro dispositivos.
+- **Áreas táctiles:** 44 px como mínimo en todo control. Las secciones de la barra inferior miden 56 px de alto, y a 320 px de ancho, 62 × 56 px. `TagFilter` mide 56 px y las opciones del menú 44 px. El recorrido final no encontró ningún control bajo 44 px ni scroll horizontal, en los cuatro dispositivos.
 
 ## Elevation & Depth
 
-El sistema se ordena por fondo, filas y espacio. `paper` es el piso, `shell` marca la banda, las filas se separan con líneas de 1 px, los campos se dibujan con un borde de 1 px y los botones con un relleno. Solo hay sombra en lo que flota sobre la página y en las portadas, siempre teñida de tinta, nunca negra. Las barras son planas, sobre `paper`: las separa una raya de 1 px en color `edge`, porque el contenido pasa por debajo.
+El sistema se ordena por espacio, tamaño de los títulos y pocos bloques de `shell`. Las filas se separan con líneas de 1 px. Solo hay sombra en lo que flota sobre la página y en las portadas, siempre teñida, nunca negra. Las dos barras son planas, sobre `paper`, y sólidas: nada las transparenta ni las desenfoca.
 
 ### Shadow Vocabulary
 
-- **Flotante** (`--shadow-float`: `0 2px 4px rgb(30 25 21 / 14%), 0 18px 34px -8px rgb(30 25 21 / 40%)`): `AnchoredMenu` y toast.
+- **Flotante** (`--shadow-float`: `0 2px 4px rgb(30 25 21 / 14%), 0 18px 34px -8px rgb(30 25 21 / 40%)`): `AnchoredMenu`, toast y `RailArrow`.
 - **Libro** (`--shadow-book`: `0 1px 1px rgb(30 25 21 / 20%), 0 6px 12px -5px rgb(30 25 21 / 35%)`): portadas en tamaños `sm` y `fill`.
 - **Libro grande** (`--shadow-book-lg`: `0 2px 3px rgb(30 25 21 / 22%), 0 16px 26px -10px rgb(30 25 21 / 50%)`): la portada `lg` de la ficha.
+- **Portada** (`--shadow-cover`: `0 1px 2px rgb(20 12 8 / 22%), 0 14px 28px -12px rgb(20 12 8 / 55%)`): una portada con `raised`, sobre un tono o sola en un riel.
 
 ### Named Rules
 
-**La regla de lo que flota.** Solo `AnchoredMenu` y el toast flotan con sombra. Una tarjeta, un botón o un campo no llevan sombra: se separan con fondo, borde y espacio.
+**La regla de lo que flota.** Solo `AnchoredMenu`, el toast y las flechas de un riel flotan con sombra. Una tarjeta, un botón o un campo no llevan sombra: se separan con fondo, borde y espacio.
 
-**La regla de la presión.** Lo que se toca baja 1 px al presionarlo. `FolderCard`, `Button` y "Cambiar o quitar" lo hacen en 100 ms.
+**La regla de la presión.** Lo que se toca responde al instante. Un botón se encoge al 98 % en 150 ms (`active:scale-98`), una tarjeta baja 1 px (`active:translate-y-px`) y una fila cambia de fondo.
 
-**La regla del libro físico.** Solo las portadas usan sombras de libro. Son objetos, no tarjetas.
+**La regla del libro físico.** Solo las portadas usan sombras de libro. Son objetos, no tarjetas. En un riel suben 6 px bajo el cursor, con `cover-lift`, y nunca se mueven solas.
 
 ## Shapes
 
-La forma es de papelería: esquinas apenas redondeadas que crecen con la altura de la capa.
+Lo que se presiona es una píldora y lo que contiene tiene esquinas amplias, que crecen con el tamaño del bloque.
 
 - **Portada** (2 px en el lomo y 3 px en el borde exterior): portadas, sus huecos en `FolderCard` y sus esqueletos en `LoadingState`. Una línea plana de 2 px de tinta al 15 % dibuja la bisagra del libro y separa las portadas claras del fondo.
-- **Control** (6 px): botones, campo de búsqueda, opciones del menú y secciones de la barra superior.
-- **Tarjeta** (8 px): tarjetas de carpeta e `InlineConfirm`. Solo arriba en `TagFilter`, para que parezca una pestaña.
-- **Flotante** (10 px): menú y toast.
+- **Píldora** (`rounded-full`): `Button`, `SearchField`, los botones de texto de un campo, "Cambiar o quitar" y un selector de listas.
+- **Control** (`rounded-control`, 10 px): `TextField`, opciones del menú, secciones de la barra lateral, botones de `TagFilter` y `BackLink`.
+- **Fila** (`rounded-row`, 14 px): el fondo de una fila bajo el cursor, una fila de actividad y un aviso.
+- **Tarjeta** (`rounded-card`, 16 px): tarjetas de carpeta y de autor.
+- **Flotante** (`rounded-float`, 16 px): menú y toast.
+- **Bloque** (`rounded-tile`, 20 px): tarjetas de tono, `EmptyState`, `ErrorState` e `InlineConfirm`.
+- **Pestaña** (`rounded-tab`, 22 px): la sección activa de la barra inferior.
+- **Escena** (`rounded-stage`, 24 px): el escenario del carrusel de Descubrir.
 - **Cinta:** rectángulo con muesca en V, con `clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%)`. Se dibuja solo con `Ribbon`.
-
-- **Avatar:** un círculo, la única forma redonda del sistema. Separa a una persona de un libro de un vistazo, porque las portadas son rectángulos.
-
-No hay formas de píldora.
+- **Avatar:** un círculo, para separar a una persona de un libro de un vistazo.
 
 ## Components
 
@@ -470,74 +556,78 @@ Importa todo desde `src/components/`. Son del bloque base: si necesitas cambiar 
 
 ### Qué usar para cada necesidad
 
-| Necesidad                                          | Usa                                                                                                  |
-| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Navegación principal y contenedor de la página     | `AppShell`, que ya envuelve las rutas; no agregues otra barra                                        |
-| Comienzo de una sección, con título y volver       | `PageHeader`, con `backTo` y `backLabel` en subpáginas, y `action` para lo que actúa sobre la página |
-| Volver desde una página sin `PageHeader`           | `BackLink`, siempre a una ruta fija, junto a `Wordmark`, como en la ficha                            |
-| Filtrar por tag con la cantidad de cada uno        | `TagFilter`, como hijo de `PageHeader`                                                               |
-| Mostrar un libro en una lista                      | `BookRow`; la acción extra, como "Quitar", va en `trailing`, y en una lista de otra persona, `note`  |
-| Mostrar una portada suelta                         | `BookCover`: `sm` para listas, `fill` para grillas y `lg` para la ficha                              |
-| Mostrar el estado de un libro, sin cambiarlo       | `StatusTag`; en listas, `size="sm"`                                                                  |
-| Cambiar o agregar el tag de un libro               | `StatusControl`, y no otro control. Recibe `book` si el libro puede no estar en el store             |
-| Mostrar o elegir un puntaje                        | `Stars`; con `onChange` es un campo                                                                  |
-| Acción con botón                                   | `Button`: `primary`, `secondary`, `quiet` o `danger`; `compact` en una fila o una banda              |
-| Cambio rápido con pocas opciones, junto al control | `AnchoredMenu`                                                                                       |
-| Editar un dato                                     | En su lugar, en la misma fila o título donde se lee                                                  |
-| Escribir un texto corto donde se lee               | `TextField`, con Guardar y Cancelar al lado                                                          |
-| Confirmar lo que no se puede deshacer              | `InlineConfirm`, solo para eliminar carpeta y Reiniciar demo                                         |
-| Buscar o filtrar mientras se escribe               | `SearchField`, en la banda; en una lista de libros, `BandSearch`                                     |
-| Mostrar a una persona                              | `Avatar`, siempre junto a su nombre                                                                  |
-| Confirmar después de un cambio y permitir deshacer | El toast del store, que `AppShell` ya muestra; no montes otro                                        |
-| Lista vacía o sin resultados                       | `EmptyState`, con ícono, título, descripción y acción opcional                                       |
-| Esperar resultados                                 | `LoadingState`                                                                                       |
-| Algo falló                                         | `ErrorState`, con `onRetry` si se puede reintentar                                                   |
-| Enlaces a un libro o una carpeta                   | `bookPath` y `folderPath`                                                                            |
+| Necesidad                                          | Usa                                                                                                                                  |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Navegación principal y contenedor de la página     | `AppShell`, que ya envuelve las rutas; no agregues otra barra                                                                        |
+| Comienzo de una sección, con título y volver       | `PageHeader`, con `backTo` y `backLabel` en subpáginas, y `action` para lo que actúa sobre la página                                 |
+| Un título de página sin `PageHeader`               | `page-title` en el h1, con `Wordmark` en la misma pantalla                                                                           |
+| Un título de sección                               | `section-title`                                                                                                                      |
+| Volver desde una página sin `PageHeader`           | `BackLink`, siempre a una ruta fija, junto a `Wordmark`, como en la ficha                                                            |
+| Filtrar por tag con la cantidad de cada uno        | `TagFilter`, como hijo de `PageHeader`                                                                                               |
+| Mostrar un libro en una lista                      | `BookRow`; la acción extra, como "Quitar", va en `trailing`, y en una lista de otra persona, `note`                                  |
+| Mostrar una portada suelta                         | `BookCover`: `sm` para listas, `fill` para grillas y `lg` para la ficha; `raised` sobre un tono o sola en un riel                    |
+| Que una portada responda al cursor                 | `cover-lift` en lo que la envuelve, dentro del enlace                                                                                |
+| Una lista horizontal que se recorre                | `useRail`, `rail` y `full-bleed`; `RailArrow` para el mouse                                                                          |
+| Una tarjeta con el color de su libro               | `coverTone(bookId)` como `backgroundColor`, con `text-white`                                                                         |
+| Mostrar el estado de un libro, sin cambiarlo       | `StatusTag`; en listas, `size="sm"`                                                                                                  |
+| Cambiar o agregar el tag de un libro               | `StatusControl`, y no otro control. Recibe `book` si el libro puede no estar en el store                                             |
+| Mostrar o elegir un puntaje                        | `Stars`; con `onChange` es un campo                                                                                                  |
+| Acción con botón                                   | `Button`: `primary`, `secondary`, `quiet` o `danger`; `compact` en una fila o junto al título                                        |
+| Cambio rápido con pocas opciones, junto al control | `AnchoredMenu`                                                                                                                       |
+| Editar un dato                                     | En su lugar, en la misma fila o título donde se lee                                                                                  |
+| Escribir un texto corto donde se lee               | `TextField`, con Guardar y Cancelar al lado                                                                                          |
+| Confirmar lo que no se puede deshacer              | `InlineConfirm`, solo para eliminar carpeta y Reiniciar demo                                                                         |
+| Buscar o filtrar mientras se escribe               | `SearchField`, bajo el título o en su fila; `size="lg"` si buscar es lo primero de la pantalla; en una lista de libros, `BandSearch` |
+| Mostrar a una persona                              | `Avatar`, siempre junto a su nombre; `xs` dentro de una línea de texto                                                               |
+| Confirmar después de un cambio y permitir deshacer | El toast del store, que `AppShell` ya muestra; no montes otro                                                                        |
+| Lista vacía o sin resultados                       | `EmptyState`, con ícono, título, descripción y acción opcional                                                                       |
+| Esperar resultados                                 | `LoadingState`                                                                                                                       |
+| Algo falló                                         | `ErrorState`, con `onRetry` si se puede reintentar                                                                                   |
+| Enlaces a un libro o una carpeta                   | `bookPath` y `folderPath`                                                                                                            |
 
-### Pantallas pendientes
+### Lo que falta por pantalla
 
-Esto dice qué piezas existen para cada pantalla. Su contenido y sus textos salen de `PLAN.md`.
+Esto dice qué piezas existen para cada pantalla que todavía no toma su forma final. Su contenido y sus textos salen de `PLAN.md`.
 
-| Pantalla  | Piezas existentes                                                                  | Sin componente todavía                     |
-| --------- | ---------------------------------------------------------------------------------- | ------------------------------------------ |
-| Inicio    | `PageHeader`, `BookCover`, `StatusTag`, `EmptyState`                               | Tarjeta "Leyendo ahora", fila de actividad |
-| Descubrir | `PageHeader`, `BookCover` con `fill`; título de sección en Heading                 | Tarjeta de libro para las secciones        |
-| Buscar    | `PageHeader`, `SearchField`, `BookRow`, `LoadingState`, `EmptyState`, `ErrorState` | Nada                                       |
-| Mi perfil | `PageHeader`, `Avatar`, `Button`, `InlineConfirm` para la confirmación             | Nada                                       |
+| Pantalla  | Piezas existentes                                                                                        | Sin componente todavía                           |
+| --------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| Inicio    | `BookCover` con `raised`, `coverTone`, `Avatar` `xs`, `Wordmark`, `EmptyState`                           | Tarjeta de lectura, fila de actividad            |
+| Descubrir | `BookCover` con `raised`, `coverTone`, `useRail`, `tone-scene`, `carousel-item`, `Wordmark`              | Selector de listas, zonas de flecha del carrusel |
+| Buscar    | `SearchField` con `size="lg"`, `BookRow`, `useRail`, `RailArrow`, `coverTone`, `Avatar` `xs`, `Wordmark` | Tarjeta de autor, mejor resultado                |
 
-`InlineConfirm` confirma eliminar carpeta, y confirmará Reiniciar demo cuando exista Mi perfil.
+`/actividad` todavía no es una ruta: hoy la actividad completa es `/?actividad=1`, dentro de Inicio. `AppShell` ya deja Inicio activa y a todo el ancho en esa ruta para cuando exista.
 
-**Lo que no está en `src/components/` no tiene aspecto definido.** Arma lo que falte solo con estos tokens, respeta las 14 reglas y anótalo como decisión para el CP. Una pieza que dos pantallas necesiten se propone como compartida, para que los dos roles no construyan versiones distintas. Los campos de texto ya heredan el foco global, el acento de tinta (`accent-color`) y el cursor burdeo. `FolderCard` es de `src/features/library/`: sirve de modelo para una tarjeta, pero no es un componente compartido.
+**Lo que no está en `src/components/` no tiene aspecto definido.** Arma lo que falte solo con estos tokens, respeta las 14 reglas y anótalo como decisión para el CP. Una pieza que dos pantallas necesiten se propone como compartida, para que los dos roles no construyan versiones distintas. Los campos de texto ya heredan el foco global, el acento de tinta (`accent-color`) y el cursor burdeo. `FolderCard` es de `src/features/library/`: sirve de ejemplo para una tarjeta, pero no es un componente compartido.
 
 ### Piezas locales
 
-Viven en la carpeta de su pantalla. Sirven de modelo, y se vuelven compartidas si otra pantalla las necesita.
+Viven en la carpeta de su pantalla. Sirven de ejemplo, y se vuelven compartidas si otra pantalla las necesita.
 
 - **Lista de libros:** `BookList`, en `src/features/library/`, la usan Mis libros y la carpeta.
-- **Aviso de D5:** `WantPrompt`, en `src/features/library/`. Una fila sobre la lista, sin tarjeta, en "Todos" y "Lo quiero", y oculta mientras se busca. Lleva portada de 56 px, la pregunta en Book title y "It · 210 días en Lo quiero" en Small `muted`, hasta dos líneas. Debajo, también en Small `muted`, dice lo que cuesta el "No" con las palabras del toast: "Si dices No, sale de Mis libros y de Terror". Con dos carpetas o más dice "y de sus 2 carpetas", y sin carpetas termina en "Mis libros". Separa de lo que sigue con una línea, a 16 px de la banda. "Sí" y "No" son el mismo `Button` `secondary` `compact`, en una grilla de hasta 208 px: desde `md` van en el borde derecho y en celular bajo el texto. Responder mueve la lista hacia arriba, así que el segundo toque de un doble toque se ignora y el foco sigue en el contenido.
+- **Aviso de D5:** `WantPrompt`, en `src/features/library/`. Una fila sobre la lista, sin tarjeta, en "Todos" y "Lo quiero", y oculta mientras se busca. Lleva portada de 56 px, la pregunta en Book title y "It · 210 días en Lo quiero" en Small `muted`, hasta dos líneas. Debajo, también en Small `muted`, dice lo que cuesta el "No" con las palabras del toast: "Si dices No, sale de Mis libros y de Terror". Con dos carpetas o más dice "y de sus 2 carpetas", y sin carpetas termina en "Mis libros". Separa de lo que sigue con una línea, a 16 px de `TagFilter`. "Sí" y "No" son el mismo `Button` `secondary` `compact`, en una grilla de hasta 208 px: desde `md` van en el borde derecho y en celular bajo el texto. Responder mueve la lista hacia arriba, así que el segundo toque de un doble toque se ignora y el foco sigue en el contenido.
 - **"+ Nueva carpeta":** `NewFolderCard`, la última tarjeta del tablero. En reposo es un bloque `sand` con borde `edge`, porque se presiona: "+ Nueva carpeta" en Book title y "Un libro puede estar en varias" en Small `muted`, abajo y a la izquierda. Bajo el cursor toma `sand-deep`. Cuánto pesa en reposo es una decisión abierta del CP4, en `docs/desarrollo/checkpoints/cp4/decisiones.md`. Desde `md` mide lo mismo que una `FolderCard`, también sola en su fila. En celular ocupa la media fila que deja libre una cantidad impar de tarjetas, o la fila entera si la empieza. Al presionarla se vuelve blanca con borde `edge`, porque ahora se escribe: "Nueva carpeta" en Small label, `TextField`, y Crear (`primary`) y Cancelar (`secondary`), los dos `compact` y del mismo tamaño. Mientras se escribe toma dos celdas en todo dispositivo, con la altura de una `FolderCard` desde `md`: en celular, media fila solo dejaría leer unas doce letras de un nombre de hasta 40, y en una celda de tablet Crear y Cancelar no caben en una fila. Si cae en la última columna, baja a la fila siguiente sin cambiar de lado, alineada a la derecha, para abrir bajo el dedo. En celular toma la fila entera. La línea del motivo queda reservada, así que aparecer no mueve nada. No lleva huecos de portada: esos dicen que una carpeta real no tiene libros. Crear queda deshabilitado sin nombre. El motivo aparece cuando la persona escribe algo que no sirve, o presiona Enter con el campo vacío. Sigue los límites de renombrar. Al crear, la carpeta aparece antes de esta tarjeta y el foco vuelve a ella.
 - **Fila de persona:** `PersonRow`, en `src/features/friends/`. `Avatar` `sm`, nombre en Book title, @usuario en Small label de tinta y amigos en común en Small. El @usuario va en tinta porque es lo que separa a dos homónimos. Esas dos líneas no se juntan nunca, para que la fila mida lo mismo en todos los estados. La acción va a la derecha, en un espacio fijo de 104 px, y desde `lg` toma su propio ancho, para que el nombre no se mueva cuando la acción pasa a ser el estado de la solicitud.
 - **Invitar contactos:** un `Button` `quiet` `compact`, a la derecha del título de Amigos, para que no salte con cada búsqueda. El texto queda sobre el margen, así que su relleno sobresale 10 px con el cursor.
 - **Estado de una persona:** "Solicitud enviada" y "Amigos" en Small label `muted`, sin color de estado ni cinta. Esos colores son solo de los libros. "Amigos" lleva ícono de 16 px, y "Solicitud enviada" solo en Persona, donde hay espacio. En la lista "Tus amigos" el estado se omite, porque el título ya lo dice.
-- **Acción sobre una persona:** `PersonAction`. El estado y la acción nunca son el mismo control: el estado es texto y la acción es un `Button` `compact`, el mismo para Agregar, Cancelar y Quitar de amigos: `quiet` en una fila de Amigos y `secondary` en la banda de Persona. Pesan lo mismo y cuestan un toque, como pide la regla 11, y Quitar de amigos ofrece Deshacer. Si la solicitud se acepta justo bajo un toque a Cancelar, ese toque cae en Quitar de amigos y termina donde la persona quería: sin ser amigos. Quitar de amigos solo existe en Persona, y Persona está en la banda, con la acción en el borde derecho desde que cabe en la misma fila.
-- **Fila de enlace:** en `MorePage.tsx`, una fila de 56 px con ícono, texto y flecha, separada por una línea. Hover `shell` y presión `sand`.
+- **Acción sobre una persona:** `PersonAction`. El estado y la acción nunca son el mismo control: el estado es texto y la acción es un `Button` `compact`, el mismo para Agregar, Cancelar y Quitar de amigos: `quiet` en una fila de Amigos y `secondary` en el encabezado de Persona. Pesan lo mismo y cuestan un toque, como pide la regla 11, y Quitar de amigos ofrece Deshacer. Si la solicitud se acepta justo bajo un toque a Cancelar, ese toque cae en Quitar de amigos y termina donde la persona quería: sin ser amigos. Quitar de amigos solo existe en Persona, en su encabezado, con la acción en el borde derecho desde que cabe en la misma fila.
+- **Fila de enlace:** en `MorePage.tsx`, una fila de 56 px con ícono, texto y flecha, separada por una línea. Con el cursor `shell` y al presionar `sand`.
 - **Fila del registro:** `LedgerRow`, en `src/features/book/`, dentro de un `dl`. La etiqueta va en Small `muted`, en una columna de 60 px (80 px desde `md`), y el valor va a la derecha, editable ahí mismo. Mide 44 px más 4 px arriba y abajo, con una línea debajo. Las filas son Estado, Inicio, Fin, Puntaje y Carpetas: Inicio aparece en Leyendo y Leído, Fin y Puntaje solo en Leído, y Carpetas si el libro está en la biblioteca. La acción de una fila es un botón `quiet` `compact`, siempre al final, con el texto sobre el margen. Solo la fecha y la fila Estado sobresalen 8 px a la izquierda con el cursor, para que su texto quede alineado.
 - **Fecha en una fila:** sin borde ni fondo, con su ícono `CalendarDays` en `muted` y hover de tinta al 5 %. Abre el calendario al tocar cualquier parte, así que las partes de la fecha se editan con el teclado. Chrome ignora `:focus` sobre ellas, por lo que un filtro convierte su azul en un tono cercano a `sand` y deja marcada la parte que se edita. La fecha del calendario se guarda de inmediato, y la escrita al presionar Enter o al salir del campo.
 - **Carpetas de un libro:** enlaces de texto en la fila Carpetas, en peso 500, con subrayado `muted` al 50 % que pasa a tinta con el cursor, y 44 × 44 px como mínimo. Son un lugar, no un estado: no llevan cinta ni color de tag. Al final de la fila, un `Button` `quiet` `compact` abre el menú y se llama según lo que se puede hacer: "Agregar", con un más, si no hay ninguna, y "Agregar o quitar", sin ícono, si hay, porque el más diría solo la mitad. Su nombre accesible dice "Agregar a carpeta". Sin carpetas, a su izquierda dice "Sin carpetas" en `muted`. El botón no se mueve de la primera línea: lo que no cabe son los enlaces, que bajan.
-- **Nombre de una carpeta:** `TextField` toma el lugar del título con el mismo tipo, con Guardar y Cancelar en la banda.
-- **Búsqueda en una lista de libros:** `BandSearch`, en `src/features/library/`, la usan Mis libros y la carpeta. `SearchField` va en la fila del título, porque `TagFilter` ocupa el borde inferior de la banda. Respeta el botón de tag activo, y cambiarlo no borra lo escrito. En Mis libros reemplaza el tablero y el aviso por los resultados. Con otro tag activo, "Sin resultados" ofrece "Ver todos los libros"; en "Todos", dice que Buscar sirve para lo que está fuera de la biblioteca. Desde `md` está siempre a la vista, con 288 px de ancho, junto a Opciones. En celular no cabe junto al título, así que el botón `compact` "Buscar", sin ícono para que el título quepa a 320 px, lo abre sobre esa misma fila, con el foco en el campo: aparece bajo el dedo y ningún libro se mueve. El título sigue en la página para los lectores de pantalla, y el `placeholder` dice en qué carpeta se busca. "Cerrar" vacía la búsqueda, cierra el campo y devuelve el foco a "Buscar". Una búsqueda que vuelve desde la URL abre el campo sola, sin tomar el foco.
+- **Nombre de una carpeta:** `TextField` toma el lugar del título con el mismo tipo, con Guardar y Cancelar debajo.
+- **Búsqueda en una lista de libros:** `BandSearch`, en `src/features/library/`, la usan Mis libros y la carpeta. El nombre viene de cuando había una banda. `SearchField` va en la fila del título, porque `TagFilter` ocupa lo que sigue al título. Respeta el botón de tag activo, y cambiarlo no borra lo escrito. En Mis libros reemplaza el tablero y el aviso por los resultados. Con otro tag activo, "Sin resultados" ofrece "Ver todos los libros"; en "Todos", dice que Buscar sirve para lo que está fuera de la biblioteca. Desde `md` está siempre a la vista, con 288 px de ancho, junto a Opciones. En celular no cabe junto al título, así que el botón `compact` "Buscar", sin ícono para que el título quepa a 320 px, lo abre sobre esa misma fila, con el foco en el campo: aparece bajo el dedo y ningún libro se mueve. Cubre la fila con el fondo `paper`. El título sigue en la página para los lectores de pantalla, y el `placeholder` dice en qué carpeta se busca. "Cerrar" vacía la búsqueda, cierra el campo y devuelve el foco a "Buscar". Una búsqueda que vuelve desde la URL abre el campo sola, sin tomar el foco.
 - **Carpeta fija:** solo dice "Carpeta fija" de subtítulo.
 - **Título de una carpeta:** en celular llega a dos líneas, porque comparte la fila con dos botones y un nombre de 40 caracteres dejaría el primer libro a media pantalla. Desde `md` se muestra entero.
 - **Sobre este libro:** el bloque va siempre en el mismo lugar, con su título en Book title. La descripción va en Body, entera, sin cortar ni "Leer más". Sin descripción dice "Aún no tenemos descripción de este libro." en Body `muted`, sin ícono ni `EmptyState`, porque es el caso normal y no un problema.
-- **Procedencia de una descripción:** "Traducción hecha con IA", en Small `muted` y a 8 px bajo la descripción, solo si el libro trae `descriptionTranslated`. Es un dato sobre el texto, como la línea del autor, y no un aviso: sin cinta, sin ícono y sin color de acento. Da 6,78:1 sobre `paper`.
+- **Procedencia de una descripción:** "Traducción hecha con IA", en Small `muted` y a 8 px bajo la descripción, solo si el libro trae `descriptionTranslated`. Es un dato sobre el texto, como la línea del autor, y no un aviso: sin cinta ni color de acento, con el ícono de destellos que pide `PLAN.md`. Da 7,22:1 sobre `paper`.
 - **Motivo de un botón deshabilitado:** Small en tinta con `CircleAlert` en `muted`, dentro de una región `status`.
-- **Libros de una persona:** cada libro aparece una vez, en "Está leyendo" o "Últimos leídos". Los compartidos llevan "En común" en `note` de `BookRow`, sin grilla aparte. La banda de Persona suma los amigos y libros en común, y `PersonAction`.
+- **Libros de una persona:** cada libro aparece una vez, en "Está leyendo" o "Últimos leídos". Los compartidos llevan "En común" en `note` de `BookRow`, sin grilla aparte. El encabezado de Persona suma los amigos y libros en común, y `PersonAction`.
 
 ### Cinta
 
 La firma del sistema. `Ribbon` es decorativo y lleva `aria-hidden`: lo que marca también debe decirse con texto, peso o `aria-current`.
 
-- **Lo activo, en burdeo:** la sección de la barra (9 × 10 px abajo y 9 × 12 px arriba, colgando del borde superior de la barra hacia la sección) y el botón activo de `TagFilter` (9 × 12 px). `AppShell` y `TagFilter` ya la dibujan.
+- **Lo activo, en burdeo:** la sección de la barra lateral (10 × 16 px, colgando del borde superior de la sección, a 12 px de su borde derecho) y el botón activo de `TagFilter` (9 × 12 px). `AppShell` y `TagFilter` ya la dibujan. En la barra inferior no hay cinta: la sección activa la marcan su relleno `sand`, su peso y `aria-current`.
 - **Lo fijo, en burdeo:** la carpeta fija, en la esquina superior derecha de su tarjeta (9 × 26 px, a 10 px del borde), siempre con el texto "· fija".
 - **El estado de un libro, en su color:** sale por debajo de la portada, detrás de ella. `BookCover` la dibuja al recibir `status`: 7 × 16 px en `sm`, 10 × 24 px en `fill` y en `lg`, y 13 × 36 px en `lg` desde `md`. Pásale `status` solo si el libro está en la biblioteca.
 - **El gesto:** al elegir un tag, el texto nuevo entra en 180 ms (`animate-tag-in`) y la cinta nueva baja desde detrás de la portada en 220 ms (`animate-ribbon-in`). Con reducir movimiento, el cambio es instantáneo.
@@ -546,7 +636,7 @@ La firma del sistema. `Ribbon` es decorativo y lleva `aria-hidden`: lo que marca
 
 **La regla de una por grupo.** Dentro de un grupo de opciones hay una sola cinta activa. Una pantalla puede tener varias cintas porque cada una responde a una pregunta distinta: dónde estoy, qué filtro uso, qué carpeta es fija y en qué estado va cada libro.
 
-**La regla del burdeo y el estado.** El burdeo significa activo o fijo. Una cinta de estado usa siempre el color de su tag y nunca burdeo.
+**La regla del burdeo y el estado.** El burdeo significa activo o fijo, y como cinta nunca marca un estado: una cinta de estado usa siempre el color de su tag. Fuera de la cinta, solo aparece en el corazón de un "Me gusta" dado y en la razón de una recomendación.
 
 ### Editar en su lugar
 
@@ -575,46 +665,51 @@ Elegir aplica el cambio, cierra el menú y devuelve el foco al control. Un cambi
 
 ### SearchField
 
-Un campo blanco con borde de 1 px `edge`, 44 px de alto y radio de control, con la lupa a la izquierda. Filtra mientras se escribe, así que no tiene botón de enviar. Al escribir aparece "Borrar" con su ícono, que limpia el campo y deja el foco ahí.
+Una píldora blanca con borde de 1 px `edge` y la lupa a la izquierda. Filtra mientras se escribe, así que no tiene botón de enviar. Al escribir aparece "Borrar" con su ícono, que limpia el campo y deja el foco ahí.
 
-- **Dónde va:** siempre dentro de la banda. Con 16 px abajo si es lo primero de la página, como en Amigos, donde sigue a la vista porque es el camino de T3. Si `TagFilter` ya ocupa el borde inferior, va en la fila del título, como en una carpeta. Nunca bajo la banda: el campo debe aparecer junto a lo que se tocó y no empujar la lista.
+- **Tamaño:** `md` mide 44 px y es para filtrar una lista, como en Amigos. `lg` mide 56 px, con texto de 18 px, y es para una pantalla cuyo primer trabajo es buscar, como Buscar.
+- **Dónde va:** bajo el título, con 16 px abajo, si es lo primero de la página, como en Amigos, donde sigue a la vista porque es el camino de T3. Si `TagFilter` ya sigue al título, va en la fila del título, como en una carpeta. Nunca más abajo: el campo debe aparecer junto a lo que se tocó y no empujar la lista.
 - **Etiqueta:** `label` nombra el campo para lectores de pantalla. `placeholder` dice qué se puede buscar, como "Nombre o @usuario", o dónde, como "Buscar en Terror", en `muted`, y un texto que no cabe termina en puntos suspensivos.
-- **Borrar y Cerrar:** texto en tinta, peso 600, con hover `sand` y presión `sand-deep`, como `quiet`.
+- **Borrar y Cerrar:** píldoras de texto en tinta, peso 600, con hover `sand` y presión `sand-deep`, como `quiet`.
 - **`onClose`:** para un campo que el celular abre a pedido. Agrega "Cerrar", que en celular toma el lugar de "Borrar", porque con ambos quedan 56 px para escribir a 320 px. Desde `md` sigue "Borrar". Escape cierra en todos los anchos.
-- **Foco:** el contorno global rodea todo el campo, no solo el texto.
+- **Foco:** con el foco, el borde pasa a tinta y se dobla, alrededor de toda la píldora.
 
 ### TextField
 
-Un texto corto que se escribe donde se lee, como el nombre de una carpeta. Hereda el tipo de lo que reemplaza y va sobre una línea de 1 px de tinta, que se aparta mientras el contorno de foco dibuja el campo. Parte con el foco y su texto seleccionado. Enter guarda y Escape cancela, y Enter no llega a ser un clic en el botón que recibe el foco después de guardar. Si el valor no se puede guardar, `problem` lo dice debajo, en Small con `CircleAlert`. Quien lo muestra pone Guardar y Cancelar a su lado.
+Un texto corto que se escribe donde se lee, como el nombre de una carpeta. Hereda el tipo de lo que reemplaza, en un campo blanco con radio de control y borde de 1 px `edge`, que se aparta mientras el contorno de foco dibuja el campo. Parte con el foco y su texto seleccionado. Enter guarda y Escape cancela, y Enter no llega a ser un clic en el botón que recibe el foco después de guardar. Si el valor no se puede guardar, `problem` lo dice debajo, en Small con `CircleAlert`. Quien lo muestra pone Guardar y Cancelar a su lado.
 
 ### Avatar
 
-Un círculo con las iniciales blancas en serif sobre `avatarColor`, que viene del directorio. `sm` mide 40 px, con Small label, para las filas. `lg` mide 64 px, con Subheading, para el encabezado de una persona. Es decorativo: el nombre siempre va escrito al lado, y entre homónimos los distingue el @usuario, no el color. Los colores son cinco de los seis fondos de la portada de reemplazo, todos menos el burdeo, porque el burdeo significa activo o fijo. Como en la portada, no significan nada. Un test vigila que todos los del directorio salgan de esa lista y den 4,5:1 con el blanco. En Persona va en la banda, en `media` de `PageHeader`.
+Un círculo con las iniciales blancas en serif sobre `avatarColor`, que viene del directorio. `xs` mide 24 px, con las iniciales en Figtree 700 de 10 px y un anillo `line`, para ir dentro de una línea de texto. `sm` mide 40 px, con Small label, para las filas. `lg` mide 64 px, con Subheading, para el encabezado de una persona. Es decorativo: el nombre siempre va escrito al lado, y entre homónimos los distingue el @usuario, no el color. Los colores son cinco de los seis fondos de la portada de reemplazo, todos menos el burdeo, porque el burdeo significa activo o fijo. Como en la portada, no significan nada. Un test vigila que todos los del directorio salgan de esa lista y den 4,5:1 con el blanco. En Persona va en `media` de `PageHeader`.
 
 ### InlineConfirm
 
-Pregunta dentro de la página, junto a lo que afecta, para que siga a la vista. Es una tarjeta blanca con borde de 1 px `edge`, radio de tarjeta y 12 px de relleno: título en Book title, lo que va a pasar en Body, y un `Button` `danger` con la acción junto a Cancelar en `secondary`. Desde `md`, el texto y los botones van en una fila. El foco parte en Cancelar, para que un Enter de más no confirme, y Escape cancela. Quien la muestra devuelve el foco al cancelar.
+Pregunta dentro de la página, junto a lo que afecta, para que siga a la vista. Es un bloque `shell` con radio de bloque y 20 px de relleno: título en Book title, lo que va a pasar en Body, y un `Button` `danger` con la acción junto a Cancelar en `secondary`. Desde `md`, el texto y los botones van en una fila. El foco parte en Cancelar, para que un Enter de más no confirme, y Escape cancela. Quien la muestra devuelve el foco al cancelar.
 
 ### Buttons
 
-Bloques de relleno, con un solo llamado por pantalla. Es la diferencia con un campo: lo blanco con borde se escribe, y lo relleno se presiona. Por eso ningún botón es blanco.
+Píldoras con texto en peso 600, con un solo llamado por pantalla. Solo `primary` y `danger` van rellenos, así que la pantalla tiene una sola forma negra y el ojo sabe a dónde ir. Los demás se dibujan con su borde o con nada. Un campo se distingue porque es blanco y trae su lupa o su texto; por eso ningún botón es blanco.
 
-- **Shape:** esquinas de control (6 px), 44 px de alto, 16 px de relleno lateral y texto Control. El ícono mide 18 px y va antes del texto. Nunca hay botones de solo ícono. Si algo sobra en una fila angosta, sobra el ícono, no el texto.
+- **Shape:** píldora, 44 px de alto, 16 px de relleno lateral y texto Control. El ícono mide 18 px y va antes del texto. Nunca hay botones de solo ícono, salvo la flecha de un riel y el corazón de "Me gusta" en celular, las dos excepciones aprobadas en `PLAN.md`. Si algo sobra en una fila angosta, sobra el ícono, no el texto.
 - **Primary:** relleno de tinta con texto blanco. Al pasar el cursor baja al 90 % y al presionar al 80 %.
-- **Secondary:** relleno `sand-deep` con borde `edge` de 1 px y texto de tinta. Al pasar el cursor el relleno sube a `sand-dark`, y al presionar suma borde de tinta. Con su menú abierto (`aria-expanded`) se invierte a tinta con texto blanco, con o sin cursor: la tinta significa abierto. Es la variante por defecto.
-- **Quiet:** texto de tinta sin relleno, sobre el papel o la banda. Al pasar el cursor toma `sand`, y al presionar y con su menú abierto, `sand-deep`. Es para las acciones de una fila, como "Agregar o quitar" o "+ Agregar", y para lo secundario de la página, como "Invitar contactos". En una fila, el texto queda sobre el margen y el relleno sobresale con el cursor.
-- **Compact:** 10 px de relleno lateral y 6 px entre ícono y texto, para una fila o una banda que comparte el ancho con texto. Conserva los 44 px de alto.
+- **Secondary:** sin relleno, con borde `edge` de 1 px y texto de tinta. Al pasar el cursor toma `sand`, y al presionar, `sand-deep`. Con su menú abierto (`aria-expanded`) se invierte a tinta con texto blanco, con o sin cursor: la tinta significa abierto. Es la variante por defecto.
+- **Quiet:** texto de tinta sin borde ni relleno. Al pasar el cursor y con su menú abierto toma `sand`, y al presionar, `sand-deep`. Es para las acciones de una fila, como "Agregar o quitar" o "+ Agregar", y para lo secundario de la página, como "Invitar contactos". En una fila, el texto queda sobre el margen y el relleno sobresale con el cursor.
+- **Compact:** 10 px de relleno lateral y 6 px entre ícono y texto, para una fila o un título que comparte el ancho con texto. Conserva los 44 px de alto.
 - **Danger:** relleno `danger` con texto blanco, con el mismo comportamiento que `primary`. Es para lo destructivo que pide confirmación, como Reiniciar demo y eliminar carpeta.
-- **Disabled:** relleno `sand`, texto `muted`.
+- **Disabled:** relleno `sand`, texto `muted`, sin borde.
 - **Pares:** "Sí" y "No", agregar y quitar, o la acción y Cancelar, usan la misma variante o el mismo tamaño, para cumplir la regla 11. Cancelar nunca es un enlace subrayado.
 
-**La regla del relleno de página.** Lo que actúa sobre la página va a la derecha del título, en la banda, y lleva relleno, como "Opciones" y "Buscar". Lo que actúa sobre una fila va al final de esa fila y no lleva relleno en reposo, para que una lista o un registro no se llenen de bloques que compiten con las portadas. Así un botón siempre termina en el margen derecho de la columna.
+**La regla del lugar del botón.** Lo que actúa sobre la página va a la derecha del título y lleva borde, como "Opciones" y "Buscar". Lo que actúa sobre una fila va al final de esa fila y no lleva borde en reposo, para que una lista o un registro no se llenen de píldoras que compiten con las portadas. Así un botón siempre termina en el margen derecho de la columna.
 
 `StatusControl` lleno de tinta ("Agregar a Mis libros") cuenta como el botón principal de la pantalla. Una pantalla puede no tener `primary`: Amigos y Persona no lo tienen, porque sus filas repiten la misma acción y agregar y quitar pesan lo mismo.
 
+### RailArrow
+
+La flecha de un riel: un círculo blanco de 48 px con `shadow-float` y un chevron de 24 px. Crece al 105 % bajo el cursor y se encoge al 95 % al presionar. No aparece en tacto (`pointer-coarse:hidden`), donde manda el gesto, y sale del orden de tabulación, porque el teclado recorre los libros con Tab y las flechas. Lleva nombre accesible en `label`, como "Ver más libros". Al llegar al final de un lado se desvanece y queda deshabilitada. Se ubica con `className`, dentro de un padre `relative`.
+
 ### StatusControl
 
-La fila Estado de la ficha, a todo el ancho y de 44 px de alto, y toda ella abre el menú. A la izquierda va `StatusTag` y a la derecha el lápiz con "Cambiar o quitar", dibujado como un botón `quiet` `compact`, en paralelo con "Agregar o quitar" de la fila Carpetas. Bajo 360 px el texto baja a Small y el lápiz se va, porque es lo que permite que quepa en una línea junto a "Lo quiero". Bajo el cursor, la fila toma tinta al 5 %, como una fecha, y "Cambiar o quitar" solo reacciona si el cursor está sobre él, con `sand`; con el menú abierto toma `sand-deep`. Si el libro no está en la biblioteca, la fila se llena de tinta con un más y "Agregar a Mis libros", dentro de los márgenes del registro, abre el mismo menú y con él abierto pasa a `sand-dark`. El menú es un `AnchoredMenu`. La opción actual tiene fondo `sand` y un check con "Actual" en tinta. Se aplica de inmediato. "Leído" se elige aquí mismo, sin pasos intermedios. Si el libro está en la biblioteca, bajo una línea va "Quitar de Mis libros", con el detalle de lo que se pierde, como "Pierdes 1 carpeta y el puntaje".
+La fila Estado de la ficha, a todo el ancho y de 44 px de alto, y toda ella abre el menú. A la izquierda va `StatusTag` y a la derecha el lápiz con "Cambiar o quitar", dibujado como un botón `quiet` `compact`, en paralelo con "Agregar o quitar" de la fila Carpetas. Bajo 360 px el texto baja a Small y el lápiz se va, porque es lo que permite que quepa en una línea junto a "Lo quiero". Bajo el cursor, la fila toma tinta al 5 %, como una fecha, con radio de control, y "Cambiar o quitar" solo reacciona si el cursor está sobre él, con `sand`, igual que con el menú abierto. Si el libro no está en la biblioteca, la fila es una píldora de tinta con un más y "Agregar a Mis libros", dentro de los márgenes del registro, y abre el mismo menú. El menú es un `AnchoredMenu`. La opción actual tiene un check con "Actual" en tinta. Se aplica de inmediato. "Leído" se elige aquí mismo, sin pasos intermedios. Si el libro está en la biblioteca, bajo una línea va "Quitar de Mis libros", con el detalle de lo que se pierde, como "Pierdes 1 carpeta y el puntaje".
 
 ### StatusTag
 
@@ -622,7 +717,7 @@ La fila Estado de la ficha, a todo el ancho y de 44 px de alto, y toda ella abre
 
 ### TagFilter
 
-Cinco botones iguales en una grilla, de 56 px de alto y hasta 512 px de ancho total desde `md`: cantidad en serif de 16 px y etiqueta en Caption. El activo toma el fondo `paper`, peso 700 y la cinta burdeo, y se abre hacia la página como una pestaña. Por eso va en el borde inferior de la banda, como hijo de `PageHeader`. No usa los colores de estado.
+Cinco botones iguales en una grilla, de 56 px de alto y hasta 512 px de ancho total desde `md`: cantidad en serif de 16 px y etiqueta en Caption. No lleva caja alrededor. El activo se reconoce por la tinta, el peso 700 y la cinta burdeo que cuelga sobre él. Los demás son `muted` y bajo el cursor toman `shell`. Va como hijo de `PageHeader`. No usa los colores de estado.
 
 ### Stars
 
@@ -630,75 +725,141 @@ Estrellas de 14 px para mostrar un puntaje y de 26 px, en áreas de 44 px, cuand
 
 ### Cards / Containers
 
-- **Corner Style:** tarjeta (8 px).
-- **Background:** blanco. "+ Nueva carpeta" es la excepción en reposo: es un bloque que se presiona.
+- **Tarjeta blanca** (`FolderCard`): radio de tarjeta, fondo blanco, 1 px `line` que pasa a `edge` con el cursor y 12 px de relleno. Dos portadas con 6 px de separación, nombre serif a 10 px y cantidad en Small. Si falta una portada, su hueco se rellena con `sand`.
+- **Bloque** (`EmptyState`, `ErrorState`, `InlineConfirm`): radio de bloque, fondo `shell`, sin borde y 20 px de relleno.
+- **Fila tintada** (fila de actividad, aviso): radio de fila, fondo `shell` que pasa a `sand` con el cursor.
+- **Tarjeta de tono** (lectura, autor, mejor resultado): radio de bloque o de tarjeta, fondo `coverTone`, texto `text-white` y `text-white/88`, portada con `raised`.
 - **Shadow Strategy:** ninguna. Nunca una tarjeta dentro de otra.
-- **Border:** 1 px `line` en `FolderCard`, que pasa a `edge` con el cursor, y 1 px `edge` en `InlineConfirm` y "+ Nueva carpeta".
-- **Internal Padding:** 12 px.
-
-`FolderCard` es la tarjeta de referencia: dos portadas con 6 px de separación, nombre serif a 10 px y cantidad en Small. Si falta una portada, su hueco se rellena con `sand`.
 
 ### BookRow
 
-Portada `sm` (56 px, 64 px desde `md`) con su cinta, y a 14 px el título, el `StatusTag` junto al autor, y las estrellas si tiene puntaje. Toda la fila abre la ficha y recuerda de qué lista se viene. Solo muestra una respuesta al presionar, con fondo `shell`. En una lista de otra persona, `note` reemplaza el tag y las estrellas, y la portada va sin cinta, porque podrían pasar por los de esa persona. En una lista ya filtrada por estado, `folders` reemplaza el texto del tag, que el filtro ya dice: las carpetas van bajo el autor, en Small de peso 500, hasta dos líneas y separadas por un punto medio, y la cinta se queda. Un libro sin carpetas no lleva esa línea, y dentro de una carpeta no se repite la que está abierta.
+Portada `sm` (56 px, 64 px desde `md`) con su cinta, y a 14 px el título, el `StatusTag` junto al autor, y las estrellas si tiene puntaje. Toda la fila abre la ficha y recuerda de qué lista se viene. Con el cursor toma `shell` y al presionar `sand`, con radio de fila. En una lista de otra persona, `note` reemplaza el tag y las estrellas, y la portada va sin cinta, porque podrían pasar por los de esa persona. En una lista ya filtrada por estado, `folders` reemplaza el texto del tag, que el filtro ya dice: las carpetas van bajo el autor, en Small de peso 500, hasta dos líneas y separadas por un punto medio, y la cinta se queda. Un libro sin carpetas no lleva esa línea, y dentro de una carpeta no se repite la que está abierta.
 
 ### BookCover
 
-Las portadas no se tiñen ni se recortan en la ficha. `lg` mide 112 px en celular y 224 px desde `md`, y conserva la proporción real de la imagen dentro de una caja de 2:3, para que nada salte al cargar. Si falta la imagen, muestra las iniciales blancas sobre uno de seis fondos, elegido por el id del libro. Ese fondo no significa nada. Es decorativa: el título siempre va escrito al lado.
+Las portadas no se tiñen ni se recortan en la ficha. `lg` mide 112 px en celular y 224 px desde `md`, y conserva la proporción real de la imagen dentro de una caja de 2:3, para que nada salte al cargar. `raised` cambia su sombra por `shadow-cover`, para una portada sobre un tono o sola en un riel. Si falta la imagen, muestra las iniciales blancas sobre uno de seis fondos, elegido por el id del libro. Ese fondo no significa nada. Es decorativa: el título siempre va escrito al lado.
 
 ### Navigation
 
-- **Scroll:** `AppShell` parte cada página arriba. Volver, con el botón del navegador o con `BackLink`, deja la lista donde estaba. Un filtro o una búsqueda no mueven la página.
-- **Celular:** `AppShell` fija una barra abajo, sobre `paper`, de 64 px más el área segura, con raya superior `edge` y cinco secciones repartidas por igual, ícono de 22 px y etiqueta Caption. La presión es `sand`.
-- **Desde `md`:** barra superior fija, sobre `paper`, de 48 px, con raya inferior `edge`. "Goodreads" en serif de 18 px y "Prototipo" ("Prototipo de rediseño" desde `lg`) van en el borde izquierdo de la columna, y las cinco secciones terminan en el derecho, con íconos de 18 px y Small label. Cada sección mide 44 px para tocar y muestra un relleno de 36 px, para que la barra no quede llena. El hover es `sand`.
-- **Estados:** la sección activa es de tinta, con peso 700 y cinta, y desde `md` también con relleno `sand-deep`. Las demás son `muted` con peso 600 y pasan a tinta con el cursor. "Más" sigue activa en Amigos y Mi perfil.
-- **Marca en celular:** `PageHeader` y la ficha muestran `Wordmark`, porque no hay barra superior. Va a la derecha del título. Si `PageHeader` recibe `backTo` o `action`, sube a la fila de arriba, para que el título y la acción tengan el ancho, salvo con `wordmarkBeside`, para un título corto y una acción `compact`, como en Mis libros. Ninguna pantalla pierde el aviso de prototipo.
+- **Scroll:** `AppShell` parte cada página arriba. Volver, con el botón del navegador o con `BackLink`, deja la lista donde estaba. Un filtro o una búsqueda no mueven la página. La barra lateral queda fija mientras la página se desplaza.
+- **Bajo `lg`:** `AppShell` fija una barra al borde inferior, de lado a lado, sobre `paper` sólido y sin desenfoque, de 65 px más el área segura, con una raya superior `edge` al 60 %. Va pegada al borde porque una barra flotante se movía con la barra del navegador en un celular real. Tiene cinco secciones repartidas por igual, hasta 448 px de ancho y centradas en una tablet, de 56 px de alto, con ícono de 21 px y etiqueta Caption. La presión es `sand`.
+- **Desde `lg`:** barra lateral de 232 px, sobre `paper`, con una raya `line` a la derecha. Arriba va "Goodreads" en serif de 24 px, que lleva a Inicio; abajo, "Prototipo de rediseño, proyecto de curso" en Caption. Las secciones miden 44 px, con ícono de 20 px, y van una sobre otra.
+- **Estados:** la sección activa es de tinta, con peso 700, ícono más grueso y relleno `sand`, y en la lateral también con cinta. Las demás son `muted`, con peso 500 en la lateral y 600 abajo. En la lateral, con el cursor, toman `shell` y tinta. "Más" sigue activa en Amigos y Mi perfil, e "Inicio" en `/actividad`, y esa página se anuncia con `aria-current="true"`.
+- **Marca bajo `lg`:** `PageHeader` y la ficha muestran `Wordmark`, "Goodreads prototipo" en una línea. Va a la derecha del título. Si `PageHeader` recibe `backTo` o `action`, sube a la fila de arriba, para que el título y la acción tengan el ancho, salvo con `wordmarkBeside`, para un título corto y una acción `compact`, como en Mis libros, donde se apila en dos líneas. Una pantalla sin `PageHeader` pone su propio `Wordmark`. Ninguna pantalla pierde el aviso de prototipo: desde `lg` lo dice la barra lateral.
 
 ### Toast
 
-Una capa de tinta de hasta 448 px, centrada, con radio `float` y `shadow-float`. Queda sobre la barra inferior en celular y a 24 px del borde desde `md`. Entra en 200 ms. Deshacer va con ícono y texto en `shell`. Dura 5 s y se detiene mientras el cursor o el foco están encima. Si la acción se hizo con teclado y su control desapareció, como en el aviso de D5, el foco llega a Deshacer y Tab lo devuelve a donde estaba. El mensaje corta una palabra larga, para que Deshacer siga a la vista.
+Una capa de tinta de hasta 448 px, con radio `float` y `shadow-float`. Bajo `lg` queda centrada, a 15 px sobre la barra inferior, y desde `lg` a 24 px del borde, centrada en el contenido y sin pisar la barra lateral. Entra en 200 ms. Deshacer es una píldora con ícono y texto en `shell`. Dura 5 s y se detiene mientras el cursor o el foco están encima. Si la acción se hizo con teclado y su control desapareció, como en el aviso de D5, el foco llega a Deshacer y Tab lo devuelve a donde estaba. El mensaje corta una palabra larga, para que Deshacer siga a la vista.
 
 ### Estados de pantalla
 
-`EmptyState` y `ErrorState` centran un ícono de 32 px con trazo 1,5, un título Subheading y una descripción `muted`, que corta una palabra larga para no salirse del margen. El ícono de error va en `danger`. `LoadingState` dibuja tres filas de esqueleto en `sand` con la forma de `BookRow`, para que la página no salte, y pulsa solo si la persona no pidió reducir movimiento.
+`EmptyState` y `ErrorState` son un bloque `shell` en el lugar donde iría el contenido, a 16 px de lo anterior: ícono de 24 px a la izquierda, título en Book title, descripción `muted` y la acción al final, que baja de línea si no cabe. La descripción corta una palabra larga para no salirse del margen. El ícono de error va en `danger`. `LoadingState` dibuja tres filas de esqueleto en `sand` con la forma de `BookRow`, para que la página no salte, y pulsa solo si la persona no pidió reducir movimiento.
 
 ### Movimiento
 
-Una sola curva, `--ease-quick` (`cubic-bezier(0.16, 1, 0.3, 1)`). Respuestas al tacto en 100 ms, menú en 150 ms, tag en 180 ms, toast en 200 ms y cinta en 220 ms. `src/index.css` reduce todo a 1 ms con `prefers-reduced-motion`.
+Una sola curva, `--ease-quick` (`cubic-bezier(0.16, 1, 0.3, 1)`). Respuestas al tacto entre 100 y 150 ms, menú en 150 ms, tag en 180 ms, toast en 200 ms, cinta y `cover-lift` en 220 ms, carrusel en 260 ms y tono de escena en 420 ms. Una página nueva cruza en 160 ms y la portada viaja en 320 ms, en los enlaces con `viewTransition`. `src/index.css` reduce todo a 1 ms con `prefers-reduced-motion`.
 
 ### Foco
 
-Un solo estilo: contorno de 2 px de tinta a 2 px de distancia, definido de forma global. No lo reemplaces ni lo quites. Solo el toast lo cambia a blanco, por su fondo oscuro, las opciones del menú lo dibujan hacia adentro y `SearchField` lo dibuja alrededor de todo el campo.
+Un solo estilo: contorno de 2 px de tinta a 2 px de distancia, definido de forma global. No lo reemplaces ni lo quites. Solo el toast lo cambia a blanco, por su fondo oscuro, las opciones del menú lo dibujan hacia adentro y `SearchField` pasa su borde a tinta y lo dobla, alrededor de toda la píldora.
+
+## Cómo se aplica a una pantalla
+
+Lo que sigue quien lleva una pantalla al aspecto de este documento.
+
+**Marco.** `main` ya trae el margen, el fondo y el espacio bajo el contenido. La pantalla no agrega `px-*` en su raíz, ni fondo, ni `pb-*`, y parte con un `section` sin clases. Ninguna pantalla toca la barra ni el toast.
+
+**Ancho de columna.** Inicio, Descubrir, Buscar y `/actividad` usan todo el ancho. Las demás van en `max-w-app`. Dentro de una pantalla ancha, el texto seguido no pasa de `max-w-3xl`, y una descripción, de `max-w-[60ch]`.
+
+**Títulos.**
+
+- Cada pantalla tiene un solo `h1`. Con `PageHeader` no hay que hacer nada más.
+- Una pantalla sin `PageHeader` usa `page-title` en su `h1`, con `pt-3 lg:pt-8` arriba y `Wordmark` en la pantalla, como Buscar o Descubrir. Si el título visible no nombra la sección, como "Leyendo ahora" en Inicio, el `h1` va en `sr-only` con el nombre real y el título visible es un `h2` con `page-title`.
+- Cada bloque se abre con un `h2` con `section-title`, sin línea ni fondo.
+
+**Secciones.** `mt-7 lg:mt-10` entre secciones, `mt-3` bajo un título de sección y `mt-4` bajo un título de página. Un "ver todo" va a la derecha del título de sección en celular, en una fila con `items-end justify-between`, y como última tarjeta de la grilla desde `md`.
+
+**Tarjetas.** Elige por lo que carga, y no anides una dentro de otra.
+
+| Qué es                         | Clases                                                                                                                                           |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Libro con color propio         | `rounded-tile p-4 text-white lg:p-5` y `style={{ backgroundColor: coverTone(book.id) }}`, portada con `raised`, texto secundario `text-white/88` |
+| Autor o mejor resultado        | `rounded-card p-3.5 text-white`, con el tono de su primer libro                                                                                  |
+| Fila de actividad o de aviso   | `rounded-row bg-shell`, con `hover:bg-sand`, y toda la fila como enlace con `after:absolute after:inset-0`                                       |
+| Carpeta                        | `FolderCard`                                                                                                                                     |
+| Enlace "ver todo" como tarjeta | `rounded-row border border-edge px-4 font-semibold hover:bg-sand active:bg-sand-deep`                                                            |
+
+Una tarjeta con color baja 1 px al presionar (`active:translate-y-px`). Un `StatusTag` sobre un tono va en su píldora blanca.
+
+**Rieles.** Un riel es un `ul` nativo, con el dedo y el trackpad en manos del navegador. Va así, dentro de un padre `relative`:
+
+```tsx
+const { ref, canGoBack, canGoForward, advance, railProps } = useRail<HTMLUListElement>()
+
+<div className="relative">
+  <ul
+    ref={ref}
+    {...railProps}
+    className="rail full-bleed flex snap-x scroll-pl-(--gut) gap-3.5 overflow-x-auto pt-1.5 pb-3 lg:cursor-grab lg:gap-4"
+  >
+    <li className="w-28 shrink-0 snap-start lg:w-36">
+      <Link to={bookPath(book.id)} className="block rounded-control">
+        <span className="cover-lift block">
+          <BookCover book={book} raised />
+        </span>
+      </Link>
+    </li>
+  </ul>
+  <RailArrow direction="back" label="Ver libros anteriores" onClick={() => advance(-1)} visible={canGoBack} className="top-20 -left-3" />
+  <RailArrow direction="forward" label="Ver más libros" onClick={() => advance(1)} visible={canGoForward} className="top-20 -right-3" />
+</div>
+```
+
+Un riel que solo vive en celular y en computador es grilla usa `lg:grid lg:snap-none lg:overflow-visible`, y ahí no lleva `RailArrow`. Si el `li` no tiene un enlace, las flechas del teclado no hacen nada.
+
+**Selector de listas.** Las opciones que cambian el contenido de una misma pantalla, como las listas de Descubrir, van en `flex rounded-full bg-sand p-1`, con `aria-pressed` en cada botón de `min-h-11 rounded-full`. La elegida es `bg-ink text-white` y las demás `text-ink hover:bg-sand-deep active:bg-sand-dark`. Caben todas a 320 px, sin scroll. `TagFilter` no se reemplaza por esto: es la fila de D3.
+
+**Portadas que viajan.** Un enlace a la ficha desde una pantalla ancha lleva `viewTransition`, con su `state={{ from }}` para volver.
+
+**Estados.** Lo vacío, lo que falla y lo que carga van en el lugar donde iría el contenido, con `EmptyState`, `ErrorState` y `LoadingState`. Una pantalla mantiene su forma con el dato presente o ausente. Un vacío al que se llega por un filtro trae una salida.
+
+**Contraste.** Texto solo en los pares de "Contrastes medidos". Sobre un tono, solo blanco y blanco al 88 %. El tinte de Descubrir nunca queda bajo texto.
+
+**Prohibido en una pantalla.** Un `style` con colores que no sean `coverTone` o el `avatarColor` de una persona, `text-[#fff]` en vez de `text-white`, un `backdrop-blur`, un `shadow-*` en una tarjeta, y CSS en `src/index.css` para arreglar un componente desde afuera. Si una forma falta, va en el componente o en un token, en un commit aparte.
 
 ## Do's and Don'ts
 
 ### Do:
 
-- **Do** parte cada sección con `PageHeader`, salvo la ficha, que parte sobre el papel, sin banda.
+- **Do** parte cada sección con `PageHeader`, o con `page-title` y `Wordmark` si la pantalla necesita otra forma.
 - **Do** edita cada dato en su lugar, en la fila o el título donde se lee.
 - **Do** da una salida en los estados vacíos a los que se llega por un filtro o un enlace malo: un botón "Ver todos los libros" o "Ir a Mis libros".
 - **Do** usa solo los tokens de `src/index.css`: colores, tamaños, radios y sombras.
 - **Do** muestra cada estado con texto además de color, como pide la regla 3.
-- **Do** pon los tags solo sobre `white`, `paper`, `shell` o `sand`, donde el test vigila que lleguen a 4,5:1.
-- **Do** escribe etiqueta de texto junto a cada ícono, también en la barra de navegación.
+- **Do** pon los tags solo sobre `white`, `paper`, `shell` o `sand`, donde el test vigila que lleguen a 4,5:1, o en su píldora blanca sobre un tono.
+- **Do** escribe etiqueta de texto junto a cada ícono, también en la barra de navegación. Las únicas excepciones son las flechas de un riel y el corazón en celular.
 - **Do** mantén 44 px como mínimo en todo control, y que nada dependa solo del hover.
-- **Do** deja las portadas sin teñir y con su sombra de libro.
+- **Do** usa el color de una portada solo con `coverTone`, en una tarjeta que carga ese libro, o como tinte detrás de portadas.
+- **Do** deja que un riel sea un scroll nativo, y usa `useRail` para lo que el navegador no da.
 - **Do** anima solo como respuesta a una acción, y deja que `prefers-reduced-motion` la anule.
-- **Do** mira Mis libros y la ficha como referencia, en `.claude/capturas/salida/<dispositivo>/`.
 - **Do** anota como decisión para el CP lo que este documento no cubra.
 
 ### Don't:
 
 - **Don't** uses la cinta para decorar o para llamar la atención, ni la dibujes sin `Ribbon`.
-- **Don't** pongas una cinta burdeo bajo una portada ni uses burdeo en texto, botones o superficies de la interfaz.
+- **Don't** pongas una cinta burdeo bajo una portada, ni uses burdeo en botones o superficies de la interfaz.
+- **Don't** vuelvas a poner una banda o una caja detrás de un título.
+- **Don't** hagas flotar la barra inferior, ni le pongas transparencia o desenfoque.
 - **Don't** uses un color de marca, el naranja de las estrellas de Goodreads ni su logo.
-- **Don't** rellenes un tag ni lo conviertas en píldora de color.
+- **Don't** rellenes un tag con su color ni lo conviertas en píldora de color.
+- **Don't** tiñas una portada, ni pongas texto sobre el tinte de Descubrir.
 - **Don't** abras un panel o un modal: no existen en este sistema.
 - **Don't** pongas sombra en lo que no flota, salvo las portadas.
-- **Don't** dibujes un botón blanco: es el aspecto de un campo.
+- **Don't** dibujes un botón blanco: es el aspecto de un campo. La flecha de un riel es la excepción, porque va sobre portadas.
 - **Don't** agregues un "¿Estás seguro?" a lo reversible: se resuelve con Deshacer.
-- **Don't** pongas más de un `primary` por pantalla; "Agregar a Mis libros" también cuenta.
+- **Don't** pongas más de un `primary` por pantalla; "Agregar a Mis libros" y "Ver ficha" también cuentan.
 - **Don't** apiles tarjetas dentro de tarjetas ni uses bordes de 2 px para separar capas.
-- **Don't** escribas colores, tamaños o sombras sueltos en una pantalla, ni uses la paleta por defecto de Tailwind, que no existe.
+- **Don't** escribas colores o sombras sueltos en una pantalla, ni uses la paleta por defecto de Tailwind, que no existe.
+- **Don't** corrijas un componente desde `src/index.css` con un selector como `main button`.
 - **Don't** copies "Disponible pronto" como patrón: son textos temporales de las pantallas pendientes.
 - **Don't** muestres la palabra "tag" en la interfaz: cada uno se llama por su nombre.

@@ -98,5 +98,5 @@ El requisito viene de las reglas de interfaz de `PLAN.md` y de `docs/conceptos-h
 - Contraste de texto de al menos 4.5:1.
 - El estado siempre se comunica con texto además de color.
 - Áreas táctiles de al menos 44×44 px, y nada depende solo del hover.
-- Los íconos van siempre con etiqueta de texto, incluida la barra de navegación.
+- Los íconos van siempre con etiqueta de texto, incluida la barra de navegación, salvo las dos excepciones aprobadas en `PLAN.md`: las flechas de un riel, en computador, y el corazón de "Me gusta", en celular. Las dos llevan nombre accesible.
 - La animación solo responde a una acción.
