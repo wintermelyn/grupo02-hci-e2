@@ -42,20 +42,24 @@ describe('NewFolderCard', () => {
     expect(plus?.parentElement).toHaveClass('flex')
   })
 
-  it('takes the whole row on a phone when it starts one', () => {
+  it('has the shape of a folder at rest: one cell, two empty covers and no border', () => {
     renderApp(LIBRARY)
     const item = card().closest('li') as HTMLElement
-    expect(item.matches(':nth-child(odd)')).toBe(true)
-    expect(item).toHaveClass('max-md:odd:col-span-2')
+    expect(item).not.toHaveAttribute('class')
+    expect(card()).toHaveClass('h-full', 'w-full', 'rounded-card', 'bg-sand', 'p-3')
+    expect(card()).not.toHaveClass('border')
+    const covers = card().querySelectorAll('.aspect-2\\/3')
+    expect(covers).toHaveLength(2)
+    for (const cover of covers) expect(cover).toHaveClass('rounded-[2px_3px_3px_2px]', 'bg-shell')
+    expect(card()).toHaveTextContent('Nueva carpetaUn libro puede estar en varias')
   })
 
-  it('takes the half that seven cards leave free on a phone, so no card stands alone', () => {
+  it('stays in one cell after seven cards too', () => {
     act(() => state().createFolder('Para las vacaciones'))
     renderApp(LIBRARY)
     const item = card().closest('li') as HTMLElement
     expect(within(item.parentElement as HTMLElement).getAllByRole('link')).toHaveLength(7)
-    expect(item.matches(':nth-child(odd)')).toBe(false)
-    expect(item).toHaveClass('max-md:odd:col-span-2')
+    expect(item).not.toHaveAttribute('class')
   })
 
   it.each([
