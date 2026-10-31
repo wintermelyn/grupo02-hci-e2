@@ -24,7 +24,7 @@ function ReadingCard({ book, shared }: { book: Book; shared: boolean }) {
       to={bookPath(book.id)}
       state={state}
       viewTransition
-      style={{ backgroundColor: coverTone(book.id) }}
+      style={{ backgroundColor: coverTone(book) }}
       className="flex h-full gap-4 rounded-tile p-4 text-white transition-[translate] duration-200 active:translate-y-px lg:gap-5 lg:p-5"
     >
       <span className="cover-lift block w-26 shrink-0 lg:w-32">

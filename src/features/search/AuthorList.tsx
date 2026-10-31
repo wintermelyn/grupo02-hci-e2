@@ -41,7 +41,7 @@ function AuthorTile({ author, counted, featured, onPick }: AuthorTileProps) {
     <button
       type="button"
       onClick={() => onPick(author.name)}
-      style={{ backgroundColor: coverTone(author.books[0].id) }}
+      style={{ backgroundColor: coverTone(author.books[0]) }}
       className={cx(
         'relative isolate flex h-36 w-full flex-col overflow-hidden rounded-card p-3.5 text-left text-white transition-[translate] duration-150 hover:-translate-y-0.5 active:translate-y-px lg:h-40',
         featured && 'lg:h-full lg:min-h-80 lg:p-5',

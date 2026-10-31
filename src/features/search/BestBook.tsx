@@ -25,7 +25,7 @@ export function BestBook({ book, onOpen }: BestBookProps) {
         upsertBook(book)
         onOpen()
       }}
-      style={{ backgroundColor: coverTone(book.id) }}
+      style={{ backgroundColor: coverTone(book) }}
       className="flex h-full min-h-56 gap-4 rounded-tile p-4 text-white transition-[translate] duration-150 active:translate-y-px lg:gap-5 lg:p-5"
     >
       <span className="cover-lift block w-28 shrink-0 self-start lg:w-40">

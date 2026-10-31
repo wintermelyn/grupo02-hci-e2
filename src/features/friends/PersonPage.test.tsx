@@ -191,7 +191,7 @@ describe('PersonPage reading card', () => {
   it('takes the colour of its book, with the book as its only link', () => {
     renderApp('/amigos/camila')
     expect(card()).toHaveAttribute('href', '/libro/OL278437W')
-    expect(card()).toHaveStyle({ backgroundColor: coverTone('OL278437W') })
+    expect(card()).toHaveStyle({ backgroundColor: coverTone({ id: 'OL278437W' }) })
     expect(card()).toHaveClass('text-white')
   })
 

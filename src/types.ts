@@ -14,6 +14,8 @@ export interface Book {
   descriptionTranslated?: boolean
   year?: number
   pages?: number
+  /** The hex colour of the cover. The 54 books of books.json have it in coverColors.json instead. */
+  coverColor?: string
 }
 
 export interface LibraryEntry {
@@ -74,7 +76,7 @@ export interface AppState {
   me: User
   /** books.json, not persisted. */
   seedBooks: Record<BookId, Book>
-  /** Fetched from the API, persisted. */
+  /** Copies of the catalog books the person added, so Mis libros needs no download. Persisted. */
   extraBooks: Record<BookId, Book>
   library: Record<BookId, LibraryEntry>
   folders: Folder[]

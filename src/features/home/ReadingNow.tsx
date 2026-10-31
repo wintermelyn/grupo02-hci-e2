@@ -39,7 +39,7 @@ function ReadingCard({ book, entry, company, friend }: ReadingCardProps) {
       to={bookPath(book.id)}
       state={{ from: '/' }}
       viewTransition
-      style={{ backgroundColor: coverTone(book.id) }}
+      style={{ backgroundColor: coverTone(book) }}
       className={cx(
         'flex h-full gap-3 rounded-tile text-white transition-[translate] duration-200 active:translate-y-px md:gap-4 md:p-4 lg:gap-5 lg:p-5',
         CARD_SHAPES[company],

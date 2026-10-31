@@ -35,7 +35,7 @@ function Shelf({ list, startAt }: ShelfProps) {
         <BookCarousel
           label={`Libros de ${list.title}`}
           books={books}
-          tone={coverTone(book.id)}
+          tone={coverTone(book)}
           fromOf={(shown) => discoverPath(list.id, shown)}
           carousel={carousel}
         />

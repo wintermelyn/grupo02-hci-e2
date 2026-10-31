@@ -1,4 +1,5 @@
 import coverColors from '../data/coverColors.json'
+import type { Book } from '../types'
 
 type Triplet = [number, number, number]
 
@@ -71,10 +72,11 @@ const css = ([r, g, b]: Triplet) => `rgb(${r} ${g} ${b})`
 
 /**
  * The tone of a cover, darkened until white text passes 8.5:1: the background of a card that carries
- * that cover. Under a book or a list of them only, never as a tint behind text on paper.
+ * that cover. Under a book or a list of them only, never as a tint behind text on paper. The colour
+ * of a book of the catalog comes with it, and those of the 54 books are in coverColors.json.
  */
-export function coverTone(bookId: string): string {
-  const hex = (coverColors as Record<string, string | null>)[bookId]
+export function coverTone({ id, coverColor }: Pick<Book, 'id' | 'coverColor'>): string {
+  const hex = coverColor ?? (coverColors as Record<string, string | null>)[id]
   if (!hex) return NO_COLOUR_TONE
   const [rawHue, rawSaturation] = toHsl(toTriplet(hex))
   const hue = friendlyHue(rawHue)
