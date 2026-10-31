@@ -9,7 +9,11 @@ export interface LikeButtonProps {
   className?: string
 }
 
-/** A gesture towards a friend, so it has no counter. The toast says who it reaches. */
+/**
+ * A gesture towards a friend, so it has no counter. The toast says who it reaches. On a phone it is
+ * only the heart, one of the two approved exceptions to rule 1: its name is in aria-label, and given
+ * or not shows in the shape of the heart, filled or empty.
+ */
 export function LikeButton({ item, className }: LikeButtonProps) {
   const activityId = item.activity.id
   const likedIds = useStore((state) => state.likedActivityIds)
@@ -24,17 +28,16 @@ export function LikeButton({ item, className }: LikeButtonProps) {
       aria-label={`Me gusta: ${activitySentence(item)}`}
       aria-pressed={liked}
       onClick={() => toggleLike(activityId)}
-      // The same states as a quiet button, in the size of the text next to it. The minimum width
-      // keeps the row still when the word changes.
+      // The minimum width keeps the row still when the word changes.
       className={cx(
-        'inline-flex min-h-11 min-w-24 items-center gap-1.5 rounded-control px-2 text-sm font-semibold whitespace-nowrap transition-colors duration-100 hover:bg-shell active:bg-sand',
-        liked ? 'text-ink' : 'text-muted',
+        'inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-[background-color,color,scale] duration-150 hover:bg-sand active:scale-90 active:bg-sand-deep md:min-w-26 md:justify-start md:px-3',
+        liked ? 'text-ribbon' : 'text-muted',
         className,
       )}
     >
-      <Heart aria-hidden size={16} fill={liked ? 'currentColor' : 'none'} />
+      <Heart aria-hidden size={20} fill={liked ? 'currentColor' : 'none'} />
       {/* A new element per state, so the word that changed enters like a new tag does. */}
-      <span key={String(liked)} className={cx(changed && 'animate-tag-in')}>
+      <span key={String(liked)} className={cx('max-md:hidden', changed && 'animate-tag-in')}>
         {liked ? 'Te gusta' : 'Me gusta'}
       </span>
     </button>

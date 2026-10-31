@@ -1,4 +1,4 @@
-import { PageHeader } from '../../components'
+import { Wordmark } from '../../components'
 import { ActivityPreview } from './ActivityPreview'
 import { ActivityView } from './ActivityView'
 import { ReadingNow } from './ReadingNow'
@@ -17,12 +17,12 @@ export function HomePage() {
   }
 
   return (
-    <section>
-      <PageHeader title="Inicio" />
-      <div className="md:grid md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:gap-12">
-        <ReadingNow reading={reading} />
-        <ActivityPreview feed={feed} viewLinkRef={viewLink} />
-      </div>
+    <section className="pt-3 lg:pt-8">
+      {/* "Leyendo ahora" is what shows, but the page is Inicio: that is its name and its tab. */}
+      <h1 className="sr-only">Inicio</h1>
+      <Wordmark className="mb-2" />
+      <ReadingNow reading={reading} feed={feed} />
+      <ActivityPreview feed={feed} viewLinkRef={viewLink} />
     </section>
   )
 }

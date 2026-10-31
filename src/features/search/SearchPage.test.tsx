@@ -123,9 +123,17 @@ describe('before typing', () => {
     expect(readRecentSearches()).toEqual([])
   })
 
-  it('sends a person who looks for someone to Amigos', () => {
+  it('does not hint that people are found elsewhere, which a question of the evaluation asks', () => {
     renderApp('/buscar')
-    expect(screen.getByRole('link', { name: 'Amigos' })).toHaveAttribute('href', '/amigos')
+    expect(screen.queryByText(/Buscas a una persona/)).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Amigos' })).not.toBeInTheDocument()
+  })
+
+  it('says which friend read each book', () => {
+    renderApp('/buscar')
+    const shelf = within(section('Lo que leen tus amigos'))
+    const dune = shelf.getByRole('link', { name: /Dune/ })
+    expect(dune).toHaveTextContent('Diego')
   })
 })
 
@@ -307,13 +315,14 @@ describe('with results', () => {
   it('separates authors and books, and tapping an author filters their books', async () => {
     answerWith(APOCALYPSE, { key: '/works/OL5W', title: 'King Lear', author_name: ['Shakespeare'] })
     renderApp('/buscar?q=king')
-    expect(await within(section('Libros')).findByText('King Lear')).toBeInTheDocument()
+    // By role: the match is marked, so the title is no longer one text node.
+    expect(await within(section('Libros')).findByRole('link', { name: /King Lear/ })).toBeVisible()
     const list = within(section('Autores'))
 
     fireEvent.click(list.getByRole('button', { name: /Stephen King/ }))
     expect(currentLocation()).toBe('/buscar?q=Stephen+King')
     await screen.findByText('Apocalipsis')
-    expect(screen.queryByText('King Lear')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /King Lear/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Autores' })).not.toBeInTheDocument()
     expect(readRecentSearches()).toEqual(['Stephen King'])
   })
@@ -386,6 +395,80 @@ describe('with results', () => {
     answerFirst(new Response(JSON.stringify({ docs: [{ key: '/works/OL1W', title: 'Tarde' }] })))
     await waitFor(() => expect(screen.queryByText('Tarde')).not.toBeInTheDocument())
     expect(screen.getByText('Apocalipsis')).toBeInTheDocument()
+  })
+})
+
+describe('the best result', () => {
+  const marks = () => [...document.querySelectorAll('mark')].map(({ textContent }) => textContent)
+
+  it('is the first book when its title starts with the search, in the same list', async () => {
+    answerWith(APOCALYPSE, { key: '/works/OL9W', title: 'Otra novela', author_name: ['Otra'] })
+    renderApp('/buscar?q=apocalipsis')
+    await screen.findByText('2 libros')
+    expect(screen.getByRole('heading', { name: 'Mejor resultado' })).toBeInTheDocument()
+    const links = within(section('Libros')).getAllByRole('link')
+    expect(links[0]).toHaveTextContent('Apocalipsis')
+    expect(links[0]).toHaveTextContent('Ver ficha')
+    expect(links).toHaveLength(2)
+  })
+
+  it('opens the book and remembers the search, like any other result', async () => {
+    answerWith(APOCALYPSE, { key: '/works/OL9W', title: 'Otra novela', author_name: ['Otra'] })
+    renderApp('/buscar?q=apocalipsis')
+    await screen.findByText('2 libros')
+    fireEvent.click(within(section('Libros')).getAllByRole('link')[0])
+    expect(currentLocation()).toBe('/libro/OL123W')
+    expect(useStore.getState().extraBooks.OL123W).toBeDefined()
+    expect(readRecentSearches()).toEqual(['apocalipsis'])
+  })
+
+  it('says nothing about "best" when there is only one book', async () => {
+    renderApp('/buscar?q=dune')
+    await screen.findByText('1 libro · 1 en Mis libros')
+    expect(screen.queryByRole('heading', { name: 'Mejor resultado' })).not.toBeInTheDocument()
+    expect(within(section('Libros')).getByRole('link', { name: /Dune/ })).toBeInTheDocument()
+  })
+
+  it('is the author when no title starts with the search', async () => {
+    renderApp('/buscar?q=king')
+    await screen.findByText(/en Mis libros/)
+    expect(screen.queryByRole('heading', { name: 'Mejor resultado' })).not.toBeInTheDocument()
+    expect(within(section('Autores')).getByRole('button', { name: /Stephen King/ })).toHaveClass(
+      'lg:min-h-80',
+    )
+  })
+
+  it('counts the books of an author when the list is complete, and not while it can grow', async () => {
+    const deliver = holdAnswers()
+    renderApp('/buscar?q=king')
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce())
+    expect(within(section('Autores')).queryByText('4 libros')).not.toBeInTheDocument()
+    deliver()
+    expect(await within(section('Autores')).findByText('4 libros')).toBeInTheDocument()
+  })
+
+  it('moves what does not fit beside it under "Más libros", still among the books', async () => {
+    const others = [1, 2, 3, 4, 5, 6, 7].map((id) => byOtherKing(id, 'Otra Persona'))
+    answerWith(...others.map((doc) => ({ ...doc, title: `Apocalipsis ${doc.title}` })))
+    renderApp('/buscar?q=apocalipsis')
+    await screen.findByText('7 libros')
+    expect(screen.getByRole('heading', { name: 'Más libros' })).toBeInTheDocument()
+    expect(section('Más libros')).toBe(section('Libros'))
+    expect(within(section('Libros')).getAllByRole('link')).toHaveLength(7)
+  })
+
+  it('marks what matched, at the start of a word', async () => {
+    answerWith({ key: '/works/OL5W', title: 'The Shining', author_name: ['Hawking Fan'] })
+    renderApp('/buscar?q=king')
+    await screen.findByText(/en Mis libros/)
+    expect(marks().length).toBeGreaterThan(0)
+    expect(new Set(marks())).toEqual(new Set(['King']))
+  })
+
+  it('marks nothing in the books of one author, where every row would match', async () => {
+    renderApp('/buscar?q=Stephen+King')
+    await screen.findByText(/en Mis libros/)
+    expect(marks()).toEqual([])
   })
 })
 

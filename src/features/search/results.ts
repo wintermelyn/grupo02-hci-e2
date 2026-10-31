@@ -15,9 +15,19 @@ export interface ArrangedResults {
   /** Kept from the search before while this one has no answer, and they do not match it. */
   earlier: Book[]
   summary: string
+  /** What the search most likely wanted, which takes the first place and the larger card. */
+  lead: ResultLead
+  /** False while the list can grow or is a page of a search: the amount would not be the author's. */
+  countedAuthors: boolean
+  /** What to mark in the rows. Nothing when the list is the books of one author. */
+  marked: string
 }
 
+export type ResultLead = 'author' | 'book' | undefined
+
 export const MAX_AUTHORS = 6
+
+const WORD_CHARACTER = /[\p{L}\p{N}]/u
 
 /** The authors with more books first, and by name among equals. */
 export function groupByAuthor(books: Book[]): AuthorGroup[] {
@@ -28,6 +38,13 @@ export function groupByAuthor(books: Book[]): AuthorGroup[] {
   return [...byName]
     .map(([name, list]) => ({ name, books: list }))
     .sort((a, b) => b.books.length - a.books.length || a.name.localeCompare(b.name, 'es-CL'))
+}
+
+/** A title that starts with the search beats an author. If not, a person who types a name wants them. */
+function leadOf(authors: AuthorGroup[], books: Book[], wanted: string, exact: boolean): ResultLead {
+  if (exact || books.length === 0) return undefined
+  if (authors.length === 0) return 'book'
+  return normalizeText(books[0].title).startsWith(wanted) ? 'book' : 'author'
 }
 
 /** A page of a search is not its total: "king" has thousands of books and the page, 20. */
@@ -59,11 +76,30 @@ export function arrangeResults(
   const mine = books.filter(({ id }) => Object.hasOwn(library, id))
   const others = books.filter(({ id }) => !Object.hasOwn(library, id))
   const arranged = [...mine, ...others]
+  // Once answered, the service decides what matches: it also searches what the app cannot see.
+  const matching = loading ? arranged.filter((book) => matchesBook(book, query)) : arranged
   return {
     authors: exact ? [] : authors.slice(0, MAX_AUTHORS),
-    // Once answered, the service decides what matches: it also searches what the app cannot see.
-    books: loading ? arranged.filter((book) => matchesBook(book, query)) : arranged,
+    books: matching,
     earlier: loading ? arranged.filter((book) => !matchesBook(book, query)) : [],
     summary: resultsSummary(books.length, mine.length, more),
+    lead: leadOf(authors, matching, wanted, exact !== undefined),
+    countedAuthors: !more && !loading,
+    marked: exact ? '' : query,
   }
+}
+
+/**
+ * Where a search shows in a text, by the start of a word: the rule an author matches by, so "king"
+ * marks Stephen King and never the end of Hawking. Accents do not count, as in the search itself.
+ */
+export function matchRange(text: string, query: string): [number, number] | undefined {
+  const wanted = normalizeText(query)
+  const plain = text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
+  // A letter that does not fold into one would move everything after it.
+  if (!wanted || plain.length !== text.length) return undefined
+  for (let at = plain.indexOf(wanted); at >= 0; at = plain.indexOf(wanted, at + 1)) {
+    if (at === 0 || !WORD_CHARACTER.test(plain[at - 1])) return [at, at + wanted.length]
+  }
+  return undefined
 }

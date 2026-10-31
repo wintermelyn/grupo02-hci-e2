@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { today } from '../../lib/dates'
 import type { Book, LibraryEntry } from '../../types'
-import { arrangeResults, groupByAuthor, MAX_AUTHORS } from './results'
+import { arrangeResults, groupByAuthor, matchRange, MAX_AUTHORS } from './results'
 
 const book = (id: string, ...authors: string[]): Book => ({ id, title: `Libro ${id}`, authors })
 const entry = (bookId: string): LibraryEntry => ({
@@ -27,9 +27,59 @@ describe('groupByAuthor', () => {
   })
 })
 
+describe('matchRange', () => {
+  it('finds the search at the start of a word', () => {
+    expect(matchRange('Stephen King', 'king')).toEqual([8, 12])
+  })
+
+  it('does not take the end of a word for a match, also further on in the text', () => {
+    expect(matchRange('Stephen Hawking', 'king')).toBeUndefined()
+    expect(matchRange('Hawking y King', 'king')).toEqual([10, 14])
+  })
+
+  it('takes punctuation as the end of a word', () => {
+    expect(matchRange('Jean-Paul Sartre', 'paul')).toEqual([5, 9])
+  })
+
+  it('ignores accents and case, and marks the text as it is written', () => {
+    expect(matchRange('Gabriel García Márquez', 'GARCIA')).toEqual([8, 14])
+  })
+
+  it('leaves alone a letter that does not fold into one, and an empty search', () => {
+    expect(matchRange('İstanbul', 'stan')).toBeUndefined()
+    expect(matchRange('Dune', '  ')).toBeUndefined()
+  })
+})
+
 describe('arrangeResults', () => {
   const stephen = book('1', 'Stephen King')
   const hawking = book('2', 'Stephen Hawking')
+
+  it('leads with the author when no title starts with the search', () => {
+    expect(arrangeResults([stephen], 'king', NOTHING).lead).toBe('author')
+  })
+
+  it('leads with the book when its title starts with the search, even with an author', () => {
+    const results = [{ ...book('1', 'Stephen King'), title: 'King Lear' }]
+    expect(arrangeResults(results, 'king', NOTHING).lead).toBe('book')
+    expect(arrangeResults([book('1', 'Otra')], 'libro', NOTHING).lead).toBe('book')
+  })
+
+  it('has no lead for the books of one author, or for an empty list', () => {
+    expect(arrangeResults([stephen], 'stephen king', NOTHING).lead).toBeUndefined()
+    expect(arrangeResults([], 'king', NOTHING).lead).toBeUndefined()
+  })
+
+  it('marks the search, except in the books of one author', () => {
+    expect(arrangeResults([stephen], 'king', NOTHING).marked).toBe('king')
+    expect(arrangeResults([stephen], 'stephen king', NOTHING).marked).toBe('')
+  })
+
+  it('counts the books of an author only in a complete list', () => {
+    expect(arrangeResults([stephen], 'king', NOTHING).countedAuthors).toBe(true)
+    expect(arrangeResults([stephen], 'king', NOTHING, true).countedAuthors).toBe(false)
+    expect(arrangeResults([stephen], 'king', NOTHING, false, true).countedAuthors).toBe(false)
+  })
 
   it('finds an author by the start of a word of the name', () => {
     const { authors } = arrangeResults([stephen, hawking], 'king', NOTHING)

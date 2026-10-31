@@ -22,16 +22,10 @@ export function RecentSearches({ terms, onPick, onClear }: RecentSearchesProps) 
           Borrar
         </Button>
       </div>
-      <ul className="-ml-2.5 flex flex-wrap">
+      <ul className="mt-1 flex flex-wrap gap-1.5">
         {terms.map((term) => (
           <li key={term} className="max-w-full min-w-0">
-            <Button
-              compact
-              variant="quiet"
-              icon={History}
-              onClick={() => onPick(term)}
-              className="max-w-full"
-            >
+            <Button icon={History} onClick={() => onPick(term)} className="max-w-full">
               <span className="truncate">{term}</span>
             </Button>
           </li>

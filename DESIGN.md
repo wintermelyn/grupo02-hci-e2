@@ -398,8 +398,8 @@ Los cuatro colores de estado se usan en el texto y el ícono de `StatusTag`, y e
 ### Neutral
 
 - **Papel** (`paper`, #fdfafa): el fondo de la app, de las dos barras y el `theme-color` del navegador.
-- **Concha** (`shell`, #f9f1f2): los bloques de la página, como `EmptyState`, `ErrorState`, `InlineConfirm`, una fila de actividad o un aviso. También el hover de las filas y de las secciones inactivas de la barra lateral.
-- **Blanco** (`white`, #ffffff): tarjetas, campos, menú, flechas de un riel y la píldora de un tag sobre una tarjeta de tono.
+- **Concha** (`shell`, #f9f1f2): los bloques de la página, como `EmptyState`, `ErrorState`, `InlineConfirm` o un aviso. También el hover de las filas y de las secciones inactivas de la barra lateral.
+- **Blanco** (`white`, #ffffff): tarjetas, filas de actividad en Inicio, campos, menú, flechas de un riel y la píldora de un tag sobre una tarjeta de tono.
 - **Arena** (`sand`, #f3e4e6): la sección activa de las dos barras, el hover de `secondary`, `quiet` y las opciones del menú, la presión de las filas, el botón deshabilitado, los huecos de portada, los esqueletos de carga, la selección de texto, el fondo de un selector de listas y el bloque de "+ Nueva carpeta".
 - **Arena profunda** (`sand-deep`, #ead4d8): la presión de `secondary`, `quiet` y las opciones del menú, el resaltado de una coincidencia en Buscar y el hover de un selector de listas. Solo da 1,4:1 sobre papel, así que nunca es la única señal de un control.
 - **Arena oscura** (`sand-dark`, #dfc2c8): un paso más, solo para la presión dentro de un selector de listas.
@@ -411,7 +411,7 @@ Los cuatro colores de estado se usan en el texto y el ícono de `StatusTag`, y e
 
 `coverTone(bookId)`, de `src/lib/coverTone.ts`, toma el color dominante de la portada, que viene de `src/data/coverColors.json`, y lo oscurece hasta dar 8,5:1 con texto blanco. El texto secundario va en blanco al 88 %. Un azul que deriva a índigo se queda en azul y un amarillo, que oscuro se vuelve oliva, pasa a ámbar. Una portada sin color propio, o un libro de una búsqueda en vivo, toma un tono de tinta (`rgb(50 43 38)`).
 
-- **Inicio y Buscar:** el tono es el fondo de la tarjeta que carga ese libro o autor.
+- **Inicio y Buscar:** el tono es el fondo de la tarjeta que carga ese libro o autor. En una fila de actividad de Inicio, es el bloque detrás de la portada, y separa de un vistazo una fila de otra.
 - **Descubrir:** solo es un tinte al 12 % sobre papel detrás de los libros (`tone-scene`, con `--tone`), y nunca queda bajo el texto, así que no cambia ningún contraste.
 - **Ficha:** el mismo tinte, en la escena donde se para la portada, sin texto encima.
 - **Ninguna otra superficie** se tiñe, y las portadas mismas nunca se tiñen.
@@ -480,7 +480,7 @@ Todos superan el 3:1 que pide el borde de un control. Sobre `sand-deep` da 2,88:
 - **Display** (600, 32 px, 38 px de línea, tracking -0,025 em) y **Heading** (600, 22 px, 28 px de línea): quedaron sin uso desde que la ficha pasó a `page-title`.
 - **Subheading** (600, 20 px, 28 px de línea): las iniciales de `Avatar` `lg`, y el nombre en una tarjeta de autor desde 1024 px.
 - **Book title** (600, 18 px): el nombre de un libro en `BookRow` (línea 1,375, máximo dos líneas), el de una persona en `PersonRow`, el de una carpeta en `FolderCard` y el título de `EmptyState`, `ErrorState` e `InlineConfirm`.
-- **Fila compacta** (600, 17 px, línea 1,375): el libro en una fila de actividad o de resultados, con `font-serif text-[1.0625rem]/snug`.
+- **Fila compacta** (600, 17 px, línea 1,375): el libro en una fila de actividad o en `BookRow` con `compact`, con `font-serif text-[1.0625rem]/snug`.
 - **Body** (400, 16 px, 24 px de línea): texto de lectura y datos del libro.
 - **Control** (600, 16 px, 24 px de línea): botones y `StatusTag` en tamaño normal. Los enlaces de volver y de carpeta usan 500.
 - **Small** (400, 14 px, 20 px de línea): subtítulos, autores, cantidades y procedencia de una descripción, en `muted`.
@@ -543,7 +543,7 @@ Lo que se presiona es una píldora y lo que contiene tiene esquinas amplias, que
 - **Portada** (2 px en el lomo y 3 px en el borde exterior): portadas, sus huecos en `FolderCard` y sus esqueletos en `LoadingState`. Una línea plana de 2 px de tinta al 15 % dibuja la bisagra del libro y separa las portadas claras del fondo.
 - **Píldora** (`rounded-full`): `Button`, `SearchField`, los botones de texto de un campo, "Cambiar o quitar" y un selector de listas.
 - **Control** (`rounded-control`, 10 px): `TextField`, opciones del menú, secciones de la barra lateral, botones de `TagFilter` y `BackLink`.
-- **Fila** (`rounded-row`, 14 px): el fondo de una fila bajo el cursor, una fila de actividad y un aviso.
+- **Fila** (`rounded-row`, 14 px): el fondo de una fila bajo el cursor, una fila de actividad y el enlace "ver todo" como tarjeta.
 - **Tarjeta** (`rounded-card`, 16 px): tarjetas de carpeta y de autor.
 - **Flotante** (`rounded-float`, 16 px): menú y toast.
 - **Bloque** (`rounded-tile`, 20 px): tarjetas de tono, `EmptyState`, `ErrorState` e `InlineConfirm`.
@@ -558,44 +558,44 @@ Importa todo desde `src/components/`. Son del bloque base: si necesitas cambiar 
 
 ### Qué usar para cada necesidad
 
-| Necesidad                                          | Usa                                                                                                                                  |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Navegación principal y contenedor de la página     | `AppShell`, que ya envuelve las rutas; no agregues otra barra                                                                        |
-| Comienzo de una sección, con título y volver       | `PageHeader`, con `backTo` y `backLabel` en subpáginas, y `action` para lo que actúa sobre la página                                 |
-| Un título de página sin `PageHeader`               | `page-title` en el h1, con `Wordmark` en la misma pantalla                                                                           |
-| Un título de sección                               | `section-title`                                                                                                                      |
-| Volver desde una página sin `PageHeader`           | `BackLink`, siempre a una ruta fija, junto a `Wordmark`, como en la ficha                                                            |
-| Filtrar por tag con la cantidad de cada uno        | `TagFilter`, como hijo de `PageHeader`                                                                                               |
-| Mostrar un libro en una lista                      | `BookRow`; la acción extra, como "Quitar", va en `trailing`, y en una lista de otra persona, `note`                                  |
-| Mostrar una portada suelta                         | `BookCover`: `sm` para listas, `fill` para grillas y `lg` para la ficha; `raised` sobre un tono o sola en un riel                    |
-| Que una portada responda al cursor                 | `cover-lift` en lo que la envuelve, dentro del enlace                                                                                |
-| Una lista horizontal que se recorre                | `useRail`, `rail` y `full-bleed`; `RailArrow` para el mouse                                                                          |
-| Una tarjeta con el color de su libro               | `coverTone(bookId)` como `backgroundColor`, con `text-white`                                                                         |
-| Mostrar el estado de un libro, sin cambiarlo       | `StatusTag`; en listas, `size="sm"`                                                                                                  |
-| Cambiar o agregar el tag de un libro               | `StatusControl`, y no otro control. Recibe `book` si el libro puede no estar en el store                                             |
-| Mostrar o elegir un puntaje                        | `Stars`; con `onChange` es un campo                                                                                                  |
-| Acción con botón                                   | `Button`: `primary`, `secondary`, `quiet` o `danger`; `compact` en una fila o junto al título                                        |
-| Cambio rápido con pocas opciones, junto al control | `AnchoredMenu`                                                                                                                       |
-| Editar un dato                                     | En su lugar, en la misma fila o título donde se lee                                                                                  |
-| Escribir un texto corto donde se lee               | `TextField`, con Guardar y Cancelar al lado                                                                                          |
-| Confirmar lo que no se puede deshacer              | `InlineConfirm`, solo para eliminar carpeta y Reiniciar demo                                                                         |
-| Buscar o filtrar mientras se escribe               | `SearchField`, bajo el título o en su fila; `size="lg"` si buscar es lo primero de la pantalla; en una lista de libros, `BandSearch` |
-| Mostrar a una persona                              | `Avatar`, siempre junto a su nombre; `xs` dentro de una línea de texto                                                               |
-| Confirmar después de un cambio y permitir deshacer | El toast del store, que `AppShell` ya muestra; no montes otro                                                                        |
-| Lista vacía o sin resultados                       | `EmptyState`, con ícono, título, descripción y acción opcional                                                                       |
-| Esperar resultados                                 | `LoadingState`                                                                                                                       |
-| Algo falló                                         | `ErrorState`, con `onRetry` si se puede reintentar                                                                                   |
-| Enlaces a un libro o una carpeta                   | `bookPath` y `folderPath`                                                                                                            |
+| Necesidad                                          | Usa                                                                                                                                       |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Navegación principal y contenedor de la página     | `AppShell`, que ya envuelve las rutas; no agregues otra barra                                                                             |
+| Comienzo de una sección, con título y volver       | `PageHeader`, con `backTo` y `backLabel` en subpáginas, y `action` para lo que actúa sobre la página                                      |
+| Un título de página sin `PageHeader`               | `page-title` en el h1, con `Wordmark` en la misma pantalla                                                                                |
+| Un título de sección                               | `section-title`                                                                                                                           |
+| Volver desde una página sin `PageHeader`           | `BackLink`, siempre a una ruta fija, junto a `Wordmark`, como en la ficha                                                                 |
+| Filtrar por tag con la cantidad de cada uno        | `TagFilter`, como hijo de `PageHeader`                                                                                                    |
+| Mostrar un libro en una lista                      | `BookRow`; la acción extra, como "Quitar", va en `trailing`, y en una lista de otra persona, `note`                                       |
+| Mostrar una portada suelta                         | `BookCover`: `xs` para filas densas, `sm` para listas, `fill` para grillas y `lg` para la ficha; `raised` sobre un tono o sola en un riel |
+| Que una portada responda al cursor                 | `cover-lift` en lo que la envuelve, dentro del enlace                                                                                     |
+| Una lista horizontal que se recorre                | `useRail`, `rail` y `full-bleed`; `RailArrow` para el mouse                                                                               |
+| Una tarjeta con el color de su libro               | `coverTone(bookId)` como `backgroundColor`, con `text-white`                                                                              |
+| Mostrar el estado de un libro, sin cambiarlo       | `StatusTag`; en listas, `size="sm"`                                                                                                       |
+| Cambiar o agregar el tag de un libro               | `StatusControl`, y no otro control. Recibe `book` si el libro puede no estar en el store                                                  |
+| Mostrar o elegir un puntaje                        | `Stars`; con `onChange` es un campo                                                                                                       |
+| Acción con botón                                   | `Button`: `primary`, `secondary`, `quiet` o `danger`; `compact` en una fila o junto al título                                             |
+| Cambio rápido con pocas opciones, junto al control | `AnchoredMenu`                                                                                                                            |
+| Editar un dato                                     | En su lugar, en la misma fila o título donde se lee                                                                                       |
+| Escribir un texto corto donde se lee               | `TextField`, con Guardar y Cancelar al lado                                                                                               |
+| Confirmar lo que no se puede deshacer              | `InlineConfirm`, solo para eliminar carpeta y Reiniciar demo                                                                              |
+| Buscar o filtrar mientras se escribe               | `SearchField`, bajo el título o en su fila; `size="lg"` si buscar es lo primero de la pantalla; en una lista de libros, `BandSearch`      |
+| Mostrar a una persona                              | `Avatar`, siempre junto a su nombre; `xs` dentro de una línea de texto                                                                    |
+| Confirmar después de un cambio y permitir deshacer | El toast del store, que `AppShell` ya muestra; no montes otro                                                                             |
+| Lista vacía o sin resultados                       | `EmptyState`, con ícono, título, descripción y acción opcional                                                                            |
+| Esperar resultados                                 | `LoadingState`                                                                                                                            |
+| Algo falló                                         | `ErrorState`, con `onRetry` si se puede reintentar                                                                                        |
+| Enlaces a un libro o una carpeta                   | `bookPath` y `folderPath`                                                                                                                 |
 
 ### Lo que falta por pantalla
 
 Esto dice qué piezas existen para cada pantalla que todavía no toma su forma final. Su contenido y sus textos salen de `PLAN.md`.
 
-| Pantalla  | Piezas existentes                                                                                        | Sin componente todavía                           |
-| --------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| Inicio    | `BookCover` con `raised`, `coverTone`, `Avatar` `xs`, `Wordmark`, `EmptyState`                           | Tarjeta de lectura, fila de actividad            |
-| Descubrir | `BookCover` con `raised`, `coverTone`, `useRail`, `tone-scene`, `carousel-item`, `Wordmark`              | Selector de listas, zonas de flecha del carrusel |
-| Buscar    | `SearchField` con `size="lg"`, `BookRow`, `useRail`, `RailArrow`, `coverTone`, `Avatar` `xs`, `Wordmark` | Tarjeta de autor, mejor resultado                |
+| Pantalla  | Piezas locales, en su carpeta                                                                      |
+| --------- | -------------------------------------------------------------------------------------------------- |
+| Inicio    | `ReadingNow` (tarjeta de lectura), `ActivityRow` y `ActivityEntry` (filas de actividad)            |
+| Descubrir | `ListPicker` (selector de listas), `BookCarousel` (carrusel y sus zonas de flecha), `BookDetail`   |
+| Buscar    | `AuthorList` (tarjetas de autor), `BestBook` (mejor resultado), `FriendsShelf` (riel), `Highlight` |
 
 `/actividad` todavía no es una ruta: hoy la actividad completa es `/?actividad=1`, dentro de Inicio. `AppShell` ya deja Inicio activa y a todo el ancho en esa ruta para cuando exista.
 
@@ -730,13 +730,15 @@ Estrellas de 14 px para mostrar un puntaje y de 26 px, en áreas de 44 px, cuand
 
 - **Tarjeta blanca** (`FolderCard`): radio de tarjeta, fondo blanco, 1 px `line` que pasa a `edge` con el cursor y 12 px de relleno. Dos portadas con 6 px de separación, nombre serif a 10 px y cantidad en Small. Si falta una portada, su hueco se rellena con `sand`.
 - **Bloque** (`EmptyState`, `ErrorState`, `InlineConfirm`): radio de bloque, fondo `shell`, sin borde y 20 px de relleno.
-- **Fila tintada** (fila de actividad, aviso): radio de fila, fondo `shell` que pasa a `sand` con el cursor.
-- **Tarjeta de tono** (lectura, autor, mejor resultado): radio de bloque o de tarjeta, fondo `coverTone`, texto `text-white` y `text-white/88`, portada con `raised`.
+- **Fila tintada** (aviso): radio de fila, fondo `shell` que pasa a `sand` con el cursor.
+- **Fila de actividad** (Inicio): radio de fila, fondo blanco con 1 px `line`, que pasa a `shell` con el cursor. A la izquierda, un bloque de 64 px (80 px desde `lg`) con el tono del libro y su portada `raised`. Cada fila lleva así su propio color, y por eso ya no van todas sobre `shell`.
+- **Tarjeta de tono** (lectura, autor, mejor resultado): radio de bloque o de tarjeta, fondo `coverTone`, texto `text-white` y `text-white/88`, portada con `raised`. La de lectura muestra la portada entera siempre: sobre el texto en dos o tres columnas, y al lado desde `md` si hay espacio.
+- **Mejor resultado:** desde `lg` va junto a los primeros cinco libros, y lo demás sigue debajo. Si es un autor, es la primera tarjeta de "Autores" y sus portadas la llenan. Si es un libro, trae su descripción. Con un solo libro no se llama "mejor".
 - **Shadow Strategy:** ninguna. Nunca una tarjeta dentro de otra.
 
 ### BookRow
 
-Portada `sm` (56 px, 64 px desde `md`) con su cinta, y a 14 px el título, el `StatusTag` junto al autor, y las estrellas si tiene puntaje. Toda la fila abre la ficha y recuerda de qué lista se viene. Con el cursor toma `shell` y al presionar `sand`, con radio de fila. En una lista de otra persona, `note` reemplaza el tag y las estrellas, y la portada va sin cinta, porque podrían pasar por los de esa persona. En una lista ya filtrada por estado, `folders` reemplaza el texto del tag, que el filtro ya dice: las carpetas van bajo el autor, en Small de peso 500, hasta dos líneas y separadas por un punto medio, y la cinta se queda. Un libro sin carpetas no lleva esa línea, y dentro de una carpeta no se repite la que está abierta.
+Portada `sm` (56 px, 64 px desde `md`) con su cinta, y a 14 px el título, el `StatusTag` junto al autor, y las estrellas si tiene puntaje. Con `compact`, para los resultados de Buscar, la portada es `xs` (44 px) y el título va en Fila compacta. `highlight` marca lo que coincidió con una búsqueda, en el título y en los autores. Toda la fila abre la ficha y recuerda de qué lista se viene. Con el cursor toma `shell` y al presionar `sand`, con radio de fila. En una lista de otra persona, `note` reemplaza el tag y las estrellas, y la portada va sin cinta, porque podrían pasar por los de esa persona. En una lista ya filtrada por estado, `folders` reemplaza el texto del tag, que el filtro ya dice: las carpetas van bajo el autor, en Small de peso 500, hasta dos líneas y separadas por un punto medio, y la cinta se queda. Un libro sin carpetas no lleva esa línea, y dentro de una carpeta no se repite la que está abierta.
 
 ### BookCover
 
@@ -788,7 +790,8 @@ Lo que sigue quien lleva una pantalla al aspecto de este documento.
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Libro con color propio         | `rounded-tile p-4 text-white lg:p-5` y `style={{ backgroundColor: coverTone(book.id) }}`, portada con `raised`, texto secundario `text-white/88` |
 | Autor o mejor resultado        | `rounded-card p-3.5 text-white`, con el tono de su primer libro                                                                                  |
-| Fila de actividad o de aviso   | `rounded-row bg-shell`, con `hover:bg-sand`, y toda la fila como enlace con `after:absolute after:inset-0`                                       |
+| Fila de aviso                  | `rounded-row bg-shell`, con `hover:bg-sand`, y toda la fila como enlace con `after:absolute after:inset-0`                                       |
+| Fila de actividad              | `ActivityRow`, con toda la fila como enlace con `after:absolute after:inset-0`; el avatar y el corazón van sobre él con `relative z-10`          |
 | Carpeta                        | `FolderCard`                                                                                                                                     |
 | Enlace "ver todo" como tarjeta | `rounded-row border border-edge px-4 font-semibold hover:bg-sand active:bg-sand-deep`                                                            |
 

@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router'
 import { selectEntry, useStore } from '../store'
 import type { Book } from '../types'
 import { BookCover } from './BookCover'
+import { cx } from './cx'
 import { bookPath } from './paths'
 import { Stars } from './Stars'
 import { StatusTag } from './StatusTag'
@@ -19,9 +20,20 @@ export interface BookRowProps {
    * filter already says. The ribbon on the cover stays.
    */
   folders?: string[]
+  /** Smaller, for a list that has to be read at a glance, like the results of Buscar. */
+  compact?: boolean
+  /** Marks what a search matched, in the title and in the authors. */
+  highlight?: (text: string) => ReactNode
 }
 
-export function BookRow({ book, trailing, note, folders }: BookRowProps) {
+export function BookRow({
+  book,
+  trailing,
+  note,
+  folders,
+  compact = false,
+  highlight = (text) => text,
+}: BookRowProps) {
   const upsertBook = useStore((state) => state.upsertBook)
   const entry = useStore(selectEntry(book.id))
   const { pathname, search } = useLocation()
@@ -38,22 +50,33 @@ export function BookRow({ book, trailing, note, folders }: BookRowProps) {
         onClick={open}
         tabIndex={-1}
         aria-hidden
-        className="shrink-0 py-2.5"
+        className={cx('shrink-0', compact ? 'py-2' : 'py-2.5')}
       >
-        <BookCover book={book} size="sm" status={note === undefined ? entry?.status : undefined} />
+        <BookCover
+          book={book}
+          size={compact ? 'xs' : 'sm'}
+          status={note === undefined ? entry?.status : undefined}
+        />
       </Link>
       <Link
         to={bookPath(book.id)}
         state={linkState}
         onClick={open}
-        className="block min-w-0 flex-1 rounded-row py-2.5"
+        className={cx('block min-w-0 flex-1 rounded-row', compact ? 'py-2' : 'py-2.5')}
       >
-        <span className="line-clamp-2 font-serif text-lg/snug font-semibold">{book.title}</span>
+        <span
+          className={cx(
+            'line-clamp-2 font-serif font-semibold',
+            compact ? 'text-[1.0625rem]/snug' : 'text-lg/snug',
+          )}
+        >
+          {highlight(book.title)}
+        </span>
         <span className="flex flex-wrap items-center gap-x-2 text-sm text-muted">
           {entry && note === undefined && folders === undefined && (
             <StatusTag status={entry.status} size="sm" />
           )}
-          <span>{book.authors.join(', ')}</span>
+          <span>{highlight(book.authors.join(', '))}</span>
         </span>
         {note}
         {folders && folders.length > 0 && (

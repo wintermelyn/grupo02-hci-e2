@@ -26,6 +26,14 @@ describe('BookRow', () => {
     expect(currentLocation()).toBe(`/libro/${apiBook.id}`)
   })
 
+  it('lets the list mark what matched, in the title and in the authors', () => {
+    renderWithRouter(<BookRow book={apiBook} highlight={(text) => <mark>{text}</mark>} />, {
+      route: '/buscar',
+    })
+    const marked = [...document.querySelectorAll('mark')].map(({ textContent }) => textContent)
+    expect(marked).toEqual(['Libro de la API', 'Autora'])
+  })
+
   it('swaps my tag and stars for a note in a list about someone else', () => {
     const book = libraryBook('OL274505W') // Leído, 5 estrellas
     renderWithRouter(<BookRow book={book} note={<span>En común</span>} />)
