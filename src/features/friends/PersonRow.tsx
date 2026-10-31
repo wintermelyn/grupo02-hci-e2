@@ -33,10 +33,11 @@ export function PersonRow({ user, status, stableHeight = false }: PersonRowProps
           <Avatar user={user} />
           <span className="min-w-0">
             <span className="block font-serif text-lg/snug font-semibold">{user.name}</span>
-            <span className="flex flex-wrap gap-x-2 text-sm text-muted">
+            {/* Two lines in every state, so a row never changes height next to its neighbour. */}
+            <span className="block text-sm text-muted">
               {/* Between homonyms, this is what tells them apart. */}
-              <span className="font-semibold text-ink">@{user.username}</span>
-              <span>{mutualFriendsLabel(user.mutualFriends)}</span>
+              <span className="block font-semibold text-ink">@{user.username}</span>
+              <span className="block">{mutualFriendsLabel(user.mutualFriends)}</span>
             </span>
           </span>
         </Link>

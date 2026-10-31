@@ -414,6 +414,12 @@ describe('loading a book the store does not have', () => {
     expect(fetchWork).not.toHaveBeenCalled()
   })
 
+  it('offers a way out when the book cannot be found', async () => {
+    renderApp('/libro/OL0W')
+    fireEvent.click(await screen.findByRole('button', { name: 'Ir a Mis libros' }))
+    expect(currentLocation()).toBe('/biblioteca')
+  })
+
   it('ends in Libro no encontrado when Open Library does not have it', async () => {
     renderApp('/libro/OL999W')
     expect(

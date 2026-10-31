@@ -5,6 +5,8 @@ import { contrast } from '../test/contrast'
 import { Avatar } from './Avatar'
 
 const MIN_TEXT_CONTRAST = 4.5
+// The backgrounds of the BookCover placeholder, all of them tokens of index.css.
+const PALETTE = ['#1e1915', '#2f4a78', '#6b3a63', '#85490f', '#5f564d', '#7a2334']
 const camilas = users.filter(({ name }) => name === 'Camila Torres')
 
 describe('Avatar', () => {
@@ -27,6 +29,13 @@ describe('Avatar', () => {
     render(<Avatar user={{ name: 'Alex Muñoz', avatarColor: '#1e1915' }} />)
     expect(screen.getByText('AM')).toHaveStyle({ backgroundColor: '#1e1915' })
   })
+
+  it.each(users.map((user) => [user.name, user.avatarColor]))(
+    'draws %s with a colour of the system',
+    (_, colour) => {
+      expect(PALETTE).toContain(colour)
+    },
+  )
 
   it('tells homonyms apart by colour, on top of their usernames', () => {
     expect(camilas).toHaveLength(2)

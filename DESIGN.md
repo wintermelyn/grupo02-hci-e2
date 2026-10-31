@@ -379,7 +379,7 @@ El diseño parte del celular. El contenido vive en una columna centrada de hasta
 - **Espacio bajo el contenido:** `main` deja 144 px abajo en celular, para la barra y el toast, y 48 px desde `md`.
 - **Ritmo vertical:** 20 px entre bloques, 12 px bajo un título de sección y 4 px entre un título de bloque de la ficha y su contenido.
 - **Tablero de tarjetas:** 2 columnas con 10 px de separación en celular, 4 columnas con 16 px desde `md` y 5 desde `lg`.
-- **Listas de libros:** una columna de `BookRow` en celular y dos desde `md`, con 32 px entre columnas. Cada fila va en un `li` con `border-b border-line last:border-b-0`, como en `TagList` de `LibraryPage.tsx`. Esa lista es local: la carpeta debe repetir esas clases.
+- **Listas de libros:** una columna de `BookRow` en celular y dos desde `md`, con 32 px entre columnas. Cada fila va en un `li` con `border-b border-line last:border-b-0`, como en `BookList`. Esa lista es `BookList`. Desde `md`, las dos últimas filas pierden su línea si quedan una al lado de la otra, con `md:nth-last-2:odd:border-b-0`.
 - **Ficha:**
   - **Celular:** portada centrada de 164 px en una banda `shell`, seguida del título centrado y el control a todo el ancho.
   - **Pantalla baja:** la portada baja a 88 px, va junto al título en una columna de 5,5 rem y la banda se vuelve transparente.
@@ -450,20 +450,30 @@ Importa todo desde `src/components/`. Son del bloque base: si necesitas cambiar 
 
 Esto dice qué piezas existen para cada pantalla. Su contenido y sus textos salen de `PLAN.md`.
 
-| Pantalla  | Piezas existentes                                                                                              | Sin componente todavía                     |
-| --------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| Carpeta   | `PageHeader` con `backTo` y `TagFilter`, `BookRow`, `SearchField`, `AnchoredMenu`, `EmptyState`, `BottomSheet` | Nada                                       |
-| Inicio    | `PageHeader`, `BookCover`, `StatusTag`, `EmptyState`                                                           | Tarjeta "Leyendo ahora", fila de actividad |
-| Descubrir | `PageHeader`, `BookCover` con `fill`; título de sección en Heading                                             | Tarjeta de libro para las secciones        |
-| Buscar    | `PageHeader`, `SearchField`, `BookRow`, `LoadingState`, `EmptyState`, `ErrorState`                             | Nada                                       |
-| Más       | `PageHeader`                                                                                                   | Fila de enlace                             |
-| Amigos    | `PageHeader`, `SearchField`, `Avatar`, `Button`, `EmptyState`, `LoadingState`, `ErrorState`                    | Fila de persona                            |
-| Persona   | `PageHeader` con `backTo`, `Avatar`, `BookRow`, `Button`                                                       | Nada                                       |
-| Mi perfil | `PageHeader`, `Avatar`, `Button` con `danger`, `BottomSheet` para la confirmación                              | Nada                                       |
+| Pantalla  | Piezas existentes                                                                  | Sin componente todavía                     |
+| --------- | ---------------------------------------------------------------------------------- | ------------------------------------------ |
+| Inicio    | `PageHeader`, `BookCover`, `StatusTag`, `EmptyState`                               | Tarjeta "Leyendo ahora", fila de actividad |
+| Descubrir | `PageHeader`, `BookCover` con `fill`; título de sección en Heading                 | Tarjeta de libro para las secciones        |
+| Buscar    | `PageHeader`, `SearchField`, `BookRow`, `LoadingState`, `EmptyState`, `ErrorState` | Nada                                       |
+| Mi perfil | `PageHeader`, `Avatar`, `Button` con `danger`, `BottomSheet` para la confirmación  | Nada                                       |
 
 `BottomSheet` confirma Reiniciar demo y eliminar carpeta, según la sección 6 de `PLAN.md`.
 
-Tampoco existen todavía el aviso de D5 ni los campos de fecha. **Lo que no está en `src/components/` no tiene aspecto definido.** Arma lo que falte solo con estos tokens, respeta las 14 reglas y anótalo como decisión para el CP. Una pieza que dos pantallas necesiten se propone como compartida, para que los dos roles no construyan versiones distintas. Los campos de texto ya heredan el foco global, el acento de tinta (`accent-color`) y el cursor burdeo. `FolderCard` es de `src/features/library/`: sirve de modelo para una tarjeta, pero no es un componente compartido.
+Tampoco existe todavía el aviso de D5. **Lo que no está en `src/components/` no tiene aspecto definido.** Arma lo que falte solo con estos tokens, respeta las 14 reglas y anótalo como decisión para el CP. Una pieza que dos pantallas necesiten se propone como compartida, para que los dos roles no construyan versiones distintas. Los campos de texto ya heredan el foco global, el acento de tinta (`accent-color`) y el cursor burdeo. `FolderCard` es de `src/features/library/`: sirve de modelo para una tarjeta, pero no es un componente compartido.
+
+### Piezas locales
+
+Viven en la carpeta de su pantalla. Sirven de modelo, y se vuelven compartidas si otra pantalla las necesita.
+
+- **Lista de libros:** `BookList`, en `src/features/library/`, la usan Mis libros y la carpeta.
+- **Fila de persona:** `PersonRow`, en `src/features/friends/`. `Avatar` `sm`, nombre en Book title, @usuario en Small label de tinta y amigos en común en Small. El @usuario va en tinta porque es lo que separa a dos homónimos. Esas dos líneas no se juntan nunca, para que la fila mida lo mismo en todos los estados. La acción va en su propia línea bajo 1024 px y a la derecha desde `lg`.
+- **Estado de una persona:** "Solicitud enviada" y "Amigos" en Small label `muted`, con ícono de 16 px, sin color de estado ni cinta. Esos colores son solo de los libros.
+- **Acción sobre una persona:** `PersonAction`. Agregar, Cancelar y Quitar de amigos son `secondary` en Amigos y en Persona, por la regla 11.
+- **Fila de enlace:** en `MorePage.tsx`, una tarjeta blanca de 56 px con ícono, texto y flecha.
+- **Campo de un formulario:** blanco, con borde de 1 px `muted`, radio de control, 44 px de alto y la etiqueta encima. El borde es necesario porque la sombra casi no se ve sobre el panel blanco. Lo usan `FolderOptions.tsx` y `ReadingDetails.tsx`. El campo de fecha pone su ícono `CalendarDays` en `muted`, abre el calendario al tocar cualquier parte y pinta la parte enfocada en `sand`, no con el azul del navegador.
+- **Motivo de un botón deshabilitado:** Small en tinta con `CircleAlert` en `muted`, dentro de una región `status`.
+- **"Tu lectura":** bloque de la ficha, bajo `StatusControl`, con inicio, fin y puntaje, y "Editar lectura" como `secondary`.
+- **Libros en común:** portadas `fill` con su título en serif de 14 px, en 3 columnas y 6 desde `md`. Son portadas y no filas porque esos libros suelen aparecer justo arriba, en la misma página.
 
 ### Cinta
 
@@ -521,11 +531,11 @@ Un campo blanco con `shadow-card`, 44 px de alto y radio de control, con la lupa
 
 ### Avatar
 
-Un círculo con las iniciales blancas en serif sobre `avatarColor`, que viene del directorio. `sm` mide 40 px, con Small label, para las filas. `lg` mide 64 px, con Subheading, para el encabezado de una persona. Es decorativo: el nombre siempre va escrito al lado, y entre homónimos los distingue el @usuario, no el color. Un test vigila que todos los colores del directorio den 4,5:1 con el blanco.
+Un círculo con las iniciales blancas en serif sobre `avatarColor`, que viene del directorio. `sm` mide 40 px, con Small label, para las filas. `lg` mide 64 px, con Subheading, para el encabezado de una persona. Es decorativo: el nombre siempre va escrito al lado, y entre homónimos los distingue el @usuario, no el color. Los colores son los seis fondos de la portada de reemplazo y, como ahí, no significan nada. Un test vigila que todos los del directorio salgan de esa lista y den 4,5:1 con el blanco. En Persona va en la banda, en `media` de `PageHeader`.
 
 ### BottomSheet
 
-Todavía no aparece en una pantalla real: su aspecto sale del código, no de una captura.
+Lo usan "Editar lectura", renombrar y eliminar carpeta. El foco parte en el primer campo y el texto del nombre queda seleccionado al renombrar.
 
 ### Buttons
 
@@ -538,7 +548,7 @@ Sobrios y estándar, con un solo llamado por pantalla o panel.
 - **Disabled:** relleno `sand`, texto `muted`, sin sombra.
 - **Pares:** "Sí" y "No", o agregar y quitar, usan la misma variante, para cumplir la regla 11.
 
-`StatusControl` lleno de tinta ("Agregar a Mis libros") cuenta como el botón principal de la pantalla. Hasta ahora, `Button` solo aparece dentro de `ErrorState`, así que su aspecto sale del código y no de una captura.
+`StatusControl` lleno de tinta ("Agregar a Mis libros") cuenta como el botón principal de la pantalla. Una pantalla puede no tener `primary`: Amigos y Persona no lo tienen, porque sus filas repiten la misma acción y agregar y quitar pesan lo mismo.
 
 ### StatusControl
 
@@ -576,7 +586,7 @@ Las portadas no se tiñen ni se recortan en la ficha: `lg` conserva la proporci�
 
 ### Chips
 
-El único chip construido es el enlace a una carpeta en la ficha, hoy local en `BookPage.tsx`: fondo `sand`, 44 px de alto, 6 px de radio, peso 500. Hover y presión en `sand-deep`. Es un lugar, no un estado: no lleva cinta ni color de tag.
+El único chip construido es el enlace a una carpeta en la ficha, local en `BookFolders.tsx`: fondo `sand`, 44 px de alto, 6 px de radio, peso 500. Hover y presión en `sand-deep`. Es un lugar, no un estado: no lleva cinta ni color de tag.
 
 ### Navigation
 
@@ -606,6 +616,7 @@ Un solo estilo: contorno de 2 px de tinta a 2 px de distancia, definido de forma
 ### Do:
 
 - **Do** parte cada sección con `PageHeader`, salvo la ficha, que usa su propia banda.
+- **Do** da una salida en los estados vacíos a los que se llega por un filtro o un enlace malo: un botón "Ver todos los libros" o "Ir a Mis libros".
 - **Do** usa solo los tokens de `src/index.css`: colores, tamaños, radios y sombras.
 - **Do** muestra cada estado con texto además de color, como pide la regla 3.
 - **Do** pon los tags solo sobre `white`, `paper`, `shell` o `sand`, donde el test vigila que lleguen a 4,5:1.

@@ -26,9 +26,14 @@ La sesión integra los PR en GitHub con `gh pr merge --merge`, nunca antes de `A
 
 - **Qué manda:** el informe, después `PLAN.md` y después `DESIGN.md`. `DESIGN.md` fija tipografía, color, densidad, formas y un gesto propio. Las pantallas, los flujos, los textos y D1–D6 siguen saliendo del informe y del plan. Ante un choque con las 14 reglas de interfaz de `PLAN.md`, ganan las reglas.
 - **Modo:** todas las pantallas son de modo Operate. Cada una se reconoce primero como una app para ordenar libros, con controles estándar.
-- **Dónde corre Impeccable:** en la sesión principal, en esta carpeta, porque vive en `.claude/`. Se usa en la fase 2, para crear el mundo visual, y en la fase 5, para el pulido con `/impeccable polish`.
+- **Dónde corre Impeccable:** en la sesión principal, en esta carpeta, porque vive en `.claude/`. Se usa en la fase 2, para crear el mundo visual, en las fases 3 y 4, para revisar las pantallas nuevas, y en la fase 5, para el pulido con `/impeccable polish`.
 - **Quién elige:** Impeccable propone las direcciones en su página y la sesión espera. Matías elige, y el CP registra la elegida y las descartadas.
 - **Agentes en paralelo:** construyen con `DESIGN.md`, los tokens de `src/index.css` y los componentes compartidos. Lo que el sistema no cubra se anota como decisión para el CP.
+- **Revisión de las fases 3 y 4:** va después de corregir los hallazgos del recorrido.
+  1. La sesión corre `.claude/skills/impeccable/scripts/impeccable detect --json src`.
+  2. Lanza el agente `impeccable-finish-reviewer` sobre las pantallas nuevas, con sus capturas en los cuatro dispositivos y `DESIGN.md` como vara.
+  3. Corrige sus arreglos, vuelve a capturar y le pide veredicto otra vez.
+  4. La revisión termina con veredicto `ship` o, tras dos rondas de arreglos, con lo abierto como hallazgo del CP. El veredicto va en la evidencia del CP.
 
 ## 1. Empezar
 

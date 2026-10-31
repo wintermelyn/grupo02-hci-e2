@@ -58,7 +58,7 @@ function NoBooks({ folder, label, query, total, onShowAll }: NoBooksProps) {
   return (
     <EmptyState
       icon={FolderOpen}
-      title={`Ningún libro con el estado «${label}»`}
+      title={`Ningún libro en «${label}»`}
       description={
         total === 1
           ? 'El libro de esta carpeta tiene otro estado.'
@@ -195,8 +195,9 @@ export function FolderPage() {
         <PageHeader title="Carpeta no encontrada" backTo={LIBRARY_PATH} backLabel="Mis libros" />
         <EmptyState
           icon={FolderX}
-          title="No encontramos esta carpeta"
-          description="Puede que la hayas eliminado o que el enlace esté incompleto. Vuelve a Mis libros para seguir."
+          title="El enlace no lleva a una carpeta"
+          description="Puede que la hayas eliminado o que esté incompleto."
+          action={<Button onClick={() => navigate(LIBRARY_PATH)}>Ir a Mis libros</Button>}
         />
       </section>
     )

@@ -75,9 +75,7 @@ describe('FolderPage', () => {
   it('follows the store when a tag changes', () => {
     renderApp(`${TERROR}?tag=reading`)
     act(() => state().setStatus('OL81626W', 'owned'))
-    expect(
-      main().getByRole('heading', { name: 'Ningún libro con el estado «Leyendo»' }),
-    ).toBeInTheDocument()
+    expect(main().getByRole('heading', { name: 'Ningún libro en «Leyendo»' })).toBeInTheDocument()
     expect(tagButton(/^Lo tengo: 3/)).toBeInTheDocument()
   })
 
@@ -179,10 +177,14 @@ describe('FolderPage', () => {
 
     it('tells what a tag without books in this folder is for', () => {
       renderApp('/biblioteca/carpeta/novela?tag=reading')
-      expect(
-        main().getByRole('heading', { name: 'Ningún libro con el estado «Leyendo»' }),
-      ).toBeInTheDocument()
+      expect(main().getByRole('heading', { name: 'Ningún libro en «Leyendo»' })).toBeInTheDocument()
       expect(searchBox()).toBeInTheDocument()
+    })
+
+    it('offers a way out of a folder that does not exist', () => {
+      renderApp('/biblioteca/carpeta/nada')
+      fireEvent.click(main().getByRole('button', { name: 'Ir a Mis libros' }))
+      expect(currentLocation()).toBe('/biblioteca')
     })
 
     it('tells when the folder does not exist, with one h1 and the way back', () => {

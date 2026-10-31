@@ -1,6 +1,7 @@
-import { CircleAlert, Pencil } from 'lucide-react'
+import { CalendarDays, CircleAlert, Pencil } from 'lucide-react'
 import { useId, useState, type FormEvent, type ReactNode } from 'react'
 import { BottomSheet, Button, Stars } from '../../components'
+import { cx } from '../../components/cx'
 import { formatDate, today } from '../../lib/dates'
 import { useStore } from '../../store'
 import type { BookId, ISODate, LibraryEntry } from '../../types'
@@ -14,18 +15,38 @@ interface DateFieldProps {
   max?: ISODate
 }
 
+// The browser paints its picker and the focused part of the date with its own colours. The picker
+// button stays, invisible over the whole field, so touching anywhere on it opens the calendar.
+const DATE_INPUT = cx(
+  'relative min-h-11 w-full min-w-0 rounded-control border border-muted bg-white py-2 pr-9 pl-3',
+  '[&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0',
+  '[&::-webkit-calendar-picker-indicator]:m-0 [&::-webkit-calendar-picker-indicator]:size-full',
+  '[&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:p-0',
+  '[&::-webkit-calendar-picker-indicator]:opacity-0',
+  '[&::-webkit-datetime-edit-day-field:focus]:bg-sand [&::-webkit-datetime-edit-day-field:focus]:text-ink',
+  '[&::-webkit-datetime-edit-month-field:focus]:bg-sand [&::-webkit-datetime-edit-month-field:focus]:text-ink',
+  '[&::-webkit-datetime-edit-year-field:focus]:bg-sand [&::-webkit-datetime-edit-year-field:focus]:text-ink',
+)
+
 function DateField({ label, value, onChange, min, max }: DateFieldProps) {
   return (
     <label className="block min-w-0">
       <span className="mb-1 block font-medium">{label}</span>
-      <input
-        type="date"
-        value={value}
-        min={min}
-        max={max}
-        onChange={(event) => onChange(event.target.value)}
-        className="min-h-11 w-full min-w-0 rounded-control border border-muted bg-white px-3"
-      />
+      <span className="relative block">
+        <input
+          type="date"
+          value={value}
+          min={min}
+          max={max}
+          onChange={(event) => onChange(event.target.value)}
+          className={DATE_INPUT}
+        />
+        <CalendarDays
+          aria-hidden
+          size={18}
+          className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-muted"
+        />
+      </span>
     </label>
   )
 }

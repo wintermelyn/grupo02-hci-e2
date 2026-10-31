@@ -144,6 +144,14 @@ describe('PersonPage books', () => {
     expect(titlesIn('Libros en común')).toHaveLength(1)
   })
 
+  it('shows them as covers that open the book and can come back here', () => {
+    keepInLibrary('OL893414W')
+    renderApp('/amigos/diego')
+    fireEvent.click(sectionOf('Libros en común').getByRole('link'))
+    expect(currentLocation()).toBe('/libro/OL893414W')
+    expect(main().getByRole('link', { name: 'Volver' })).toHaveAttribute('href', '/amigos/diego')
+  })
+
   it('says so when there is nothing in common', () => {
     keepInLibrary()
     renderApp('/amigos/diego')
@@ -171,7 +179,8 @@ describe('PersonPage without a person', () => {
         screen.getByRole('heading', { level: 1, name: 'Persona no encontrada' }),
       ).toBeInTheDocument()
       expect(backLink()).toHaveAttribute('href', '/amigos')
-      expect(main().queryByRole('button')).not.toBeInTheDocument()
+      fireEvent.click(main().getByRole('button', { name: 'Ir a Amigos' }))
+      expect(currentLocation()).toBe('/amigos')
     },
   )
 })
