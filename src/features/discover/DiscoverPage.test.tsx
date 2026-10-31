@@ -118,6 +118,18 @@ describe('what it shows of a book', () => {
     expect(screen.getByText('Aún no tenemos descripción de este libro.')).toBeInTheDocument()
   })
 
+  it('keeps two lines of title and two of description on a phone, whatever each one takes', () => {
+    renderApp('/descubrir')
+    const book = state().getBook(FIRST)!
+    expect(screen.getByText(book.title).closest('a')).toHaveClass('min-h-[3.25rem]', 'sm:min-h-11')
+    expect(screen.getByText(book.description!)).toHaveClass(
+      'line-clamp-2',
+      'min-h-[2.75rem]',
+      'sm:line-clamp-3',
+      'lg:line-clamp-7',
+    )
+  })
+
   it('has one main action, which opens the book', () => {
     renderApp('/descubrir')
     const link = screen.getByRole('link', { name: `Ver ficha de ${titleOf(FIRST)}` })
