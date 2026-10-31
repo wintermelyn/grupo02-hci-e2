@@ -47,7 +47,12 @@ function AuthorTile({ author, counted, featured, onPick }: AuthorTileProps) {
         featured && 'lg:h-full lg:min-h-80 lg:p-5',
       )}
     >
-      <span className="block font-serif text-[1.5rem]/[1.12] font-semibold tracking-[-0.02em] text-balance lg:text-[2rem]/[1.1]">
+      <span
+        className={cx(
+          'block font-serif text-lg/[1.15] font-semibold text-balance',
+          featured ? 'lg:text-[2rem]/[1.1] lg:tracking-[-0.02em]' : 'lg:text-xl/[1.15]',
+        )}
+      >
         {author.name}
       </span>
       {counted && (

@@ -475,7 +475,8 @@ Todos superan el 3:1 que pide el borde de un control. Sobre `sand-deep` da 2,88:
 
 - **Título de página** (600, 32 px, línea 1,1, tracking -0,03 em; 28 px bajo 360 px y 40 px desde 1024 px): el h1 de cada sección. Es la utilidad `page-title`, y `PageHeader` ya la usa.
 - **Título de sección** (600, 24 px, línea 1,2, tracking -0,02 em; 28 px desde 1024 px): títulos dentro de la página, como "Mis carpetas", "Tus amigos" o "Está leyendo". Es la utilidad `section-title`.
-- **Título de tarjeta** (600, 24 px y línea 1,12; 32 px desde 1024 px, tracking -0,02 em): el libro o el autor en una tarjeta de tono, con `font-serif text-[1.5rem]/[1.12] lg:text-[2rem]/[1.1]`.
+- **Título de tarjeta** (600, 24 px y línea 1,12; 32 px desde 1024 px, tracking -0,02 em): el libro en una tarjeta de tono, con `font-serif text-[1.5rem]/[1.12] lg:text-[2rem]/[1.1]`.
+- **Nombre de autor** (600, 18 px y línea 1,15; 20 px desde 1024 px): el autor en su tarjeta de tono, con `font-serif text-lg/[1.15] lg:text-xl/[1.15]`. Desde 1024 px, la primera tarjeta de los resultados, que hace de mejor resultado, usa los 32 px de Título de tarjeta.
 - **Título del libro en Descubrir** (600, tracking -0,02 em): 22 px en celular, 28 px desde 640 px y 44 px desde 1024 px.
 - **Display** (600, 32 px, 38 px de línea, tracking -0,025 em) y **Heading** (600, 22 px, 28 px de línea): quedaron sin uso desde que la ficha pasó a `page-title`.
 - **Subheading** (600, 20 px, 28 px de línea): las iniciales de `Avatar` `lg`.
