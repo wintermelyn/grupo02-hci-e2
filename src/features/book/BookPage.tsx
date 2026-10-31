@@ -1,3 +1,4 @@
+import { Sparkle } from 'lucide-react'
 import { matchPath, useLocation, useParams } from 'react-router'
 import { BackLink, BookCover, StatusControl, Wordmark } from '../../components'
 import { selectBook, selectEntry, useStore } from '../../store'
@@ -45,7 +46,10 @@ function AboutBook({ description, descriptionTranslated }: Book) {
           <p className="mt-1 wrap-break-word whitespace-pre-line">{description}</p>
           {/* Where the text comes from, so it reads like the author line and not like a warning. */}
           {descriptionTranslated && (
-            <p className="mt-2 text-sm text-muted">Traducción hecha con IA</p>
+            <p className="mt-2 flex items-center gap-1.5 text-sm text-muted">
+              <Sparkle aria-hidden size={14} fill="currentColor" strokeWidth={1.5} />
+              Traducción hecha con IA
+            </p>
           )}
         </>
       ) : (
