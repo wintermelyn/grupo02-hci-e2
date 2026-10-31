@@ -1,6 +1,7 @@
 /// <reference types="node" />
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
+import { contrast } from '../test/contrast'
 import type { ReadingStatus } from '../types'
 import { STATUS_ICONS, STATUS_RIBBON, STATUS_TEXT } from './statusStyles'
 
@@ -17,20 +18,6 @@ function token(name: string): string {
   return match[1]
 }
 
-// WCAG relative luminance: https://www.w3.org/TR/WCAG21/#dfn-relative-luminance
-function luminance(hex: string): number {
-  const channels = [1, 3, 5].map((start) => parseInt(hex.slice(start, start + 2), 16) / 255)
-  const [r, g, b] = channels.map((channel) =>
-    channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4,
-  )
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b
-}
-
-function contrast(a: string, b: string): number {
-  const [light, dark] = [luminance(a), luminance(b)].sort((x, y) => y - x)
-  return (light + 0.05) / (dark + 0.05)
-}
-
 describe('status styles', () => {
   it.each([...STATUSES, 'ink', 'muted', 'danger'])(
     '%s reads at 4.5:1 or more everywhere',
@@ -44,6 +31,17 @@ describe('status styles', () => {
   it('keeps white text at 4.5:1 or more on the filled buttons', () => {
     for (const fill of ['ink', 'danger']) {
       expect(contrast(token(fill), token('white'))).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST)
+    }
+  })
+
+  it('keeps the text of a secondary button at 4.5:1 or more on its fill', () => {
+    expect(contrast(token('ink'), token('sand-deep'))).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST)
+    expect(contrast(token('ink'), token('sand-dark'))).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST)
+  })
+
+  it('keeps the edge of a secondary button at 3:1 or more on every ground', () => {
+    for (const surface of ['white', 'paper', 'shell']) {
+      expect(contrast(token('edge'), token(surface))).toBeGreaterThanOrEqual(3)
     }
   })
 

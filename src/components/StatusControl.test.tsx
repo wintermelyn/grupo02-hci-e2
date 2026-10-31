@@ -14,6 +14,7 @@ const IT = 'OL81613W' // Lo quiero
 const CIEN_ANOS = 'OL274505W' // Leído
 
 const option = (name: string) => screen.getByRole('menuitemradio', { name })
+const removeOption = () => screen.getByRole('menuitem', { name: /^Quitar de mi biblioteca/ })
 
 function renderControl(bookId: string, book?: Book) {
   renderWithRouter(<StatusControl bookId={bookId} book={book} />)
@@ -68,6 +69,21 @@ describe('StatusControl', () => {
     openMenu()
     fireEvent.click(option('Leyendo'))
     expect(state().library[IT].status).toBe('reading')
+  })
+
+  it('offers to leave the library below the tags, set apart and saying what it costs', () => {
+    renderControl(CIEN_ANOS)
+    openMenu()
+    const remove = screen.getByRole('menuitem', { name: /^Quitar de mi biblioteca/ })
+    expect(remove).toHaveTextContent('Pierdes 1 carpeta, las fechas y el puntaje')
+    expect(remove).toHaveAccessibleDescription('Pierdes 1 carpeta, las fechas y el puntaje')
+    expect(screen.getByRole('separator')).toBeInTheDocument()
+  })
+
+  it('has nothing to leave when the book is not in the library', () => {
+    renderControl(apiBook.id, apiBook)
+    openMenu('Agregar a Mis libros')
+    expect(screen.queryByRole('menuitem')).not.toBeInTheDocument()
   })
 
   it('finishes a started book with finishBook, never with setStatus', () => {
@@ -149,9 +165,11 @@ describe('StatusControl with the keyboard', () => {
     key('ArrowDown')
     expect(option('Leído')).toHaveFocus()
     key('ArrowDown')
+    expect(removeOption()).toHaveFocus()
+    key('ArrowDown')
     expect(option('Lo quiero')).toHaveFocus()
     key('ArrowUp')
-    expect(option('Leído')).toHaveFocus()
+    expect(removeOption()).toHaveFocus()
   })
 
   it('jumps to the ends with Home and End', () => {
@@ -160,10 +178,10 @@ describe('StatusControl with the keyboard', () => {
     key('Home')
     expect(option('Lo quiero')).toHaveFocus()
     key('End')
-    expect(option('Leído')).toHaveFocus()
+    expect(removeOption()).toHaveFocus()
   })
 
-  it('opens from the control with the arrow keys', () => {
+  it('opens from the control with the arrow keys, on the last tag and not on leaving', () => {
     renderControl(IT)
     trigger().focus()
     key('ArrowUp')

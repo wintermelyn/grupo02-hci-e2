@@ -41,7 +41,7 @@ export function TagFilter({ value, counts, onChange }: TagFilterProps) {
             aria-label={`${option.label}: ${booksLabel(counts[option.value])}`}
             onClick={() => onChange(option.value)}
             className={cx(
-              'relative flex min-h-16 flex-col items-center justify-end rounded-t-card pt-3 pb-2.5 text-xs whitespace-nowrap',
+              'relative flex min-h-14 flex-col items-center justify-end rounded-t-card pt-3 pb-1.5 text-xs whitespace-nowrap',
               'transition-colors duration-100',
               active
                 ? 'bg-paper font-bold text-ink'
@@ -51,7 +51,7 @@ export function TagFilter({ value, counts, onChange }: TagFilterProps) {
             {active && (
               <Ribbon className="absolute top-0 left-1/2 h-3 w-2.25 -translate-x-1/2 bg-ribbon" />
             )}
-            <span className="font-serif text-xl font-semibold tabular-nums">
+            <span className="font-serif text-base/5 font-semibold tabular-nums">
               {counts[option.value]}
             </span>
             {option.label}
