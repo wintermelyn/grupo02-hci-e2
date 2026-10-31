@@ -15,7 +15,7 @@ export function EmptyState({ title, description, icon: Icon = Inbox, action }: E
     <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-tile bg-shell p-5">
       <Icon aria-hidden size={24} className="shrink-0 text-muted" />
       <div className="min-w-0 flex-1 basis-48">
-        <h2 className="font-serif text-lg font-semibold">{title}</h2>
+        <h2 className="font-serif text-lg font-semibold wrap-anywhere">{title}</h2>
         {description && <p className="wrap-anywhere text-muted">{description}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}

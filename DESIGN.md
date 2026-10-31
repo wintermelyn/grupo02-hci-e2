@@ -765,7 +765,7 @@ Una capa de tinta de hasta 448 px, con radio `float` y `shadow-float`. Bajo `lg`
 
 ### Estados de pantalla
 
-`EmptyState` y `ErrorState` son un bloque `shell` en el lugar donde iría el contenido, a 16 px de lo anterior: ícono de 24 px a la izquierda, título en Book title, descripción `muted` y la acción al final, que baja de línea si no cabe. La descripción corta una palabra larga para no salirse del margen. El ícono de error va en `danger`. `LoadingState` dibuja tres filas de esqueleto en `sand` con la forma de `BookRow`, para que la página no salte, y pulsa solo si la persona no pidió reducir movimiento. La ficha de un libro que llega con el catálogo espera con `BookSkeleton`, en `src/features/book/`, con su misma forma: la escena, el título y el registro, y sin autor dice "Autor desconocido" en ese mismo lugar.
+`EmptyState` y `ErrorState` son un bloque `shell` en el lugar donde iría el contenido, a 16 px de lo anterior: ícono de 24 px a la izquierda, título en Book title, descripción `muted` y la acción al final, que baja de línea si no cabe. El título y la descripción cortan una palabra larga para no salirse del margen. El ícono de error va en `danger`. `LoadingState` dibuja tres filas de esqueleto en `sand` con la forma de `BookRow`, para que la página no salte, y pulsa solo si la persona no pidió reducir movimiento. La ficha de un libro que llega con el catálogo espera con `BookSkeleton`, en `src/features/book/`, con su misma forma: la escena, el título y el registro, y sin autor dice "Autor desconocido" en ese mismo lugar.
 
 ### Movimiento
 
