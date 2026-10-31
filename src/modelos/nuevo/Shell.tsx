@@ -82,9 +82,9 @@ export function Shell() {
 
       <nav
         aria-label="Principal"
-        className="fixed inset-x-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-md rounded-[26px] border border-line bg-paper/92 shadow-float backdrop-blur-xl backdrop-saturate-150 lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-edge/60 bg-paper pb-[env(safe-area-inset-bottom)] lg:hidden"
       >
-        <ul className="flex p-1">
+        <ul className="mx-auto flex max-w-md p-1">
           {SECCIONES.map(({ to, label, icon: Icono, tambien }) => {
             const es = activa(to, tambien, pathname)
             return (
