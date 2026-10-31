@@ -1,4 +1,4 @@
-import { FolderOpen, FolderX, SearchX } from 'lucide-react'
+import { FolderOpen, FolderX } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import {
@@ -13,64 +13,21 @@ import {
 import { ignoreSecondClick } from '../../components/ignoreSecondClick'
 import { STATUS_LABELS } from '../../lib/status'
 import { useStore } from '../../store'
-import type { Book, Folder } from '../../types'
+import type { Folder } from '../../types'
 import { BandSearch } from './BandSearch'
 import { BookList } from './BookList'
 import {
   booksLabel,
-  compareTitles,
   countByTag,
   folderNameProblem,
-  matchesQuery,
+  LIBRARY_PATH,
   MAX_FOLDER_NAME_LENGTH,
   TAG_PARAM,
-  useBookLookup,
+  useFilteredBooks,
 } from './filters'
 import { FolderOptions } from './FolderOptions'
+import { NoBooks } from './NoBooks'
 import { useListFilters } from './useListFilters'
-
-const LIBRARY_PATH = '/biblioteca'
-
-interface NoBooksProps {
-  folder: Folder
-  label?: string
-  query: string
-  /** How many books the folder has, whatever their tag. */
-  total: number
-  onShowAll: () => void
-}
-
-function NoBooks({ folder, label, query, total, onShowAll }: NoBooksProps) {
-  // A book that changes its tag leaves this list but stays in the folder, so the way back is here.
-  const showAll = label && <Button onClick={onShowAll}>Ver todos los libros</Button>
-
-  if (query) {
-    return (
-      <EmptyState
-        icon={SearchX}
-        title="Sin resultados"
-        description={
-          label
-            ? `Ningún libro con el estado «${label}» coincide con «${query}».`
-            : `Ningún libro de «${folder.name}» coincide con «${query}».`
-        }
-        action={showAll}
-      />
-    )
-  }
-  return (
-    <EmptyState
-      icon={FolderOpen}
-      title={`Ningún libro en «${label}»`}
-      description={
-        total === 1
-          ? 'El libro de esta carpeta tiene otro estado.'
-          : `Los ${total} libros de esta carpeta tienen otro estado.`
-      }
-      action={showAll}
-    />
-  )
-}
 
 type Editing = 'rename' | 'delete'
 
@@ -80,7 +37,6 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
   const [name, setName] = useState('')
   const library = useStore((state) => state.library)
   const renameFolder = useStore((state) => state.renameFolder)
-  const bookOf = useBookLookup()
   const folders = useStore((state) => state.folders)
   const nameProblem = folderNameProblem(name, folders, folder.id)
   const optionsRef = useRef<HTMLDivElement>(null)
@@ -99,15 +55,7 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
   )
   const counts = useMemo(() => countByTag(entries), [entries])
 
-  const books = useMemo<Book[]>(
-    () =>
-      entries
-        .filter(({ status }) => tag === 'all' || status === tag)
-        .flatMap(({ bookId }) => bookOf(bookId) ?? [])
-        .filter((book) => matchesQuery(book, query))
-        .sort(compareTitles),
-    [entries, tag, query, bookOf],
-  )
+  const books = useFilteredBooks(entries, tag, query)
 
   function chooseTag(value: TagFilterValue) {
     setParams({ [TAG_PARAM]: value === 'all' ? '' : value })
@@ -224,7 +172,7 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
             />
           ) : (
             <NoBooks
-              folder={folder}
+              name={folder.name}
               label={label}
               query={query}
               total={counts.all}

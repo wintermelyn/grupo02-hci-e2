@@ -5,6 +5,10 @@ import { useStore } from '../../store'
 import type { Book, BookId, Folder, LibraryEntry } from '../../types'
 
 export const TAG_PARAM = 'tag'
+export const LIBRARY_PATH = '/biblioteca'
+/** Not under /carpeta: a folder named "Sin carpeta" gets that same id. */
+export const UNFILED_PATH = '/biblioteca/sin-carpeta'
+export const UNFILED_NAME = 'Sin carpeta'
 
 export function parseTag(value: string | null): TagFilterValue {
   return STATUS_ORDER.find((status) => status === value) ?? 'all'
@@ -68,4 +72,22 @@ export function useBookLookup() {
     const books = { ...seedBooks, ...extraBooks }
     return (bookId: BookId): Book | undefined => books[bookId]
   }, [seedBooks, extraBooks])
+}
+
+/** The books of these entries that pass the tag and the search, by title. */
+export function useFilteredBooks(
+  entries: LibraryEntry[],
+  tag: TagFilterValue,
+  query: string,
+): Book[] {
+  const bookOf = useBookLookup()
+  return useMemo(
+    () =>
+      entries
+        .filter(({ status }) => tag === 'all' || status === tag)
+        .flatMap(({ bookId }) => bookOf(bookId) ?? [])
+        .filter((book) => matchesQuery(book, query))
+        .sort(compareTitles),
+    [entries, tag, query, bookOf],
+  )
 }
