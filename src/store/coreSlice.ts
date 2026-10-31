@@ -25,11 +25,11 @@ export interface CoreActions {
   pauseToast: () => void
   /** Restarts the auto-dismiss timer with the full TOAST_DURATION_MS. */
   resumeToast: () => void
-  /** Adds a book from the API to extraBooks. Never overwrites a seed book. */
+  /** Keeps a copy of a catalog book in extraBooks. Never overwrites a seed book. */
   upsertBook: (book: Book) => void
   /**
    * Adds the book to the library or changes its status. Ignores ids that getBook does not know,
-   * so call upsertBook first for an API book. Leaving Leído deletes nothing, so a mistaken Leído
+   * so call upsertBook first for a catalog book. Leaving Leído deletes nothing, so a mistaken Leído
    * can be fixed at any time: only Leyendo drops finishedAt, because that reading is not over.
    * Moving to Lo quiero sets wantCheckedAt to today, so the D5 prompt does not ask about a book the
    * person just chose.
