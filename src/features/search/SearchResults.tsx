@@ -55,6 +55,7 @@ export function NoResults({ text, authors, onPickAuthor }: NoResultsProps) {
         <AuthorList
           title="Autores de Mis libros"
           authors={authors.slice(0, AUTHORS_AS_WAY_OUT)}
+          className="lg:mt-10"
           onPick={onPickAuthor}
         />
       )}

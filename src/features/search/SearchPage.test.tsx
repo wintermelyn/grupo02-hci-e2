@@ -429,6 +429,17 @@ describe('the best result', () => {
     expect(within(section('Libros')).getByRole('link', { name: /Dune/ })).toBeInTheDocument()
   })
 
+  it('gives a lone author the whole row up to lg, with the size of a card title', async () => {
+    renderApp('/buscar?q=king')
+    await screen.findByText(/en Mis libros/)
+    const author = within(section('Autores')).getByRole('button', { name: /Stephen King/ })
+    expect(author.closest('li')).toHaveClass('only:max-lg:col-span-full')
+    expect(within(author).getByText('Stephen King')).toHaveClass(
+      'text-[1.5rem]/[1.12]',
+      'lg:text-[2rem]/[1.1]',
+    )
+  })
+
   it('is the author when no title starts with the search', async () => {
     renderApp('/buscar?q=king')
     await screen.findByText(/en Mis libros/)
@@ -480,6 +491,12 @@ describe('without results', () => {
       within(section('Autores de Mis libros')).getByRole('button', { name: /George Orwell/ }),
     )
     expect(currentLocation()).toBe('/buscar?q=George+Orwell')
+  })
+
+  it('separates the way out from the block above as two sections', async () => {
+    renderApp('/buscar?q=zzzz')
+    await screen.findByText('No encontramos «zzzz»')
+    expect(section('Autores de Mis libros')).toHaveClass('mt-7', 'lg:mt-10')
   })
 
   it('cuts a long search, which the title cannot break', async () => {
