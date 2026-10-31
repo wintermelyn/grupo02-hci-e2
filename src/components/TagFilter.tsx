@@ -26,7 +26,11 @@ function booksLabel(count: number): string {
  */
 export function TagFilter({ value, counts, onChange }: TagFilterProps) {
   return (
-    <div role="group" aria-label="Filtrar por estado" className="-mx-2 grid grid-cols-5">
+    <div
+      role="group"
+      aria-label="Filtrar por estado"
+      className="-mx-2 grid grid-cols-5 md:max-w-lg"
+    >
       {OPTIONS.map((option) => {
         const active = option.value === value
         return (

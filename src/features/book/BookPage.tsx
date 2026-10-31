@@ -77,7 +77,8 @@ export function BookPage() {
   }
 
   return (
-    <article>
+    // On short screens the page always has room to scroll, so the menu can open below the control.
+    <article className="[@media(max-height:640px)]:min-h-[calc(100dvh+2.5rem)]">
       <div className="full-bleed bg-shell pt-2 md:mx-0 md:bg-transparent md:px-0 md:pt-6">
         <BackLink to={back.to} label={back.label} />
       </div>

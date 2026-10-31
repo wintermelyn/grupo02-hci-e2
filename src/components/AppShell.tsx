@@ -75,8 +75,12 @@ export function AppShell() {
             <span className="text-xs text-muted">Prototipo de rediseño</span>
           </p>
           <nav aria-label="Principal">
-            <ul className="flex gap-1">
-              <NavItems layout="min-h-16 gap-2 px-3" ribbon="top-0 h-3.5 w-2.5" iconSize={20} />
+            <ul className="flex lg:gap-1">
+              <NavItems
+                layout="min-h-16 gap-2 px-2 lg:px-3"
+                ribbon="top-0 h-3.5 w-2.5"
+                iconSize={20}
+              />
             </ul>
           </nav>
         </div>
