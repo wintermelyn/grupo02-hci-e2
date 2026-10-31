@@ -24,8 +24,8 @@ describe('Avatar', () => {
   })
 
   it('takes the colour of the person', () => {
-    render(<Avatar user={{ name: 'Alex Muñoz', avatarColor: '#123456' }} />)
-    expect(screen.getByText('AM')).toHaveStyle({ backgroundColor: '#123456' })
+    render(<Avatar user={{ name: 'Alex Muñoz', avatarColor: '#1e1915' }} />)
+    expect(screen.getByText('AM')).toHaveStyle({ backgroundColor: '#1e1915' })
   })
 
   it('tells homonyms apart by colour, on top of their usernames', () => {
