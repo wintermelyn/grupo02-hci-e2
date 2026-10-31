@@ -505,7 +505,7 @@ El diseño parte del celular. `AppShell` pone el marco y cada pantalla solo llen
 - **Puntos de quiebre:** `lg` (1024 px) cambia la barra inferior por la lateral. `md` (768 px) cambia las grillas. `sm` (640 px) solo afina Descubrir.
 - **Barra lateral:** 232 px (`--sidebar`), fija al alto de la pantalla, desde `lg`.
 - **Margen:** `--gut` mide 16 px, 28 px desde `md` y 44 px desde `lg`. `main` lo pone siempre, así que una pantalla no agrega su propio margen lateral. Lo que deba llegar al borde de la columna, como un riel, usa `full-bleed`.
-- **Ancho:** Inicio, Descubrir, Buscar y `/actividad` usan todo el ancho que deja la barra lateral (`WIDE_PATHS` en `AppShell`). Las demás pantallas van en una columna de hasta 1040 px (`max-w-app`), centrada bajo `lg` y pegada a la barra lateral desde ahí.
+- **Ancho:** Inicio, Descubrir y Buscar, también la actividad completa (`/?actividad=`), usan todo el ancho que deja la barra lateral (`WIDE_PATHS` en `AppShell`). Las demás pantallas van en una columna de hasta 1040 px (`max-w-app`), centrada bajo `lg` y pegada a la barra lateral desde ahí.
 - **Inicio de página:** `PageHeader` deja 12 px arriba, 32 px desde `lg`, y 16 px abajo si no lleva nada bajo el título. El margen inferior de lo que lleva adentro queda en el encabezado, gracias a `flow-root`. La acción de la página, si la hay, va en la misma fila del título.
 - **Espacio bajo el contenido:** `main` deja 128 px abajo más el área segura bajo `lg`, para la barra de 65 px y el toast, y 64 px desde `lg`. Medido al final de cada pantalla, lo último queda a 63 px o más de la barra.
 - **Ritmo vertical:** 28 px entre secciones (40 px desde `lg`), 12 px bajo un título de sección y 16 px bajo un título de página.
@@ -757,7 +757,7 @@ Las portadas no se tiñen ni se recortan en la ficha. `lg` mide 112 px en celula
 - **Scroll:** `AppShell` parte cada página arriba. Volver, con el botón del navegador o con `BackLink`, deja la lista donde estaba. Un filtro no mueve la página. Una búsqueda nueva la lleva al comienzo de sus resultados, justo bajo el campo, solo si estaba más abajo. La barra lateral queda fija mientras la página se desplaza.
 - **Bajo `lg`:** `AppShell` fija una barra al borde inferior, de lado a lado, sobre `paper` sólido y sin desenfoque, de 65 px más el área segura, con una raya superior `edge` al 60 %. Va pegada al borde porque una barra flotante se movía con la barra del navegador en un celular real. Tiene cinco secciones repartidas por igual, hasta 448 px de ancho y centradas en una tablet, de 56 px de alto, con ícono de 21 px y etiqueta Caption. La presión es `sand`.
 - **Desde `lg`:** barra lateral de 232 px, sobre `paper`, con una raya `line` a la derecha. Arriba va "Goodreads" en serif de 24 px, que lleva a Inicio; abajo, "Prototipo de rediseño, proyecto de curso" en Caption. Las secciones miden 44 px, con ícono de 20 px, y van una sobre otra.
-- **Estados:** la sección activa es de tinta, con peso 700, ícono más grueso y relleno `sand`, y en la lateral también con cinta. Las demás son `muted`, con peso 500 en la lateral y 600 abajo. En la lateral, con el cursor, toman `shell` y tinta. "Más" sigue activa en Amigos y Mi perfil, e "Inicio" en `/actividad`, y esa página se anuncia con `aria-current="true"`.
+- **Estados:** la sección activa es de tinta, con peso 700, ícono más grueso y relleno `sand`, y en la lateral también con cinta. Las demás son `muted`, con peso 500 en la lateral y 600 abajo. En la lateral, con el cursor, toman `shell` y tinta. "Más" sigue activa en Amigos y Mi perfil, e "Inicio" en la actividad completa (`/?actividad=`), y esa vista se anuncia con `aria-current="true"`.
 - **Marca bajo `lg`:** `PageHeader` y la ficha muestran `Wordmark`, "Goodreads prototipo" en una línea. Va a la derecha del título. Si `PageHeader` recibe `backTo` o `action`, sube a la fila de arriba, para que el título y la acción tengan el ancho, salvo con `wordmarkBeside`, para un título corto y una acción `compact`, como en Mis libros, donde se apila en dos líneas. Una pantalla sin `PageHeader` pone su propio `Wordmark`. Ninguna pantalla pierde el aviso de prototipo: desde `lg` lo dice la barra lateral.
 
 ### Toast
@@ -782,7 +782,7 @@ Lo que sigue quien lleva una pantalla al aspecto de este documento.
 
 **Marco.** `main` ya trae el margen, el fondo y el espacio bajo el contenido. La pantalla no agrega `px-*` en su raíz, ni fondo, ni `pb-*`, y parte con un `section` sin clases. Ninguna pantalla toca la barra ni el toast.
 
-**Ancho de columna.** Inicio, Descubrir, Buscar y `/actividad` usan todo el ancho. Las demás van en `max-w-app`. Dentro de una pantalla ancha, el texto seguido no pasa de `max-w-3xl`, y una descripción, de `max-w-[60ch]`.
+**Ancho de columna.** Inicio, Descubrir y Buscar, también la actividad completa (`/?actividad=`), usan todo el ancho. Las demás van en `max-w-app`. Dentro de una pantalla ancha, el texto seguido no pasa de `max-w-3xl`, y una descripción, de `max-w-[60ch]`.
 
 **Títulos.**
 

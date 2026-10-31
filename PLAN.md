@@ -263,7 +263,7 @@ También son compartidos y del bloque base:
 Si alguien necesita cambiar algo compartido, le avisa al otro rol antes y lo sube en un commit separado.
 
 ### Reglas de interfaz (valen para ambos roles; el detalle está en `docs/conceptos-hci.md`)
-1. **Íconos siempre con etiqueta de texto**, incluida la barra de navegación. Excepciones aprobadas: las flechas de un riel, en computador, y el corazón de "Me gusta", en celular. Ambas llevan nombre accesible.
+1. **Íconos siempre con etiqueta de texto**, incluida la barra de navegación. Excepciones aprobadas: las flechas de un riel, en computador, y el corazón de "Me gusta", en celular y en las filas de Inicio en tablet. Ambas llevan nombre accesible.
 2. **Áreas táctiles de al menos 44×44 px**, y nada que dependa solo del hover.
 3. **El estado nunca se comunica solo con color:** siempre texto + color.
 4. **Contraste de texto mínimo 4.5:1.** Nada de gris claro sobre blanco para texto que importa.
