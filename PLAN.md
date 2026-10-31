@@ -229,11 +229,12 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 - Con el tag en "Leído", la ficha muestra inicio, fin y puntaje como filas editables, que guardan con `finishBook`. Con "Leyendo" muestra el inicio, que guarda con `setStartDate`.
 
 ### Componentes compartidos (`src/components/`, del bloque base)
-- **`AppShell`:** navegación inferior en celular y superior en computador, contenedor centrado y `<Toast/>`.
+- **`AppShell`:** navegación inferior en celular y superior en computador, contenedor centrado, `<Toast/>` y memoria de scroll: cada página parte arriba y volver deja la lista donde estaba.
 - **`PageHeader`:** banda de la página con título, subtítulo, botón de volver y una acción a la derecha. Lo que recibe como hijo, como `TagFilter`, queda en el borde inferior. "Goodreads / prototipo" sigue visible en el celular, también con acción. `media` pone algo antes del título, como un `Avatar`.
 - **`BookCover`:** portada, con un placeholder de color e iniciales si no hay imagen. Con la prop `status`, muestra la cinta del tag bajo la portada.
 - **`BookRow`:** portada con su cinta, título, `StatusTag` junto al autor, bajo el título (si el libro está en la biblioteca), y estrellas (si está en "Leído"). Acepta las props `trailing` y `note`, que reemplaza mi tag y mis estrellas en una lista sobre otra persona. Al abrir la ficha le pasa de dónde viene, para que vuelva a esa misma lista.
 - **`AnchoredMenu`:** el menú anclado reutilizable. Sirve para un cambio rápido y reversible con pocas opciones, junto a su control: `radio` para una opción actual, `checkbox` para varias y `action` para comandos. `actions` agrega comandos bajo una línea, con lo que cuestan.
+- **`TextField`:** un texto corto que se escribe donde se lee, con Enter para guardar, Escape para cancelar y `problem` para decir por qué no se puede guardar. Quien lo usa pone Guardar y Cancelar.
 - **`SearchField`:** campo de búsqueda que filtra mientras se escribe, con "Borrar". Con `onClose` suma "Cerrar", para un campo que el celular abre a pedido.
 - **`Avatar`:** círculo con las iniciales sobre `avatarColor`, siempre junto al nombre.
 - **`StatusControl`:** el tag de la ficha con su lápiz (D2). Al tocarlo abre un `AnchoredMenu` junto al control, con las cuatro opciones de 48 px de alto. El menú no oscurece la pantalla y deja ver el libro. Funciona con foco, flechas, Inicio, Fin, Escape y clic afuera. El informe solo pide una "vista de selección de opciones de tags". Si el libro no está en la biblioteca, muestra "Agregar a Mis libros" y abre el mismo menú. Si está, el menú suma "Quitar de mi biblioteca" bajo una línea, con lo que se pierde, así que entrar y salir cuestan dos toques. Recibe `bookId` y `book`.
@@ -352,7 +353,7 @@ Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarr
   - se editan ahí mismo, con fechas y estrellas opcionales;
   - no permite fin anterior a inicio ni fechas futuras.
 - [ ] **Acciones de `librarySlice`.** Falta `answerWantPrompt`; las demás están hechas.
-- [ ] **Campo de formulario compartido** (bloque base, antes de "+ Nueva carpeta"): lo usan renombrar carpeta y "+ Nueva carpeta".
+- [x] **Campo de formulario compartido** (bloque base, antes de "+ Nueva carpeta"): `TextField`, para renombrar carpeta y "+ Nueva carpeta".
 - **Listo cuando:** T1 y T2 se completan desde "Reiniciar demo", en celular y en computador, y cada cambio muestra el toast con Deshacer.
 
 ### Rol B · Social y búsqueda (T3 + búsqueda) · `src/features/home|search|discover|more|friends|profile/`, `src/lib/openlibrary.ts`, `socialSlice.ts`, `src/data/seedDiscover.ts`

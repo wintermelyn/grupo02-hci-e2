@@ -8,6 +8,7 @@ import {
   PageHeader,
   SearchField,
   TagFilter,
+  TextField,
   type TagFilterValue,
 } from '../../components'
 import { cx } from '../../components/cx'
@@ -22,11 +23,11 @@ import {
   countByTag,
   folderNameProblem,
   matchesQuery,
+  MAX_FOLDER_NAME_LENGTH,
   parseTag,
   TAG_PARAM,
   useBookLookup,
 } from './filters'
-import { FolderNameField } from './FolderNameField'
 import { FolderOptions } from './FolderOptions'
 
 const LIBRARY_PATH = '/biblioteca'
@@ -188,13 +189,14 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
       <PageHeader
         title={
           renaming ? (
-            <FolderNameField
-              folder={folder}
+            <TextField
+              label={`Nombre de «${folder.name}»`}
               value={name}
               onChange={setName}
-              onSave={saveName}
+              onSubmit={saveName}
               onCancel={stopEditing}
               problem={nameProblem}
+              maxLength={MAX_FOLDER_NAME_LENGTH}
             />
           ) : (
             // Next to two buttons, a long name took seven lines of a 320 px phone from the list.

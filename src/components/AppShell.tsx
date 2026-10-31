@@ -3,6 +3,7 @@ import { Link, matchPath, Outlet, useLocation } from 'react-router'
 import { cx } from './cx'
 import { Ribbon } from './Ribbon'
 import { Toast } from './Toast'
+import { useScrollMemory } from './useScrollMemory'
 
 interface Section {
   to: string
@@ -66,6 +67,8 @@ function NavItems({
 }
 
 export function AppShell() {
+  useScrollMemory()
+
   return (
     <div className="min-h-dvh">
       {/* On the ground of the page, so the bar and the column read as one: 48 px, one line, no card. */}

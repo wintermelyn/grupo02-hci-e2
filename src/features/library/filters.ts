@@ -45,6 +45,8 @@ export function matchesQuery({ title, authors }: Book, query: string): boolean {
   return normalizeText([title, ...authors].join(' ')).includes(normalizeText(query))
 }
 
+export const MAX_FOLDER_NAME_LENGTH = 40
+
 /** Why a folder cannot take this name, in the person's words. */
 export function folderNameProblem(
   folder: Folder,

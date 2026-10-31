@@ -476,6 +476,7 @@ Importa todo desde `src/components/`. Son del bloque base: si necesitas cambiar 
 | Acción con botón                                   | `Button`: `primary`, `secondary`, `quiet` o `danger`; `compact` en una fila o una banda              |
 | Cambio rápido con pocas opciones, junto al control | `AnchoredMenu`                                                                                       |
 | Editar un dato                                     | En su lugar, en la misma fila o título donde se lee                                                  |
+| Escribir un texto corto donde se lee               | `TextField`, con Guardar y Cancelar al lado                                                          |
 | Confirmar lo que no se puede deshacer              | `InlineConfirm`, solo para eliminar carpeta y Reiniciar demo                                         |
 | Buscar o filtrar mientras se escribe               | `SearchField`, en la banda                                                                           |
 | Mostrar a una persona                              | `Avatar`, siempre junto a su nombre                                                                  |
@@ -513,7 +514,7 @@ Viven en la carpeta de su pantalla. Sirven de modelo, y se vuelven compartidas s
 - **Fila del registro:** `LedgerRow`, en `src/features/book/`, dentro de un `dl`. La etiqueta va en Small `muted`, en una columna de 60 px (80 px desde `md`), y el valor va a la derecha, editable ahí mismo. Mide 44 px más 4 px arriba y abajo, con una línea debajo. Las filas son Estado, Inicio, Fin, Puntaje y Carpetas: Inicio aparece en Leyendo y Leído, Fin y Puntaje solo en Leído, y Carpetas si el libro está en la biblioteca. La acción de una fila es un botón `quiet` `compact`, siempre al final, con el texto sobre el margen. Solo la fecha y la fila Estado sobresalen 8 px a la izquierda con el cursor, para que su texto quede alineado.
 - **Fecha en una fila:** sin borde ni fondo, con su ícono `CalendarDays` en `muted` y hover de tinta al 5 %. Abre el calendario al tocar cualquier parte, así que las partes de la fecha se editan con el teclado. Chrome ignora `:focus` sobre ellas, por lo que un filtro convierte su azul en un tono cercano a `sand` y deja marcada la parte que se edita. La fecha del calendario se guarda de inmediato, y la escrita al presionar Enter o al salir del campo.
 - **Carpetas de un libro:** enlaces de texto en la fila Carpetas, en peso 500, con subrayado `muted` al 50 % que pasa a tinta con el cursor, y 44 × 44 px como mínimo. Son un lugar, no un estado: no llevan cinta ni color de tag. Al final de la fila, un `Button` `quiet` `compact` abre el menú y se llama según lo que se puede hacer: "Agregar", con un más, si no hay ninguna, y "Agregar o quitar", sin ícono, si hay, porque el más diría solo la mitad. Su nombre accesible dice "Agregar a carpeta". Sin carpetas, a su izquierda dice "Sin carpetas" en `muted`. El botón no se mueve de la primera línea: lo que no cabe son los enlaces, que bajan.
-- **Nombre de una carpeta:** `FolderNameField` toma el lugar del título con el mismo tipo, sobre una línea de 1 px de tinta que se aparta mientras el contorno de foco dibuja el campo, con Guardar y Cancelar en la banda.
+- **Nombre de una carpeta:** `TextField` toma el lugar del título con el mismo tipo, con Guardar y Cancelar en la banda.
 - **Búsqueda en una carpeta:** `SearchField` va en la fila del título, porque `TagFilter` ocupa el borde inferior de la banda. Desde `md` está siempre a la vista, con 288 px de ancho, junto a Opciones. En celular no cabe junto al título, así que el botón `compact` "Buscar", sin ícono para que el título quepa a 320 px, lo abre sobre esa misma fila, con el foco en el campo: aparece bajo el dedo y ningún libro se mueve. El título sigue en la página para los lectores de pantalla, y el `placeholder` dice en qué carpeta se busca. "Cerrar" vacía la búsqueda, cierra el campo y devuelve el foco a "Buscar". Una búsqueda que vuelve desde la URL abre el campo sola, sin tomar el foco.
 - **Carpeta fija:** solo dice "Carpeta fija" de subtítulo.
 - **Título de una carpeta:** en celular llega a dos líneas, porque comparte la fila con dos botones y un nombre de 40 caracteres dejaría el primer libro a media pantalla. Desde `md` se muestra entero.
@@ -547,7 +548,7 @@ La firma del sistema. `Ribbon` es decorativo y lleva `aria-hidden`: lo que marca
 
 - **Dónde abre el menú:** debajo del control siempre que pueda, porque arriba taparía el libro. Si no cabe, la página hace scroll primero. Solo abre hacia arriba cuando la página ya no puede moverse. Si tampoco cabe arriba, queda abajo, sobre la barra inferior (capa 45, entre las barras y el toast), y limita su alto al espacio que queda.
 - **Agregar o quitar carpetas de un libro:** es un cambio rápido y reversible, así que va en un menú anclado con todas las carpetas. Tocar una la agrega o la quita, y las dos cosas cuestan lo mismo, como pide la regla 11.
-- **Nombrar una carpeta:** el nombre se escribe en el título, con `FolderNameField`.
+- **Nombrar una carpeta:** el nombre se escribe en el título, con `TextField`.
 - **Fechas y puntaje:** se corrigen en su fila de la ficha, y cada cambio ofrece Deshacer.
 
 ### AnchoredMenu
@@ -571,6 +572,10 @@ Un campo blanco con borde de 1 px `edge`, 44 px de alto y radio de control, con 
 - **Borrar y Cerrar:** texto en tinta, peso 600, con hover `sand` y presión `sand-deep`, como `quiet`.
 - **`onClose`:** para un campo que el celular abre a pedido. Agrega "Cerrar", que en celular toma el lugar de "Borrar", porque con ambos quedan 56 px para escribir a 320 px. Desde `md` sigue "Borrar". Escape cierra en todos los anchos.
 - **Foco:** el contorno global rodea todo el campo, no solo el texto.
+
+### TextField
+
+Un texto corto que se escribe donde se lee, como el nombre de una carpeta. Hereda el tipo de lo que reemplaza y va sobre una línea de 1 px de tinta, que se aparta mientras el contorno de foco dibuja el campo. Parte con el foco y su texto seleccionado. Enter guarda y Escape cancela. Si el valor no se puede guardar, `problem` lo dice debajo, en Small con `CircleAlert`. Quien lo muestra pone Guardar y Cancelar a su lado.
 
 ### Avatar
 
@@ -633,6 +638,7 @@ Las portadas no se tiñen ni se recortan en la ficha. `lg` mide 112 px en celula
 
 ### Navigation
 
+- **Scroll:** `AppShell` parte cada página arriba. Volver, con el botón del navegador o con `BackLink`, deja la lista donde estaba. Un filtro o una búsqueda no mueven la página.
 - **Celular:** `AppShell` fija una barra abajo, sobre `paper`, de 64 px más el área segura, con raya superior `edge` y cinco secciones repartidas por igual, ícono de 22 px y etiqueta Caption. La presión es `sand`.
 - **Desde `md`:** barra superior fija, sobre `paper`, de 48 px, con raya inferior `edge`. "Goodreads" en serif de 18 px y "Prototipo" ("Prototipo de rediseño" desde `lg`) van en el borde izquierdo de la columna, y las cinco secciones terminan en el derecho, con íconos de 18 px y Small label. Cada sección mide 44 px para tocar y muestra un relleno de 36 px, para que la barra no quede llena. El hover es `sand`.
 - **Estados:** la sección activa es de tinta, con peso 700 y cinta, y desde `md` también con relleno `sand-deep`. Las demás son `muted` con peso 600 y pasan a tinta con el cursor. "Más" sigue activa en Amigos y Mi perfil.

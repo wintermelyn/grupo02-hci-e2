@@ -12,6 +12,7 @@ export function BackLink({ to, label = 'Volver' }: BackLinkProps) {
   return (
     <Link
       to={to}
+      state={{ restoreScroll: true }}
       className="-ml-2 inline-flex min-h-11 shrink-0 items-center gap-0.5 rounded-control pr-2 pl-1 font-medium whitespace-nowrap text-ink transition-colors duration-100 hover:bg-sand active:bg-sand-deep"
     >
       <ChevronLeft aria-hidden size={20} />

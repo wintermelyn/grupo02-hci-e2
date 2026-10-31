@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react'
+import { fireEvent, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { renderApp } from '../test/router'
 
@@ -63,5 +63,32 @@ describe('AppShell', () => {
   it('marks no section on a book page', () => {
     renderApp('/libro/OL81626W')
     for (const nav of navigationBars()) expect(activeSections(nav)).toEqual([])
+  })
+
+  describe('scroll between pages', () => {
+    const scrollTo = (top: number) => {
+      document.documentElement.scrollTop = top
+      fireEvent.scroll(window)
+    }
+    const scrolled = () => document.documentElement.scrollTop
+
+    it('starts another page at the top and returns to the list with its back link', () => {
+      renderApp('/biblioteca?tag=want')
+      scrollTo(400)
+
+      fireEvent.click(screen.getByRole('link', { name: /^Fundación/ }))
+      expect(scrolled()).toBe(0)
+
+      fireEvent.click(within(screen.getByRole('main')).getByRole('link', { name: 'Mis libros' }))
+      expect(screen.getByRole('heading', { level: 1, name: 'Mis libros' })).toBeInTheDocument()
+      expect(scrolled()).toBe(400)
+    })
+
+    it('stays in place when a filter changes the URL of the same page', () => {
+      renderApp('/biblioteca?tag=want')
+      scrollTo(400)
+      fireEvent.click(screen.getByRole('button', { name: /Leído/ }))
+      expect(scrolled()).toBe(400)
+    })
   })
 })

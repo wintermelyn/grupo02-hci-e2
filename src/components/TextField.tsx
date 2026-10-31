@@ -1,28 +1,31 @@
 import { CircleAlert } from 'lucide-react'
 import { useEffect, useId, useRef, type KeyboardEvent } from 'react'
-import type { Folder } from '../../types'
 
-const MAX_NAME_LENGTH = 40
-
-export interface FolderNameFieldProps {
-  folder: Folder
+export interface TextFieldProps {
+  /** Names the field for screen readers: the place it sits in already names it on screen. */
+  label: string
   value: string
   onChange: (value: string) => void
-  onSave: () => void
+  onSubmit: () => void
   onCancel: () => void
-  /** Why the name cannot be saved. */
+  /** Why the value cannot be saved. */
   problem?: string
+  maxLength?: number
 }
 
-/** Takes the place of the title with the same type, so the name changes where it is read. */
-export function FolderNameField({
-  folder,
+/**
+ * A short text written where it is read, with the type of what it replaces. It starts focused with
+ * its text selected. Whoever shows it puts Guardar and Cancelar next to it.
+ */
+export function TextField({
+  label,
   value,
   onChange,
-  onSave,
+  onSubmit,
   onCancel,
   problem,
-}: FolderNameFieldProps) {
+  maxLength,
+}: TextFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const hintId = useId()
 
@@ -32,7 +35,7 @@ export function FolderNameField({
   }, [])
 
   function onKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Enter') onSave()
+    if (event.key === 'Enter') onSubmit()
     if (event.key === 'Escape') onCancel()
   }
 
@@ -43,16 +46,16 @@ export function FolderNameField({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={onKeyDown}
-        aria-label={`Nombre de «${folder.name}»`}
+        aria-label={label}
         aria-describedby={hintId}
         aria-invalid={Boolean(problem)}
-        maxLength={MAX_NAME_LENGTH}
+        maxLength={maxLength}
         autoComplete="off"
         enterKeyHint="done"
         // The focus outline already draws the field, so its line steps aside.
         className="block min-h-11 w-full min-w-0 rounded-control border-b border-ink bg-transparent font-semibold focus-visible:border-transparent"
       />
-      {/* Inside the h1 with the field, so the hint stays under it. Mounted for screen readers. */}
+      {/* Spans, so it also fits inside a heading. Mounted for screen readers. */}
       <span
         id={hintId}
         role="status"
