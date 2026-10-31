@@ -69,7 +69,7 @@ D1 a D6 son las decisiones 1 a 6 del informe, con la misma numeración. La colum
 | D5 | **Aviso "¿Sigues queriendo leer este libro?":** un libro antiguo de "Lo quiero" a la vez, con portada, título y botones "Sí" y "No". "No" muestra "Quitado de tu lista" con Deshacer | N1 | Mis libros |
 | D6 | **"Seleccionados para ti" en Descubrir:** las recomendaciones según los gustos quedan al mismo nivel que las listas prehechas | N5 | Descubrir |
 | — | **Toast con Deshacer** después de cada cambio en la biblioteca | — | Global |
-| — | Pantallas de **carga, sin resultados y error** | — | Buscar, Amigos, ficha |
+| — | Pantallas de **carga, sin resultados y error** | — | Buscar y ficha. Amigos solo tiene "sin resultados" y "sin amigos", porque su directorio está en la app |
 
 N3 no se atiende en esta entrega. Si el equipo cambia alguna decisión, se actualizan el informe y esta tabla.
 
@@ -352,6 +352,7 @@ Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarr
   - se editan ahí mismo, con fechas y estrellas opcionales;
   - no permite fin anterior a inicio ni fechas futuras.
 - [ ] **Acciones de `librarySlice`.** Falta `answerWantPrompt`; las demás están hechas.
+- [ ] **Campo de formulario compartido** (bloque base, antes de "+ Nueva carpeta"): lo usan renombrar carpeta y "+ Nueva carpeta".
 - **Listo cuando:** T1 y T2 se completan desde "Reiniciar demo", en celular y en computador, y cada cambio muestra el toast con Deshacer.
 
 ### Rol B · Social y búsqueda (T3 + búsqueda) · `src/features/home|search|discover|more|friends|profile/`, `src/lib/openlibrary.ts`, `socialSlice.ts`, `src/data/seedDiscover.ts`
@@ -443,3 +444,16 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Carpetas de un libro sin carpetas | No aparece | La fila dice "Sin carpetas" y el botón, "Agregar". Con carpetas dice "Agregar o quitar", sin ícono, porque el más diría solo la mitad |
 | Libros en común | Persona debe mostrarlos | Cada libro aparece una vez, en "Está leyendo" o "Últimos leídos", marcado "En común", y la cantidad va en el encabezado. Esas filas no muestran mi tag ni mis estrellas |
 | Buscador de la carpeta | "Buscador interno" | En la fila del título, dentro de la banda. Desde 768 px está siempre visible. En celular, "Buscar" lo abre sobre esa misma fila y "Cerrar" lo vacía y lo cierra, así aparece donde se tocó y ningún libro se mueve. En Amigos sigue siempre visible, porque es el camino de T3 |
+| Quitar de mi biblioteca | No aparece | Dos toques en el menú del tag, que dice qué se pierde, con Deshacer y sin confirmación (reglas 10 y 11) |
+| Aspecto de los botones | No aparece | Bloques de relleno, como describe `DESIGN.md`. Se revisan otra vez en la auditoría con todas las vistas |
+| Texto en agregar y quitar | Solo menciona "+" y un lápiz | Todo botón lleva texto (regla 1). Sin carpetas, el botón de la ficha dice "Agregar" |
+| Forma y color del avatar | No aparece | Círculo, para separarlo de una portada de un vistazo. Cinco fondos de la portada de reemplazo, sin el burdeo. Entre homónimos distingue el @usuario |
+| Menú de carpetas de un libro | No aparece | Se cierra al elegir, igual que el de tags, y cada cambio deja su Deshacer |
+| Renombrar "Próximos" | No aparece | Sin renombrar ni eliminar, porque T2 depende de ese nombre. La carpeta dice "fija" |
+| Campo de fecha | No aparece | Campo nativo con un solo ícono. En Firefox queda su ícono, y el formato sigue el idioma del navegador |
+| Campo de formulario | No aparece | Pieza compartida desde la fase 4, para renombrar carpeta, "+ Nueva carpeta" y lo que venga |
+| Nombres de carpeta | No aparece | Máximo 40 caracteres. Los repetidos se comparan sin mayúsculas, tildes ni espacios externos |
+| Carpeta vacía | No aparece | Se oculta el buscador y se explica cómo agregar libros desde la ficha |
+| Límites del calendario | Fechas futuras deshabilitadas | Inicio llega hasta hoy y fin va de inicio a hoy. Si inicio queda después de fin, un texto lo explica y no se guarda |
+| Falla de red en una ficha | No aparece | Error con Reintentar, separado de "Libro no encontrado" |
+| Orden en Amigos | No aparece | Amigos y solicitudes por nombre. Los resultados siguen el orden del directorio |
