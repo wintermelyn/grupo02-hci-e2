@@ -488,41 +488,6 @@ describe('without results', () => {
   })
 })
 
-describe('when the search is after a person', () => {
-  const peopleLink = () => screen.queryByRole('link', { name: 'Buscar personas en Amigos' })
-
-  it('takes an @usuario to Amigos, with the search already written', async () => {
-    renderApp('/buscar?q=@camitorres')
-    expect(await screen.findByText('No encontramos «@camitorres»')).toBeInTheDocument()
-    expect(screen.queryByText(/apellido del autor/)).not.toBeInTheDocument()
-    fireEvent.click(peopleLink() as HTMLElement)
-    expect(currentLocation()).toBe('/amigos?q=%40camitorres')
-    expect(screen.getByRole('searchbox', { name: 'Buscar personas' })).toHaveValue('@camitorres')
-    expect(screen.getByText('@camitorres')).toBeInTheDocument()
-  })
-
-  it('offers Amigos for a name of the directory, next to the books it did find', async () => {
-    answerWith(APOCALYPSE)
-    renderApp('/buscar?q=Camila Torres')
-    await screen.findByText('Apocalipsis')
-    expect(peopleLink()).toHaveAttribute('href', '/amigos?q=Camila+Torres')
-  })
-
-  it('leaves it out while the books are enough', async () => {
-    answerWith(APOCALYPSE)
-    renderApp('/buscar?q=apocalipsis')
-    await screen.findByText('Apocalipsis')
-    expect(peopleLink()).not.toBeInTheDocument()
-  })
-
-  it('offers Amigos as the way out of a search with no results', async () => {
-    renderApp('/buscar?q=zzzz')
-    await screen.findByText('No encontramos «zzzz»')
-    expect(screen.getByText(/apellido del autor/)).toBeInTheDocument()
-    expect(peopleLink()).toHaveAttribute('href', '/amigos?q=zzzz')
-  })
-})
-
 describe('when Open Library fails', () => {
   it('shows the local catalogue, says so, and can retry', async () => {
     failNetwork()

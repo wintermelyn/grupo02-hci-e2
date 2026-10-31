@@ -46,22 +46,3 @@ export function searchTerm(text: string): string {
 export function matchesPerson({ name, username }: User, term: string): boolean {
   return normalize(name).includes(term) || normalize(username).includes(term)
 }
-
-/**
- * Whether a text typed outside Amigos is after a person: it has the @ of a username, or it starts a
- * word of a name in the directory. Inside a word would be noise, as "ana" is also in "Fernanda".
- */
-export function looksForPerson(text: string, users: User[]): boolean {
-  const term = searchTerm(text)
-  if (!term) return false
-  if (text.trimStart().startsWith('@')) return true
-  return users.some(
-    ({ name, username }) =>
-      ` ${normalize(name)}`.includes(` ${term}`) || normalize(username).startsWith(term),
-  )
-}
-
-/** Amigos with this text already in its search field. */
-export function peopleSearchPath(text: string): string {
-  return `${FRIENDS_PATH}?${new URLSearchParams({ q: text })}`
-}

@@ -1,10 +1,8 @@
-import { ChevronRight, CircleAlert, RotateCcw, SearchX, Users } from 'lucide-react'
+import { CircleAlert, RotateCcw, SearchX } from 'lucide-react'
 import type { MouseEventHandler, ReactNode, Ref } from 'react'
-import { Link } from 'react-router'
 import { BookRow, Button, EmptyState } from '../../components'
 import { cx } from '../../components/cx'
 import type { Book } from '../../types'
-import { peopleSearchPath } from '../friends/people'
 import { AuthorList } from './AuthorList'
 import { BestBook } from './BestBook'
 import { Highlight } from './Highlight'
@@ -38,52 +36,20 @@ export function OfflineNotice({ onRetry }: { onRetry: () => void }) {
   )
 }
 
-const PEOPLE_LINK = 'Buscar personas en Amigos'
-
-/** Buscar finds books and authors, so a search for someone is told where people are. */
-export function PeopleNotice({ text }: { text: string }) {
-  return (
-    <Link
-      to={peopleSearchPath(text)}
-      className="mt-3 flex min-h-11 items-center gap-2 rounded-row bg-shell px-3 font-semibold transition-colors duration-100 hover:bg-sand active:bg-sand-deep"
-    >
-      <Users aria-hidden size={18} className="shrink-0 text-muted" />
-      <span className="min-w-0 flex-1">{PEOPLE_LINK}</span>
-      <ChevronRight aria-hidden size={18} className="shrink-0 text-muted" />
-    </Link>
-  )
-}
-
 export interface NoResultsProps {
   text: string
-  /** PeopleNotice is already on the screen, and the advice about authors would not help. */
-  forPerson: boolean
   /** The way out: the authors the person already has. */
   authors: AuthorGroup[]
   onPickAuthor: (name: string) => void
 }
 
-export function NoResults({ text, forPerson, authors, onPickAuthor }: NoResultsProps) {
+export function NoResults({ text, authors, onPickAuthor }: NoResultsProps) {
   return (
     <>
       <EmptyState
         icon={SearchX}
         title={`No encontramos «${cutQuery(text)}»`}
-        description={
-          forPerson
-            ? 'Aquí encuentras libros y autores. A las personas, en Amigos.'
-            : 'Revisa cómo se escribe o prueba solo con el apellido del autor.'
-        }
-        action={
-          !forPerson && (
-            <Link
-              to={peopleSearchPath(text)}
-              className="inline-flex min-h-11 items-center rounded-full border border-edge px-4 font-semibold transition-colors duration-100 hover:bg-sand active:bg-sand-deep"
-            >
-              {PEOPLE_LINK}
-            </Link>
-          )
-        }
+        description="Revisa cómo se escribe o prueba solo con el apellido del autor."
       />
       {authors.length > 0 && (
         <AuthorList

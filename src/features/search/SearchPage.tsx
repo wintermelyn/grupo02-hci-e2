@@ -2,12 +2,11 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { useSearchParams } from 'react-router'
 import { ErrorState, LoadingState, PageHeader, SearchField } from '../../components'
 import { useStore } from '../../store'
-import { looksForPerson } from '../friends/people'
 import { useBookLookup } from '../library/filters'
 import { addRecentSearch, clearRecentSearches, readRecentSearches } from './recentSearchStore'
 import { arrangeResults } from './results'
 import { SearchStart } from './SearchStart'
-import { NoResults, OfflineNotice, PeopleNotice, SearchResults } from './SearchResults'
+import { NoResults, OfflineNotice, SearchResults } from './SearchResults'
 import { useBookSearch } from './useBookSearch'
 import { useFriendsBooks, useLibraryAuthors } from './useSearchStart'
 
@@ -31,7 +30,6 @@ export function SearchPage() {
   const query = params.get('q') ?? ''
   const search = useBookSearch(query)
   const library = useStore((state) => state.library)
-  const users = useStore((state) => state.users)
   const authors = useLibraryAuthors()
   const friendsBooks = useFriendsBooks()
   const [recent, setRecent] = useState(readRecentSearches)
@@ -40,7 +38,6 @@ export function SearchPage() {
   const bookOf = useBookLookup()
   const booksHeading = useRef<HTMLHeadingElement>(null)
   const focusOnBooks = useRef(false)
-  const forPerson = useMemo(() => looksForPerson(text, users), [text, users])
 
   const results = useMemo(
     // The store's copy can know more than the search did, like a description found on the book page.
@@ -98,7 +95,6 @@ export function SearchPage() {
         />
       </div>
 
-      {forPerson && <PeopleNotice text={text} />}
       {!text ? (
         <SearchStart
           recent={recent}
@@ -120,7 +116,7 @@ export function SearchPage() {
           onRetry={retry}
         />
       ) : books.length === 0 ? (
-        <NoResults text={text} forPerson={forPerson} authors={authors} onPickAuthor={pickAuthor} />
+        <NoResults text={text} authors={authors} onPickAuthor={pickAuthor} />
       ) : (
         <>
           {offline && <OfflineNotice onRetry={retry} />}
