@@ -16,15 +16,23 @@ export interface CoreActions {
   showToast: (message: string, options?: { undoable?: boolean }) => void
   /** Hides the toast and drops the undo copy. */
   dismissToast: () => void
+  /**
+   * Takes the focus to Deshacer, for an action run from the keyboard whose control leaves with it.
+   * Deshacer is the last stop of the page, too far to reach in 5 s from the middle of a list.
+   */
+  focusToast: () => void
   /** Stops the auto-dismiss timer while the toast is hovered or focused. */
   pauseToast: () => void
   /** Restarts the auto-dismiss timer with the full TOAST_DURATION_MS. */
   resumeToast: () => void
-  /** Adds a book from the API to extraBooks. Never overwrites a seed book. */
+  /** An open menu can cover the toast, which waits for it so Deshacer outlasts what is on top. */
+  menuOpen: boolean
+  setMenuOpen: (open: boolean) => void
+  /** Keeps a copy of a catalog book in extraBooks. Never overwrites a seed book. */
   upsertBook: (book: Book) => void
   /**
    * Adds the book to the library or changes its status. Ignores ids that getBook does not know,
-   * so call upsertBook first for an API book. Leaving Leído deletes nothing, so a mistaken Leído
+   * so call upsertBook first for a catalog book. Leaving Leído deletes nothing, so a mistaken Leído
    * can be fixed at any time: only Leyendo drops finishedAt, because that reading is not over.
    * Moving to Lo quiero sets wantCheckedAt to today, so the D5 prompt does not ask about a book the
    * person just chose.
@@ -97,6 +105,10 @@ export const createCoreSlice: SliceCreator<CoreActions> = (set, get) => ({
     set({ toast: null, undoSnapshot: null })
   },
 
+  focusToast: () => {
+    set(({ toast }) => ({ toast: toast && { ...toast, takesFocus: true } }))
+  },
+
   pauseToast: () => {
     clearTimeout(toastTimer)
   },
@@ -105,6 +117,10 @@ export const createCoreSlice: SliceCreator<CoreActions> = (set, get) => ({
     clearTimeout(toastTimer)
     if (get().toast) toastTimer = setTimeout(get().dismissToast, TOAST_DURATION_MS)
   },
+
+  menuOpen: false,
+
+  setMenuOpen: (menuOpen) => set({ menuOpen }),
 
   upsertBook: (book) => {
     if (lookup(get().seedBooks, book.id)) return

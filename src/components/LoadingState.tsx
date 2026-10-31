@@ -17,8 +17,8 @@ export function LoadingState({ label = 'Cargando…' }: LoadingStateProps) {
         >
           <div className="aspect-2/3 w-11 shrink-0 rounded-[2px_3px_3px_2px] bg-sand" />
           <div className="flex-1 space-y-2">
-            <div className="h-4 w-3/5 rounded-control bg-sand" />
-            <div className="h-3 w-2/5 rounded-control bg-sand" />
+            <div className="h-4 w-3/5 rounded-full bg-sand" />
+            <div className="h-3 w-2/5 rounded-full bg-sand" />
           </div>
         </div>
       ))}

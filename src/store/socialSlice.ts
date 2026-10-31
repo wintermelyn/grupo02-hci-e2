@@ -11,11 +11,14 @@ export interface SocialActions {
    * accepts if the request is still pending with the same `since`. Called once at startup.
    */
   processPendingRequests: () => void
+  /** A gesture towards a friend, not a figure: giving a like says who it reaches, taking it back says nothing. */
   toggleLike: (activityId: string) => void
 }
 
 /** How long a simulated person takes to accept a request. */
 export const ACCEPT_AFTER_MS = 4000
+
+const firstName = (name: string) => name.split(' ')[0]
 
 // None of these actions touch library or folders, so they skip commit. Only removing a friend keeps
 // an undo copy: the others are undone with one tap on the button that replaces them.
@@ -96,11 +99,16 @@ export const createSocialSlice: SliceCreator<SocialActions> = (set, get) => {
     },
 
     toggleLike: (activityId) => {
-      set(({ likedActivityIds }) => ({
-        likedActivityIds: likedActivityIds.includes(activityId)
-          ? likedActivityIds.filter((id) => id !== activityId)
-          : [...likedActivityIds, activityId],
-      }))
+      const { activities, likedActivityIds, users, showToast, undoSnapshot } = get()
+      if (likedActivityIds.includes(activityId)) {
+        set({ likedActivityIds: likedActivityIds.filter((id) => id !== activityId) })
+        return
+      }
+      set({ likedActivityIds: [...likedActivityIds, activityId] })
+      const activity = activities.find(({ id }) => id === activityId)
+      const user = users.find(({ id }) => id === activity?.userId)
+      // As in accept: a new toast would take Deshacer away, and the button already shows the like.
+      if (user && !undoSnapshot) showToast(`${firstName(user.name)} verá que te gustó`)
     },
   }
 }

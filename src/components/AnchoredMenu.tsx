@@ -10,6 +10,7 @@ import {
   type ReactNode,
   type RefObject,
 } from 'react'
+import { useStore } from '../store'
 import { cx } from './cx'
 import { ignoreSecondClick } from './ignoreSecondClick'
 
@@ -126,6 +127,7 @@ export function AnchoredMenu({
   const menuRef = useRef<HTMLDivElement>(null)
   const focusOnOpen = useRef<'selected' | 'last'>('selected')
   const menuId = useId()
+  const setMenuOpen = useStore((state) => state.setMenuOpen)
 
   useLayoutEffect(() => {
     const control = triggerRef.current
@@ -137,12 +139,23 @@ export function AnchoredMenu({
     const room = window.innerHeight - control.getBoundingClientRect().bottom - MENU_GAP * 2
     setMaxHeight(place === 'below' && room < menu.offsetHeight ? room : undefined)
     const items = [...menu.querySelectorAll<HTMLElement>(ITEM_SELECTOR)]
-    const selected = items.find((item) => item.getAttribute('aria-checked') === 'true')
+    // Only a single choice has a current option. Among checkboxes, starting on one that is on would
+    // leave Enter one key away from taking it off.
+    const selected =
+      kind === 'radio'
+        ? items.find((item) => item.getAttribute('aria-checked') === 'true')
+        : undefined
     // Opening with ArrowUp must not land on a command such as leaving the library, one Enter away.
     const last = items.filter((item) => !item.hasAttribute('data-command')).at(-1)
     const target = focusOnOpen.current === 'last' ? last : (selected ?? items[0])
     target?.focus()
-  }, [open])
+  }, [open, kind])
+
+  useEffect(() => {
+    if (!open) return
+    setMenuOpen(true)
+    return () => setMenuOpen(false)
+  }, [open, setMenuOpen])
 
   useEffect(() => {
     if (!open) return
@@ -229,7 +242,8 @@ export function AnchoredMenu({
         style={{ maxHeight }}
         className={cx(
           // Over the bottom bar: in a page too short to scroll, that is the only room left below.
-          'absolute z-45 max-h-[60dvh] overflow-y-auto rounded-float bg-white p-1.5 shadow-float',
+          // Over the toast: under it, a tap on an option would land on Deshacer.
+          'absolute z-50 max-h-[60dvh] overflow-y-auto rounded-float bg-white p-1.5 shadow-float',
           'transition-[opacity,translate,display] transition-discrete duration-150 ease-quick',
           'starting:-translate-y-1 starting:opacity-0 [&[hidden]]:opacity-0',
           ALIGN_CLASSES[align],
@@ -246,7 +260,7 @@ export function AnchoredMenu({
             onClick={() => choose(option)}
             className={cx(
               'flex min-h-11 w-full items-center justify-between gap-3 rounded-control px-2.5 text-left',
-              'transition-colors duration-100 -outline-offset-2 hover:bg-shell active:bg-sand-deep',
+              'transition-colors duration-100 -outline-offset-2 hover:bg-sand active:bg-sand-deep',
             )}
           >
             {option.label}
@@ -273,11 +287,11 @@ export function AnchoredMenu({
             tabIndex={-1}
             aria-description={action.detail}
             onClick={() => choose(action)}
-            className="block min-h-11 w-full rounded-control px-2.5 py-1.5 text-left font-semibold transition-colors duration-100 -outline-offset-2 hover:bg-shell active:bg-sand-deep"
+            className="block min-h-11 w-full rounded-control px-2.5 py-1.5 text-left font-semibold transition-colors duration-100 -outline-offset-2 hover:bg-sand active:bg-sand-deep"
           >
             {action.label}
             {action.detail && (
-              <span aria-hidden className="block text-sm font-normal text-muted">
+              <span aria-hidden className="block text-sm font-normal wrap-anywhere text-muted">
                 {action.detail}
               </span>
             )}

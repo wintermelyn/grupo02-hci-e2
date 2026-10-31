@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { state } from '../test/store'
 import { AnchoredMenu, type AnchoredMenuProps } from './AnchoredMenu'
 
 const onSelect = vi.fn()
@@ -45,6 +46,31 @@ describe('AnchoredMenu', () => {
     fireEvent.click(action)
     expect(onRemove).toHaveBeenCalledOnce()
     expect(onSelect).not.toHaveBeenCalled()
+  })
+
+  it('breaks a long word of what a command costs, so it stays inside the menu', () => {
+    render(
+      <Menu actions={[{ id: 'x', label: 'Quitar', detail: 'M'.repeat(40), onSelect: vi.fn() }]} />,
+    )
+    open()
+    expect(screen.getByText('M'.repeat(40))).toHaveClass('wrap-anywhere')
+  })
+
+  it('goes over the toast, and tells it to wait while it is open', () => {
+    render(<Menu />)
+    expect(state().menuOpen).toBe(false)
+    open()
+    expect(menu()).toHaveClass('z-50')
+    expect(state().menuOpen).toBe(true)
+    key('Escape')
+    expect(state().menuOpen).toBe(false)
+  })
+
+  it('lets the toast go on if it leaves with the page, still open', () => {
+    const { unmount } = render(<Menu />)
+    open()
+    unmount()
+    expect(state().menuOpen).toBe(false)
   })
 
   it('stays closed until the control opens it, and tells the control what it opens', () => {
@@ -151,6 +177,13 @@ describe('AnchoredMenu with the keyboard', () => {
     render(<Menu options={OPTIONS.map((option) => ({ ...option, checked: false }))} />)
     open()
     expect(radio('Uno')).toHaveFocus()
+  })
+
+  it('starts on the first option of checkboxes, so Enter does not take off the one that is on', () => {
+    render(<Menu kind="checkbox" />)
+    open()
+    expect(screen.getByRole('menuitemcheckbox', { name: 'Uno' })).toHaveFocus()
+    expect(screen.getByRole('menuitemcheckbox', { name: 'Dos' })).toBeChecked()
   })
 
   it('jumps to the ends with Home and End', () => {

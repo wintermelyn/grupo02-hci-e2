@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-31T06:32:59.000Z",
+  "generatedAt": "2026-10-31T12:00:00.000Z",
   "title": "Design System: Goodreads · Prototipo de rediseño",
   "extensions": {
     "colorMeta": {
@@ -112,31 +112,31 @@
       "paper": {
         "role": "neutral",
         "displayName": "Papel",
-        "canonical": "#faf8f6",
+        "canonical": "#fdfafa",
         "tonalRamp": [
-          "#0c0b0a",
-          "#262523",
-          "#434240",
-          "#62615f",
-          "#848280",
-          "#a6a5a3",
-          "#cac9c7",
-          "#efeeee"
+          "#100909",
+          "#2b2223",
+          "#4a3f3f",
+          "#6c5d5d",
+          "#8d7e7e",
+          "#afa1a1",
+          "#d2c6c6",
+          "#f6ecec"
         ]
       },
       "shell": {
         "role": "neutral",
         "displayName": "Concha",
-        "canonical": "#f4f1ea",
+        "canonical": "#f9f1f2",
         "tonalRamp": [
-          "#0c0b08",
-          "#272520",
-          "#44423c",
-          "#63615b",
-          "#85827c",
-          "#a8a59e",
-          "#cbc9c4",
-          "#efeeed"
+          "#0f090a",
+          "#2b2224",
+          "#4a3f40",
+          "#6b5d5f",
+          "#8d7e80",
+          "#afa1a3",
+          "#d2c6c7",
+          "#f6ebed"
         ]
       },
       "white": {
@@ -157,114 +157,118 @@
       "sand": {
         "role": "neutral",
         "displayName": "Arena",
-        "canonical": "#ebe2d7",
+        "canonical": "#f3e4e6",
         "tonalRamp": [
-          "#0e0a07",
-          "#2a241c",
-          "#484138",
-          "#686056",
-          "#898177",
-          "#aca499",
-          "#cec8c1",
-          "#f0eeec"
+          "#0f090a",
+          "#2b2224",
+          "#4a3f40",
+          "#6b5d5f",
+          "#8d7e80",
+          "#afa1a3",
+          "#d2c6c7",
+          "#f6ebed"
         ]
       },
       "sand-deep": {
         "role": "neutral",
         "displayName": "Arena profunda",
-        "canonical": "#dfd3c4",
+        "canonical": "#ead4d8",
         "tonalRamp": [
-          "#0f0a05",
-          "#2c2318",
-          "#4a4034",
-          "#6a5f52",
-          "#8b8073",
-          "#afa395",
-          "#d0c8be",
-          "#f0eeeb"
+          "#10090a",
+          "#2d2224",
+          "#4c3e40",
+          "#6e5c5f",
+          "#8f7d80",
+          "#b1a0a3",
+          "#d4c5c7",
+          "#f7ebed"
         ]
       },
       "sand-dark": {
         "role": "neutral",
         "displayName": "Arena oscura",
-        "canonical": "#d3c4b1",
+        "canonical": "#dfc2c8",
         "tonalRamp": [
-          "#0f0a05",
-          "#2c2318",
-          "#4a4034",
-          "#6a5f52",
-          "#8b8073",
-          "#afa395",
-          "#d0c8be",
-          "#f0eeeb"
+          "#12080a",
+          "#2f2024",
+          "#4f3c40",
+          "#715a5f",
+          "#947b80",
+          "#b59ea3",
+          "#d7c3c7",
+          "#fbe9ed"
         ]
       },
       "line": {
         "role": "neutral",
         "displayName": "Línea",
-        "canonical": "#e9e2d8",
+        "canonical": "#f0e4e6",
         "tonalRamp": [
-          "#0d0b07",
-          "#29241d",
-          "#474139",
-          "#666058",
-          "#888178",
-          "#aba49b",
-          "#cdc8c2",
-          "#f0eeec"
+          "#0f090a",
+          "#2b2224",
+          "#4a3f41",
+          "#6b5d5f",
+          "#8d7e80",
+          "#afa1a3",
+          "#d2c6c8",
+          "#f6ebed"
         ]
       },
       "edge": {
         "role": "neutral",
         "displayName": "Borde",
-        "canonical": "#857a6e",
+        "canonical": "#8b7a7d",
         "tonalRamp": [
-          "#0e0a06",
-          "#2c251e",
-          "#4d4339",
-          "#6f6458",
-          "#92877b",
-          "#b7aca0",
-          "#d5ccc3",
-          "#f1eeea"
+          "#10090a",
+          "#2c2224",
+          "#4b3e41",
+          "#6c5d5f",
+          "#8e7e80",
+          "#afa1a3",
+          "#d2c5c8",
+          "#f6ebed"
         ]
       },
       "muted": {
         "role": "neutral",
         "displayName": "Neutro",
-        "canonical": "#5f564d",
+        "canonical": "#5e5251",
         "tonalRamp": [
-          "#0e0a07",
-          "#2b231b",
-          "#494038",
-          "#695f56",
-          "#8a8077",
-          "#ada399",
-          "#cfc8c1",
-          "#f0eeec"
+          "#100909",
+          "#2b2322",
+          "#4a3f3e",
+          "#6c5d5c",
+          "#8d7e7d",
+          "#afa1a0",
+          "#d2c6c5",
+          "#f6eceb"
         ]
       }
     },
     "typographyMeta": {
+      "page-title": {
+        "displayName": "Título de página",
+        "purpose": "H1 de cada sección: 32 px, 28 px bajo 360 px y 40 px desde 1024 px."
+      },
+      "section-title": {
+        "displayName": "Título de sección",
+        "purpose": "Títulos dentro de la página: 24 px y 28 px desde 1024 px."
+      },
       "display": {
         "displayName": "Display",
-        "purpose": "H1 de cada sección y título de la ficha desde 768 px."
-      },
-      "title": {
-        "displayName": "Title",
-        "purpose": "H1 de cada sección en celular."
+        "purpose": "Título de la ficha desde 768 px, hasta que la ficha pase a page-title."
       },
       "heading": {
         "displayName": "Heading",
-        "purpose": "Títulos de sección dentro de la página y título de la ficha en celular."
+        "purpose": "Título de la ficha en celular, hasta que la ficha pase a page-title."
       },
       "subheading": {
         "displayName": "Subheading",
-        "purpose": "Títulos de EmptyState y ErrorState."
+        "purpose": "Iniciales de Avatar lg y nombre en una tarjeta de autor desde 1024 px."
       },
       "book-title": {
         "displayName": "Book title",
-        "purpose": "Nombre de un libro, una persona o una carpeta, \"Sobre este libro\" y título de InlineConfirm."
+        "purpose": "Nombre de un libro, una persona o una carpeta, y título de EmptyState, ErrorState e InlineConfirm."
       },
       "body": {
         "displayName": "Body",
@@ -276,7 +280,7 @@
       },
       "small": {
         "displayName": "Small",
-        "purpose": "Subtítulo de la banda, autores, cantidades y etiquetas de LedgerRow."
+        "purpose": "Subtítulos, autores, cantidades y etiquetas de LedgerRow."
       },
       "small-label": {
         "displayName": "Small label",
@@ -284,14 +288,14 @@
       },
       "caption": {
         "displayName": "Caption",
-        "purpose": "Etiquetas de la barra inferior y de TagFilter."
+        "purpose": "Etiquetas de la barra inferior y de TagFilter, y aviso de prototipo."
       }
     },
     "shadows": [
       {
         "name": "float",
         "value": "0 2px 4px rgb(30 25 21 / 14%), 0 18px 34px -8px rgb(30 25 21 / 40%)",
-        "purpose": "AnchoredMenu y toast."
+        "purpose": "AnchoredMenu, toast y RailArrow."
       },
       {
         "name": "book",
@@ -302,6 +306,11 @@
         "name": "book-lg",
         "value": "0 2px 3px rgb(30 25 21 / 22%), 0 16px 26px -10px rgb(30 25 21 / 50%)",
         "purpose": "Portada lg de la ficha."
+      },
+      {
+        "name": "cover",
+        "value": "0 1px 2px rgb(20 12 8 / 22%), 0 14px 28px -12px rgb(20 12 8 / 55%)",
+        "purpose": "Una portada con raised, sobre un tono o sola en un riel."
       }
     ],
     "motion": [
@@ -312,8 +321,8 @@
       },
       {
         "name": "press",
-        "value": "100ms",
-        "purpose": "Respuesta al tacto y al cursor."
+        "value": "100–150ms",
+        "purpose": "Respuesta al tacto y al cursor. Un botón se encoge al 98 %."
       },
       {
         "name": "menu",
@@ -334,9 +343,28 @@
         "name": "ribbon-in",
         "value": "220ms",
         "purpose": "La cinta nueva baja desde detrás de la portada."
+      },
+      {
+        "name": "cover-lift",
+        "value": "220ms",
+        "purpose": "La portada de un riel sube 6 px bajo el cursor."
+      },
+      {
+        "name": "carousel",
+        "value": "260ms",
+        "purpose": "La portada del carrusel crece al llegar al centro."
+      },
+      {
+        "name": "tone",
+        "value": "420ms",
+        "purpose": "Cambio del tono detrás de los libros en Descubrir."
       }
     ],
     "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
       {
         "name": "md",
         "value": "768px"
@@ -354,15 +382,15 @@
       "refersTo": "button-primary",
       "description": "Button primary: una sola acción principal por pantalla.",
       "html": "<button class=\"ds-btn-primary\">Guardar</button>",
-      "css": ".ds-btn-primary { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: var(--radius-control, 6px); background: var(--color-ink, #1e1915); color: #fff; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; transition: background-color 100ms, translate 100ms; } .ds-btn-primary:hover { background: color-mix(in srgb, var(--color-ink, #1e1915) 90%, transparent); } .ds-btn-primary:active { background: color-mix(in srgb, var(--color-ink, #1e1915) 80%, transparent); translate: 0 1px; } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+      "css": ".ds-btn-primary { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: 9999px; background: var(--color-ink, #1e1915); color: #fff; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; transition: background-color 150ms, scale 150ms; } .ds-btn-primary:hover { background: color-mix(in srgb, var(--color-ink, #1e1915) 90%, transparent); } .ds-btn-primary:active { background: color-mix(in srgb, var(--color-ink, #1e1915) 80%, transparent); scale: 0.98; } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
     },
     {
       "name": "Botón secundario",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Button secondary: la variante por defecto, arena profunda con borde; se invierte con su menú abierto.",
+      "description": "Button secondary: la variante por defecto, una píldora con borde y sin relleno; se invierte con su menú abierto.",
       "html": "<button class=\"ds-btn-secondary\">Cancelar</button>",
-      "css": ".ds-btn-secondary { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 1px solid var(--color-edge, #857a6e); border-radius: var(--radius-control, 6px); background: var(--color-sand-deep, #dfd3c4); color: var(--color-ink, #1e1915); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; transition: background-color 100ms, translate 100ms; } .ds-btn-secondary:hover { background: var(--color-sand-dark, #d3c4b1); } .ds-btn-secondary:active { border-color: var(--color-ink, #1e1915); background: var(--color-sand-dark, #d3c4b1); translate: 0 1px; } .ds-btn-secondary[aria-expanded='true'] { border-color: var(--color-ink, #1e1915); background: var(--color-ink, #1e1915); color: #fff; } .ds-btn-secondary:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+      "css": ".ds-btn-secondary { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 1px solid var(--color-edge, #8b7a7d); border-radius: 9999px; background: transparent; color: var(--color-ink, #1e1915); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; transition: background-color 150ms, scale 150ms; } .ds-btn-secondary:hover { background: var(--color-sand, #f3e4e6); } .ds-btn-secondary:active { background: var(--color-sand-deep, #ead4d8); scale: 0.98; } .ds-btn-secondary[aria-expanded='true'] { border-color: var(--color-ink, #1e1915); background: var(--color-ink, #1e1915); color: #fff; } .ds-btn-secondary:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
     },
     {
       "name": "Botón discreto",
@@ -370,7 +398,7 @@
       "refersTo": "button-quiet",
       "description": "Button quiet: la acción de una fila y lo secundario de la página, sin relleno en reposo.",
       "html": "<button class=\"ds-btn-quiet\">Invitar contactos</button>",
-      "css": ".ds-btn-quiet { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: var(--radius-control, 6px); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; transition: background-color 100ms, translate 100ms; background: transparent; color: var(--color-ink, #1e1915); } .ds-btn-quiet:hover { background: var(--color-sand, #ebe2d7); } .ds-btn-quiet:active { background: var(--color-sand-deep, #dfd3c4); translate: 0 1px; } .ds-btn-quiet[aria-expanded='true'] { background: var(--color-sand-deep, #dfd3c4); } .ds-btn-quiet:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+      "css": ".ds-btn-quiet { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: 9999px; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; transition: background-color 150ms, scale 150ms; background: transparent; color: var(--color-ink, #1e1915); } .ds-btn-quiet:hover { background: var(--color-sand, #f3e4e6); } .ds-btn-quiet:active { background: var(--color-sand-deep, #ead4d8); scale: 0.98; } .ds-btn-quiet[aria-expanded='true'] { background: var(--color-sand, #f3e4e6); } .ds-btn-quiet:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
     },
     {
       "name": "Botón de peligro",
@@ -378,7 +406,7 @@
       "refersTo": "button-danger",
       "description": "Button danger: lo destructivo que pide confirmación.",
       "html": "<button class=\"ds-btn-danger\">Eliminar carpeta</button>",
-      "css": ".ds-btn-danger { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: var(--radius-control, 6px); background: var(--color-danger, #a3341c); color: #fff; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; transition: background-color 100ms, translate 100ms; } .ds-btn-danger:hover { background: color-mix(in srgb, var(--color-danger, #a3341c) 90%, transparent); } .ds-btn-danger:active { background: color-mix(in srgb, var(--color-danger, #a3341c) 80%, transparent); translate: 0 1px; } .ds-btn-danger:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+      "css": ".ds-btn-danger { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: 9999px; background: var(--color-danger, #a3341c); color: #fff; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; transition: background-color 150ms, scale 150ms; } .ds-btn-danger:hover { background: color-mix(in srgb, var(--color-danger, #a3341c) 90%, transparent); } .ds-btn-danger:active { background: color-mix(in srgb, var(--color-danger, #a3341c) 80%, transparent); scale: 0.98; } .ds-btn-danger:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
     },
     {
       "name": "Tags de estado",
@@ -392,17 +420,17 @@
       "name": "Control de tag con su menú",
       "kind": "custom",
       "refersTo": "status-control",
-      "description": "StatusControl: la fila del tag con su botón Cambiar, y el menú anclado, que no oscurece la página.",
-      "html": "<div class=\"ds-status\"><button class=\"ds-status-trigger\" aria-expanded=\"true\"><span class=\"ds-tag\" style=\"color: var(--color-reading, #85490f)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v16\"/><path d=\"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z\"/></svg>Leyendo</span><span class=\"ds-status-edit\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"/><path d=\"m15 5 4 4\"/></svg>Cambiar</span></button><div class=\"ds-status-menu\"><button class=\"ds-status-item\"><span class=\"ds-tag\" style=\"color: var(--color-want, #2f4a78)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z\"/></svg>Lo quiero</span></button><button class=\"ds-status-item\"><span class=\"ds-tag\" style=\"color: var(--color-owned, #6b3a63)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20\"/></svg>Lo tengo</span></button><button class=\"ds-status-item ds-status-item-on\"><span class=\"ds-tag\" style=\"color: var(--color-reading, #85490f)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v16\"/><path d=\"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z\"/></svg>Leyendo</span><span class=\"ds-status-now\">Actual</span></button><button class=\"ds-status-item\"><span class=\"ds-tag\" style=\"color: var(--color-read, #2a6249)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m16 9-5.5 5.5L8 12\"/></svg>Leído</span></button><div class=\"ds-status-line\" role=\"separator\"></div><button class=\"ds-status-command\">Quitar de mi biblioteca<span class=\"ds-status-detail\">Pierdes 1 carpeta y el puntaje</span></button></div></div>",
-      "css": ".ds-status { width: 320px; max-width: 100%; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; color: var(--color-ink, #1e1915); } .ds-status-trigger { display: flex; width: 100%; min-height: 44px; align-items: center; justify-content: space-between; gap: 12px; padding: 0; border: 0; border-radius: var(--radius-control, 6px); background: transparent; color: inherit; font: inherit; font-weight: 600; transition: background-color 100ms, translate 100ms; } .ds-status-edit { display: inline-flex; min-height: 44px; align-items: center; gap: 6px; padding: 0 8px; border-radius: var(--radius-control, 6px); transition: background-color 100ms, color 100ms, translate 100ms; } .ds-status-trigger:hover { background: color-mix(in srgb, var(--color-ink, #1e1915) 5%, transparent); } .ds-status-edit:hover { background: var(--color-sand, #ebe2d7); } .ds-status-trigger[aria-expanded='true'] .ds-status-edit { background: var(--color-sand-deep, #dfd3c4); } .ds-status-menu { margin-top: 6px; padding: 6px; border-radius: var(--radius-float, 10px); background: var(--color-white, #ffffff); box-shadow: var(--shadow-float, 0 2px 4px rgb(30 25 21 / 14%), 0 18px 34px -8px rgb(30 25 21 / 40%)); } .ds-status-item { display: flex; width: 100%; min-height: 44px; align-items: center; justify-content: space-between; gap: 12px; padding: 0 10px; border: 0; border-radius: var(--radius-control, 6px); background: transparent; font: inherit; transition: background-color 100ms; } .ds-status-item:hover { background: var(--color-shell, #f4f1ea); } .ds-status-item-on, .ds-status-item-on:hover { background: var(--color-sand, #ebe2d7); } .ds-status-item:active { background: var(--color-sand, #ebe2d7); } .ds-status-now { font-size: 14px; font-weight: 600; color: var(--color-muted, #5f564d); } .ds-tag { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; } .ds-status-trigger:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; } .ds-status-item:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: -2px; } .ds-status-line { margin: 6px 0; border-top: 1px solid var(--color-line, #e9e2d8); } .ds-status-command { display: block; width: 100%; min-height: 44px; padding: 6px 10px; border: 0; border-radius: var(--radius-control, 6px); background: transparent; font: inherit; font-weight: 600; text-align: left; transition: background-color 100ms; } .ds-status-command:hover { background: var(--color-shell, #f4f1ea); } .ds-status-command:active { background: var(--color-sand, #ebe2d7); } .ds-status-detail { display: block; font-size: 14px; font-weight: 400; color: var(--color-muted, #5f564d); } .ds-status-command:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: -2px; }"
+      "description": "StatusControl: la fila del tag con su botón Cambiar o quitar, y el menú anclado, que no oscurece la página.",
+      "html": "<div class=\"ds-status\"><button class=\"ds-status-trigger\" aria-expanded=\"true\"><span class=\"ds-tag\" style=\"color: var(--color-reading, #85490f)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v16\"/><path d=\"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z\"/></svg>Leyendo</span><span class=\"ds-status-edit\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"/><path d=\"m15 5 4 4\"/></svg>Cambiar o quitar</span></button><div class=\"ds-status-menu\"><button class=\"ds-status-item\"><span class=\"ds-tag\" style=\"color: var(--color-want, #2f4a78)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z\"/></svg>Lo quiero</span></button><button class=\"ds-status-item\"><span class=\"ds-tag\" style=\"color: var(--color-owned, #6b3a63)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20\"/></svg>Lo tengo</span></button><button class=\"ds-status-item ds-status-item-on\"><span class=\"ds-tag\" style=\"color: var(--color-reading, #85490f)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v16\"/><path d=\"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z\"/></svg>Leyendo</span><span class=\"ds-status-now\">Actual</span></button><button class=\"ds-status-item\"><span class=\"ds-tag\" style=\"color: var(--color-read, #2a6249)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m16 9-5.5 5.5L8 12\"/></svg>Leído</span></button><div class=\"ds-status-line\" role=\"separator\"></div><button class=\"ds-status-command\">Quitar de mi biblioteca<span class=\"ds-status-detail\">Pierdes 1 carpeta y el puntaje</span></button></div></div>",
+      "css": ".ds-status { width: 320px; max-width: 100%; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; color: var(--color-ink, #1e1915); } .ds-status-trigger { display: flex; width: 100%; min-height: 44px; align-items: center; justify-content: space-between; gap: 12px; padding: 0; border: 0; border-radius: var(--radius-control, 10px); background: transparent; color: inherit; font: inherit; font-weight: 600; transition: background-color 150ms, scale 150ms; } .ds-status-edit { display: inline-flex; min-height: 44px; align-items: center; gap: 6px; padding: 0 10px; border-radius: 9999px; transition: background-color 100ms, color 100ms, translate 100ms; } .ds-status-trigger:hover { background: color-mix(in srgb, var(--color-ink, #1e1915) 5%, transparent); } .ds-status-edit:hover { background: var(--color-sand, #f3e4e6); } .ds-status-trigger[aria-expanded='true'] .ds-status-edit { background: var(--color-sand, #f3e4e6); } .ds-status-menu { margin-top: 6px; padding: 6px; border-radius: var(--radius-float, 16px); background: var(--color-white, #ffffff); box-shadow: var(--shadow-float, 0 2px 4px rgb(30 25 21 / 14%), 0 18px 34px -8px rgb(30 25 21 / 40%)); } .ds-status-item { display: flex; width: 100%; min-height: 44px; align-items: center; justify-content: space-between; gap: 12px; padding: 0 10px; border: 0; border-radius: var(--radius-control, 10px); background: transparent; font: inherit; transition: background-color 100ms; } .ds-status-item:hover { background: var(--color-shell, #f9f1f2); } .ds-status-item-on, .ds-status-item-on:hover { background: var(--color-sand, #f3e4e6); } .ds-status-item:active { background: var(--color-sand, #f3e4e6); } .ds-status-now { font-size: 14px; font-weight: 600; color: var(--color-muted, #5e5251); } .ds-tag { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; } .ds-status-trigger:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; } .ds-status-item:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: -2px; } .ds-status-line { margin: 6px 0; border-top: 1px solid var(--color-line, #f0e4e6); } .ds-status-command { display: block; width: 100%; min-height: 44px; padding: 6px 10px; border: 0; border-radius: var(--radius-control, 10px); background: transparent; font: inherit; font-weight: 600; text-align: left; transition: background-color 100ms; } .ds-status-command:hover { background: var(--color-shell, #f9f1f2); } .ds-status-command:active { background: var(--color-sand, #f3e4e6); } .ds-status-detail { display: block; font-size: 14px; font-weight: 400; color: var(--color-muted, #5e5251); } .ds-status-command:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: -2px; }"
     },
     {
       "name": "Botones de tag",
       "kind": "custom",
       "refersTo": "tag-filter-item-active",
-      "description": "TagFilter: el activo se abre hacia la página, con la cinta burdeo.",
+      "description": "TagFilter: sin caja alrededor; el activo lleva tinta, peso 700 y la cinta burdeo.",
       "html": "<div class=\"ds-filter\"><button class=\"ds-filter-item ds-filter-item-on\" aria-pressed=\"true\"><span class=\"ds-filter-ribbon\"></span><span class=\"ds-filter-count\">34</span>Todos</button><button class=\"ds-filter-item\"><span class=\"ds-filter-count\">17</span>Lo quiero</button><button class=\"ds-filter-item\"><span class=\"ds-filter-count\">5</span>Lo tengo</button><button class=\"ds-filter-item\"><span class=\"ds-filter-count\">2</span>Leyendo</button><button class=\"ds-filter-item\"><span class=\"ds-filter-count\">10</span>Leído</button></div>",
-      "css": ".ds-filter { display: grid; grid-template-columns: repeat(5, 1fr); max-width: 512px; padding-top: 12px; background: var(--color-shell, #f4f1ea); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-filter-item { position: relative; display: flex; min-height: 56px; flex-direction: column; align-items: center; justify-content: flex-end; padding: 12px 0 6px; border: 0; border-radius: var(--radius-card, 8px) var(--radius-card, 8px) 0 0; background: transparent; color: var(--color-muted, #5f564d); font-family: inherit; font-size: 12px; font-weight: 500; white-space: nowrap; transition: color 100ms; } .ds-filter-item:hover { color: var(--color-ink, #1e1915); } .ds-filter-item:active { background: var(--color-sand, #ebe2d7); } .ds-filter-item-on { background: var(--color-paper, #faf8f6); color: var(--color-ink, #1e1915); font-weight: 700; } .ds-filter-ribbon { position: absolute; top: 0; left: 50%; width: 9px; height: 12px; translate: -50% 0; background: var(--color-ribbon, #7a2334); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); } .ds-filter-count { font-family: 'Source Serif 4', Georgia, serif; font-size: 16px; line-height: 20px; font-weight: 600; font-variant-numeric: tabular-nums; } .ds-filter-item:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+      "css": ".ds-filter { display: grid; grid-template-columns: repeat(5, 1fr); max-width: 512px;  font-family: Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-filter-item { position: relative; display: flex; min-height: 56px; flex-direction: column; align-items: center; justify-content: flex-end; padding: 12px 0 6px; border: 0; border-radius: var(--radius-control, 10px); background: transparent; color: var(--color-muted, #5e5251); font-family: inherit; font-size: 12px; font-weight: 500; white-space: nowrap; transition: color 100ms; } .ds-filter-item:hover { background: var(--color-shell, #f9f1f2); color: var(--color-ink, #1e1915); } .ds-filter-item:active { background: var(--color-sand, #f3e4e6); } .ds-filter-item-on { color: var(--color-ink, #1e1915); font-weight: 700; } .ds-filter-ribbon { position: absolute; top: 0; left: 50%; width: 9px; height: 12px; translate: -50% 0; background: var(--color-ribbon, #7a2334); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); } .ds-filter-count { font-family: 'Source Serif 4', Georgia, serif; font-size: 16px; line-height: 20px; font-weight: 600; font-variant-numeric: tabular-nums; } .ds-filter-item:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
     },
     {
       "name": "Tarjeta de carpeta",
@@ -410,7 +438,7 @@
       "refersTo": "folder-card",
       "description": "FolderCard: la tarjeta de referencia, aquí en su versión fija con cinta.",
       "html": "<a class=\"ds-folder\" href=\"#\"><span class=\"ds-folder-ribbon\"></span><span class=\"ds-folder-covers\"><span class=\"ds-folder-cover\"></span><span class=\"ds-folder-cover\"></span></span><span class=\"ds-folder-name\">Próximos</span><span class=\"ds-folder-count\">2 libros · fija</span></a>",
-      "css": ".ds-folder { position: relative; display: block; width: 180px; padding: 12px; border: 1px solid var(--color-line, #e9e2d8); border-radius: var(--radius-card, 8px); background: var(--color-white, #ffffff); color: var(--color-ink, #1e1915); text-decoration: none; transition: border-color 100ms, translate 100ms; } .ds-folder:hover { border-color: var(--color-edge, #857a6e); } .ds-folder:active { translate: 0 1px; } .ds-folder-ribbon { position: absolute; top: -1px; right: 10px; z-index: 1; width: 9px; height: 26px; background: var(--color-ribbon, #7a2334); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); } .ds-folder-covers { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; } .ds-folder-cover { aspect-ratio: 2 / 3; border-radius: 2px 3px 3px 2px; background: var(--color-sand, #ebe2d7); box-shadow: var(--shadow-book, 0 1px 1px rgb(30 25 21 / 20%), 0 6px 12px -5px rgb(30 25 21 / 35%)); } .ds-folder-name { display: block; margin-top: 10px; font-family: 'Source Serif 4', Georgia, serif; font-size: 18px; line-height: 28px; font-weight: 600; } .ds-folder-count { display: block; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 14px; line-height: 20px; color: var(--color-muted, #5f564d); } .ds-folder:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+      "css": ".ds-folder { position: relative; display: block; width: 180px; padding: 12px; border: 1px solid var(--color-line, #f0e4e6); border-radius: var(--radius-card, 16px); background: var(--color-white, #ffffff); color: var(--color-ink, #1e1915); text-decoration: none; transition: border-color 100ms, translate 100ms; } .ds-folder:hover { border-color: var(--color-edge, #8b7a7d); } .ds-folder:active { scale: 0.98; } .ds-folder-ribbon { position: absolute; top: -1px; right: 10px; z-index: 1; width: 9px; height: 26px; background: var(--color-ribbon, #7a2334); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); } .ds-folder-covers { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; } .ds-folder-cover { aspect-ratio: 2 / 3; border-radius: 2px 3px 3px 2px; background: var(--color-sand, #f3e4e6); box-shadow: var(--shadow-book, 0 1px 1px rgb(30 25 21 / 20%), 0 6px 12px -5px rgb(30 25 21 / 35%)); } .ds-folder-name { display: block; margin-top: 10px; font-family: 'Source Serif 4', Georgia, serif; font-size: 18px; line-height: 28px; font-weight: 600; } .ds-folder-count { display: block; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 14px; line-height: 20px; color: var(--color-muted, #5e5251); } .ds-folder:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
     },
     {
       "name": "Confirmación en la página",
@@ -418,7 +446,7 @@
       "refersTo": "inline-confirm",
       "description": "InlineConfirm: pide confirmar junto a lo que afecta, solo para eliminar carpeta y Reiniciar demo.",
       "html": "<section class=\"ds-confirm\"><h2 class=\"ds-confirm-title\">Eliminar «Verano»</h2><p class=\"ds-confirm-text\">Esta carpeta tiene 3 libros. Los libros siguen en tu biblioteca.</p><div class=\"ds-confirm-actions\"><button class=\"ds-confirm-danger\">Eliminar carpeta</button><button class=\"ds-confirm-cancel\">Cancelar</button></div></section>",
-      "css": ".ds-confirm { max-width: 448px; padding: 12px; border: 1px solid var(--color-edge, #857a6e); border-radius: var(--radius-card, 8px); background: var(--color-white, #ffffff); color: var(--color-ink, #1e1915); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; line-height: 24px; } .ds-confirm-title { margin: 0; font-family: 'Source Serif 4', Georgia, serif; font-size: 18px; line-height: 28px; font-weight: 600; } .ds-confirm-text { margin: 2px 0 0; } .ds-confirm-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; } .ds-confirm-danger, .ds-confirm-cancel { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: var(--radius-control, 6px); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; transition: background-color 100ms, translate 100ms; } .ds-confirm-danger { background: var(--color-danger, #a3341c); color: #fff; } .ds-confirm-danger:hover { background: color-mix(in srgb, var(--color-danger, #a3341c) 90%, transparent); } .ds-confirm-danger:active { background: color-mix(in srgb, var(--color-danger, #a3341c) 80%, transparent); translate: 0 1px; } .ds-confirm-cancel { border: 1px solid var(--color-edge, #857a6e); background: var(--color-sand-deep, #dfd3c4); color: var(--color-ink, #1e1915); } .ds-confirm-cancel:hover { background: var(--color-sand-dark, #d3c4b1); } .ds-confirm-cancel:active { border-color: var(--color-ink, #1e1915); background: var(--color-sand-dark, #d3c4b1); translate: 0 1px; } .ds-confirm-danger:focus-visible, .ds-confirm-cancel:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+      "css": ".ds-confirm { max-width: 448px; padding: 20px; border-radius: var(--radius-tile, 20px); background: var(--color-shell, #f9f1f2); color: var(--color-ink, #1e1915); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; line-height: 24px; } .ds-confirm-title { margin: 0; font-family: 'Source Serif 4', Georgia, serif; font-size: 18px; line-height: 28px; font-weight: 600; } .ds-confirm-text { margin: 2px 0 0; } .ds-confirm-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; } .ds-confirm-danger, .ds-confirm-cancel { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: 9999px; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; transition: background-color 150ms, scale 150ms; } .ds-confirm-danger { background: var(--color-danger, #a3341c); color: #fff; } .ds-confirm-danger:hover { background: color-mix(in srgb, var(--color-danger, #a3341c) 90%, transparent); } .ds-confirm-danger:active { background: color-mix(in srgb, var(--color-danger, #a3341c) 80%, transparent); scale: 0.98; } .ds-confirm-cancel { border: 1px solid var(--color-edge, #8b7a7d); background: transparent; color: var(--color-ink, #1e1915); } .ds-confirm-cancel:hover { background: var(--color-sand, #f3e4e6); } .ds-confirm-cancel:active { border-color: var(--color-ink, #1e1915); background: var(--color-sand-dark, #dfc2c8); scale: 0.98; } .ds-confirm-danger:focus-visible, .ds-confirm-cancel:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
     },
     {
       "name": "Portada con cinta de estado",
@@ -432,34 +460,59 @@
       "name": "Barra de navegación",
       "kind": "nav",
       "refersTo": "nav-bar",
-      "description": "AppShell en celular: cinco secciones con ícono y texto; la activa lleva cinta y peso 700.",
-      "html": "<nav class=\"ds-nav\" aria-label=\"Principal\"><a class=\"ds-nav-item\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"/><path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/></svg>Inicio</a><a class=\"ds-nav-item ds-nav-item-on\" href=\"#\" aria-current=\"page\"><span class=\"ds-nav-ribbon\"></span><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect width=\"8\" height=\"18\" x=\"3\" y=\"3\" rx=\"1\"/><path d=\"M7 3v18\"/><path d=\"M20.4 18.9c.2.5-.1 1.1-.6 1.3l-1.9.7c-.5.2-1.1-.1-1.3-.6L11.1 5.1c-.2-.5.1-1.1.6-1.3l1.9-.7c.5-.2 1.1.1 1.3.6Z\"/></svg>Mis libros</a><a class=\"ds-nav-item\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z\"/></svg>Descubrir</a><a class=\"ds-nav-item\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m21 21-4.34-4.34\"/><circle cx=\"11\" cy=\"11\" r=\"8\"/></svg>Buscar</a><a class=\"ds-nav-item\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"19\" cy=\"12\" r=\"1\"/><circle cx=\"5\" cy=\"12\" r=\"1\"/></svg>Más</a></nav>",
-      "css": ".ds-nav { display: flex; padding: 0 4px; background: var(--color-paper, #faf8f6); border-top: 1px solid var(--color-edge, #857a6e); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-nav-item { position: relative; display: flex; flex: 1; min-height: 64px; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--color-muted, #5f564d); font-size: 12px; font-weight: 600; text-decoration: none; transition: color 100ms; } .ds-nav-item:hover { color: var(--color-ink, #1e1915); } .ds-nav-item:active { background: var(--color-sand, #ebe2d7); } .ds-nav-item-on { color: var(--color-ink, #1e1915); font-weight: 700; } .ds-nav-ribbon { position: absolute; top: 0; left: 50%; width: 9px; height: 10px; translate: -50% 0; background: var(--color-ribbon, #7a2334); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); } .ds-nav-item:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+      "description": "AppShell bajo 1024 px: pegada al borde, sólida y sin desenfoque; la sección activa lleva relleno arena y peso 700.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Principal\"><a class=\"ds-nav-item\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"/><path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/></svg>Inicio</a><a class=\"ds-nav-item ds-nav-item-on\" href=\"#\" aria-current=\"page\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect width=\"8\" height=\"18\" x=\"3\" y=\"3\" rx=\"1\"/><path d=\"M7 3v18\"/><path d=\"M20.4 18.9c.2.5-.1 1.1-.6 1.3l-1.9.7c-.5.2-1.1-.1-1.3-.6L11.1 5.1c-.2-.5.1-1.1.6-1.3l1.9-.7c.5-.2 1.1.1 1.3.6Z\"/></svg>Mis libros</a><a class=\"ds-nav-item\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z\"/></svg>Descubrir</a><a class=\"ds-nav-item\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m21 21-4.34-4.34\"/><circle cx=\"11\" cy=\"11\" r=\"8\"/></svg>Buscar</a><a class=\"ds-nav-item\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"19\" cy=\"12\" r=\"1\"/><circle cx=\"5\" cy=\"12\" r=\"1\"/></svg>Más</a></nav>",
+      "css": ".ds-nav { display: flex; padding: 4px; background: var(--color-paper, #fdfafa); border-top: 1px solid color-mix(in srgb, var(--color-edge, #8b7a7d) 60%, transparent); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-nav-item { position: relative; display: flex; flex: 1; min-height: 56px; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border-radius: var(--radius-tab, 22px); color: var(--color-muted, #5e5251); font-size: 12px; font-weight: 600; text-decoration: none; transition: background-color 100ms; } .ds-nav-item:active { background: var(--color-sand, #f3e4e6); } .ds-nav-item-on { background: var(--color-sand, #f3e4e6); color: var(--color-ink, #1e1915); font-weight: 700; } .ds-nav-item:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+    },
+    {
+      "name": "Barra lateral",
+      "kind": "nav",
+      "refersTo": "nav-sidebar",
+      "description": "AppShell desde 1024 px: la marca arriba, las cinco secciones y el aviso de prototipo abajo; la activa lleva cinta.",
+      "html": "<aside class=\"ds-side\"><p class=\"ds-side-mark\">Goodreads</p><nav class=\"ds-side-nav\" aria-label=\"Principal\"><a class=\"ds-side-item ds-side-item-on\" href=\"#\" aria-current=\"page\">Mis libros<span class=\"ds-side-ribbon\"></span></a><a class=\"ds-side-item\" href=\"#\">Descubrir</a><a class=\"ds-side-item\" href=\"#\">Buscar</a></nav><p class=\"ds-side-note\">Prototipo de rediseño, proyecto de curso</p></aside>",
+      "css": ".ds-side { display: flex; width: 232px; height: 320px; flex-direction: column; padding: 24px 12px 20px; border-right: 1px solid var(--color-line, #f0e4e6); background: var(--color-paper, #fdfafa); color: var(--color-ink, #1e1915); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; } .ds-side-mark { margin: 0; padding: 8px 12px; font-family: 'Source Serif 4', Georgia, serif; font-size: 24px; font-weight: 600; letter-spacing: -0.025em; } .ds-side-nav { display: flex; flex-direction: column; gap: 4px; margin-top: 32px; } .ds-side-item { position: relative; display: flex; min-height: 44px; align-items: center; padding: 0 12px; border-radius: var(--radius-control, 10px); color: var(--color-muted, #5e5251); font-weight: 500; text-decoration: none; transition: background-color 100ms, color 100ms; } .ds-side-item:hover { background: var(--color-shell, #f9f1f2); color: var(--color-ink, #1e1915); } .ds-side-item-on, .ds-side-item-on:hover { background: var(--color-sand, #f3e4e6); color: var(--color-ink, #1e1915); font-weight: 700; } .ds-side-ribbon { position: absolute; top: 0; right: 12px; width: 10px; height: 16px; background: var(--color-ribbon, #7a2334); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); } .ds-side-note { margin: auto 0 0; padding: 0 12px; color: var(--color-muted, #5e5251); font-size: 12px; line-height: 16px; }"
+    },
+    {
+      "name": "Campo de búsqueda",
+      "kind": "input",
+      "refersTo": "search-field",
+      "description": "SearchField: una píldora blanca con su lupa; con el foco, el borde pasa a tinta y se dobla.",
+      "html": "<label class=\"ds-search\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m21 21-4.34-4.34\"/><circle cx=\"11\" cy=\"11\" r=\"8\"/></svg><input class=\"ds-search-input\" type=\"search\" placeholder=\"Título o autor\" aria-label=\"Buscar libros y autores\"></label>",
+      "css": ".ds-search { display: flex; width: 320px; max-width: 100%; min-height: 44px; align-items: center; gap: 8px; padding-left: 16px; border: 1px solid var(--color-edge, #8b7a7d); border-radius: 9999px; background: var(--color-white, #ffffff); color: var(--color-muted, #5e5251); transition: border-color 150ms, box-shadow 150ms; } .ds-search:focus-within { border-color: var(--color-ink, #1e1915); box-shadow: 0 0 0 1px var(--color-ink, #1e1915); } .ds-search-input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--color-ink, #1e1915); font: 400 16px/24px Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-search-input::placeholder { color: var(--color-muted, #5e5251); }"
+    },
+    {
+      "name": "Tarjeta de tono",
+      "kind": "card",
+      "refersTo": "block",
+      "description": "Una tarjeta que carga un libro, con el color de su portada oscurecido hasta 8,5:1 con texto blanco.",
+      "html": "<a class=\"ds-tone\" href=\"#\"><span class=\"ds-tone-cover\"></span><span class=\"ds-tone-text\"><span class=\"ds-tone-title\">Dune</span><span class=\"ds-tone-author\">Frank Herbert</span><span class=\"ds-tone-time\">Llevas 30 días</span></span></a>",
+      "css": ".ds-tone { display: flex; width: 320px; max-width: 100%; gap: 16px; padding: 16px; border-radius: var(--radius-tile, 20px); background: rgb(122 53 20); color: #fff; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; text-decoration: none; transition: translate 200ms; } .ds-tone:active { translate: 0 1px; } .ds-tone-cover { width: 104px; flex-shrink: 0; aspect-ratio: 2 / 3; border-radius: 2px 3px 3px 2px; background: var(--color-sand, #f3e4e6); box-shadow: var(--shadow-cover, 0 1px 2px rgb(20 12 8 / 22%), 0 14px 28px -12px rgb(20 12 8 / 55%)); } .ds-tone-text { display: flex; min-width: 0; flex: 1; flex-direction: column; } .ds-tone-title { font-family: 'Source Serif 4', Georgia, serif; font-size: 24px; line-height: 1.12; font-weight: 600; letter-spacing: -0.02em; } .ds-tone-author { margin-top: 6px; color: rgb(255 255 255 / 88%); font-size: 14px; line-height: 20px; } .ds-tone-time { margin-top: auto; font-size: 14px; line-height: 20px; font-weight: 600; }"
     }
   ],
   "narrative": {
     "northStar": "Cinta marcapáginas",
-    "overview": "La biblioteca se ve como Goodreads en sus neutros y su tinta, sin color de marca: fondos de papel, títulos serif y portadas reales sin teñir. Sobre esa calma, una cinta con la punta cortada es el único gesto propio. Marca lo activo, lo fijo y el estado de un libro, y nada más. La app es para ordenar libros, así que los controles son estándar y las pantallas se reconocen primero como una herramienta de trabajo.\n\nLa densidad es de app, no de página de lectura: márgenes de 16 px, tarjetas compactas y mucha información por pantalla. La jerarquía viene del fondo, las filas y el espacio, como en un libro mayor: solo el menú y el toast flotan con sombra. Lo blanco con borde es un campo y lo que se presiona es un bloque relleno, así que un campo y un botón nunca se confunden. No hay modales: lo que se edita se edita en su lugar. Las portadas ponen casi todo el color de la pantalla; por eso la interfaz casi no lo usa.\n\nEste documento fija tipografía, color, densidad, formas y el gesto de la cinta. Las pantallas, los flujos, los textos y las decisiones D1 a D6 salen de `docs/e2/informe-e2.pdf` y de `PLAN.md`. El orden de autoridad es el informe, después `PLAN.md` y después este documento. **Ante un choque con las 14 reglas de interfaz de `PLAN.md`, ganan las reglas.** Lo que el sistema no cubra se anota como decisión para el CP.\n\nEste sistema se escribió desde lo construido. Las páginas de referencia son Mis libros (`src/features/library/LibraryPage.tsx` y `FolderCard.tsx`) y la ficha (`src/features/book/BookPage.tsx`). Los tokens viven en `src/index.css`, y si este archivo y el código difieren, se corrige este archivo. Los títulos de sección quedan en inglés porque las herramientas de este formato los buscan por su nombre exacto.",
+    "overview": "La biblioteca vive sobre un papel apenas rosado, una escalera de pálidos que sale del burdeo de la cinta. El título de cada página es una serif grande sin nada detrás, y él solo dice dónde estás. Las formas son redondeadas: los botones son píldoras, las tarjetas tienen esquinas amplias y las portadas ponen casi todo el color de la pantalla. En Inicio y en Buscar, ese color salta a la tarjeta que carga el libro. Sobre esa calma, una cinta con la punta cortada sigue siendo el gesto propio: marca lo activo, lo fijo y el estado de un libro.\n\nLa vara es que parezca un producto que alguien usaría hoy, despejado y con un orden evidente. La jerarquía viene del tamaño del título, del espacio y de pocos bloques de color, no de bandas ni de cajas. Un solo botón relleno por pantalla concentra la atención, y los demás se dibujan con su borde. En computador la navegación es una barra lateral, y en celular y tablet una barra sólida pegada al borde inferior. No hay modales: lo que se edita se edita en su lugar.\n\nEste documento fija tipografía, color, densidad, formas y el gesto de la cinta. Las pantallas, los flujos, los textos y las decisiones D1 a D6 salen de `docs/e2/informe-e2.pdf` y de `PLAN.md`. El orden de autoridad es el informe, después `PLAN.md` y después este documento. **Ante un choque con las 14 reglas de interfaz de `PLAN.md`, ganan las reglas**, salvo las excepciones aprobadas en su sección 6. Lo que el sistema no cubra se anota como decisión para el CP.\n\nLos tokens viven en `src/index.css`, y si este archivo y el código difieren, se corrige este archivo. Los títulos de sección quedan en inglés porque las herramientas de este formato los buscan por su nombre exacto.",
     "keyCharacteristics": [
-      "Neutros cálidos y tinta, sin color de marca ni acento que tiña la app.",
-      "Una cinta con punta cortada como única marca de lo activo, lo fijo y el estado.",
-      "Títulos en Source Serif 4 semibold e interfaz en Figtree.",
+      "Fondos de pálidos del burdeo y tinta para el texto.",
+      "Títulos serif grandes, sin banda ni caja detrás.",
+      "Barra lateral en computador, y barra sólida pegada al borde bajo 1024 px.",
+      "Píldoras para lo que se presiona: solo el botón principal va relleno.",
+      "Una cinta con punta cortada como marca de lo activo, lo fijo y el estado.",
       "Tags sin relleno: ícono, texto y color, siempre juntos.",
-      "Jerarquía por fondo, filas y espacio; sombra solo en lo que flota y en las portadas.",
-      "Botones de relleno; lo blanco con borde es un campo.",
+      "El color de la portada como fondo de sus tarjetas, oscurecido hasta 8,5:1 con texto blanco.",
+      "Rieles nativos, con flechas solo para el mouse.",
       "Lo que se edita se edita en su lugar, sin modales ni paneles.",
-      "Portadas sin teñir, con sombra física.",
       "Movimiento corto y solo como respuesta a una acción."
     ],
     "rules": [
       {
-        "name": "La regla sin acento",
-        "body": "Ningún color tiñe la app. Encabezados, enlaces y botones se resuelven con tinta y neutros; el color vive en las portadas, los tags y las cintas.",
+        "name": "La regla del tono",
+        "body": "El fondo de la app sale de un solo tono, el de la cinta. El único otro color de área es el de una portada, y solo en una tarjeta que carga ese libro. Encabezados, enlaces y botones se resuelven con tinta.",
         "section": "colors"
       },
       {
         "name": "La regla del tag sin relleno",
-        "body": "Un estado es ícono, texto y color, nunca una píldora de color. Esta regla existe para que una lista de veinte libros no compita con sus portadas.",
+        "body": "Un estado es ícono, texto y color, nunca una píldora de color. Esta regla existe para que una lista de veinte libros no compita con sus portadas. Sobre una tarjeta de tono, donde su color no se leería, el tag va en una píldora blanca (`rounded-full bg-white px-2.5 py-1`) y conserva su color.",
         "section": "colors"
       },
       {
@@ -469,27 +522,27 @@
       },
       {
         "name": "La regla de la serif que nombra",
-        "body": "La serif es para lo que nombra: secciones, libros, carpetas, la marca y las cantidades de `TagFilter`. Lo que se opera o se explica va en Figtree.",
+        "body": "La serif es para lo que nombra: páginas, secciones, libros, autores, carpetas, la marca y las cantidades de `TagFilter`. Lo que se opera o se explica va en Figtree.",
         "section": "typography"
       },
       {
         "name": "La regla de la escala cerrada",
-        "body": "Usa solo los tamaños de esta lista. La única excepción son las iniciales de la portada de reemplazo, que crecen con la portada. No hay texto en mayúsculas sostenidas ni tamaños sueltos en el código.",
+        "body": "Usa solo los tamaños de esta lista. Las únicas excepciones son las iniciales de la portada de reemplazo, que crecen con la portada, y las de `Avatar` `xs`, de 10 px. No hay texto en mayúsculas sostenidas.",
         "section": "typography"
       },
       {
         "name": "La regla de lo que flota",
-        "body": "Solo `AnchoredMenu` y el toast flotan con sombra. Una tarjeta, un botón o un campo no llevan sombra: se separan con fondo, borde y espacio.",
+        "body": "Solo `AnchoredMenu`, el toast y las flechas de un riel flotan con sombra. Una tarjeta, un botón o un campo no llevan sombra: se separan con fondo, borde y espacio.",
         "section": "elevation"
       },
       {
         "name": "La regla de la presión",
-        "body": "Lo que se toca baja 1 px al presionarlo. `FolderCard`, `Button` y \"Cambiar\" lo hacen en 100 ms.",
+        "body": "Lo que se toca responde al instante. Un botón se encoge al 98 % en 150 ms (`active:scale-98`), una tarjeta baja 1 px (`active:translate-y-px`) y una fila cambia de fondo.",
         "section": "elevation"
       },
       {
         "name": "La regla del libro físico",
-        "body": "Solo las portadas usan sombras de libro. Son objetos, no tarjetas.",
+        "body": "Solo las portadas usan sombras de libro. Son objetos, no tarjetas. En un riel suben 6 px bajo el cursor, con `cover-lift`, y nunca se mueven solas.",
         "section": "elevation"
       },
       {
@@ -504,7 +557,7 @@
       },
       {
         "name": "La regla del burdeo y el estado",
-        "body": "El burdeo significa activo o fijo. Una cinta de estado usa siempre el color de su tag y nunca burdeo.",
+        "body": "El burdeo significa activo o fijo, y como cinta nunca marca un estado: una cinta de estado usa siempre el color de su tag. Fuera de la cinta, solo aparece en el corazón de un \"Me gusta\" dado y en la razón de una recomendación.",
         "section": "components"
       },
       {
@@ -523,37 +576,41 @@
         "section": "components"
       },
       {
-        "name": "La regla del relleno de página",
-        "body": "Lo que actúa sobre la página va en la banda y lleva relleno. Lo que actúa sobre una fila va al final de ella y no lleva relleno en reposo.",
+        "name": "La regla del lugar del botón",
+        "body": "Lo que actúa sobre la página va a la derecha del título y lleva borde, como \"Opciones\" y \"Buscar\". Lo que actúa sobre una fila va al final de esa fila y no lleva borde en reposo, para que una lista o un registro no se llenen de píldoras que compiten con las portadas. Así un botón siempre termina en el margen derecho de la columna.",
         "section": "components"
       }
     ],
     "dos": [
-      "Do parte cada sección con `PageHeader`, salvo la ficha, que parte sobre el papel, sin banda.",
+      "Do parte cada sección con `PageHeader`, o con `page-title` y `Wordmark` si la pantalla necesita otra forma.",
       "Do edita cada dato en su lugar, en la fila o el título donde se lee.",
       "Do da una salida en los estados vacíos a los que se llega por un filtro o un enlace malo: un botón \"Ver todos los libros\" o \"Ir a Mis libros\".",
       "Do usa solo los tokens de `src/index.css`: colores, tamaños, radios y sombras.",
       "Do muestra cada estado con texto además de color, como pide la regla 3.",
-      "Do pon los tags solo sobre `white`, `paper`, `shell` o `sand`, donde el test vigila que lleguen a 4,5:1.",
-      "Do escribe etiqueta de texto junto a cada ícono, también en la barra de navegación.",
+      "Do pon los tags solo sobre `white`, `paper`, `shell` o `sand`, donde el test vigila que lleguen a 4,5:1, o en su píldora blanca sobre un tono.",
+      "Do escribe etiqueta de texto junto a cada ícono, también en la barra de navegación. Las únicas excepciones son las flechas de un riel y el corazón en celular.",
       "Do mantén 44 px como mínimo en todo control, y que nada dependa solo del hover.",
-      "Do deja las portadas sin teñir y con su sombra de libro.",
+      "Do usa el color de una portada solo con `coverTone`, en una tarjeta que carga ese libro, o como tinte detrás de portadas.",
+      "Do deja que un riel sea un scroll nativo, y usa `useRail` para lo que el navegador no da.",
       "Do anima solo como respuesta a una acción, y deja que `prefers-reduced-motion` la anule.",
-      "Do mira Mis libros y la ficha como referencia, en `.claude/capturas/salida/<dispositivo>/`.",
       "Do anota como decisión para el CP lo que este documento no cubra."
     ],
     "donts": [
       "Don't uses la cinta para decorar o para llamar la atención, ni la dibujes sin `Ribbon`.",
-      "Don't pongas una cinta burdeo bajo una portada ni uses burdeo en texto, botones o superficies de la interfaz.",
+      "Don't pongas una cinta burdeo bajo una portada, ni uses burdeo en botones o superficies de la interfaz.",
+      "Don't vuelvas a poner una banda o una caja detrás de un título.",
+      "Don't hagas flotar la barra inferior, ni le pongas transparencia o desenfoque.",
       "Don't uses un color de marca, el naranja de las estrellas de Goodreads ni su logo.",
-      "Don't rellenes un tag ni lo conviertas en píldora de color.",
+      "Don't rellenes un tag con su color ni lo conviertas en píldora de color.",
+      "Don't tiñas una portada, ni pongas texto sobre el tinte de Descubrir.",
       "Don't abras un panel o un modal: no existen en este sistema.",
       "Don't pongas sombra en lo que no flota, salvo las portadas.",
-      "Don't dibujes un botón blanco: es el aspecto de un campo.",
+      "Don't dibujes un botón blanco: es el aspecto de un campo. La flecha de un riel es la excepción, porque va sobre portadas.",
       "Don't agregues un \"¿Estás seguro?\" a lo reversible: se resuelve con Deshacer.",
-      "Don't pongas más de un `primary` por pantalla; \"Agregar a Mis libros\" también cuenta.",
+      "Don't pongas más de un `primary` por pantalla; \"Agregar a Mis libros\" y \"Ver ficha\" también cuentan.",
       "Don't apiles tarjetas dentro de tarjetas ni uses bordes de 2 px para separar capas.",
-      "Don't escribas colores, tamaños o sombras sueltos en una pantalla, ni uses la paleta por defecto de Tailwind, que no existe.",
+      "Don't escribas colores o sombras sueltos en una pantalla, ni uses la paleta por defecto de Tailwind, que no existe.",
+      "Don't corrijas un componente desde `src/index.css` con un selector como `main button`.",
       "Don't copies \"Disponible pronto\" como patrón: son textos temporales de las pantallas pendientes.",
       "Don't muestres la palabra \"tag\" en la interfaz: cada uno se llama por su nombre."
     ]

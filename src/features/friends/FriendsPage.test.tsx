@@ -34,6 +34,11 @@ const cancelButton = (username: string) =>
   rowOf(username).getByRole('button', { name: /^Cancelar/ })
 
 describe('FriendsPage without text', () => {
+  it('gives the search the width of the first column', () => {
+    renderApp('/amigos')
+    expect(searchBox().closest('.rounded-full')).toHaveClass('md:w-[calc((100%-0.625rem)/2)]')
+  })
+
   it('has its header, search field and back link', () => {
     renderApp('/amigos')
     expect(screen.getByRole('heading', { level: 1, name: 'Amigos' })).toBeInTheDocument()
@@ -193,6 +198,18 @@ describe('person row', () => {
     act(() => vi.advanceTimersByTime(ACCEPT_AFTER_MS))
     expect(row.getByText('Amigos').closest('[tabindex]')).toBe(slot)
     expect(slot).toHaveClass('w-26')
+  })
+
+  it('is a tinted row like those of Inicio, painted by its link and not by its action', () => {
+    renderApp('/amigos?q=camitorres')
+    const row = rowOf('camitorres').getByRole('link').parentElement
+    expect(row).toHaveClass('rounded-row', 'bg-shell', 'has-[a:hover]:bg-sand')
+    expect(row).not.toHaveClass('hover:bg-sand')
+  })
+
+  it('keeps the action inside the row, not over its edge', () => {
+    renderApp('/amigos?q=camitorres')
+    expect(addButton('camitorres')).not.toHaveClass('-mr-2.5')
   })
 
   it('offers Agregar without a fill, since it is an action of a row', () => {

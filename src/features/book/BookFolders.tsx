@@ -50,10 +50,10 @@ export function BookFolders({ book, entry }: BookFoldersProps) {
         {hasFolders ? (
           <ul className="flex min-w-0 flex-wrap gap-x-3">
             {bookFolders.map(({ id, name }) => (
-              <li key={id}>
+              <li key={id} className="min-w-0">
                 <Link
                   to={folderPath(id)}
-                  className="inline-flex min-h-11 min-w-11 items-center font-medium underline decoration-muted/50 underline-offset-4 hover:decoration-ink"
+                  className="inline-flex min-h-11 min-w-11 items-center font-medium wrap-anywhere underline decoration-muted/50 underline-offset-4 hover:decoration-ink"
                 >
                   {name}
                 </Link>
@@ -69,7 +69,8 @@ export function BookFolders({ book, entry }: BookFoldersProps) {
           checkedLabel="Agregado"
           align="end"
           resetKey={book.id}
-          className="shrink-0"
+          // Its text ends where "Cambiar o quitar" ends, on the row above.
+          className="-mr-2 shrink-0"
           options={options}
           trigger={(triggerProps) => (
             <Button

@@ -1,8 +1,11 @@
 import { Compass, Ellipsis, House, LibraryBig, Search, type LucideIcon } from 'lucide-react'
+import { useRef, type ReactNode } from 'react'
 import { Link, matchPath, Outlet, useLocation } from 'react-router'
 import { cx } from './cx'
 import { Ribbon } from './Ribbon'
 import { Toast } from './Toast'
+import { usePageTitle } from './usePageTitle'
+import { useScrollMemory } from './useScrollMemory'
 
 interface Section {
   to: string
@@ -20,45 +23,50 @@ const SECTIONS: readonly Section[] = [
   { to: '/mas', label: 'Más', icon: Ellipsis, alsoActiveOn: ['/amigos', '/perfil'] },
 ]
 
+/** Screens made of rails and big cards take all the width. The rest keep a column they can read. */
+const WIDE_PATHS: readonly string[] = ['/', '/descubrir', '/buscar']
+
 function isSectionActive({ to, alsoActiveOn = [] }: Section, pathname: string): boolean {
   return [to, ...alsoActiveOn].some((path) => matchPath({ path, end: to === '/' }, pathname))
 }
 
-// Active is shown by weight, the ribbon and aria-current, not by colour alone.
-function navItemClass(isActive: boolean, layout: string): string {
-  return cx(
-    'relative flex items-center transition-colors duration-100',
-    layout,
-    isActive ? 'font-bold text-ink' : 'font-semibold text-muted hover:text-ink',
-  )
+/** La actividad lives inside Inicio, so touching Inicio from there is also going back. */
+function linkState(to: string, pathname: string, search: string) {
+  return to === '/' && pathname === '/' && search ? { restoreScroll: true } : undefined
 }
 
-function NavItems({
-  layout,
-  ribbon,
-  iconSize,
-}: {
-  layout: string
-  ribbon: string
+interface NavItemsProps {
+  /** The classes of the item, of the link and of each of its two states. */
+  item?: string
+  link: string
+  active: string
+  idle: string
   iconSize: number
-}) {
-  const { pathname } = useLocation()
+  /** What marks the active section, besides its fill, its weight and aria-current. */
+  activeMark?: ReactNode
+}
+
+function NavItems({ item, link, active, idle, iconSize, activeMark }: NavItemsProps) {
+  const { pathname, search } = useLocation()
   return SECTIONS.map((section) => {
     const { to, label, icon: Icon } = section
     const isActive = isSectionActive(section, pathname)
     return (
-      <li key={to} className="flex-1 md:flex-none">
+      <li key={to} className={item}>
         {/* NavLink only knows its own URL. "true" says the page belongs to the section without being it. */}
         <Link
           to={to}
+          state={linkState(to, pathname, search)}
           aria-current={isActive ? (matchPath(to, pathname) ? 'page' : 'true') : undefined}
-          className={navItemClass(isActive, layout)}
-        >
-          {isActive && (
-            <Ribbon className={cx('absolute left-1/2 -translate-x-1/2 bg-ribbon', ribbon)} />
+          className={cx(
+            'relative flex transition-colors duration-100',
+            link,
+            isActive ? active : idle,
           )}
-          <Icon aria-hidden size={iconSize} />
+        >
+          <Icon aria-hidden size={iconSize} strokeWidth={isActive ? 2.4 : 2} />
           {label}
+          {isActive && activeMark}
         </Link>
       </li>
     )
@@ -66,44 +74,56 @@ function NavItems({
 }
 
 export function AppShell() {
-  return (
-    <div className="min-h-dvh">
-      {/* On the ground of the page, so the bar and the column read as one: 48 px, one line, no card. */}
-      <header className="sticky top-0 z-40 hidden border-b border-edge bg-paper md:block">
-        <div className="mx-auto flex h-12 max-w-app items-center justify-between gap-6 px-4">
-          <p className="flex items-baseline gap-2">
-            <span className="font-serif text-lg font-semibold">Goodreads</span>
-            <span className="text-xs whitespace-nowrap text-muted">
-              Prototipo<span className="hidden lg:inline"> de rediseño</span>
-            </span>
-          </p>
-          <nav aria-label="Principal">
-            <ul className="flex items-center gap-0.5 text-sm lg:gap-1">
-              {/* 44 px to touch and a 36 px fill: the bar keeps a margin around the active section. */}
-              <NavItems
-                layout="isolate min-h-11 gap-1.5 px-2.5 before:absolute before:inset-x-0 before:inset-y-1 before:-z-10 before:rounded-control before:transition-colors before:duration-100 hover:before:bg-sand active:before:bg-sand-deep aria-[current]:before:bg-sand-deep lg:px-3"
-                ribbon="-top-0.5 h-3 w-2.25"
-                iconSize={18}
-              />
-            </ul>
-          </nav>
-        </div>
-      </header>
+  const main = useRef<HTMLElement>(null)
+  const { pathname } = useLocation()
+  const isWide = WIDE_PATHS.some((path) => matchPath({ path, end: true }, pathname))
+  useScrollMemory()
+  usePageTitle(main)
 
-      <main className="mx-auto w-full max-w-app px-4 pb-36 md:pb-12">
+  return (
+    <div className="min-h-dvh lg:grid lg:grid-cols-[var(--sidebar)_minmax(0,1fr)]">
+      <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line px-3 pt-6 pb-5 lg:flex">
+        <Link to="/" className="flex min-h-11 items-center rounded-control px-3">
+          <span className="block font-serif text-2xl font-semibold tracking-tight">Goodreads</span>
+        </Link>
+        <nav aria-label="Principal" className="mt-8">
+          <ul className="flex flex-col gap-1">
+            <NavItems
+              link="min-h-11 items-center gap-3 rounded-control px-3"
+              active="bg-sand font-bold text-ink"
+              idle="font-medium text-muted hover:bg-shell hover:text-ink active:bg-sand"
+              iconSize={20}
+              activeMark={<Ribbon className="absolute top-0 right-3 h-4 w-2.5 bg-ribbon" />}
+            />
+          </ul>
+        </nav>
+        <p className="mt-auto px-3 text-xs text-muted">Prototipo de rediseño, proyecto de curso</p>
+      </aside>
+
+      {/* Under lg the bar takes 65 px of the bottom, and the last row has to clear it and the toast. */}
+      <main
+        ref={main}
+        className={cx(
+          'w-full min-w-0 px-(--gut) pb-[calc(8rem+env(safe-area-inset-bottom))] lg:pb-16',
+          !isWide && 'mx-auto max-w-app lg:mx-0',
+        )}
+      >
         <Outlet />
       </main>
 
+      {/* Solid and against the edge: a floating bar moved with the browser's own bar on a real phone. */}
       <nav
         aria-label="Principal"
         data-bottom-bar
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-edge bg-paper pb-[env(safe-area-inset-bottom)] md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-edge/60 bg-paper pb-[env(safe-area-inset-bottom)] lg:hidden"
       >
-        <ul className="flex px-1">
+        <ul className="mx-auto flex max-w-md p-1">
           <NavItems
-            layout="min-h-16 flex-col justify-center gap-0.5 text-xs active:bg-sand"
-            ribbon="top-0 h-2.5 w-2.25"
-            iconSize={22}
+            item="min-w-0 flex-1"
+            link="min-h-14 flex-col items-center justify-center gap-0.5 rounded-tab text-xs"
+            active="bg-sand font-bold text-ink"
+            idle="font-semibold text-muted active:bg-sand"
+            iconSize={21}
           />
         </ul>
       </nav>

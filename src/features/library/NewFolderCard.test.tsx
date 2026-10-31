@@ -1,0 +1,191 @@
+import { act, fireEvent, screen, within } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+import { renderApp } from '../../test/router'
+import { state, stubAction } from '../../test/store'
+
+const LIBRARY = '/biblioteca'
+const main = () => within(screen.getByRole('main'))
+const card = () => main().getByRole('button', { name: /Nueva carpeta/ })
+const field = () => main().getByRole('textbox', { name: 'Nombre de la carpeta nueva' })
+const create = () => main().getByRole('button', { name: 'Crear' })
+const cancel = () => main().getByRole('button', { name: 'Cancelar' })
+
+function write(value: string) {
+  fireEvent.change(field(), { target: { value } })
+}
+
+describe('NewFolderCard', () => {
+  it('is the last card of the board, also in Todos with books outside every folder', () => {
+    renderApp(LIBRARY)
+    const list = main().getAllByRole('list')[0]
+    expect(within(list).getAllByRole('listitem').at(-1)).toContainElement(card())
+  })
+
+  it('only exists on the board', () => {
+    renderApp(`${LIBRARY}?tag=want`)
+    expect(main().queryByRole('button', { name: /Nueva carpeta/ })).not.toBeInTheDocument()
+  })
+
+  it('writes the name right there, with the focus in the field and no dialog', () => {
+    renderApp(LIBRARY)
+    const item = card().closest('li') as HTMLElement
+    fireEvent.click(card())
+    expect(item).toContainElement(field())
+    expect(field()).toHaveFocus()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('keeps the plus out of the text that wraps', () => {
+    renderApp(LIBRARY)
+    const plus = card().querySelector('svg')
+    expect(plus).toHaveClass('shrink-0')
+    expect(plus?.parentElement).toHaveClass('flex')
+  })
+
+  it('has the shape of a folder at rest: one cell, two empty covers and no border', () => {
+    renderApp(LIBRARY)
+    const item = card().closest('li') as HTMLElement
+    expect(item).not.toHaveAttribute('class')
+    expect(card()).toHaveClass('h-full', 'w-full', 'rounded-card', 'bg-sand', 'p-3')
+    expect(card()).not.toHaveClass('border')
+    const covers = card().querySelectorAll('.aspect-2\\/3')
+    expect(covers).toHaveLength(2)
+    for (const cover of covers) expect(cover).toHaveClass('rounded-[2px_3px_3px_2px]', 'bg-shell')
+    expect(card()).toHaveTextContent('Nueva carpetaUn libro puede estar en varias')
+  })
+
+  it('stays in one cell after seven cards too', () => {
+    act(() => state().createFolder('Para las vacaciones'))
+    renderApp(LIBRARY)
+    const item = card().closest('li') as HTMLElement
+    expect(within(item.parentElement as HTMLElement).getAllByRole('link')).toHaveLength(7)
+    expect(item).not.toHaveAttribute('class')
+  })
+
+  it.each([
+    ['six cards', 0],
+    ['seven cards', 1],
+  ])('writes in two cells after %s, so the buttons fit in one row', (_name, extra) => {
+    if (extra) act(() => state().createFolder('Para las vacaciones'))
+    renderApp(LIBRARY)
+    fireEvent.click(card())
+    expect(field().closest('li')).toHaveClass('col-span-2')
+    expect(create().parentElement).toHaveClass('grid', 'grid-cols-2')
+    expect(cancel().parentElement).toBe(create().parentElement)
+  })
+
+  it.each([
+    ['a tablet', 8, ':nth-child(4n)', 'md:max-lg:[&:nth-child(4n)]:col-start-3'],
+    ['a computer', 10, ':nth-child(5n)', 'lg:[&:nth-child(5n)]:col-start-4'],
+  ])('stays on its side in the last column of %s', (_name, place, column, keepsSide) => {
+    act(() => {
+      for (let extra = 7; extra < place; extra++) state().createFolder(`Carpeta ${extra}`)
+    })
+    renderApp(LIBRARY)
+    fireEvent.click(card())
+    const item = field().closest('li') as HTMLElement
+    expect(item.matches(column)).toBe(true)
+    expect(item).toHaveClass(keepsSide)
+  })
+
+  it('has room for the reason before it appears, so it moves nothing', () => {
+    renderApp(LIBRARY)
+    fireEvent.click(card())
+    const block = field().parentElement as HTMLElement
+    expect(block).toHaveClass('min-h-23.5')
+    write('Terror')
+    expect(field().parentElement).toBe(block)
+    expect(block).toContainElement(main().getByText('Ya tienes una carpeta con ese nombre.'))
+  })
+
+  it('keeps Crear and Cancelar clear of the bottom bar', () => {
+    const scroll = vi.fn()
+    Element.prototype.scrollIntoView = scroll
+    renderApp(LIBRARY)
+    fireEvent.click(card())
+    expect(scroll).toHaveBeenCalledWith({ block: 'nearest' })
+    expect(scroll.mock.contexts[0]).toHaveClass('scroll-mb-20')
+    Reflect.deleteProperty(Element.prototype, 'scrollIntoView')
+  })
+
+  it('creates the folder with the name as written, and offers Deshacer', () => {
+    renderApp(LIBRARY)
+    fireEvent.click(card())
+    write('  Para el verano  ')
+    fireEvent.click(create())
+    expect(state().folders.at(-1)?.name).toBe('Para el verano')
+    expect(main().getByRole('link', { name: /Para el verano/ })).toHaveTextContent('0 libros')
+    expect(screen.getByRole('button', { name: 'Deshacer' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Deshacer' }))
+    expect(main().queryByRole('link', { name: /Para el verano/ })).not.toBeInTheDocument()
+  })
+
+  it('goes back to the card with the focus on it after creating', () => {
+    renderApp(LIBRARY)
+    fireEvent.click(card())
+    write('Viajes')
+    fireEvent.keyDown(field(), { key: 'Enter' })
+    expect(card()).toHaveFocus()
+  })
+
+  it.each([
+    ['Cancelar', () => fireEvent.click(cancel())],
+    ['Escape', () => fireEvent.keyDown(field(), { key: 'Escape' })],
+  ])('leaves without creating anything with %s, and starts empty next time', (_name, leave) => {
+    const createFolder = stubAction('createFolder')
+    renderApp(LIBRARY)
+    fireEvent.click(card())
+    write('Viajes')
+    leave()
+    expect(createFolder).not.toHaveBeenCalled()
+    expect(card()).toHaveFocus()
+    fireEvent.click(card())
+    expect(field()).toHaveValue('')
+  })
+
+  it('keeps its name on screen, so the empty field says what it waits for', () => {
+    renderApp(LIBRARY)
+    fireEvent.click(card())
+    expect(field().closest('li')).toHaveTextContent('Nueva carpeta')
+  })
+
+  it('does not scold an empty field, but keeps Crear disabled', () => {
+    renderApp(LIBRARY)
+    fireEvent.click(card())
+    expect(create()).toBeDisabled()
+    expect(main().queryByText('Escribe un nombre para la carpeta.')).not.toBeInTheDocument()
+  })
+
+  it('says why after Enter on an empty field', () => {
+    const createFolder = stubAction('createFolder')
+    renderApp(LIBRARY)
+    fireEvent.click(card())
+    fireEvent.keyDown(field(), { key: 'Enter' })
+    expect(createFolder).not.toHaveBeenCalled()
+    expect(main().getByText('Escribe un nombre para la carpeta.')).toBeInTheDocument()
+    expect(field()).toHaveAttribute('aria-invalid', 'true')
+  })
+
+  it('applies the same limits as renaming: repeated names and 40 characters', () => {
+    renderApp(LIBRARY)
+    fireEvent.click(card())
+    expect(field()).toHaveAttribute('maxlength', '40')
+    write(' CIENCIA FICCIÓN ')
+    expect(main().getByText('Ya tienes una carpeta con ese nombre.')).toBeInTheDocument()
+    expect(create()).toBeDisabled()
+    write('Ciencia')
+    expect(create()).toBeEnabled()
+  })
+
+  it('names a folder after one deleted, without taking its address', () => {
+    act(() => state().deleteFolder('regalos'))
+    renderApp(LIBRARY)
+    fireEvent.click(card())
+    write('Regalos')
+    fireEvent.click(create())
+    expect(main().getByRole('link', { name: /Regalos/ })).toHaveAttribute(
+      'href',
+      '/biblioteca/carpeta/regalos',
+    )
+  })
+})

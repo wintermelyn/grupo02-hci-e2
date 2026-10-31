@@ -7,6 +7,7 @@ import { PersonPage } from './features/friends/PersonPage'
 import { HomePage } from './features/home/HomePage'
 import { FolderPage } from './features/library/FolderPage'
 import { LibraryPage } from './features/library/LibraryPage'
+import { UnfiledPage } from './features/library/UnfiledPage'
 import { MorePage } from './features/more/MorePage'
 import { ProfilePage } from './features/profile/ProfilePage'
 import { SearchPage } from './features/search/SearchPage'
@@ -16,6 +17,7 @@ export const appRoutes = (
   <Route element={<AppShell />}>
     <Route index element={<HomePage />} />
     <Route path="biblioteca" element={<LibraryPage />} />
+    <Route path="biblioteca/sin-carpeta" element={<UnfiledPage />} />
     <Route path="biblioteca/carpeta/:folderId" element={<FolderPage />} />
     <Route path="libro/:bookId" element={<BookPage />} />
     <Route path="descubrir" element={<DiscoverPage />} />

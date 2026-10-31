@@ -13,6 +13,12 @@ describe('BookCover', () => {
     expect(container).toHaveTextContent('EL')
   })
 
+  it('has a size for a dense list, with a ribbon that fits it', () => {
+    const { container } = render(<BookCover book={book} size="xs" status="read" />)
+    expect(container.firstChild).toHaveClass('w-11')
+    expect(ribbonOf(container)).toHaveClass('w-1.5')
+  })
+
   it('takes the real shape of a large cover once it loads', () => {
     const { container } = render(<BookCover book={book} size="lg" />)
     const image = container.querySelector('img') as HTMLImageElement
@@ -22,6 +28,17 @@ describe('BookCover', () => {
     })
     fireEvent.load(image)
     expect(image.parentElement).toHaveStyle({ aspectRatio: '0.5', width: '75%' })
+  })
+
+  it('takes the shadow of its size, or the longer one when it is raised', () => {
+    const shadow = (container: HTMLElement) => container.querySelector('img')?.parentElement
+    const { container, rerender } = render(<BookCover book={book} />)
+    expect(shadow(container)).toHaveClass('shadow-book')
+    rerender(<BookCover book={book} size="lg" />)
+    expect(shadow(container)).toHaveClass('shadow-book-lg')
+    rerender(<BookCover book={book} size="lg" raised />)
+    expect(shadow(container)).toHaveClass('shadow-cover')
+    expect(shadow(container)).not.toHaveClass('shadow-book-lg')
   })
 
   it('shows no ribbon for a book without a status', () => {

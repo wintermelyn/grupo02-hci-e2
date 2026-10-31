@@ -34,9 +34,10 @@ describe('status styles', () => {
     }
   })
 
-  it('keeps the text of a secondary button at 4.5:1 or more on its fill', () => {
-    expect(contrast(token('ink'), token('sand-deep'))).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST)
-    expect(contrast(token('ink'), token('sand-dark'))).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST)
+  it('keeps the text of a button at 4.5:1 or more on the fills it takes under the cursor', () => {
+    for (const fill of ['sand', 'sand-deep', 'sand-dark']) {
+      expect(contrast(token('ink'), token(fill))).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST)
+    }
   })
 
   it('keeps the edge of a secondary button at 3:1 or more on every ground', () => {

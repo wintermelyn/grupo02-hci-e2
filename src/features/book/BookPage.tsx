@@ -1,13 +1,26 @@
+import { RotateCcw, Sparkle } from 'lucide-react'
 import { matchPath, useLocation, useParams } from 'react-router'
-import { BackLink, BookCover, StatusControl, Wordmark } from '../../components'
+import { BookCover, Button, StatusControl } from '../../components'
+import { useCatalogBook } from '../../lib/catalog'
 import { selectBook, selectEntry, useStore } from '../../store'
 import type { Book, Folder, ReadingStatus } from '../../types'
+import { UNFILED_NAME, UNFILED_PATH } from '../library/filters'
 import { BookFolders } from './BookFolders'
+import {
+  BOOK_ABOUT,
+  BOOK_COLUMNS,
+  BOOK_COVER,
+  BOOK_READING,
+  BOOK_RECORD,
+  BookTopRow,
+} from './BookSkeleton'
 import { LedgerRow } from './LedgerRow'
 import { MissingBook } from './MissingBook'
 import { ReadingDetails } from './ReadingDetails'
+import { useBookDescription } from './useBookDescription'
 
 const LIBRARY_PATH = '/biblioteca'
+const SEARCH_PATH = '/buscar'
 const FOLDER_PATTERN = `${LIBRARY_PATH}/carpeta/:folderId`
 
 /** The tags that have a reading to show. Lo quiero and Lo tengo keep theirs, out of sight. */
@@ -19,6 +32,8 @@ function backTarget(state: unknown, folders: Folder[]): { to: string; label: str
   if (!from) return { to: LIBRARY_PATH, label: 'Mis libros' }
   const [pathname] = from.split('?')
   if (pathname === LIBRARY_PATH) return { to: from, label: 'Mis libros' }
+  if (pathname === UNFILED_PATH) return { to: from, label: UNFILED_NAME }
+  if (pathname === SEARCH_PATH) return { to: from, label: 'Buscar' }
   const folderId = matchPath(FOLDER_PATTERN, pathname)?.params.folderId
   const folder = folders.find(({ id }) => id === folderId)
   return { to: from, label: folder?.name ?? 'Volver' }
@@ -26,30 +41,57 @@ function backTarget(state: unknown, folders: Folder[]): { to: string; label: str
 
 function BookDetails({ authors, year, pages }: Book) {
   // The number and its unit stay together.
-  const edition = [year, pages && `${pages} páginas`].filter(Boolean).join(' · ')
+  const edition = [year, pages && `${pages} páginas`].filter(Boolean).join(' · ')
   return (
-    <div className="mt-1 text-sm text-muted md:text-base">
-      <p>{authors.join(', ')}</p>
+    <div className="mt-1 text-sm wrap-break-word text-muted md:mt-1.5 md:text-base">
+      <p>{authors.join(', ') || 'Autor desconocido'}</p>
       {edition && <p>{edition}</p>}
     </div>
   )
 }
 
-/** Always there, in the same place: most books have no description, and the page keeps its shape. */
-function AboutBook({ description, descriptionTranslated }: Book) {
+/** Where the text comes from, so it reads like the author line and not like a warning. */
+function TranslatedByAI() {
   return (
-    <section className="col-span-2 mt-5 min-w-0 md:col-span-1 md:col-start-2 lg:col-start-3 lg:border-t lg:border-line lg:pt-2.5">
-      <h2 className="font-serif text-lg font-semibold">Sobre este libro</h2>
+    <p className="mt-2 flex items-center gap-1.5 text-sm text-muted">
+      <Sparkle aria-hidden size={14} fill="currentColor" strokeWidth={1.5} />
+      Traducción hecha con IA
+    </p>
+  )
+}
+
+/** Only the text failed, so the page stays and only this section offers to try again. */
+function DescriptionFailed({ onRetry }: { onRetry: () => void }) {
+  return (
+    <p
+      role="status"
+      className="mt-3 flex items-center gap-2 rounded-row bg-shell py-1 pr-1 pl-3 text-sm"
+    >
+      <span className="min-w-0 flex-1">No pudimos cargar la descripción.</span>
+      <Button compact variant="quiet" icon={RotateCcw} onClick={onRetry}>
+        Reintentar
+      </Button>
+    </p>
+  )
+}
+
+/** Always there, in the same place: most books have no description, and the page keeps its shape. */
+function AboutBook({ book }: { book: Book }) {
+  const { description, descriptionTranslated, loading, failed, retry } = useBookDescription(book)
+  return (
+    <section className={BOOK_ABOUT}>
+      <h2 className="section-title">Sobre este libro</h2>
       {description ? (
         <>
-          <p className="mt-1 wrap-break-word whitespace-pre-line">{description}</p>
-          {/* Where the text comes from, so it reads like the author line and not like a warning. */}
-          {descriptionTranslated && (
-            <p className="mt-2 text-sm text-muted">Traducción hecha con IA</p>
-          )}
+          <p className="mt-3 max-w-[60ch] wrap-break-word whitespace-pre-line">{description}</p>
+          {descriptionTranslated && <TranslatedByAI />}
         </>
+      ) : failed ? (
+        <DescriptionFailed onRetry={retry} />
       ) : (
-        <p className="mt-1 text-muted">Aún no tenemos descripción de este libro.</p>
+        <p className="mt-3 text-muted">
+          {loading ? 'Buscando la descripción…' : 'Aún no tenemos descripción de este libro.'}
+        </p>
       )}
     </section>
   )
@@ -58,7 +100,9 @@ function AboutBook({ description, descriptionTranslated }: Book) {
 export function BookPage() {
   const { bookId = '' } = useParams()
   const { state } = useLocation()
-  const book = useStore(selectBook(bookId))
+  const stored = useStore(selectBook(bookId))
+  const listed = useCatalogBook(bookId)
+  const book = stored ?? listed
   const entry = useStore(selectEntry(bookId))
   const folders = useStore((state) => state.folders)
   const back = backTarget(state, folders)
@@ -67,40 +111,42 @@ export function BookPage() {
 
   return (
     <article>
-      <div className="flex items-center justify-between pt-2 md:pt-4">
-        <BackLink to={back.to} label={back.label} />
-        <Wordmark />
-      </div>
+      <BookTopRow back={back} />
 
       {/*
-        One shape for every book. From lg, the description takes the third column instead of pushing
-        itself under the fold. The last row takes what the cover has left, so the description follows
-        the record at md, however short the record is.
+        One shape for every book. On a phone the title goes beside the cover, and from a tablet up
+        everything that is read does, so a long description never leaves the page lopsided.
       */}
-      <div className="mt-1 grid grid-cols-[7rem_minmax(0,1fr)] gap-x-4 md:mt-3 md:grid-cols-[14rem_minmax(0,34rem)] md:grid-rows-[auto_auto_1fr] md:gap-x-10 lg:grid-cols-[14rem_minmax(0,1.2fr)_minmax(0,1fr)]">
-        {/* The ribbon hangs below the cover, so the block leaves it room. */}
-        <div className="pb-3 md:row-span-3 md:pb-5">
+      <div className={BOOK_COLUMNS}>
+        <div className={BOOK_COVER}>
           <BookCover book={book} size="lg" status={entry?.status} />
         </div>
 
-        <header className="min-w-0 lg:col-span-2">
-          <h1 className="font-serif text-heading font-semibold tracking-tight hyphens-auto md:text-display">
-            {book.title}
-          </h1>
-          <BookDetails {...book} />
-        </header>
+        <div className={BOOK_READING}>
+          <header className="min-w-0">
+            <h1 className="font-serif text-heading font-semibold tracking-tight wrap-break-word md:page-title">
+              {book.title}
+            </h1>
+            <BookDetails {...book} />
+          </header>
 
-        <dl className="col-span-2 mt-2 min-w-0 self-start border-t border-line md:col-span-1 md:col-start-2 md:mt-5">
-          <LedgerRow label="Estado">
-            <StatusControl bookId={book.id} book={book} />
-          </LedgerRow>
-          {entry && WITH_READING.includes(entry.status) && (
-            <ReadingDetails bookId={book.id} entry={entry} />
-          )}
-          {entry && <BookFolders book={book} entry={entry} />}
-        </dl>
+          <dl className={BOOK_RECORD}>
+            <LedgerRow label="Estado">
+              {/* On a wide record, a full-width black pill would weigh more than the title. */}
+              <StatusControl
+                bookId={book.id}
+                book={book}
+                className={entry ? undefined : 'md:w-fit'}
+              />
+            </LedgerRow>
+            {entry && WITH_READING.includes(entry.status) && (
+              <ReadingDetails bookId={book.id} entry={entry} />
+            )}
+            {entry && <BookFolders book={book} entry={entry} />}
+          </dl>
 
-        <AboutBook {...book} />
+          <AboutBook book={book} />
+        </div>
       </div>
     </article>
   )

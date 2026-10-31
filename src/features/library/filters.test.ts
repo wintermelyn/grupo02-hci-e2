@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Book, Folder } from '../../types'
-import { matchesQuery, normalizeText, parseTag, pinnedFirst } from './filters'
+import { folderNameProblem, matchesQuery, normalizeText, parseTag, pinnedFirst } from './filters'
 
 const book: Book = { id: 'OL1W', title: 'Gótico', authors: ['Silvia Moreno-García', 'Otra Autora'] }
 
@@ -39,5 +39,22 @@ describe('pinnedFirst', () => {
       { id: 'a', name: 'A', pinned: true, createdAt: '2026-01-01' },
     ]
     expect(pinnedFirst(folders).map(({ id }) => id)).toEqual(['a', 'b', 'c'])
+  })
+})
+
+describe('folderNameProblem', () => {
+  const folders: Folder[] = [{ id: 'novela', name: 'Novela', createdAt: '2026-01-01' }]
+
+  it('asks for a name', () => {
+    expect(folderNameProblem('   ', folders)).toBe('Escribe un nombre para la carpeta.')
+  })
+
+  it('compares without case, accents or the spaces around', () => {
+    expect(folderNameProblem(' NOVÉLA ', folders)).toBe('Ya tienes una carpeta con ese nombre.')
+    expect(folderNameProblem('Viajes', folders)).toBeUndefined()
+  })
+
+  it('lets a folder keep its own name', () => {
+    expect(folderNameProblem('novela', folders, 'novela')).toBeUndefined()
   })
 })

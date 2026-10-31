@@ -44,7 +44,7 @@ beforeEach(() => {
 })
 
 describe('getBook, upsertBook, selectBook and selectEntry', () => {
-  it('adds API books to extraBooks', () => {
+  it('keeps a copy of a catalog book in extraBooks', () => {
     state().upsertBook(unknownBook)
     expect(state().extraBooks[unknownBook.id]).toEqual(unknownBook)
     expect(state().getBook(unknownBook.id)).toEqual(unknownBook)
@@ -361,6 +361,74 @@ describe('persistence', () => {
     const seed = buildSeed()
     expect(state().library).toEqual(seed.library)
     expect(state().folders).toEqual(seed.folders)
+  })
+
+  describe('from the last version with a live search', () => {
+    const LIVE_SEARCH_VERSION = 8
+    const inLibrary: Book = {
+      id: 'OL1W',
+      title: 'Guardado',
+      authors: ['Autora'],
+      year: 1999,
+      pages: 200,
+      coverUrl: 'https://covers.openlibrary.org/b/id/1-L.jpg',
+      description: 'A text in English.',
+    }
+    const onlySeen: Book = { id: 'OL2W', title: 'Solo visto', authors: ['Autora'] }
+    const entry: LibraryEntry = {
+      bookId: inLibrary.id,
+      status: 'read',
+      folderIds: ['mia'],
+      addedAt: daysAgo(30),
+      finishedAt: daysAgo(2),
+      rating: 4,
+    }
+    const folders = [{ id: 'mia', name: 'Mía', createdAt: daysAgo(30) }]
+
+    async function migrate() {
+      const saved = {
+        library: { [inLibrary.id]: entry },
+        folders,
+        friendships: [pendingRequest],
+        likedActivityIds: ['act-1'],
+        extraBooks: { [inLibrary.id]: inLibrary, [onlySeen.id]: onlySeen },
+        lastWantPromptOn: daysAgo(1),
+      }
+      useStore.setState({ library: {} })
+      const state = JSON.stringify({ state: saved, version: LIVE_SEARCH_VERSION })
+      localStorage.setItem(STORAGE_KEY, state)
+      await useStore.persist.rehydrate()
+    }
+
+    it('is older than this version', () => {
+      expect(useStore.persist.getOptions().version).toBeGreaterThan(LIVE_SEARCH_VERSION)
+    })
+
+    it('keeps everything the person did', async () => {
+      await migrate()
+      expect(state().library).toEqual({ [inLibrary.id]: entry })
+      expect(state().folders).toEqual(folders)
+      expect(state().friendships).toEqual([pendingRequest])
+      expect(state().likedActivityIds).toEqual(['act-1'])
+      expect(state().lastWantPromptOn).toBe(daysAgo(1))
+    })
+
+    it('keeps a book of the library with a cover of the app and no outside text', async () => {
+      await migrate()
+      expect(state().extraBooks[inLibrary.id]).toEqual({
+        id: inLibrary.id,
+        title: inLibrary.title,
+        authors: inLibrary.authors,
+        year: inLibrary.year,
+        pages: inLibrary.pages,
+        coverUrl: '/covers/OL1W.jpg',
+      })
+    })
+
+    it('drops a book that was only looked at', async () => {
+      await migrate()
+      expect(state().extraBooks).not.toHaveProperty(onlySeen.id)
+    })
   })
 
   it('keeps lastWantPromptOn across a reload', async () => {

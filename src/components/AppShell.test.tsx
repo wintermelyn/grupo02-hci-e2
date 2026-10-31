@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { renderApp } from '../test/router'
 
@@ -63,5 +63,92 @@ describe('AppShell', () => {
   it('marks no section on a book page', () => {
     renderApp('/libro/OL81626W')
     for (const nav of navigationBars()) expect(activeSections(nav)).toEqual([])
+  })
+
+  it('keeps Inicio active on the activity view', () => {
+    renderApp('/?actividad=1')
+    for (const nav of navigationBars()) {
+      expect(activeSections(nav)).toEqual(['Inicio'])
+    }
+  })
+
+  it('keeps the bottom bar on the edge, solid, up to lg', () => {
+    renderApp('/')
+    const bar = navigationBars().find((nav) => nav.hasAttribute('data-bottom-bar'))
+    expect(bar).toHaveClass('fixed', 'inset-x-0', 'bottom-0', 'bg-paper', 'lg:hidden')
+    expect(bar?.className).not.toContain('backdrop-blur')
+  })
+
+  it('names the product and says it is a prototype on the sidebar', () => {
+    renderApp('/')
+    const sidebar = screen.getByRole('complementary')
+    expect(within(sidebar).getByRole('link', { name: 'Goodreads' })).toHaveAttribute('href', '/')
+    expect(within(sidebar).getByText(/^Prototipo de rediseño/)).toBeInTheDocument()
+  })
+
+  it.each(['/', '/descubrir', '/buscar'])('gives %s all the width', (path) => {
+    renderApp(path)
+    expect(screen.getByRole('main')).not.toHaveClass('max-w-app')
+  })
+
+  it.each(['/biblioteca', '/biblioteca/carpeta/terror', '/libro/OL81626W', '/amigos'])(
+    'keeps %s in the column',
+    (path) => {
+      renderApp(path)
+      expect(screen.getByRole('main')).toHaveClass('max-w-app')
+    },
+  )
+
+  it('leaves room under the last row for the bar and the toast', () => {
+    renderApp('/')
+    expect(screen.getByRole('main').className).toContain('pb-[calc(8rem+')
+  })
+
+  describe('scroll between pages', () => {
+    const scrollTo = (top: number) => {
+      document.documentElement.scrollTop = top
+      fireEvent.scroll(window)
+    }
+    const scrolled = () => document.documentElement.scrollTop
+
+    it('starts another page at the top and returns to the list with its back link', () => {
+      renderApp('/biblioteca?tag=want')
+      scrollTo(400)
+
+      fireEvent.click(screen.getByRole('link', { name: /^Fundación/ }))
+      expect(scrolled()).toBe(0)
+
+      fireEvent.click(within(screen.getByRole('main')).getByRole('link', { name: 'Mis libros' }))
+      expect(screen.getByRole('heading', { level: 1, name: 'Mis libros' })).toBeInTheDocument()
+      expect(scrolled()).toBe(400)
+    })
+
+    it('stays in place when a filter changes the URL of the same page', () => {
+      renderApp('/biblioteca?tag=want')
+      scrollTo(400)
+      fireEvent.click(screen.getByRole('button', { name: /Leído/ }))
+      expect(scrolled()).toBe(400)
+    })
+  })
+})
+
+describe('title of the tab', () => {
+  it.each([
+    ['/', 'Inicio · Goodreads'],
+    ['/biblioteca', 'Mis libros · Goodreads'],
+    ['/buscar', 'Buscar · Goodreads'],
+    ['/?actividad=1', 'Actividad de tus amigos · Goodreads'],
+    ['/libro/OL81626W', 'Carrie · Goodreads'],
+  ])('%s is named as its page', (path, title) => {
+    renderApp(path)
+    expect(document.title).toBe(title)
+  })
+
+  it('follows a change inside the page, which does not change the path', async () => {
+    renderApp('/')
+    fireEvent.click(screen.getByRole('link', { name: /Ver toda la actividad/ }))
+    await waitFor(() => expect(document.title).toBe('Actividad de tus amigos · Goodreads'))
+    fireEvent.click(screen.getByRole('link', { name: 'Inicio', current: false }))
+    await waitFor(() => expect(document.title).toBe('Inicio · Goodreads'))
   })
 })

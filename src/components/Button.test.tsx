@@ -11,24 +11,32 @@ describe('Button', () => {
     expect(screen.getByRole('button')).not.toHaveClass('bg-white')
   })
 
-  it('gives the secondary a fill and an edge, which reaches 3:1 on the band', () => {
-    render(<Button>Opciones</Button>)
-    expect(screen.getByRole('button')).toHaveClass('bg-sand-deep', 'border-edge', 'text-ink')
+  it.each(VARIANTS)('is a pill in %s', (variant) => {
+    render(<Button variant={variant}>Guardar</Button>)
+    expect(screen.getByRole('button')).toHaveClass('rounded-full')
   })
 
-  it('goes one step darker under the cursor, and to ink only while its menu is open', () => {
+  it('draws the secondary with an edge that reaches 3:1, and leaves the fill to the primary', () => {
+    render(<Button>Opciones</Button>)
+    const button = screen.getByRole('button')
+    expect(button).toHaveClass('border-edge', 'text-ink')
+    expect(button.className).not.toMatch(/(^|\s)bg-/)
+  })
+
+  it('takes a fill under the cursor, and goes to ink only while its menu is open', () => {
     render(<Button>Opciones</Button>)
     const { classList } = screen.getByRole('button')
-    expect(classList.contains('hover:bg-sand-dark')).toBe(true)
+    expect(classList.contains('hover:bg-sand')).toBe(true)
     expect(classList.contains('hover:bg-ink')).toBe(false)
     expect(classList.contains('aria-expanded:bg-ink')).toBe(true)
   })
 
-  it('leaves the quiet without a fill at rest, and marks it while its menu is open', () => {
+  it('leaves the quiet without edge or fill at rest, and marks it while its menu is open', () => {
     render(<Button variant="quiet">Agregar o quitar</Button>)
-    const { classList } = screen.getByRole('button')
-    expect(classList.contains('bg-sand-deep')).toBe(false)
-    expect(classList.contains('aria-expanded:bg-shell')).toBe(true)
+    const button = screen.getByRole('button')
+    expect(button).not.toHaveClass('border')
+    expect(button.className).not.toMatch(/(^|\s)bg-/)
+    expect(button.classList.contains('aria-expanded:bg-sand')).toBe(true)
   })
 
   it('is 44 px tall at every size, also compact', () => {
