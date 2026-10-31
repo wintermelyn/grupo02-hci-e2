@@ -62,9 +62,10 @@ function ToastCard({ toast }: { toast: ToastData }) {
   }
 
   // Deshacer disappears with this toast, which would drop keyboard users back at the top of the page.
+  // It came from where the person is, so getting the focus back must not move the page.
   function undoAndRestoreFocus() {
     undo()
-    focusedBefore.current?.focus()
+    focusedBefore.current?.focus({ preventScroll: true })
   }
 
   function onUndoKeyDown(event: KeyboardEvent) {
