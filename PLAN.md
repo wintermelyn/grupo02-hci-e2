@@ -367,10 +367,10 @@ Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarr
 
 ### Rol B · Social y búsqueda (T3 + búsqueda) · `src/features/home|search|discover|more|friends|profile/`, `src/lib/catalog.ts`, `socialSlice.ts`, `src/data/seedDiscover.ts`
 - [x] **`catalog.ts`:** baja el índice y las descripciones, los deja en memoria y dice si están cargando o fallaron. La ficha de A los usa con `useCatalogBook`, `useCatalog` y `useDescription`.
-- [ ] **Buscar:**
+- [x] **Buscar:**
   - resultados en `BookRow`, que navega a `/libro/:id`;
   - estados de carga, sin resultados y error.
-- [ ] **Descubrir (D6):**
+- [x] **Descubrir (D6):**
   - `seedDiscover.ts` con "Seleccionados para ti" (unos 6 libros según los gustos de Alex: terror y ciencia ficción) y 2 o 3 listas prehechas, usando los 20 libros del catálogo que no están en la biblioteca inicial;
   - todas las secciones usan el mismo componente y tamaño;
   - "Seleccionados para ti" oculta los libros que ya están en la biblioteca;
@@ -384,11 +384,11 @@ Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarr
   - "Invitar contactos" es una acción secundaria junto al título, que solo muestra un aviso;
   - estado sin resultados.
 - [x] **Persona:** qué está leyendo, últimos leídos, libros en común y botón de agregar o estado de la solicitud.
-- [ ] **Inicio:**
+- [x] **Inicio:**
   - "Leyendo ahora", que abre la ficha;
   - las 5 últimas actividades de los amigos, con like, y "Ver toda la actividad", que abre una vista aparte dentro de Inicio;
   - estado vacío.
-- [ ] **Mi perfil:** nombre, @usuario y "Reiniciar demo" con confirmación.
+- [x] **Mi perfil:** nombre, @usuario y "Reiniciar demo" con confirmación.
 - [x] **Acciones de `socialSlice`.**
 - **Listo cuando:** T3 se completa desde "Reiniciar demo", en celular y en computador; la búsqueda funciona sin Open Library; y los estados de carga, sin resultados y error están implementados.
 
@@ -478,7 +478,7 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Descubrir | "Seleccionados para ti" al mismo nivel que las listas | Carrusel infinito con un libro grande y sus vecinos a los lados, sin miniaturas. Las cuatro listas quedan siempre a la vista, "Seleccionados para ti" primero, y un contador dice "1 de 6". Con mouse, tocar una portada lateral avanza hasta ella |
 | Flechas de los rieles | Regla 1: todo ícono lleva texto | Sin texto y solo en computador, porque "Anterior" y "Siguiente" se veían anticuados y en un carrusel el sentido se entiende por la posición. En tacto manda el gesto. Con teclado se recorre con Tab |
 | Corazón de "Me gusta" | Regla 1: todo ícono lleva texto | Solo el corazón en celular, y "Me gusta" con texto en computador. La tablet usa el corazón en las filas de Inicio, donde dos columnas no le dejan lugar al texto. Si hay un Deshacer activo, el aviso de a quién le llega no aparece, para no pisarlo |
-| Color de portada | "Portadas sin teñir" | Inicio y Buscar usan el color de la portada como fondo de sus tarjetas, oscurecido hasta dar 8,5:1 con texto blanco. Descubrir solo lo usa como tinte detrás de la portada, nunca bajo el texto. La ficha no lo usa: su portada va sola |
+| Color de portada | "Portadas sin teñir" | Inicio, Buscar y "Está leyendo" en Persona usan el color de la portada como fondo de sus tarjetas, oscurecido hasta dar 8,5:1 con texto blanco. Descubrir solo lo usa como tinte detrás de la portada, nunca bajo el texto. La ficha no lo usa: su portada va sola |
 | Barra del celular | Barra inferior | Pegada al borde inferior, de lado a lado, sólida y sin desenfoque. El modelo la traía flotante, y en un celular real se movía mucho al hacer scroll. La causa probable es la barra del navegador, que no se pudo reproducir en emulación |
 | Fila de actividad | No aparece | Abre el libro |
 | Estante de Descubrir | No aparece | Si el libro ya está en mi biblioteca, muestra su tag |
