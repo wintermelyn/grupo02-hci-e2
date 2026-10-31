@@ -5,6 +5,7 @@ import { BackLink, BookCover, StatusControl, Wordmark } from '../../components'
 import { coverTone } from '../../lib/coverTone'
 import { selectBook, selectEntry, useStore } from '../../store'
 import type { Book, Folder, ReadingStatus } from '../../types'
+import { UNFILED_NAME, UNFILED_PATH } from '../library/filters'
 import { BookFolders } from './BookFolders'
 import { LedgerRow } from './LedgerRow'
 import { MissingBook } from './MissingBook'
@@ -23,6 +24,7 @@ function backTarget(state: unknown, folders: Folder[]): { to: string; label: str
   if (!from) return { to: LIBRARY_PATH, label: 'Mis libros' }
   const [pathname] = from.split('?')
   if (pathname === LIBRARY_PATH) return { to: from, label: 'Mis libros' }
+  if (pathname === UNFILED_PATH) return { to: from, label: UNFILED_NAME }
   const folderId = matchPath(FOLDER_PATTERN, pathname)?.params.folderId
   const folder = folders.find(({ id }) => id === folderId)
   return { to: from, label: folder?.name ?? 'Volver' }

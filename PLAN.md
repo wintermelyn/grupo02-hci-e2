@@ -48,6 +48,7 @@ Es una página web responsiva. En el celular y la tablet tiene una barra de nave
 | `/actividad` | **Toda la actividad:** vista aparte dentro de Inicio, por Hoy, Esta semana y Antes | B |
 | `/biblioteca` | **Mis libros:** aviso periódico, botones de tag, tablero "Mis carpetas" (2 portadas, nombre, cantidad), "+ Nueva carpeta" y, en "Todos", la lista de todos los libros debajo. Con un tag activo, la lista de libros con ese tag en vez del tablero | A |
 | `/biblioteca/carpeta/:folderId` | **Carpeta:** botones de tag, lista de libros con su tag, buscador interno | A |
+| `/biblioteca/sin-carpeta` | **Sin carpeta:** la misma pantalla de una carpeta, con los libros que no están en ninguna, sin renombrar ni eliminar | A |
 | `/libro/:bookId` | **Ficha:** portada, datos, tag con lápiz, carpetas del libro, fechas y puntaje | A |
 | `/descubrir` | **Descubrir:** carrusel con "Seleccionados para ti" y las listas prehechas, al mismo nivel y siempre a la vista | B |
 | `/buscar` | **Buscar:** libros y autores, sin personas ni pestañas | B |
@@ -426,7 +427,7 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | "No" del aviso | "Lo quita de Lo quiero" y muestra "Quitado de tu lista" | El libro sale de Mis libros y de sus carpetas, y el aviso lo dice antes y después, con el título y sin hablar de "tu lista". Deshacer devuelve el libro y la pregunta |
 | "Cada cierto tiempo" y "mucho tiempo" | Sin valores | Un aviso respondido por día y 90 días en la lista |
 | "Mis carpetas" y "Mis libros" | La decisión 3 usa "Mis carpetas" y los journeys, "Mis libros" | "Mis libros" es la sección y "Mis carpetas", el título del tablero |
-| Libros sin carpeta | La decisión 3 habla de "todas las carpetas" | Los botones de tag en Mis libros filtran toda la biblioteca, así que también aparecen. En "Todos", una tarjeta "Sin carpeta" al final del tablero los reúne |
+| Libros sin carpeta | La decisión 3 habla de "todas las carpetas" | Los botones de tag en Mis libros filtran toda la biblioteca, así que también aparecen. En "Todos", una tarjeta "Sin carpeta" al final del tablero los reúne. Se ve como una carpeta, así que abre la misma pantalla, en su propia ruta: con "< Mis libros", título, botones de tag y buscador, y partiendo desde arriba |
 | Botón de agregar | El journey dice "+" y la decisión 4, "Agregar" | "+ Agregar", porque los íconos van con etiqueta |
 | "Conectar con más amigos" | La decisión 4 habla de un renombrado, sin dar el nombre nuevo | "Invitar contactos" |
 | Código de amigo | No aparece | Queda fuera. Compartir un código exige coordinarse por otro medio, lo contrario de N2 |

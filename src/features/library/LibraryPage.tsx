@@ -10,17 +10,15 @@ import {
   booksLabel,
   compareTitles,
   countByTag,
-  matchesQuery,
   TAG_PARAM,
   useBookLookup,
+  useFilteredBooks,
 } from './filters'
 import { FolderBoard } from './FolderBoard'
 import { useListFilters } from './useListFilters'
 import { WantPrompt } from './WantPrompt'
 
 const SEARCH_LABEL = 'Buscar en Mis libros'
-const VIEW_PARAM = 'vista'
-const NO_FOLDER = 'sin-carpeta'
 
 function NoTaggedBooks({ status }: { status: ReadingStatus }) {
   return (
@@ -59,7 +57,7 @@ function NoResults({ query, tag, onShowAll }: NoResultsProps) {
 }
 
 export function LibraryPage() {
-  const { searchParams, setParams, tag, typed, query, search } = useListFilters()
+  const { setParams, tag, typed, query, search } = useListFilters()
   const library = useStore((state) => state.library)
   const bookOf = useBookLookup()
   const contentRef = useRef<HTMLDivElement>(null)
@@ -67,15 +65,7 @@ export function LibraryPage() {
   const entries = useMemo(() => Object.values(library), [library])
   const counts = useMemo(() => countByTag(entries), [entries])
 
-  const books = useMemo(
-    () =>
-      entries
-        .filter(({ status }) => tag === 'all' || status === tag)
-        .flatMap(({ bookId }) => bookOf(bookId) ?? [])
-        .filter((book) => matchesQuery(book, query))
-        .sort(compareTitles),
-    [entries, tag, query, bookOf],
-  )
+  const books = useFilteredBooks(entries, tag, query)
 
   const unfiledBooks = useMemo(
     () =>
@@ -85,30 +75,16 @@ export function LibraryPage() {
         .sort(compareTitles),
     [entries, bookOf],
   )
-  const showUnfiled =
-    tag === 'all' && searchParams.get(VIEW_PARAM) === NO_FOLDER && unfiledBooks.length > 0
 
   function chooseTag(value: TagFilterValue) {
-    setParams({ [TAG_PARAM]: value === 'all' ? '' : value, [VIEW_PARAM]: '' })
+    setParams({ [TAG_PARAM]: value === 'all' ? '' : value })
   }
 
   function content() {
-    if (showUnfiled) {
-      return (
-        <section className="mt-5">
-          <h2 className="mb-1 section-title">Sin carpeta</h2>
-          <BookList title="Sin carpeta" books={unfiledBooks} />
-        </section>
-      )
-    }
     if (tag === 'all') {
       return (
         <>
-          <FolderBoard
-            entries={entries}
-            unfiledBooks={unfiledBooks}
-            unfiledTo={`?${VIEW_PARAM}=${NO_FOLDER}`}
-          />
+          <FolderBoard entries={entries} unfiledBooks={unfiledBooks} />
           {/* Todos says it has them all, here as much as inside a folder. */}
           {books.length > 0 && <BookList title="Todos los libros" showTitle books={books} />}
         </>

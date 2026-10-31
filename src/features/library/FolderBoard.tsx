@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useStore } from '../../store'
 import type { Book, LibraryEntry } from '../../types'
-import { pinnedFirst, useBookLookup } from './filters'
+import { pinnedFirst, UNFILED_NAME, UNFILED_PATH, useBookLookup } from './filters'
 import { FolderCard } from './FolderCard'
 import { NewFolderCard } from './NewFolderCard'
 
@@ -9,11 +9,9 @@ export interface FolderBoardProps {
   entries: LibraryEntry[]
   /** Books outside every folder. They get a card too, so "Todos" shows all that it counts. */
   unfiledBooks: Book[]
-  /** Where the card of the books outside every folder leads. */
-  unfiledTo: string
 }
 
-export function FolderBoard({ entries, unfiledBooks, unfiledTo }: FolderBoardProps) {
+export function FolderBoard({ entries, unfiledBooks }: FolderBoardProps) {
   const folders = useStore((state) => state.folders)
   const bookOf = useBookLookup()
 
@@ -45,10 +43,10 @@ export function FolderBoard({ entries, unfiledBooks, unfiledTo }: FolderBoardPro
         {unfiledBooks.length > 0 && (
           <li>
             <FolderCard
-              folder={{ id: 'sin-carpeta', name: 'Sin carpeta' }}
+              folder={{ id: 'sin-carpeta', name: UNFILED_NAME }}
               count={unfiledBooks.length}
               covers={unfiledBooks.slice(0, 2)}
-              to={unfiledTo}
+              to={UNFILED_PATH}
             />
           </li>
         )}

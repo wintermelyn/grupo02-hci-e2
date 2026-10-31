@@ -50,7 +50,7 @@ describe('LibraryPage', () => {
       '/biblioteca/carpeta/novela',
       '/biblioteca/carpeta/ciencia-ficcion',
       '/biblioteca/carpeta/regalos',
-      '/biblioteca?vista=sin-carpeta',
+      '/biblioteca/sin-carpeta',
     ])
   })
 
@@ -437,12 +437,6 @@ describe('LibraryPage', () => {
         search('')
         expect(main().queryByRole('button', { name: 'Buscar en Mis libros' })).toBeNull()
       })
-    })
-
-    it('leaves the list of books without a folder with its tag', () => {
-      renderApp('/biblioteca?vista=sin-carpeta')
-      fireEvent.click(tagButton(/^Leído/))
-      expect(currentLocation()).toBe('/biblioteca?tag=read')
     })
   })
 })
