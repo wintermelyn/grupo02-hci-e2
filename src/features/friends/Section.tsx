@@ -10,7 +10,7 @@ export function Section({ title, children }: { title: string; children: ReactNod
   )
 }
 
-/** The tinted rows of Inicio, with the same gaps. Each <li> is a row. */
+/** One column on a phone and two from md. Each <li> is a row. */
 export function RowList({ children }: { children: ReactNode }) {
   return <ul className="grid gap-1.5 md:grid-cols-2 md:gap-2.5">{children}</ul>
 }
