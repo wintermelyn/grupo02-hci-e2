@@ -48,8 +48,9 @@ export function InlineConfirm({
         className,
       )}
     >
-      <div>
-        <h2 id={titleId} className="font-serif text-lg font-semibold">
+      {/* From md it has one line per text, so a place of fixed height can hold it. */}
+      <div className="min-w-0">
+        <h2 id={titleId} className="font-serif text-lg font-semibold md:truncate">
           {title}
         </h2>
         <p className="mt-0.5">{children}</p>
