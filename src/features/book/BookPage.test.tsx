@@ -1,6 +1,7 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter, Routes, useNavigate } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { coverTone } from '../../lib/coverTone'
 import { daysAgo, today } from '../../lib/dates'
 import { fetchDescription, fetchWork } from '../../lib/openlibrary'
 import { appRoutes } from '../../routes'
@@ -26,6 +27,7 @@ const CRONICA = '/libro/OL274574W' // Leído, sin descripción
 
 const NO_DESCRIPTION = 'Aún no tenemos descripción de este libro.'
 const TRANSLATED = 'Traducción hecha con IA'
+const UNTRANSLATED = 'Descripción de Open Library, sin traducir'
 const LONG_DESCRIPTION = `${'Una frase larga sobre el libro. '.repeat(120)}Última frase.`
 const SIMULATED: Book = {
   id: 'OL0TEST',
@@ -122,13 +124,11 @@ describe('BookPage', () => {
     expect(pageShape()).toEqual(withDescription)
   })
 
-  it('does not take the third column away from a book without a description', () => {
-    renderApp(CRONICA)
-    const header = main().getByRole('heading', { level: 1 }).closest('header')
-    expect(header).toHaveClass('lg:col-span-2')
-    expect(header?.parentElement?.className).toContain(
-      'lg:grid-cols-[14rem_minmax(0,1.2fr)_minmax(0,1fr)]',
-    )
+  it('stands the cover on the colour of its book, never under the text', () => {
+    renderApp(CARRIE)
+    const scene = document.querySelector('.tone-scene') as HTMLElement
+    expect(scene.style.getPropertyValue('--tone')).toBe(coverTone(CARRIE_ID))
+    expect(scene).toHaveTextContent('')
   })
 
   it('does not say that a description is missing when there is one', () => {
@@ -190,6 +190,52 @@ describe('BookPage', () => {
       expect(pageShape()).toEqual(loading)
     })
 
+    it('says that the text comes from Open Library, under it and without an icon', async () => {
+      vi.mocked(fetchDescription).mockResolvedValue('Una enfermera y un escritor.')
+      openLive()
+      const line = await main().findByText(UNTRANSLATED)
+      expect(main().getByText('Una enfermera y un escritor.').nextElementSibling).toBe(line)
+      expect(line).toHaveClass('text-sm', 'text-muted')
+      expect(line.querySelector('svg')).not.toBeInTheDocument()
+    })
+
+    it('says nothing about a text that is not there', async () => {
+      const description = deferred<string | undefined>()
+      vi.mocked(fetchDescription).mockReturnValue(description.promise)
+      openLive()
+      expect(main().queryByText(UNTRANSLATED)).not.toBeInTheDocument()
+      await act(async () => description.resolve(undefined))
+      expect(main().queryByText(UNTRANSLATED)).not.toBeInTheDocument()
+    })
+
+    it('says it too for a text kept from an earlier visit', () => {
+      openLive({ description: 'Ya la tiene.' })
+      expect(main().getByText(UNTRANSLATED)).toBeInTheDocument()
+    })
+
+    it('leaves the books of the catalogue out of it', () => {
+      renderApp(NOCHE)
+      expect(main().queryByText(UNTRANSLATED)).not.toBeInTheDocument()
+    })
+
+    describe('opened from a direct link', () => {
+      it('shows the text of the work with the same line, and does not ask twice', async () => {
+        vi.mocked(fetchWork).mockResolvedValue({ ...LIVE, description: 'Del enlace.' })
+        renderApp(`/libro/${LIVE.id}`)
+        expect(await main().findByText('Del enlace.')).toBeInTheDocument()
+        expect(main().getByText(UNTRANSLATED)).toBeInTheDocument()
+        expect(fetchDescription).not.toHaveBeenCalled()
+      })
+
+      it('asks for it if the book came without one', async () => {
+        vi.mocked(fetchWork).mockResolvedValue(LIVE)
+        vi.mocked(fetchDescription).mockResolvedValue('Pedida después.')
+        renderApp(`/libro/${LIVE.id}`)
+        expect(await main().findByText('Pedida después.')).toBeInTheDocument()
+        expect(main().getByText(UNTRANSLATED)).toBeInTheDocument()
+      })
+    })
+
     it('does not ask again for a work that has none', async () => {
       openLive({ description: '' })
       expect(main().getByText(NO_DESCRIPTION)).toBeInTheDocument()
@@ -226,13 +272,18 @@ describe('BookPage', () => {
       openSimulated({})
       const mark = main().getByText(TRANSLATED)
       expect(mark).toHaveClass('text-sm', 'text-muted')
-      expect(mark.querySelector('svg')).not.toBeInTheDocument()
+      expect(mark.querySelector('svg.lucide-sparkle')).toBeInTheDocument()
       expect(mark.closest('section')?.querySelector('.ribbon')).not.toBeInTheDocument()
     })
 
     it('stays out of a description that was not translated', () => {
       openSimulated({ descriptionTranslated: undefined })
       expect(main().queryByText(TRANSLATED)).not.toBeInTheDocument()
+    })
+
+    it('is the only line under a translated text', () => {
+      openSimulated({})
+      expect(main().queryByText(UNTRANSLATED)).not.toBeInTheDocument()
     })
 
     it('has nothing to say about a description that is not there', () => {
@@ -280,6 +331,16 @@ describe('BookPage', () => {
     renderApp(OUTSIDE)
     const add = main().getByRole('button', { name: 'Agregar a Mis libros' })
     expect(add.closest('[class*="-mx-"]')).toBeNull()
+  })
+
+  it('lets the pill take its width on a wide record, and the row once the book is in', () => {
+    renderApp(OUTSIDE)
+    const add = main().getByRole('button', { name: 'Agregar a Mis libros' })
+    expect(add.parentElement).toHaveClass('md:w-fit')
+    fireEvent.click(add)
+    fireEvent.click(main().getByRole('menuitemradio', { name: 'Lo quiero' }))
+    const change = main().getByRole('button', { name: /Cambiar o quitar/ })
+    expect(change.parentElement).not.toHaveClass('md:w-fit')
   })
 
   it('tells the two controls apart: only the tag says Cambiar', () => {
