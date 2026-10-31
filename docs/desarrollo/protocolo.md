@@ -2,7 +2,17 @@
 
 El prototipo se implementa por fases, cada una en una sesión nueva. El prompt de cada fase dice qué se construye. Este protocolo dice cómo parte, cómo se comprueba y cómo cierra, para que todas trabajen igual.
 
-**Esta rama** es `wintermelyn/desarrollo-proyecto`, y cada sesión abre en su carpeta, `desarrollo-proyecto`. Las ramas de trabajo se integran aquí y `main` avanza solo cuando se aprueba un checkpoint (CP). Mientras duren las fases, esto reemplaza el merge diario a `main` de la sección 5 de `PLAN.md`.
+**Esta rama** es `wintermelyn/desarrollo-proyecto`, y cada sesión abre en su carpeta, `desarrollo-proyecto`. El trabajo de cada fase llega aquí por un pull request (PR), y `main` avanza solo por otro PR, cuando se aprueba un checkpoint (CP). Mientras duren las fases, esto reemplaza el merge diario a `main` de la sección 5 de `PLAN.md`.
+
+## Ramas y pull requests
+
+Todo cambio queda en un PR. No se hace merge local hacia esta rama ni push directo a `main`.
+
+- **Rama de la fase:** cada fase trabaja en su propia rama, nacida del último commit de esta rama. Se llama `fase-<n>`, salvo que el prompt dé otro nombre. Ahí va todo lo de la fase, incluidos sus cierres.
+- **PR de la fase:** va de la rama de la fase hacia esta rama. Se abre al cerrar la fase y queda abierto hasta que Matías apruebe el CP.
+- **PR de publicación:** va de esta rama hacia `main`. Se abre y se integra con `Aprobé el CP<n>`.
+
+Los PR se integran en GitHub con `gh pr merge --merge`, nunca antes de `Aprobé el CP<n>` y primero el de la fase. Si este PR depende de otro que sigue abierto, la descripción enlaza ese PR.
 
 ## Reglas de toda fase
 
@@ -24,9 +34,11 @@ El prototipo se implementa por fases, cada una en una sesión nueva. El prompt d
 
 Una fase parte cuando Matías escribe `Aprobé el CP<n>` con sus respuestas. La fase 1 no viene de un CP y parte directo con su prompt. `Aprobé el CP6` no abre otra fase, pero hace estos mismos pasos para que el cierre de la fase 6 llegue a `main`.
 
-1. Se pasan las respuestas a `PLAN.md`. Las decisiones de implementación van a la sección 6, y si una respuesta cambia otra sección, esa también se edita.
-2. Se hace commit en esta rama.
-3. Se hace push de esta rama a `main` con `git push origin HEAD:main`, sin forzar. Si `main` tiene commits que esta rama no tiene, primero se hace merge de `main` en esta rama. Vercel despliega desde `main`, así que este push publica el prototipo.
+1. Se integra el PR de la fase aprobada y se actualiza esta rama con `git pull --ff-only`.
+2. Se pasan las respuestas a `PLAN.md`. Las decisiones de implementación van a la sección 6, y si una respuesta cambia otra sección, esa también se edita.
+3. Se hace commit en esta rama y se hace push, sin forzar. Si `main` tiene commits que esta rama no tiene, primero se hace merge de `main` en esta rama.
+4. Se abre el PR de publicación y se integra. Vercel despliega desde `main`, así que este paso publica el prototipo.
+5. Se actualiza esta rama con `git pull --ff-only origin main`, se hace push y se crea la rama de la fase nueva.
 
 **Listo cuando** `git status` no muestra cambios y esta rama y `origin/main` apuntan al mismo commit.
 
@@ -34,14 +46,14 @@ Una fase parte cuando Matías escribe `Aprobé el CP<n>` con sus respuestas. La 
 
 Aplica cuando un workflow construye en paralelo. Cada agente:
 
-- trabaja en su propio worktree, creado desde el último commit de esta rama, y lo comprueba antes de escribir;
+- trabaja en su propio worktree, creado desde el último commit de la rama de la fase, y lo comprueba antes de escribir;
 - parte con `npm ci`;
 - recibe las secciones de `PLAN.md` que le tocan y `DESIGN.md`;
 - hace commit en su rama.
 
-Después un agente integra las ramas en esta rama hasta que pasen format, lint, test y build.
+Después un agente integra las ramas de los agentes en la rama de la fase hasta que pasen format, lint, test y build. Ese resultado llega a esta rama con el PR de la fase.
 
-**Listo cuando** todas las ramas están integradas y `npm run format:check`, `npm run lint`, `npm test` y `npm run build` pasan en esta rama.
+**Listo cuando** todas las ramas están integradas y `npm run format:check`, `npm run lint`, `npm test` y `npm run build` pasan en la rama de la fase.
 
 ## 3. Recorrer
 
@@ -111,10 +123,11 @@ Trae cuatro cosas, en este orden:
 
 1. Se marca en la sección 4 de `PLAN.md` lo que quedó hecho.
 2. Se agrega a `docs/registro-ia.md` una fila con el prompt en español formal y con ortografía correcta, con todo su contenido y cada pedido. Va en una sola línea, con `<br>` entre párrafos y con `|` y `<` escapados con `\`.
-3. Se hace commit en esta rama.
-4. Se abre la página con `open .claude/entregables/cp<n>/index.html`.
-5. Se resume el resultado en cinco líneas.
+3. Se hace commit en la rama de la fase y se hace push.
+4. Se abre el PR de la fase, o se actualiza si ya existe. No se integra.
+5. Se abre la página con `open .claude/entregables/cp<n>/index.html`.
+6. Se resume el resultado en cinco líneas, con el enlace al PR.
 
 Ahí se termina y se espera la respuesta de Matías.
 
-Una sesión de correcciones sobre un CP actualiza esa misma página y cierra con estos mismos pasos. Sus cambios llegan a `main` con el `Aprobé el CP<n>` siguiente.
+Una sesión de correcciones sobre un CP trabaja en la misma rama de la fase, actualiza esa misma página y cierra con estos mismos pasos. Sus cambios quedan en el mismo PR y llegan a `main` con el `Aprobé el CP<n>` siguiente.
