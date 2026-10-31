@@ -218,7 +218,7 @@ async function downloadCover(id, coverId) {
   const publicUrl = `/covers/${id}.jpg`
   if (await fileExists(file)) return publicUrl
   const response = await request(
-    `https://covers.openlibrary.org/b/id/${coverId}-M.jpg?default=false`,
+    `https://covers.openlibrary.org/b/id/${coverId}-L.jpg?default=false`,
   )
   if (!response.ok) return undefined
   await writeFile(file, Buffer.from(await response.arrayBuffer()))

@@ -112,7 +112,7 @@ N3 no se atiende en esta entrega. Si el equipo cambia alguna decisión, se actua
   - Del resultado se usan el **título y la portada de la edición en español** (`editions.docs[0]`).
   - Los autores se corrigen a mano en el JSON, porque a veces vienen en el idioma original.
   - Las descripciones se traen de `/works/{key}.json`, donde vienen como string o como `{value}`. Pueden faltar.
-  - Las portadas se bajan con `-M.jpg?default=false` a `public/covers/`.
+  - Las portadas se bajan con `-L.jpg?default=false` a `public/covers/`, para que se vean nítidas en pantallas 2x.
   - El resultado se guarda en `src/data/books.json`, que se confirma en el repo, y la app no depende de Open Library para funcionar.
 - **ID de un libro:** la clave de la obra en Open Library, por ejemplo `OL45804W`. Se usa así tal cual en la URL.
 - **Búsqueda en vivo** (`src/lib/openlibrary.ts`, rol B):
