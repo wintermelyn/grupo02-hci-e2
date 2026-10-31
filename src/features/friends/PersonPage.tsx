@@ -31,11 +31,11 @@ function BookList({ books }: { books: Book[] }) {
   )
 }
 
-/** Covers instead of rows: these books are often listed just above, under the same person. */
+/** Small covers instead of rows: these books are often listed just above, for the same person. */
 function SharedBooks({ books }: { books: Book[] }) {
   const { pathname, search } = useLocation()
   return (
-    <ul className="mt-2.5 grid grid-cols-3 gap-2.5 md:grid-cols-6 md:gap-4">
+    <ul className="mt-2.5 grid grid-cols-[repeat(auto-fill,5rem)] gap-x-4 gap-y-3">
       {books.map((book) => (
         <li key={book.id}>
           <Link

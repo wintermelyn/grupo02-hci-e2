@@ -30,7 +30,7 @@
     "id": "tomas",
     "name": "Tomás Rojas",
     "username": "tomasreads",
-    "avatarColor": "#85490f",
+    "avatarColor": "#5f564d",
     "mutualFriends": 2,
     "readingIds": ["OL17075811W"],
     "readIds": ["OL1811898W", "OL1892617W", "OL15829966W", "OL1966488W"]
@@ -39,7 +39,7 @@
     "id": "camila",
     "name": "Camila Torres",
     "username": "camitorres",
-    "avatarColor": "#7a2334",
+    "avatarColor": "#85490f",
     "mutualFriends": 3,
     "readingIds": ["OL278437W"],
     "readIds": ["OL14860424W", "OL1731119W", "OL10263W", "OL274518W"]
@@ -57,7 +57,7 @@
     "id": "ignacio",
     "name": "Ignacio Pérez",
     "username": "nachoperez",
-    "avatarColor": "#5f564d",
+    "avatarColor": "#6b3a63",
     "mutualFriends": 1,
     "readingIds": ["OL52114W"],
     "readIds": ["OL109524W", "OL59800W"]
@@ -66,7 +66,7 @@
     "id": "fernanda",
     "name": "Fernanda Castillo",
     "username": "fercastillo",
-    "avatarColor": "#85490f",
+    "avatarColor": "#1e1915",
     "mutualFriends": 1,
     "readingIds": ["OL698173W"],
     "readIds": ["OL266178W", "OL1268413W"]
@@ -84,7 +84,7 @@
     "id": "benjamin",
     "name": "Benjamín Reyes",
     "username": "benjareyes",
-    "avatarColor": "#1e1915",
+    "avatarColor": "#85490f",
     "mutualFriends": 0,
     "readingIds": ["OL468431W"],
     "readIds": ["OL503666W", "OL498556W"]

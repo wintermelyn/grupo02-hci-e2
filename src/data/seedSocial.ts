@@ -11,7 +11,7 @@ const ME_ID = 'me'
  * Add 1 whenever this file or the shape of social data changes, so browsers with stored data
  * from the old seed start over. Part of the persist version in src/store/index.ts.
  */
-export const SOCIAL_SEED_VERSION = 3
+export const SOCIAL_SEED_VERSION = 4
 
 function findMe(list: User[]): User {
   const found = list.find((user) => user.id === ME_ID)

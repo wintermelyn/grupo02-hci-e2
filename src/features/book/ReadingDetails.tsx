@@ -16,17 +16,17 @@ interface DateFieldProps {
 }
 
 // The picker button stays, invisible over the whole field, so touching anywhere opens the calendar.
-// Chrome ignores :focus on the parts of a date, so the whole date takes the colour of the focus: a
-// rule on each part is the only thing that replaces the browser's blue.
+// Chrome ignores :focus on the parts of a date, so nothing can replace the blue of the part being
+// edited. This filter turns it into a colour close to sand and keeps that part marked.
 const DATE_INPUT = cx(
   'relative min-h-11 w-full min-w-0 rounded-control border border-muted bg-white py-2 pr-9 pl-3',
   '[&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0',
   '[&::-webkit-calendar-picker-indicator]:m-0 [&::-webkit-calendar-picker-indicator]:size-full',
   '[&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:p-0',
   '[&::-webkit-calendar-picker-indicator]:opacity-0',
-  'focus:[&::-webkit-datetime-edit-day-field]:bg-sand',
-  'focus:[&::-webkit-datetime-edit-month-field]:bg-sand',
-  'focus:[&::-webkit-datetime-edit-year-field]:bg-sand',
+  '[&::-webkit-datetime-edit-day-field]:[filter:grayscale(1)_sepia(.5)]',
+  '[&::-webkit-datetime-edit-month-field]:[filter:grayscale(1)_sepia(.5)]',
+  '[&::-webkit-datetime-edit-year-field]:[filter:grayscale(1)_sepia(.5)]',
 )
 
 function DateField({ label, value, onChange, min, max }: DateFieldProps) {

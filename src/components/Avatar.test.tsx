@@ -5,8 +5,8 @@ import { contrast } from '../test/contrast'
 import { Avatar } from './Avatar'
 
 const MIN_TEXT_CONTRAST = 4.5
-// The backgrounds of the BookCover placeholder, all of them tokens of index.css.
-const PALETTE = ['#1e1915', '#2f4a78', '#6b3a63', '#85490f', '#5f564d', '#7a2334']
+// The backgrounds of the BookCover placeholder, without the ribbon's burgundy, which means active.
+const PALETTE = ['#1e1915', '#2f4a78', '#6b3a63', '#85490f', '#5f564d']
 const camilas = users.filter(({ name }) => name === 'Camila Torres')
 
 describe('Avatar', () => {

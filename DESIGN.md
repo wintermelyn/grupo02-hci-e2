@@ -283,11 +283,11 @@ La paleta es de papel y tinta, con cuatro colores de estado sobrios y una cinta 
 ### Primary
 
 - **Tinta** (`ink`, #1e1915): texto principal, relleno del botón `primary`, del toast y de "Agregar a Mis libros", anillo de foco y estrellas llenas. Hace el trabajo que en otra app haría un color de marca.
-- **Cinta burdeo** (`ribbon`, #7a2334): el relleno de la cinta que marca lo activo y lo fijo. También es el color del cursor de texto (`caret-color`) y uno de los seis fondos de la portada de reemplazo. No se usa para nada más.
+- **Cinta burdeo** (`ribbon`, #7a2334): el relleno de la cinta que marca lo activo y lo fijo. También es el color del cursor de texto (`caret-color`) y uno de los seis fondos de la portada de reemplazo, una imagen de libro que no se confunde con la interfaz. No se usa para nada más: tampoco en avatares.
 
 ### Secondary
 
-Los cuatro colores de estado se usan en el texto y el ícono de `StatusTag`, y en la cinta bajo la portada. Nunca como relleno de una superficie ni solos: siempre van con su ícono y su nombre.
+Los cuatro colores de estado se usan en el texto y el ícono de `StatusTag`, y en la cinta bajo la portada. Nunca como relleno de una superficie de la interfaz ni solos: siempre van con su ícono y su nombre. La única excepción son las portadas de reemplazo y los avatares, que los usan como pigmento, sin significado de estado.
 
 - **Azul Lo quiero** (`want`, #2f4a78), con el ícono `Bookmark`.
 - **Ciruela Lo tengo** (`owned`, #6b3a63), con el ícono `Book`.
@@ -470,10 +470,10 @@ Viven en la carpeta de su pantalla. Sirven de modelo, y se vuelven compartidas s
 - **Estado de una persona:** "Solicitud enviada" y "Amigos" en Small label `muted`, con ícono de 16 px, sin color de estado ni cinta. Esos colores son solo de los libros.
 - **Acción sobre una persona:** `PersonAction`. Agregar, Cancelar y Quitar de amigos son `secondary` en Amigos y en Persona, por la regla 11.
 - **Fila de enlace:** en `MorePage.tsx`, una tarjeta blanca de 56 px con ícono, texto y flecha.
-- **Campo de un formulario:** blanco, con borde de 1 px `muted`, radio de control, 44 px de alto y la etiqueta encima. El borde es necesario porque la sombra casi no se ve sobre el panel blanco. Lo usan `FolderOptions.tsx` y `ReadingDetails.tsx`. El campo de fecha pone su ícono `CalendarDays` en `muted`, abre el calendario al tocar cualquier parte y pinta toda la fecha en `sand` mientras tiene el foco, en vez del azul del navegador. Chrome no deja colorear solo la parte enfocada.
+- **Campo de un formulario:** blanco, con borde de 1 px `muted`, radio de control, 44 px de alto y la etiqueta encima. El borde es necesario porque la sombra casi no se ve sobre el panel blanco. Lo usan `FolderOptions.tsx` y `ReadingDetails.tsx`. El campo de fecha pone su ícono `CalendarDays` en `muted`, y abre el calendario al tocar cualquier parte. Chrome ignora `:focus` sobre las partes de una fecha, así que un filtro convierte su azul en un tono cercano a `sand` y deja marcada la parte que se edita.
 - **Motivo de un botón deshabilitado:** Small en tinta con `CircleAlert` en `muted`, dentro de una región `status`.
 - **"Tu lectura":** bloque de la ficha, bajo `StatusControl`, con inicio, fin y puntaje, y "Editar lectura" como `secondary`.
-- **Libros en común:** portadas `fill` con su título en serif de 14 px, en 3 columnas y 6 desde `md`. Son portadas y no filas porque esos libros suelen aparecer justo arriba, en la misma página.
+- **Libros en común:** portadas `fill` de 80 px con su título en serif de 14 px, en todos los dispositivos. Son portadas chicas y no filas porque esos libros suelen aparecer justo arriba, en la misma página, y no deben pesar más que ellos.
 
 ### Cinta
 
@@ -531,7 +531,7 @@ Un campo blanco con `shadow-card`, 44 px de alto y radio de control, con la lupa
 
 ### Avatar
 
-Un círculo con las iniciales blancas en serif sobre `avatarColor`, que viene del directorio. `sm` mide 40 px, con Small label, para las filas. `lg` mide 64 px, con Subheading, para el encabezado de una persona. Es decorativo: el nombre siempre va escrito al lado, y entre homónimos los distingue el @usuario, no el color. Los colores son los seis fondos de la portada de reemplazo y, como ahí, no significan nada. Un test vigila que todos los del directorio salgan de esa lista y den 4,5:1 con el blanco. En Persona va en la banda, en `media` de `PageHeader`.
+Un círculo con las iniciales blancas en serif sobre `avatarColor`, que viene del directorio. `sm` mide 40 px, con Small label, para las filas. `lg` mide 64 px, con Subheading, para el encabezado de una persona. Es decorativo: el nombre siempre va escrito al lado, y entre homónimos los distingue el @usuario, no el color. Los colores son cinco de los seis fondos de la portada de reemplazo, todos menos el burdeo, porque el burdeo significa activo o fijo. Como en la portada, no significan nada. Un test vigila que todos los del directorio salgan de esa lista y den 4,5:1 con el blanco. En Persona va en la banda, en `media` de `PageHeader`.
 
 ### BottomSheet
 
