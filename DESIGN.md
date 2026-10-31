@@ -642,7 +642,7 @@ Las portadas no se tiñen ni se recortan en la ficha. `lg` mide 112 px en celula
 - **Celular:** `AppShell` fija una barra abajo, sobre `paper`, de 64 px más el área segura, con raya superior `edge` y cinco secciones repartidas por igual, ícono de 22 px y etiqueta Caption. La presión es `sand`.
 - **Desde `md`:** barra superior fija, sobre `paper`, de 48 px, con raya inferior `edge`. "Goodreads" en serif de 18 px y "Prototipo" ("Prototipo de rediseño" desde `lg`) van en el borde izquierdo de la columna, y las cinco secciones terminan en el derecho, con íconos de 18 px y Small label. Cada sección mide 44 px para tocar y muestra un relleno de 36 px, para que la barra no quede llena. El hover es `sand`.
 - **Estados:** la sección activa es de tinta, con peso 700 y cinta, y desde `md` también con relleno `sand-deep`. Las demás son `muted` con peso 600 y pasan a tinta con el cursor. "Más" sigue activa en Amigos y Mi perfil.
-- **Marca en celular:** `PageHeader` y la ficha muestran `Wordmark`, porque no hay barra superior. Va a la derecha del título. Si `PageHeader` recibe `backTo` o `action`, sube a la fila de arriba, para que el título y la acción tengan el ancho. Ninguna pantalla pierde el aviso de prototipo.
+- **Marca en celular:** `PageHeader` y la ficha muestran `Wordmark`, porque no hay barra superior. Va a la derecha del título. Si `PageHeader` recibe `backTo` o `action`, sube a la fila de arriba, para que el título y la acción tengan el ancho, salvo con `wordmarkBeside`, para un título corto y una acción `compact`, como en Mis libros. Ninguna pantalla pierde el aviso de prototipo.
 
 ### Toast
 

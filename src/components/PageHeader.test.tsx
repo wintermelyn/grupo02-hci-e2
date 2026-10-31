@@ -14,6 +14,16 @@ describe('PageHeader', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Mis libros' })).toBeInTheDocument()
   })
 
+  it('keeps the product name in the row of the title when asked to, even with an action', () => {
+    renderWithRouter(
+      <PageHeader title="Mis libros" action={<Button compact>Buscar</Button>} wordmarkBeside />,
+    )
+    const row = screen.getByRole('heading', { level: 1 }).parentElement?.parentElement
+      ?.parentElement
+    expect(row).toContainElement(wordmark())
+    expect(row).toContainElement(screen.getByRole('button', { name: 'Buscar' }))
+  })
+
   it('puts the media before the title', () => {
     renderWithRouter(<PageHeader title="Camila Torres" media={<span>CT</span>} />)
     const media = screen.getByText('CT')

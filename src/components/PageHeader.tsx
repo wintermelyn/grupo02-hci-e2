@@ -48,6 +48,8 @@ export interface PageHeaderProps {
   action?: ReactNode
   /** Sits on the band's bottom edge, e.g. a <TagFilter/>. */
   children?: ReactNode
+  /** Keeps the product name next to the title, for a short title and a compact action. */
+  wordmarkBeside?: boolean
 }
 
 /** The band every section starts with, so each page has one clear place to look first. */
@@ -59,9 +61,10 @@ export function PageHeader({
   backLabel,
   action,
   children,
+  wordmarkBeside = false,
 }: PageHeaderProps) {
   // Next to the title it would leave no room for an action on a phone, or for a long title.
-  const wordmarkAbove = Boolean(backTo || action)
+  const wordmarkAbove = Boolean(backTo || action) && !wordmarkBeside
 
   return (
     // flow-root: a margin at the foot of a child stays in the band instead of collapsing out of it.

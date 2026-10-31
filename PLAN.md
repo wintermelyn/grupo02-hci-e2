@@ -221,7 +221,7 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 | `answerWantPrompt(bookId, keep: boolean)` | A | Ver "Aviso periódico" |
 | `sendFriendRequest(userId)`, `cancelFriendRequest(userId)`, `removeFriend(userId)` | B | `removeFriend` deja Deshacer: es lo único que guarda `friendships` en `undoSnapshot`. La aceptación de una solicitud no muestra su aviso si hay un Deshacer disponible |
 | `processPendingRequests()` | B | Ver "Amigos (simulados)" |
-| `toggleLike(activityId)` | B | |
+| `toggleLike(activityId)` | B | Al dar un like muestra el aviso "X verá que te gustó", sin Deshacer |
 
 **Elegir "Leído":**
 - `StatusControl` llama a `finishBook(bookId, { startedAt: entry?.startedAt ?? entry?.addedAt ?? today(), finishedAt: entry?.finishedAt ?? today(), rating: entry?.rating })`, nunca a `setStatus`.
@@ -379,7 +379,7 @@ Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarr
 - [x] **Persona:** qué está leyendo, últimos leídos, libros en común y botón de agregar o estado de la solicitud.
 - [ ] **Inicio:**
   - "Leyendo ahora", que abre la ficha;
-  - feed de actividad con like;
+  - las 5 últimas actividades de los amigos, con like, y "Ver toda la actividad", que abre una vista aparte dentro de Inicio;
   - estado vacío.
 - [ ] **Mi perfil:** nombre, @usuario y "Reiniciar demo" con confirmación.
 - [x] **Acciones de `socialSlice`.**
@@ -458,3 +458,10 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Límites del calendario | Fechas futuras deshabilitadas | Inicio llega hasta hoy y fin va de inicio a hoy. Si inicio queda después de fin, un texto lo explica y no se guarda |
 | Falla de red en una ficha | No aparece | Error con Reintentar, separado de "Libro no encontrado" |
 | Orden en Amigos | No aparece | Amigos y solicitudes por nombre. Los resultados siguen el orden del directorio |
+| Largo de la actividad en Inicio | No aparece | Inicio muestra las 5 últimas. "Ver toda la actividad" abre una vista aparte, agrupada por Hoy, Esta semana y Antes, con "Ver más" por tandas y un final claro. Sin lista infinita ni caja con scroll propio |
+| "Me gusta" | No aparece en el informe E2. P1 y P2 lo mencionan en las entrevistas del E1 | Es un gesto hacia un amigo, no una cifra: sin contador ni lista de nombres. Al tocarlo, el aviso dice a quién le llega, como "Valentina verá que te gustó" |
+| Forma del aviso de D5 | Portada, título, pregunta y "Sí" y "No" | Una fila compacta sobre la lista, con portada chica, sin tarjeta, en "Todos" y "Lo quiero" |
+| "Leyendo ahora" en Inicio | "Tarjeta" que abre la ficha | Portadas grandes en dos columnas, o tres con tres libros, porque casi nadie lee más de dos o tres a la vez. Bajo cada una, "Llevas 12 días" |
+| Buscar antes de escribir | No aparece | Búsquedas recientes, cuando las hay, autores de tu biblioteca y "Lo que leen tus amigos", para reconocer en vez de recordar |
+| Resultados de Buscar | "Libros y autores" | Dicen cuántos hay y cuántos ya tienes. Van en "Autores" y "Libros", y tocar un autor filtra sus libros. Sin resultados, se ofrecen los autores como salida |
+| Buscador y "+ Nueva carpeta" en Mis libros | "Buscador" sin ubicación | El buscador va en la fila del título, como en una carpeta. "+ Nueva carpeta" es la última tarjeta del tablero y el nombre se escribe ahí mismo |
