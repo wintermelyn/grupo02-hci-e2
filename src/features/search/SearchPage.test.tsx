@@ -123,6 +123,13 @@ describe('before typing', () => {
     expect(readRecentSearches()).toEqual([])
   })
 
+  it('shows in the field what a recent search puts in the URL', () => {
+    localStorage.setItem('gr-e2-buscados', JSON.stringify(['dune']))
+    renderApp('/buscar')
+    fireEvent.click(screen.getByRole('button', { name: 'dune' }))
+    expect(search()).toHaveValue('dune')
+  })
+
   it('does not hint that people are found elsewhere, which a question of the evaluation asks', () => {
     renderApp('/buscar')
     expect(screen.queryByText(/Buscas a una persona/)).not.toBeInTheDocument()

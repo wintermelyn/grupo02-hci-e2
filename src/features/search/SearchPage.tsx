@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router'
 import { ErrorState, LoadingState, SearchField, Wordmark } from '../../components'
 import { useStore } from '../../store'
 import { useBookLookup } from '../library/filters'
+import { useListFilters } from '../library/useListFilters'
 import { addRecentSearch, clearRecentSearches, readRecentSearches } from './recentSearchStore'
 import { arrangeResults } from './results'
 import { SearchStart } from './SearchStart'
@@ -26,14 +27,15 @@ function useFocusOnWideScreen(enabled: boolean) {
 }
 
 export function SearchPage() {
-  const [params, setParams] = useSearchParams()
-  const query = params.get('q') ?? ''
-  const { text, loading, failed, books, retry } = useBookSearch(query)
+  // The field keeps its own value: if it waited for the URL, each letter would lose the caret.
+  const { typed, search } = useListFilters()
+  const [, setParams] = useSearchParams()
+  const { text, loading, failed, books, retry } = useBookSearch(typed)
   const library = useStore((state) => state.library)
   const authors = useLibraryAuthors()
   const friendsBooks = useFriendsBooks()
   const [recent, setRecent] = useState(readRecentSearches)
-  const field = useFocusOnWideScreen(query === '')
+  const field = useFocusOnWideScreen(typed === '')
   const bookOf = useBookLookup()
   const booksHeading = useRef<HTMLHeadingElement>(null)
   const focusOnBooks = useRef(false)
@@ -55,10 +57,9 @@ export function SearchPage() {
     booksHeading.current?.focus({ preventScroll: true })
   }, [text])
 
-  // Typing does not fill the history, but an author is a step: Back returns to the search before it.
-  const setQuery = (value: string) => setParams(value ? { q: value } : {}, { replace: true })
   const remember = (term: string) => setRecent((current) => addRecentSearch(term, current))
 
+  // Typing does not fill the history, but an author is a step: Back returns to the search before it.
   function pickAuthor(name: string) {
     remember(name)
     focusOnBooks.current = true
@@ -91,8 +92,8 @@ export function SearchPage() {
           size="lg"
           label="Buscar libros y autores"
           placeholder="Título o autor"
-          value={query}
-          onChange={setQuery}
+          value={typed}
+          onChange={search}
         />
       </div>
 
@@ -101,7 +102,7 @@ export function SearchPage() {
           recent={recent}
           authors={authors}
           friendsBooks={friendsBooks}
-          onSearch={setQuery}
+          onSearch={search}
           onPickAuthor={pickAuthor}
           onClearRecent={clearRecent}
         />
