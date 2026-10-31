@@ -10,6 +10,7 @@ import {
   TextField,
   type TagFilterValue,
 } from '../../components'
+import { cx } from '../../components/cx'
 import { ignoreSecondClick } from '../../components/ignoreSecondClick'
 import { STATUS_LABELS } from '../../lib/status'
 import { useStore } from '../../store'
@@ -79,6 +80,7 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
 
   const label = tag === 'all' ? undefined : STATUS_LABELS[tag]
   const renaming = editing === 'rename'
+  const deleting = editing === 'delete'
   const hasBooks = counts.all > 0
   const options = !folder.pinned && (
     <div ref={optionsRef}>
@@ -91,15 +93,27 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
       <PageHeader
         title={
           renaming ? (
-            <TextField
-              label={`Nombre de «${folder.name}»`}
-              value={name}
-              onChange={setName}
-              onSubmit={saveName}
-              onCancel={stopEditing}
-              problem={nameProblem}
-              maxLength={MAX_FOLDER_NAME_LENGTH}
-            />
+            // From md the buttons go beside the field, in the row of the title: the list stays put.
+            <span className="flex flex-col md:flex-row md:items-start md:gap-2">
+              {/* On a computer the type of the title makes the field 2 px taller than the row. */}
+              <span className="block min-w-0 md:max-w-120 md:flex-1 lg:-my-px">
+                <TextField
+                  label={`Nombre de «${folder.name}»`}
+                  value={name}
+                  onChange={setName}
+                  onSubmit={saveName}
+                  onCancel={stopEditing}
+                  problem={nameProblem}
+                  maxLength={MAX_FOLDER_NAME_LENGTH}
+                />
+              </span>
+              <span className="mt-3 mb-1 flex shrink-0 gap-2 font-sans text-base tracking-normal md:my-0">
+                <Button variant="primary" onClick={saveName} disabled={Boolean(nameProblem)}>
+                  Guardar
+                </Button>
+                <Button onClick={stopEditing}>Cancelar</Button>
+              </span>
+            </span>
           ) : (
             // Next to two buttons, a long name took seven lines of a 320 px phone from the list.
             <span className="wrap-break-word max-md:line-clamp-2">{folder.name}</span>
@@ -124,32 +138,29 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
           ))
         }
       >
-        {renaming && (
-          <div className="mt-1 mb-3 flex gap-2">
-            <Button variant="primary" onClick={saveName} disabled={Boolean(nameProblem)}>
-              Guardar
-            </Button>
-            <Button onClick={stopEditing}>Cancelar</Button>
+        <div className="relative">
+          {/* From md the question stands where the tags were, which keep their height. */}
+          <div className={cx(deleting && 'md:invisible')}>
+            <TagFilter value={tag} counts={counts} onChange={chooseTag} />
           </div>
-        )}
-        <TagFilter value={tag} counts={counts} onChange={chooseTag} />
+          {deleting && (
+            <InlineConfirm
+              title={`Eliminar «${folder.name}»`}
+              confirmLabel="Eliminar carpeta"
+              onConfirm={onDelete}
+              onCancel={stopEditing}
+              // 66 px on a place of 56: what is left over goes into the empty space around the tags.
+              className="mt-3 md:absolute md:inset-x-0 md:top-1/2 md:mt-0 md:-translate-y-1/2 md:py-1.5"
+            >
+              {!hasBooks
+                ? 'Esta carpeta no tiene libros.'
+                : `Esta carpeta tiene ${booksLabel(counts.all)}. ${
+                    counts.all === 1 ? 'Sigue' : 'Siguen'
+                  } en Mis libros.`}
+            </InlineConfirm>
+          )}
+        </div>
       </PageHeader>
-
-      {editing === 'delete' && (
-        <InlineConfirm
-          title={`Eliminar «${folder.name}»`}
-          confirmLabel="Eliminar carpeta"
-          onConfirm={onDelete}
-          onCancel={stopEditing}
-          className="mt-3"
-        >
-          {!hasBooks
-            ? 'Esta carpeta no tiene libros.'
-            : `Esta carpeta tiene ${booksLabel(counts.all)}. ${
-                counts.all === 1 ? 'Sigue' : 'Siguen'
-              } en Mis libros.`}
-        </InlineConfirm>
-      )}
 
       {!hasBooks ? (
         <EmptyState

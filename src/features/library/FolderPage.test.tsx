@@ -437,6 +437,16 @@ describe('FolderPage', () => {
       expect(nameField()).toHaveValue('Terror')
     })
 
+    it('keeps Guardar and Cancelar in the row of the field, up to 480 px, from a tablet up', () => {
+      renderApp(TERROR)
+      chooseOption('Renombrar carpeta')
+      const row = nameField().parentElement?.parentElement
+      expect(row).toContainElement(saveButton())
+      expect(row).toContainElement(cancelButton())
+      expect(row).toHaveClass('md:flex-row')
+      expect(nameField().parentElement).toHaveClass('md:max-w-120')
+    })
+
     it('has a single primary action', () => {
       renderApp(TERROR)
       chooseOption('Renombrar carpeta')
@@ -461,6 +471,18 @@ describe('FolderPage', () => {
       ).toBeInTheDocument()
       expect(confirmButton().className).toContain('bg-danger')
       expect(state().folders.map(({ id }) => id)).toContain('terror')
+    })
+
+    it('takes the place of the tags from a tablet up, which keep their height', () => {
+      renderApp(TERROR)
+      chooseOption('Eliminar carpeta')
+      const question = main().getByRole('region', { name: 'Eliminar «Terror»' })
+      const tags = screen.getByRole('group', { name: 'Filtrar por estado' })
+      expect(question).toHaveClass('md:absolute')
+      expect(tags.parentElement).toHaveClass('md:invisible')
+      expect(question.parentElement).toContainElement(tags)
+      fireEvent.keyDown(question, { key: 'Escape' })
+      expect(tags.parentElement).not.toHaveClass('md:invisible')
     })
 
     it('counts the books of the folder, not those of the filter', () => {
