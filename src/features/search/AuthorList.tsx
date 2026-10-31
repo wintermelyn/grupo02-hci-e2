@@ -2,7 +2,7 @@ import { BookCover } from '../../components'
 import { cx } from '../../components/cx'
 import { coverTone } from '../../lib/coverTone'
 import { booksLabel } from '../library/filters'
-import { MAX_AUTHORS, type AuthorGroup } from './results'
+import type { AuthorGroup } from './results'
 
 const COVERS = 2
 const FEATURED_COVERS = 3
@@ -29,12 +29,11 @@ const FEATURED_COVER_PLACES = [
 
 interface AuthorTileProps {
   author: AuthorGroup
-  counted: boolean
   featured: boolean
   onPick: (name: string) => void
 }
 
-function AuthorTile({ author, counted, featured, onPick }: AuthorTileProps) {
+function AuthorTile({ author, featured, onPick }: AuthorTileProps) {
   const places = featured ? FEATURED_COVER_PLACES : COVER_PLACES
   const covers = author.books.slice(0, featured ? FEATURED_COVERS : COVERS)
   return (
@@ -55,11 +54,9 @@ function AuthorTile({ author, counted, featured, onPick }: AuthorTileProps) {
       >
         {author.name}
       </span>
-      {counted && (
-        <span className={cx('mt-auto block text-sm text-white/88', featured && 'lg:mt-1.5')}>
-          {booksLabel(author.books.length)}
-        </span>
-      )}
+      <span className={cx('mt-auto block text-sm text-white/88', featured && 'lg:mt-1.5')}>
+        {booksLabel(author.books.length)}
+      </span>
       {covers.map((book, index) => (
         <span key={book.id} className={cx('absolute', places[index])}>
           <BookCover book={book} raised />
@@ -67,11 +64,6 @@ function AuthorTile({ author, counted, featured, onPick }: AuthorTileProps) {
       ))}
     </button>
   )
-}
-
-/** The size of a tile, so an author who arrives takes its place and moves nothing. */
-function AuthorPlaceholder() {
-  return <div className="h-36 rounded-card bg-sand motion-safe:animate-pulse lg:h-40" />
 }
 
 /**
@@ -85,10 +77,6 @@ export type AuthorListLayout = 'grid' | 'lead' | 'row'
 export interface AuthorListProps {
   title: string
   authors: AuthorGroup[]
-  /** False when `books` is only a page of a search, where the amount would not be the author's. */
-  counted?: boolean
-  /** More authors can still arrive, so the list keeps their place: four on a phone, six wider. */
-  reserving?: boolean
   layout?: AuthorListLayout
   /** What separates it from the block above on a computer. Beside the books, nothing does. */
   className?: string
@@ -99,13 +87,10 @@ export interface AuthorListProps {
 export function AuthorList({
   title,
   authors,
-  counted = true,
-  reserving = false,
   layout = 'grid',
   className = 'lg:mt-0',
   onPick,
 }: AuthorListProps) {
-  const reserved = reserving ? Math.max(MAX_AUTHORS - authors.length, 0) : 0
   const lead = layout === 'lead'
   const cell = lead ? 'lg:col-span-3 lg:mt-4' : ''
   return (
@@ -134,15 +119,10 @@ export function AuthorList({
                 featured ? 'lg:col-span-5 lg:row-start-2 lg:mt-3' : cell,
               )}
             >
-              <AuthorTile author={author} counted={counted} featured={featured} onPick={onPick} />
+              <AuthorTile author={author} featured={featured} onPick={onPick} />
             </li>
           )
         })}
-        {Array.from({ length: reserved }, (_, index) => (
-          <li key={index} aria-hidden className={cell}>
-            <AuthorPlaceholder />
-          </li>
-        ))}
       </ul>
     </section>
   )

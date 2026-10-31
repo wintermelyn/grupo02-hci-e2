@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { today } from '../../lib/dates'
 import type { Book, LibraryEntry } from '../../types'
-import { arrangeResults, groupByAuthor, matchRange, MAX_AUTHORS } from './results'
+import { arrangeResults, groupByAuthor, matchRange, MAX_AUTHORS, MAX_BOOKS } from './results'
 
 const book = (id: string, ...authors: string[]): Book => ({ id, title: `Libro ${id}`, authors })
 const entry = (bookId: string): LibraryEntry => ({
@@ -75,29 +75,9 @@ describe('arrangeResults', () => {
     expect(arrangeResults([stephen], 'stephen king', NOTHING).marked).toBe('')
   })
 
-  it('counts the books of an author only in a complete list', () => {
-    expect(arrangeResults([stephen], 'king', NOTHING).countedAuthors).toBe(true)
-    expect(arrangeResults([stephen], 'king', NOTHING, true).countedAuthors).toBe(false)
-    expect(arrangeResults([stephen], 'king', NOTHING, false, true).countedAuthors).toBe(false)
-  })
-
   it('finds an author by the start of a word of the name', () => {
     const { authors } = arrangeResults([stephen, hawking], 'king', NOTHING)
     expect(authors.map(({ name }) => name)).toEqual(['Stephen King'])
-  })
-
-  it('sets apart what does not match while the answer is on its way, and only then', () => {
-    const results = [
-      { ...book('1'), title: 'Kingdom' },
-      { ...book('2'), title: 'Carrie' },
-    ]
-    const waiting = arrangeResults(results, 'kingd', NOTHING, false, true)
-    expect(waiting.books.map(({ title }) => title)).toEqual(['Kingdom'])
-    expect(waiting.earlier.map(({ title }) => title)).toEqual(['Carrie'])
-
-    const answered = arrangeResults(results, 'kingd', NOTHING)
-    expect(answered.books).toHaveLength(2)
-    expect(answered.earlier).toEqual([])
   })
 
   it('leaves the list as it is when no author matches', () => {
@@ -131,16 +111,33 @@ describe('arrangeResults', () => {
     expect(arrangeResults([book('1')], 'libro', NOTHING).summary).toBe('1 libro')
   })
 
-  it('does not present a page of a search as its total', () => {
-    const results = [book('1'), book('2')]
-    expect(arrangeResults(results, 'libro', NOTHING, true).summary).toBe('Los 2 más relevantes')
-    expect(arrangeResults(results, 'libro', { 1: entry('1') }, true).summary).toBe(
-      'Los 2 más relevantes · 1 en Mis libros',
+  describe('with more books than the list shows', () => {
+    const many = Array.from({ length: MAX_BOOKS + 5 }, (_, index) =>
+      book(String(index), 'Stephen King'),
     )
-  })
 
-  it('uses the singular for the only relevant one of a long search', () => {
-    expect(arrangeResults([book('1')], 'libro', NOTHING, true).summary).toBe('El más relevante')
+    it('stops at the most relevant and says of how many', () => {
+      const { books, summary } = arrangeResults(many, 'libro', {})
+      expect(books).toHaveLength(MAX_BOOKS)
+      expect(summary).toBe(`Los ${MAX_BOOKS} más relevantes de ${MAX_BOOKS + 5}`)
+    })
+
+    it('keeps the library in the list and counts it', () => {
+      const { books, summary } = arrangeResults(many, 'libro', { 44: entry('44') })
+      expect(books[0].id).toBe('44')
+      expect(summary).toBe(`Los ${MAX_BOOKS} más relevantes de ${MAX_BOOKS + 5} · 1 en Mis libros`)
+    })
+
+    it('still counts every book of an author', () => {
+      const { authors } = arrangeResults(many, 'king', {})
+      expect(authors[0].books).toHaveLength(MAX_BOOKS + 5)
+    })
+
+    it('shows all of them when the search is the author', () => {
+      const { books, summary } = arrangeResults(many, 'stephen king', {})
+      expect(books).toHaveLength(MAX_BOOKS + 5)
+      expect(summary).toBe(`${MAX_BOOKS + 5} libros`)
+    })
   })
 
   it('caps the list of authors', () => {

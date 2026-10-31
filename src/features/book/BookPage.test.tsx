@@ -1,18 +1,12 @@
-import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter, Routes, useNavigate } from 'react-router'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { daysAgo, today } from '../../lib/dates'
-import { fetchDescription, fetchWork } from '../../lib/openlibrary'
 import { appRoutes } from '../../routes'
+import { stubCatalog } from '../../test/catalog'
 import { currentLocation, renderApp } from '../../test/router'
 import { state } from '../../test/store'
 import type { Book } from '../../types'
-
-vi.mock('../../lib/openlibrary', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('../../lib/openlibrary')>()),
-  fetchWork: vi.fn(),
-  fetchDescription: vi.fn(),
-}))
 
 const CARRIE_ID = 'OL81626W'
 const CARRIE = `/libro/${CARRIE_ID}` // Leyendo, en Terror
@@ -26,15 +20,9 @@ const CRONICA = '/libro/OL274574W' // Leído, sin descripción
 
 const NO_DESCRIPTION = 'Aún no tenemos descripción de este libro.'
 const TRANSLATED = 'Traducción hecha con IA'
-const UNTRANSLATED = 'Descripción de Open Library, sin traducir'
 const LONG_DESCRIPTION = `${'Una frase larga sobre el libro. '.repeat(120)}Última frase.`
-const SIMULATED: Book = {
-  id: 'OL0TEST',
-  title: 'Libro simulado',
-  authors: ['Autora'],
-  description: 'Una descripción traducida.',
-  descriptionTranslated: true,
-}
+const SIMULATED: Book = { id: 'OL1000W', title: 'Libro simulado', authors: ['Autora'] }
+const TRANSLATED_TEXT = 'Una descripción traducida.'
 
 const main = () => within(screen.getByRole('main'))
 const toast = () => screen.getByText(/./, { selector: '[role="status"] p' })
@@ -64,9 +52,17 @@ function typeDate(label: string, value: string) {
   fireEvent.blur(dateField(label))
 }
 
-function openSimulated(book: Partial<Book>) {
-  state().upsertBook({ ...SIMULATED, ...book })
+/** A book the person already added: its copy comes with no text, which is in the files. */
+async function openSimulated({
+  description,
+  descriptionTranslated,
+}: Pick<Book, 'description' | 'descriptionTranslated'>) {
+  stubCatalog({
+    texts: description ? { [SIMULATED.id]: { description, descriptionTranslated } } : {},
+  })
+  state().upsertBook(SIMULATED)
   renderApp(`/libro/${SIMULATED.id}`)
+  await main().findByText(description ?? NO_DESCRIPTION)
 }
 
 /** The classes that make the layout, from the grid down to what sits in each of its places. */
@@ -88,11 +84,6 @@ function removeBook() {
   fireEvent.click(main().getByRole('button', { name: /Cambiar o quitar/ }))
   fireEvent.click(main().getByRole('menuitem', { name: /^Quitar de Mis libros/ }))
 }
-
-beforeEach(() => {
-  vi.mocked(fetchWork).mockReset().mockResolvedValue(null)
-  vi.mocked(fetchDescription).mockReset().mockResolvedValue(undefined)
-})
 
 describe('BookPage', () => {
   it('shows the title and the data of the book', () => {
@@ -158,8 +149,8 @@ describe('BookPage', () => {
     expect(main().queryByText(NO_DESCRIPTION)).not.toBeInTheDocument()
   })
 
-  it('shows a long description whole, with the mark after it', () => {
-    openSimulated({ description: LONG_DESCRIPTION })
+  it('shows a long description whole, with the mark after it', async () => {
+    await openSimulated({ description: LONG_DESCRIPTION, descriptionTranslated: true })
     const description = main().getByText(/Última frase\.$/)
     expect(description.textContent).toBe(LONG_DESCRIPTION)
     expect(description).toHaveClass('wrap-break-word')
@@ -168,149 +159,121 @@ describe('BookPage', () => {
     )
   })
 
-  describe('book found in a live search', () => {
-    const LIVE: Book = {
+  describe('book of the catalog', () => {
+    const CATALOG_BOOK: Book = {
       id: 'OL81634W',
       title: 'Misery',
       authors: ['Stephen King'],
       year: 1978,
-      coverUrl: 'https://covers.openlibrary.org/b/id/1-L.jpg',
+      coverUrl: '/covers/OL81634W.jpg',
+    }
+    const TEXT = 'Una enfermera y un escritor.'
+    const texts = { [CATALOG_BOOK.id]: { description: TEXT } }
+
+    function holdFiles() {
+      const file = deferred<Response>()
+      const fetchFile = vi.fn(() => file.promise)
+      vi.stubGlobal('fetch', fetchFile)
+      return { fetchFile, deliver: (body: unknown) => file.resolve(Response.json(body)) }
     }
 
-    function openLive(book: Partial<Book> = {}) {
-      state().upsertBook({ ...LIVE, ...book })
-      renderApp(`/libro/${LIVE.id}`)
+    function open() {
+      state().upsertBook(CATALOG_BOOK)
+      renderApp(`/libro/${CATALOG_BOOK.id}`)
     }
 
-    it('brings its description and leaves the rest of the book as it was', async () => {
-      vi.mocked(fetchDescription).mockResolvedValue('Una enfermera y un escritor.')
-      openLive()
-      expect(await main().findByText('Una enfermera y un escritor.')).toBeInTheDocument()
-      expect(state().extraBooks[LIVE.id]).toEqual({
-        ...LIVE,
-        description: 'Una enfermera y un escritor.',
-      })
+    it('brings its description from the files and keeps nothing of it in the store', async () => {
+      stubCatalog({ texts })
+      open()
+      expect(await main().findByText(TEXT)).toBeInTheDocument()
+      expect(state().extraBooks[CATALOG_BOOK.id]).toEqual(CATALOG_BOOK)
     })
 
-    it('does not say it has no description while it is looking for one', async () => {
-      const description = deferred<string | undefined>()
-      vi.mocked(fetchDescription).mockReturnValue(description.promise)
-      openLive()
+    it('does not say it has no description while it is coming', async () => {
+      const { deliver } = holdFiles()
+      open()
       expect(main().getByText('Buscando la descripción…')).toBeInTheDocument()
       expect(main().queryByText(NO_DESCRIPTION)).not.toBeInTheDocument()
 
-      await act(async () => description.resolve(undefined))
+      await act(async () => deliver({}))
       expect(main().getByText(NO_DESCRIPTION)).toBeInTheDocument()
     })
 
-    it('keeps the same shape while it looks for the description', async () => {
-      const description = deferred<string | undefined>()
-      vi.mocked(fetchDescription).mockReturnValue(description.promise)
-      openLive()
+    it('keeps the same shape while the description comes', async () => {
+      const { deliver } = holdFiles()
+      open()
       const loading = pageShape()
-      await act(async () => description.resolve('Texto'))
+      await act(async () => deliver(texts))
+      expect(main().getByText(TEXT)).toBeInTheDocument()
       expect(pageShape()).toEqual(loading)
     })
 
-    it('says that the text comes from Open Library, under it and without an icon', async () => {
-      vi.mocked(fetchDescription).mockResolvedValue('Una enfermera y un escritor.')
-      openLive()
-      const line = await main().findByText(UNTRANSLATED)
-      expect(main().getByText('Una enfermera y un escritor.').nextElementSibling).toBe(line)
-      expect(line).toHaveClass('text-sm', 'text-muted')
-      expect(line.querySelector('svg')).not.toBeInTheDocument()
+    it('offers to try again in the same place when the file fails, and it works', async () => {
+      const files = stubCatalog({ texts, failing: [/descriptions/] })
+      open()
+      const retry = await main().findByRole('button', { name: 'Reintentar' })
+      expect(retry.closest('section')).toBe(
+        main().getByRole('heading', { name: 'Sobre este libro' }).closest('section'),
+      )
+      expect(main().queryByText(NO_DESCRIPTION)).not.toBeInTheDocument()
+
+      stubCatalog({ texts })
+      fireEvent.click(retry)
+      expect(await main().findByText(TEXT)).toBeInTheDocument()
+      expect(main().queryByRole('button', { name: 'Reintentar' })).not.toBeInTheDocument()
+      expect(files).toHaveBeenCalledOnce()
     })
 
-    it('says nothing about a text that is not there', async () => {
-      const description = deferred<string | undefined>()
-      vi.mocked(fetchDescription).mockReturnValue(description.promise)
-      openLive()
-      expect(main().queryByText(UNTRANSLATED)).not.toBeInTheDocument()
-      await act(async () => description.resolve(undefined))
-      expect(main().queryByText(UNTRANSLATED)).not.toBeInTheDocument()
+    it('has the text at once on a second visit, from what was downloaded', async () => {
+      const files = stubCatalog({ texts })
+      open()
+      await main().findByText(TEXT)
+      cleanup()
+      renderApp(`/libro/${CATALOG_BOOK.id}`)
+      expect(main().getByText(TEXT)).toBeInTheDocument()
+      expect(files).toHaveBeenCalledOnce()
     })
 
-    it('says it too for a text kept from an earlier visit', () => {
-      openLive({ description: 'Ya la tiene.' })
-      expect(main().getByText(UNTRANSLATED)).toBeInTheDocument()
-    })
-
-    it('leaves the books of the catalogue out of it', () => {
-      renderApp(NOCHE)
-      expect(main().queryByText(UNTRANSLATED)).not.toBeInTheDocument()
-    })
-
-    describe('opened from a direct link', () => {
-      it('shows the text of the work with the same line, and does not ask twice', async () => {
-        vi.mocked(fetchWork).mockResolvedValue({ ...LIVE, description: 'Del enlace.' })
-        renderApp(`/libro/${LIVE.id}`)
-        expect(await main().findByText('Del enlace.')).toBeInTheDocument()
-        expect(main().getByText(UNTRANSLATED)).toBeInTheDocument()
-        expect(fetchDescription).not.toHaveBeenCalled()
-      })
-
-      it('asks for it if the book came without one', async () => {
-        vi.mocked(fetchWork).mockResolvedValue(LIVE)
-        vi.mocked(fetchDescription).mockResolvedValue('Pedida después.')
-        renderApp(`/libro/${LIVE.id}`)
-        expect(await main().findByText('Pedida después.')).toBeInTheDocument()
-        expect(main().getByText(UNTRANSLATED)).toBeInTheDocument()
-      })
-    })
-
-    it('does not ask again for a work that has none', async () => {
-      openLive({ description: '' })
-      expect(main().getByText(NO_DESCRIPTION)).toBeInTheDocument()
-      expect(fetchDescription).not.toHaveBeenCalled()
-    })
-
-    it('does not ask for a description it already has', () => {
-      openLive({ description: 'Ya la tiene.' })
-      expect(fetchDescription).not.toHaveBeenCalled()
-    })
-
-    it('does not ask for the books of the catalogue, which already came with what there is', () => {
+    it('downloads nothing for the 54 books of the app, with or without a description', () => {
+      const files = stubCatalog()
       renderApp(CRONICA)
-      expect(fetchDescription).not.toHaveBeenCalled()
+      expect(main().getByText(NO_DESCRIPTION)).toBeInTheDocument()
+      expect(files).not.toHaveBeenCalled()
     })
 
-    it('falls back when it fails, and the next visit asks again', async () => {
-      vi.mocked(fetchDescription).mockRejectedValueOnce(new Error('sin red'))
-      openLive()
-      expect(await main().findByText(NO_DESCRIPTION)).toBeInTheDocument()
-      expect(state().extraBooks[LIVE.id].description).toBeUndefined()
+    it('says nothing about a translation of the books that came in Spanish', async () => {
+      stubCatalog({ texts })
+      open()
+      await main().findByText(TEXT)
+      expect(main().queryByText(TRANSLATED)).not.toBeInTheDocument()
     })
   })
 
   describe('machine-translated description', () => {
-    it('says where the text comes from, under the description', () => {
-      openSimulated({})
-      const description = main().getByText('Una descripción traducida.')
+    const translated = { description: TRANSLATED_TEXT, descriptionTranslated: true }
+
+    it('says where the text comes from, under the description', async () => {
+      await openSimulated(translated)
+      const description = main().getByText(TRANSLATED_TEXT)
       expect(description.nextElementSibling).toHaveTextContent(TRANSLATED)
     })
 
     // statusStyles.test.ts holds `muted` to 4.5:1 on the paper of this page.
-    it('reads as a fact about the text, not as a warning', () => {
-      openSimulated({})
+    it('reads as a fact about the text, not as a warning', async () => {
+      await openSimulated(translated)
       const mark = main().getByText(TRANSLATED)
       expect(mark).toHaveClass('text-sm', 'text-muted')
       expect(mark.querySelector('svg.lucide-sparkle')).toBeInTheDocument()
       expect(mark.closest('section')?.querySelector('.ribbon')).not.toBeInTheDocument()
     })
 
-    it('stays out of a description that was not translated', () => {
-      openSimulated({ descriptionTranslated: undefined })
+    it('stays out of a description that was not translated', async () => {
+      await openSimulated({ description: TRANSLATED_TEXT })
       expect(main().queryByText(TRANSLATED)).not.toBeInTheDocument()
     })
 
-    it('is the only line under a translated text', () => {
-      openSimulated({})
-      expect(main().queryByText(UNTRANSLATED)).not.toBeInTheDocument()
-    })
-
-    it('has nothing to say about a description that is not there', () => {
-      openSimulated({ description: undefined })
-      expect(main().getByText(NO_DESCRIPTION)).toBeInTheDocument()
+    it('has nothing to say about a description that is not there', async () => {
+      await openSimulated({})
       expect(main().queryByText(TRANSLATED)).not.toBeInTheDocument()
     })
   })
@@ -400,6 +363,7 @@ describe('BookPage', () => {
   })
 
   it('tells when the book does not exist', async () => {
+    stubCatalog()
     renderApp('/libro/OL0W')
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Libro no encontrado' }),
@@ -725,30 +689,26 @@ describe('a Leído chosen by mistake', () => {
   })
 })
 
-describe('loading a book the store does not have', () => {
-  const REMOTE: Book = { id: 'OL999W', title: 'Un libro remoto', authors: ['Una Autora'] }
+describe('a book the store does not have', () => {
+  const LISTED: Partial<Book> = {
+    id: 'OL999W',
+    title: 'Un libro del catálogo',
+    authors: ['Una Autora'],
+  }
+
+  function holdCatalog() {
+    let deliver: (response: Response) => void = () => undefined
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => new Promise<Response>((resolve) => (deliver = resolve))),
+    )
+    return () =>
+      deliver(Response.json([[LISTED.id, LISTED.title, LISTED.authors, 1999, 200, null]]))
+  }
 
   function GoTo({ to }: { to: string }) {
     const navigate = useNavigate()
     return <button onClick={() => navigate(to)}>Ir</button>
-  }
-
-  /** Opens book A, moves on to book B and hands back the answers still pending for each. */
-  async function moveOnWhileLoading() {
-    const answers: Record<string, ReturnType<typeof deferred<Book | null>>> = {
-      OLAW: deferred(),
-      OLBW: deferred(),
-    }
-    vi.mocked(fetchWork).mockImplementation((id) => answers[id].promise)
-    render(
-      <MemoryRouter initialEntries={['/libro/OLAW']}>
-        <GoTo to="/libro/OLBW" />
-        <Routes>{appRoutes}</Routes>
-      </MemoryRouter>,
-    )
-    fireEvent.click(screen.getByRole('button', { name: 'Ir' }))
-    await waitFor(() => expect(fetchWork).toHaveBeenCalledWith('OLBW'))
-    return answers
   }
 
   it('keeps the shape of the page when the book arrives, so nothing jumps', async () => {
@@ -763,86 +723,109 @@ describe('loading a book the store does not have', () => {
         record.className,
       ]
     }
-    const work = deferred<Book | null>()
-    vi.mocked(fetchWork).mockReturnValue(work.promise)
+    const deliver = holdCatalog()
     renderApp('/libro/OL999W')
     const loading = shape()
-    await act(async () => work.resolve(REMOTE))
-    expect(main().getByRole('heading', { level: 1 })).toHaveTextContent('Un libro remoto')
+    await act(async () => deliver())
+    expect(main().getByRole('heading', { level: 1 })).toHaveTextContent('Un libro del catálogo')
     expect(shape()).toEqual(loading)
   })
 
-  it('shows the loading state, then the book, and keeps it in the store', async () => {
-    const work = deferred<Book | null>()
-    vi.mocked(fetchWork).mockReturnValue(work.promise)
+  it('shows the loading state, then the book, with its local cover and without storing it', async () => {
+    const deliver = holdCatalog()
     renderApp('/libro/OL999W')
-    expect(fetchWork).toHaveBeenCalledWith('OL999W')
     expect(main().getByRole('heading', { level: 1 })).toHaveTextContent('Cargando libro…')
     expect(main().getByText('Cargando libro…', { selector: '.sr-only' })).toBeInTheDocument()
     expect(main().getByRole('status')).toBeInTheDocument()
     expect(main().getByRole('link', { name: 'Mis libros' })).toBeInTheDocument()
     expect(document.querySelector('article dl')).not.toBeNull()
 
-    await act(async () => work.resolve(REMOTE))
-    expect(main().getByRole('heading', { level: 1 })).toHaveTextContent('Un libro remoto')
-    expect(state().extraBooks.OL999W).toMatchObject(REMOTE)
+    await act(async () => deliver())
+    expect(main().getByRole('heading', { level: 1 })).toHaveTextContent('Un libro del catálogo')
+    expect(document.querySelector('article img')).toHaveAttribute('src', '/covers/OL999W.jpg')
+    expect(state().extraBooks).toEqual({})
+  })
+
+  it('adds any book of the catalog, which then needs no download to show up', async () => {
+    stubCatalog({ books: [LISTED] })
+    renderApp('/libro/OL999W')
+    fireEvent.click(await main().findByRole('button', { name: 'Agregar a Mis libros' }))
+    fireEvent.click(main().getByRole('menuitemradio', { name: 'Lo quiero' }))
+    expect(state().library.OL999W.status).toBe('want')
+    expect(state().extraBooks.OL999W).toMatchObject({
+      title: 'Un libro del catálogo',
+      coverUrl: '/covers/OL999W.jpg',
+    })
+    expect(state().extraBooks.OL999W).not.toHaveProperty('description')
+  })
+
+  it('finishes any book of the catalog from the same menu', async () => {
+    stubCatalog({ books: [LISTED] })
+    renderApp('/libro/OL999W')
+    fireEvent.click(await main().findByRole('button', { name: 'Agregar a Mis libros' }))
+    fireEvent.click(main().getByRole('menuitemradio', { name: 'Leído' }))
+    expect(state().library.OL999W).toMatchObject({ status: 'read', finishedAt: today() })
   })
 
   it('says that the author is unknown, where the author would go', async () => {
-    vi.mocked(fetchWork).mockResolvedValue({ ...REMOTE, authors: [] })
+    stubCatalog({ books: [{ ...LISTED, authors: [] }] })
     renderApp('/libro/OL999W')
     expect(await screen.findByText('Autor desconocido')).toBeInTheDocument()
   })
 
-  it('does not look for a book the store has', () => {
+  it('downloads nothing for a book the store has', () => {
+    const files = stubCatalog()
     renderApp(CARRIE)
-    expect(fetchWork).not.toHaveBeenCalled()
+    expect(files).not.toHaveBeenCalledWith('/catalog/index.json', expect.anything())
   })
 
   it('offers a way out when the book cannot be found', async () => {
+    stubCatalog()
     renderApp('/libro/OL0W')
     fireEvent.click(await screen.findByRole('button', { name: 'Ir a Mis libros' }))
     expect(currentLocation()).toBe('/biblioteca')
   })
 
-  it('ends in Libro no encontrado when Open Library does not have it', async () => {
-    renderApp('/libro/OL999W')
+  it('ends in Libro no encontrado when the catalog does not have it', async () => {
+    stubCatalog({ books: [LISTED] })
+    renderApp('/libro/OL1W')
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Libro no encontrado' }),
     ).toBeInTheDocument()
     expect(state().extraBooks).toEqual({})
   })
 
-  it('does not take a different book for the one it asked for', async () => {
-    vi.mocked(fetchWork).mockResolvedValue({ ...REMOTE, id: 'OL1W' })
-    renderApp('/libro/OL999W')
-    expect(
-      await screen.findByRole('heading', { level: 1, name: 'Libro no encontrado' }),
-    ).toBeInTheDocument()
-    expect(state().extraBooks).toEqual({})
+  it('needs no download to know an id that cannot be a book', () => {
+    const files = stubCatalog()
+    renderApp('/libro/constructor')
+    expect(screen.getByRole('heading', { level: 1, name: 'Libro no encontrado' })).toBeVisible()
+    expect(files).not.toHaveBeenCalled()
   })
 
-  it('offers to try again when the request fails', async () => {
-    vi.mocked(fetchWork).mockRejectedValueOnce(new Error('sin red')).mockResolvedValue(REMOTE)
+  it('offers to try again when the catalog cannot be downloaded', async () => {
+    stubCatalog({ failing: [/index/] })
     renderApp('/libro/OL999W')
-    fireEvent.click(await screen.findByRole('button', { name: 'Reintentar' }))
+    const retry = await screen.findByRole('button', { name: 'Reintentar' })
+    expect(screen.queryByText('Libro no encontrado')).not.toBeInTheDocument()
+
+    const deliver = holdCatalog()
+    fireEvent.click(retry)
     expect(main().getByRole('heading', { level: 1 })).toHaveTextContent('Cargando libro…')
-    expect(
-      await screen.findByRole('heading', { level: 1, name: 'Un libro remoto' }),
-    ).toBeInTheDocument()
+    await act(async () => deliver())
+    expect(main().getByRole('heading', { level: 1 })).toHaveTextContent('Un libro del catálogo')
   })
 
-  it('ignores a late answer after moving on to another book', async () => {
-    const answers = await moveOnWhileLoading()
-    await act(async () => answers.OLBW.resolve({ ...REMOTE, id: 'OLBW', title: 'El libro B' }))
-    await act(async () => answers.OLAW.resolve({ ...REMOTE, id: 'OLAW', title: 'El libro A' }))
+  it('moves from one book to another with the same download', async () => {
+    const files = stubCatalog({ books: [LISTED, { id: 'OL998W', title: 'El libro B' }] })
+    render(
+      <MemoryRouter initialEntries={['/libro/OL999W']}>
+        <GoTo to="/libro/OL998W" />
+        <Routes>{appRoutes}</Routes>
+      </MemoryRouter>,
+    )
+    await screen.findByRole('heading', { level: 1, name: 'Un libro del catálogo' })
+    fireEvent.click(screen.getByRole('button', { name: 'Ir' }))
     expect(main().getByRole('heading', { level: 1 })).toHaveTextContent('El libro B')
-    expect(state().extraBooks).not.toHaveProperty('OLAW')
-  })
-
-  it('does not end in "not found" because of a late answer for the previous book', async () => {
-    const answers = await moveOnWhileLoading()
-    await act(async () => answers.OLAW.resolve(null))
-    expect(main().getByRole('heading', { level: 1 })).toHaveTextContent('Cargando libro…')
+    expect(files.mock.calls.filter(([url]) => url === '/catalog/index.json')).toHaveLength(1)
   })
 })

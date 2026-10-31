@@ -6,7 +6,7 @@ import { useBookLookup } from '../library/filters'
 import { addRecentSearch, clearRecentSearches, readRecentSearches } from './recentSearchStore'
 import { arrangeResults } from './results'
 import { SearchStart } from './SearchStart'
-import { NoResults, OfflineNotice, SearchResults } from './SearchResults'
+import { NoResults, SearchResults } from './SearchResults'
 import { useBookSearch } from './useBookSearch'
 import { useFriendsBooks, useLibraryAuthors } from './useSearchStart'
 
@@ -28,28 +28,25 @@ function useFocusOnWideScreen(enabled: boolean) {
 export function SearchPage() {
   const [params, setParams] = useSearchParams()
   const query = params.get('q') ?? ''
-  const search = useBookSearch(query)
+  const { text, loading, failed, books, retry } = useBookSearch(query)
   const library = useStore((state) => state.library)
   const authors = useLibraryAuthors()
   const friendsBooks = useFriendsBooks()
   const [recent, setRecent] = useState(readRecentSearches)
   const field = useFocusOnWideScreen(query === '')
-  const { text, loading, books, offline, more, retry } = search
   const bookOf = useBookLookup()
   const booksHeading = useRef<HTMLHeadingElement>(null)
   const focusOnBooks = useRef(false)
 
   const results = useMemo(
-    // The store's copy can know more than the search did, like a description found on the book page.
+    // The catalog carries no descriptions, and the 54 books of the app do.
     () =>
       arrangeResults(
         books.map((book) => bookOf(book.id) ?? book),
         text,
         library,
-        more,
-        loading,
       ),
-    [books, bookOf, text, library, more, loading],
+    [books, bookOf, text, library],
   )
 
   useEffect(() => {
@@ -104,12 +101,11 @@ export function SearchPage() {
           onPickAuthor={pickAuthor}
           onClearRecent={clearRecent}
         />
-      ) : books.length === 0 && loading ? (
+      ) : loading ? (
         <div className="mt-3">
           <LoadingState label="Buscando…" />
         </div>
-      ) : offline && books.length === 0 ? (
-        // Without the service, an empty list does not mean the book is not there.
+      ) : failed ? (
         <ErrorState
           title="No pudimos buscar"
           description="Revisa tu conexión e inténtalo de nuevo. Tus libros siguen en Mis libros."
@@ -118,16 +114,12 @@ export function SearchPage() {
       ) : books.length === 0 ? (
         <NoResults text={text} authors={authors} onPickAuthor={pickAuthor} />
       ) : (
-        <>
-          {offline && <OfflineNotice onRetry={retry} />}
-          <SearchResults
-            results={results}
-            loading={loading}
-            booksHeading={booksHeading}
-            onPickAuthor={pickAuthor}
-            onOpenBook={() => remember(text)}
-          />
-        </>
+        <SearchResults
+          results={results}
+          booksHeading={booksHeading}
+          onPickAuthor={pickAuthor}
+          onOpenBook={() => remember(text)}
+        />
       )}
     </section>
   )

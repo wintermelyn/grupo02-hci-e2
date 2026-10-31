@@ -1,6 +1,7 @@
-import { Sparkle } from 'lucide-react'
+import { RotateCcw, Sparkle } from 'lucide-react'
 import { matchPath, useLocation, useParams } from 'react-router'
-import { BookCover, StatusControl } from '../../components'
+import { BookCover, Button, StatusControl } from '../../components'
+import { useCatalogBook } from '../../lib/catalog'
 import { selectBook, selectEntry, useStore } from '../../store'
 import type { Book, Folder, ReadingStatus } from '../../types'
 import { UNFILED_NAME, UNFILED_PATH } from '../library/filters'
@@ -48,35 +49,46 @@ function BookDetails({ authors, year, pages }: Book) {
 }
 
 /** Where the text comes from, so it reads like the author line and not like a warning. */
-function DescriptionSource({ translated, live }: { translated?: boolean; live: boolean }) {
-  if (translated) {
-    return (
-      <p className="mt-2 flex items-center gap-1.5 text-sm text-muted">
-        <Sparkle aria-hidden size={14} fill="currentColor" strokeWidth={1.5} />
-        Traducción hecha con IA
-      </p>
-    )
-  }
-  if (live)
-    return <p className="mt-2 text-sm text-muted">Descripción de Open Library, sin traducir</p>
-  return null
+function TranslatedByAI() {
+  return (
+    <p className="mt-2 flex items-center gap-1.5 text-sm text-muted">
+      <Sparkle aria-hidden size={14} fill="currentColor" strokeWidth={1.5} />
+      Traducción hecha con IA
+    </p>
+  )
+}
+
+/** Only the text failed, so the page stays and only this section offers to try again. */
+function DescriptionFailed({ onRetry }: { onRetry: () => void }) {
+  return (
+    <p
+      role="status"
+      className="mt-3 flex items-center gap-2 rounded-row bg-shell py-1 pr-1 pl-3 text-sm"
+    >
+      <span className="min-w-0 flex-1">No pudimos cargar la descripción.</span>
+      <Button compact variant="quiet" icon={RotateCcw} onClick={onRetry}>
+        Reintentar
+      </Button>
+    </p>
+  )
 }
 
 /** Always there, in the same place: most books have no description, and the page keeps its shape. */
 function AboutBook({ book }: { book: Book }) {
-  const { description, descriptionTranslated } = book
-  const { searching, live } = useBookDescription(book)
+  const { description, descriptionTranslated, loading, failed, retry } = useBookDescription(book)
   return (
     <section className={BOOK_ABOUT}>
       <h2 className="section-title">Sobre este libro</h2>
       {description ? (
         <>
           <p className="mt-3 max-w-[60ch] wrap-break-word whitespace-pre-line">{description}</p>
-          <DescriptionSource translated={descriptionTranslated} live={live} />
+          {descriptionTranslated && <TranslatedByAI />}
         </>
+      ) : failed ? (
+        <DescriptionFailed onRetry={retry} />
       ) : (
         <p className="mt-3 text-muted">
-          {searching ? 'Buscando la descripción…' : 'Aún no tenemos descripción de este libro.'}
+          {loading ? 'Buscando la descripción…' : 'Aún no tenemos descripción de este libro.'}
         </p>
       )}
     </section>
@@ -86,7 +98,9 @@ function AboutBook({ book }: { book: Book }) {
 export function BookPage() {
   const { bookId = '' } = useParams()
   const { state } = useLocation()
-  const book = useStore(selectBook(bookId))
+  const stored = useStore(selectBook(bookId))
+  const listed = useCatalogBook(bookId)
+  const book = stored ?? listed
   const entry = useStore(selectEntry(bookId))
   const folders = useStore((state) => state.folders)
   const back = backTarget(state, folders)

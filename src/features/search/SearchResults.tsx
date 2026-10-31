@@ -1,6 +1,6 @@
-import { CircleAlert, RotateCcw, SearchX } from 'lucide-react'
+import { SearchX } from 'lucide-react'
 import type { MouseEventHandler, ReactNode, Ref } from 'react'
-import { BookRow, Button, EmptyState } from '../../components'
+import { BookRow, EmptyState } from '../../components'
 import { cx } from '../../components/cx'
 import type { Book } from '../../types'
 import { AuthorList } from './AuthorList'
@@ -16,24 +16,6 @@ const AUTHORS_AS_WAY_OUT = 4
 
 function cutQuery(text: string): string {
   return text.length > MAX_QUERY_IN_TITLE ? `${text.slice(0, MAX_QUERY_IN_TITLE)}…` : text
-}
-
-export function OfflineNotice({ onRetry }: { onRetry: () => void }) {
-  return (
-    <p
-      role="status"
-      className="mt-3 flex items-center gap-2 rounded-row bg-shell py-1 pr-1 pl-3 text-sm"
-    >
-      {/* On a phone the icon is what can go: the sentence already takes three lines. */}
-      <CircleAlert aria-hidden size={18} className="shrink-0 text-muted max-md:hidden" />
-      <span className="min-w-0 flex-1">
-        No pudimos conectar. Te mostramos los libros que ya están en la app.
-      </span>
-      <Button compact variant="quiet" icon={RotateCcw} onClick={onRetry}>
-        Reintentar
-      </Button>
-    </p>
-  )
 }
 
 export interface NoResultsProps {
@@ -88,8 +70,6 @@ const GRID_BESIDE_LEAD = 'md:grid-cols-2 lg:grid-cols-1'
 
 export interface SearchResultsProps {
   results: ArrangedResults
-  /** Open Library has not answered yet, so the list can still grow. */
-  loading: boolean
   /** Where the focus goes after picking an author, whose button is gone by then. */
   booksHeading: Ref<HTMLHeadingElement>
   onPickAuthor: (name: string) => void
@@ -103,18 +83,16 @@ export interface SearchResultsProps {
  */
 export function SearchResults({
   results,
-  loading,
   booksHeading,
   onPickAuthor,
   onOpenBook,
 }: SearchResultsProps) {
-  const { authors, books, earlier, summary, lead, countedAuthors, marked } = results
-  const status = books.length > 0 ? 'Buscando más…' : 'Buscando…'
+  const { authors, books, summary, lead, marked } = results
   const bestBook = lead === 'book' ? books[0] : undefined
   const listed = bestBook ? books.slice(1) : books
   const shown = lead ? listed.slice(0, BOOKS_BESIDE_LEAD) : listed
   const further = lead ? listed.slice(BOOKS_BESIDE_LEAD) : []
-  const hasList = shown.length > 0 || earlier.length > 0
+  const hasList = shown.length > 0
   const highlight = (text: string) => <Highlight text={text} query={marked} />
   const opened: MouseEventHandler = ({ target }) => {
     if (target instanceof Element && target.closest('a')) onOpenBook()
@@ -125,39 +103,16 @@ export function SearchResults({
       Libros
     </h2>
   )
-  const bookList = hasList && (
-    <>
-      {shown.length > 0 && (
-        <BookGrid
-          books={shown}
-          highlight={highlight}
-          className={lead ? GRID_BESIDE_LEAD : ROOMY_GRID}
-          onClick={opened}
-        />
-      )}
-      {earlier.length > 0 && (
-        <div aria-busy="true" className={shown.length > 0 ? 'mt-4' : 'mt-1'}>
-          <h3 className="text-sm text-muted">De tu búsqueda anterior</h3>
-          <div className="opacity-70">
-            <BookGrid books={earlier} className={ROOMY_GRID} />
-          </div>
-        </div>
-      )}
-    </>
-  )
-
   return (
     <>
       <p role="status" className="mt-3 text-sm text-muted">
-        {loading ? status : summary}
+        {summary}
       </p>
       <div className="lg:mt-7 lg:grid lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-x-4">
         {authors.length > 0 && (
           <AuthorList
             title="Autores"
             authors={authors}
-            counted={countedAuthors}
-            reserving={loading}
             layout={lead === 'author' ? 'lead' : 'row'}
             onPick={onPickAuthor}
           />
@@ -186,7 +141,14 @@ export function SearchResults({
                 <BestBook book={bestBook} onOpen={onOpenBook} />
               </div>
             )}
-            {bookList}
+            {hasList && (
+              <BookGrid
+                books={shown}
+                highlight={highlight}
+                className={lead ? GRID_BESIDE_LEAD : ROOMY_GRID}
+                onClick={opened}
+              />
+            )}
           </div>
           {further.length > 0 && (
             <div className="mt-7 lg:col-span-12">

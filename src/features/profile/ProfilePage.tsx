@@ -1,7 +1,6 @@
 import { RotateCcw } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Avatar, Button, InlineConfirm, PageHeader } from '../../components'
-import { forgetSearches } from '../../lib/openlibrary'
 import { useStore } from '../../store'
 import { friendsLabel } from '../friends/people'
 import { clearRecentSearches } from '../search/recentSearchStore'
@@ -39,7 +38,6 @@ export function ProfilePage() {
   function reset() {
     resetDemo()
     clearRecentSearches()
-    forgetSearches()
     showToast('Demo reiniciada')
     close()
   }

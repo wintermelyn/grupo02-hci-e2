@@ -13,7 +13,6 @@ export interface BestBookProps {
 /** The book the search most likely wanted, with its colour and room for what it is about. */
 export function BestBook({ book, onOpen }: BestBookProps) {
   const entry = useStore(selectEntry(book.id))
-  const upsertBook = useStore((state) => state.upsertBook)
   const { pathname, search } = useLocation()
 
   return (
@@ -21,10 +20,7 @@ export function BestBook({ book, onOpen }: BestBookProps) {
       to={bookPath(book.id)}
       state={{ from: pathname + search }}
       viewTransition
-      onClick={() => {
-        upsertBook(book)
-        onOpen()
-      }}
+      onClick={onOpen}
       style={{ backgroundColor: coverTone(book) }}
       className="flex h-full min-h-56 gap-4 rounded-tile p-4 text-white transition-[translate] duration-150 active:translate-y-px lg:gap-5 lg:p-5"
     >

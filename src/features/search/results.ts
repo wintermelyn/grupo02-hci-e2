@@ -1,6 +1,6 @@
-import { matchesAuthor, matchesBook } from '../../lib/openlibrary'
 import type { Book, BookId, LibraryEntry } from '../../types'
 import { booksLabel, normalizeText } from '../library/filters'
+import { matchesAuthor } from './searchCatalog'
 
 export interface AuthorGroup {
   name: string
@@ -12,13 +12,9 @@ export interface ArrangedResults {
   authors: AuthorGroup[]
   /** The books of the library first, as the person is most likely looking for one of those. */
   books: Book[]
-  /** Kept from the search before while this one has no answer, and they do not match it. */
-  earlier: Book[]
   summary: string
   /** What the search most likely wanted, which takes the first place and the larger card. */
   lead: ResultLead
-  /** False while the list can grow or is a page of a search: the amount would not be the author's. */
-  countedAuthors: boolean
   /** What to mark in the rows. Nothing when the list is the books of one author. */
   marked: string
 }
@@ -26,6 +22,8 @@ export interface ArrangedResults {
 export type ResultLead = 'author' | 'book' | undefined
 
 export const MAX_AUTHORS = 6
+/** A letter can match half the catalog, and a list that long says less than the first ones. */
+export const MAX_BOOKS = 40
 
 const WORD_CHARACTER = /[\p{L}\p{N}]/u
 
@@ -47,27 +45,20 @@ function leadOf(authors: AuthorGroup[], books: Book[], wanted: string, exact: bo
   return normalizeText(books[0].title).startsWith(wanted) ? 'book' : 'author'
 }
 
-/** A page of a search is not its total: "king" has thousands of books and the page, 20. */
-function amountLabel(total: number, more: boolean): string {
-  if (!more) return booksLabel(total)
-  return total === 1 ? 'El más relevante' : `Los ${total} más relevantes`
-}
-
-function resultsSummary(total: number, inLibrary: number, more: boolean): string {
-  const amount = amountLabel(total, more)
+function resultsSummary(total: number, shown: number, inLibrary: number): string {
+  const amount = shown < total ? `Los ${shown} más relevantes de ${total}` : booksLabel(total)
   return inLibrary > 0 ? `${amount} · ${inLibrary} en Mis libros` : amount
 }
 
 /**
  * Splits the books of a search into authors and books. Tapping an author searches for their name,
- * and that exact name is what filters the list to their books, whether it was tapped or typed.
+ * and that exact name is what filters the list to their books, whether it was tapped or typed. That
+ * list is complete. Any other one stops at MAX_BOOKS, and the authors still count every match.
  */
 export function arrangeResults(
   results: Book[],
   query: string,
   library: Record<BookId, LibraryEntry>,
-  more = false,
-  loading = false,
 ): ArrangedResults {
   const authors = groupByAuthor(results).filter(({ name }) => matchesAuthor(name, query))
   const wanted = normalizeText(query)
@@ -76,15 +67,12 @@ export function arrangeResults(
   const mine = books.filter(({ id }) => Object.hasOwn(library, id))
   const others = books.filter(({ id }) => !Object.hasOwn(library, id))
   const arranged = [...mine, ...others]
-  // Once answered, the service decides what matches: it also searches what the app cannot see.
-  const matching = loading ? arranged.filter((book) => matchesBook(book, query)) : arranged
+  const shown = exact ? arranged : arranged.slice(0, MAX_BOOKS)
   return {
     authors: exact ? [] : authors.slice(0, MAX_AUTHORS),
-    books: matching,
-    earlier: loading ? arranged.filter((book) => !matchesBook(book, query)) : [],
-    summary: resultsSummary(books.length, mine.length, more),
-    lead: leadOf(authors, matching, wanted, exact !== undefined),
-    countedAuthors: !more && !loading,
+    books: shown,
+    summary: resultsSummary(books.length, shown.length, mine.length),
+    lead: leadOf(authors, shown, wanted, exact !== undefined),
     marked: exact ? '' : query,
   }
 }

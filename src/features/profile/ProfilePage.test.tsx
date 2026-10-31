@@ -1,6 +1,5 @@
 import { act, fireEvent, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
-import { forgetSearches, savedSearch, searchBooks } from '../../lib/openlibrary'
+import { describe, expect, it } from 'vitest'
 import { renderApp } from '../../test/router'
 import { state } from '../../test/store'
 import { addRecentSearch, readRecentSearches } from '../search/recentSearchStore'
@@ -51,19 +50,6 @@ describe('ProfilePage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
     expect(state().library[CARRIE].status).toBe('owned')
     expect(screen.getByRole('button', { name: 'Reiniciar demo' })).toHaveFocus()
-  })
-
-  it('forgets the searches it answered, so a repeated task starts from zero', async () => {
-    vi.stubGlobal('fetch', async () => new Response(JSON.stringify({ docs: [] })))
-    forgetSearches()
-    await searchBooks('dune', new AbortController().signal)
-    vi.unstubAllGlobals()
-    expect(savedSearch('dune')).toBeDefined()
-
-    renderApp('/perfil')
-    openConfirm()
-    fireEvent.click(screen.getAllByRole('button', { name: 'Reiniciar demo' })[0])
-    expect(savedSearch('dune')).toBeUndefined()
   })
 
   it('goes back to the start, recent searches included, and says so', () => {
