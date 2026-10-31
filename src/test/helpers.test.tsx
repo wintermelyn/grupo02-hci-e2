@@ -33,9 +33,9 @@ describe('test setup', () => {
   it('renderWithRouter mounts the element at a route pattern', () => {
     renderWithRouter(<BookIdProbe />, {
       route: '/libro/:bookId',
-      path: `/libro/${bookId}?accion=terminar`,
+      path: `/libro/${bookId}?desde=terror`,
     })
     expect(screen.getByText(bookId)).toBeInTheDocument()
-    expect(currentLocation()).toBe(`/libro/${bookId}?accion=terminar`)
+    expect(currentLocation()).toBe(`/libro/${bookId}?desde=terror`)
   })
 })

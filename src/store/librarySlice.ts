@@ -10,10 +10,9 @@ export interface FinishDetails {
 export interface LibraryActions {
   /**
    * The only way to set a book to 'read'. If the book is not in the library (e.g. Leído chosen on a
-   * search result), creates the entry (owned: false, folderIds: [], addedAt: today()) first.
+   * search result), creates the entry (folderIds: [], addedAt: today()) first.
    */
   finishBook: (bookId: BookId, details: FinishDetails) => void
-  toggleOwned: (bookId: BookId) => void
   removeFromLibrary: (bookIds: BookId[]) => void
   /** Returns the new folder id. */
   createFolder: (name: string) => string
@@ -22,19 +21,19 @@ export interface LibraryActions {
   deleteFolder: (id: string) => void
   addToFolder: (bookIds: BookId[], folderId: string) => void
   removeFromFolder: (bookIds: BookId[], folderId: string) => void
-  moveToFolder: (bookIds: BookId[], fromId: string, toId: string) => void
+  /** Answers the D5 prompt. See "Aviso periódico" in PLAN.md. */
+  answerWantPrompt: (bookId: BookId, keep: boolean) => void
 }
 
 // Stubs from the base block with their final signatures. Role A implements them, each change
 // to library or folders going through get().commit(label, mutator).
 export const createLibrarySlice: SliceCreator<LibraryActions> = () => ({
   finishBook: () => {},
-  toggleOwned: () => {},
   removeFromLibrary: () => {},
   createFolder: () => '',
   renameFolder: () => {},
   deleteFolder: () => {},
   addToFolder: () => {},
   removeFromFolder: () => {},
-  moveToFolder: () => {},
+  answerWantPrompt: () => {},
 })

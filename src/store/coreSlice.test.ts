@@ -17,7 +17,15 @@ function buildSeed() {
 }
 
 const STORAGE_KEY = 'gr-e2'
-const PERSISTED_KEYS = ['extraBooks', 'folders', 'friendships', 'library', 'likedActivityIds']
+const T1_BOOK_ID = 'OL81626W'
+const PERSISTED_KEYS = [
+  'extraBooks',
+  'folders',
+  'friendships',
+  'lastWantPromptOn',
+  'library',
+  'likedActivityIds',
+]
 const unknownBook: Book = { id: 'OL0000001W', title: 'Libro nuevo', authors: ['Autora'] }
 const pendingRequest: Friendship = {
   userId: 'camila',
@@ -74,16 +82,79 @@ describe('setStatus', () => {
     state().upsertBook(unknownBook)
   })
 
-  it('adds a missing book as Quiero, without startedAt', () => {
+  it('adds a missing book as Lo quiero, checked today and without startedAt', () => {
     state().setStatus(unknownBook.id, 'want')
     expect(state().library[unknownBook.id]).toEqual({
       bookId: unknownBook.id,
       status: 'want',
-      owned: false,
+      folderIds: [],
+      addedAt: today(),
+      wantCheckedAt: today(),
+    })
+    expect(state().library[unknownBook.id].startedAt).toBeUndefined()
+  })
+
+  it('adds a missing book as Lo tengo, without startedAt or wantCheckedAt', () => {
+    state().setStatus(unknownBook.id, 'owned')
+    expect(state().library[unknownBook.id]).toEqual({
+      bookId: unknownBook.id,
+      status: 'owned',
       folderIds: [],
       addedAt: today(),
     })
-    expect(state().library[unknownBook.id].startedAt).toBeUndefined()
+  })
+
+  it('names the tag in the toast', () => {
+    state().setStatus(seedEntry('want').bookId, 'owned')
+    expect(state().toast).toMatchObject({ message: 'Estado cambiado a «Lo tengo»' })
+    state().setStatus(unknownBook.id, 'want')
+    expect(state().toast).toMatchObject({ message: 'Agregado a Mis libros como «Lo quiero»' })
+  })
+
+  it('sets wantCheckedAt when a book moves to Lo quiero', () => {
+    const reading = seedEntry('reading')
+    expect(reading.wantCheckedAt).toBeUndefined()
+    state().setStatus(reading.bookId, 'want')
+    expect(state().library[reading.bookId].wantCheckedAt).toBe(today())
+  })
+
+  it('renews wantCheckedAt when a book comes back to Lo quiero', () => {
+    const want = seedEntry('want')
+    state().setStatus(want.bookId, 'owned')
+    useStore.setState((current) => ({
+      library: {
+        ...current.library,
+        [want.bookId]: { ...current.library[want.bookId], wantCheckedAt: daysAgo(100) },
+      },
+    }))
+    state().setStatus(want.bookId, 'want')
+    expect(state().library[want.bookId].wantCheckedAt).toBe(today())
+  })
+
+  it('moves a book to Lo tengo keeping its dates and folders', () => {
+    const reading = seedEntry('reading')
+    state().setStatus(reading.bookId, 'owned')
+    expect(state().library[reading.bookId]).toEqual({ ...reading, status: 'owned' })
+  })
+
+  it('moves a Leído book to Lo tengo without finishedAt or rating', () => {
+    const read = seedEntry('read')
+    state().setStatus(read.bookId, 'owned')
+    const entry = state().library[read.bookId]
+    expect(entry).toMatchObject({ status: 'owned', startedAt: read.startedAt })
+    expect(entry).not.toHaveProperty('finishedAt')
+    expect(entry).not.toHaveProperty('rating')
+  })
+
+  it('sets startedAt when a Lo tengo book moves to Leyendo', () => {
+    const owned = seedEntry('owned')
+    expect(owned.startedAt).toBeUndefined()
+    state().setStatus(owned.bookId, 'reading')
+    expect(state().library[owned.bookId]).toEqual({
+      ...owned,
+      status: 'reading',
+      startedAt: today(),
+    })
   })
 
   it('adds a missing book as Leyendo, started today', () => {
@@ -95,7 +166,7 @@ describe('setStatus', () => {
     })
   })
 
-  it('sets startedAt when a Quiero book moves to Leyendo', () => {
+  it('sets startedAt when a Lo quiero book moves to Leyendo', () => {
     const want = seedEntry('want')
     expect(want.startedAt).toBeUndefined()
     state().setStatus(want.bookId, 'reading')
@@ -265,6 +336,7 @@ describe('persistence', () => {
   const stored = () => JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null')
 
   it(`stores only ${PERSISTED_KEYS.join(', ')} under ${STORAGE_KEY}`, () => {
+    useStore.setState({ lastWantPromptOn: today() })
     state().upsertBook(unknownBook)
     state().setStatus(unknownBook.id, 'want')
     expect(Object.keys(stored().state).sort()).toEqual(PERSISTED_KEYS)
@@ -290,6 +362,23 @@ describe('persistence', () => {
     expect(state().folders).toEqual(seed.folders)
   })
 
+  it('keeps lastWantPromptOn across a reload', async () => {
+    const answeredOn = daysAgo(1)
+    useStore.setState({ lastWantPromptOn: answeredOn })
+    const saved = localStorage.getItem(STORAGE_KEY) ?? ''
+    useStore.setState({ lastWantPromptOn: undefined })
+    localStorage.setItem(STORAGE_KEY, saved)
+    await useStore.persist.rehydrate()
+    expect(state().lastWantPromptOn).toBe(answeredOn)
+  })
+
+  it('undo does not bring back an older lastWantPromptOn', () => {
+    state().setStatus(seedEntry('want').bookId, 'owned')
+    useStore.setState({ lastWantPromptOn: today() })
+    state().undo()
+    expect(state().lastWantPromptOn).toBe(today())
+  })
+
   it('resetDemo restores the initial state and clears storage', () => {
     state().upsertBook(unknownBook)
     state().setStatus(unknownBook.id, 'reading')
@@ -298,6 +387,7 @@ describe('persistence', () => {
       friendships: [pendingRequest],
       activities: [],
       likedActivityIds: ['act-1'],
+      lastWantPromptOn: today(),
     })
 
     state().resetDemo()
@@ -311,6 +401,7 @@ describe('persistence', () => {
       toast: null,
       undoSnapshot: null,
     })
+    expect(state().lastWantPromptOn).toBeUndefined()
     expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
   })
 
@@ -327,10 +418,10 @@ describe('persistence', () => {
 
   it('resetDemo dates the seed from the current day', () => {
     state().resetDemo()
-    const startedBefore = state().library['OL1811898W']?.startedAt
+    const startedBefore = state().library[T1_BOOK_ID]?.startedAt
     vi.setSystemTime(Date.now() + 24 * 60 * 60 * 1000)
     state().resetDemo()
-    expect(state().library['OL1811898W']?.startedAt).not.toBe(startedBefore)
-    expect(state().library['OL1811898W']?.startedAt).toBe(daysAgo(12))
+    expect(state().library[T1_BOOK_ID]?.startedAt).not.toBe(startedBefore)
+    expect(state().library[T1_BOOK_ID]?.startedAt).toBe(daysAgo(12))
   })
 })

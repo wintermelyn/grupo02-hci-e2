@@ -1,5 +1,5 @@
-import { House, LibraryBig, Search, UserRound, Users, type LucideIcon } from 'lucide-react'
-import { NavLink, Outlet } from 'react-router'
+import { Compass, Ellipsis, House, LibraryBig, Search, type LucideIcon } from 'lucide-react'
+import { Link, matchPath, Outlet, useLocation } from 'react-router'
 import { cx } from './cx'
 import { Toast } from './Toast'
 
@@ -7,17 +7,23 @@ interface Section {
   to: string
   label: string
   icon: LucideIcon
+  /** Other sections reached from this one, which keep it marked as active. */
+  alsoActiveOn?: readonly string[]
 }
 
 const SECTIONS: readonly Section[] = [
   { to: '/', label: 'Inicio', icon: House },
   { to: '/biblioteca', label: 'Mis libros', icon: LibraryBig },
-  { to: '/amigos', label: 'Amigos', icon: Users },
+  { to: '/descubrir', label: 'Descubrir', icon: Compass },
   { to: '/buscar', label: 'Buscar', icon: Search },
-  { to: '/perfil', label: 'Perfil', icon: UserRound },
+  { to: '/mas', label: 'Más', icon: Ellipsis, alsoActiveOn: ['/amigos', '/perfil'] },
 ]
 
-// Active is shown by weight, a filled pill and aria-current="page" (set by NavLink), not by colour alone.
+function isSectionActive({ to, alsoActiveOn = [] }: Section, pathname: string): boolean {
+  return [to, ...alsoActiveOn].some((path) => matchPath({ path, end: to === '/' }, pathname))
+}
+
+// Active is shown by weight, a filled pill and aria-current="page", not by colour alone.
 function navItemClass(isActive: boolean, layout: string): string {
   return cx(
     'flex items-center rounded-lg',
@@ -27,18 +33,24 @@ function navItemClass(isActive: boolean, layout: string): string {
 }
 
 function NavItems({ layout, iconSize }: { layout: string; iconSize: number }) {
-  return SECTIONS.map(({ to, label, icon: Icon }) => (
-    <li key={to} className="flex-1 md:flex-none">
-      <NavLink
-        to={to}
-        end={to === '/'}
-        className={({ isActive }) => navItemClass(isActive, layout)}
-      >
-        <Icon aria-hidden size={iconSize} />
-        {label}
-      </NavLink>
-    </li>
-  ))
+  const { pathname } = useLocation()
+  return SECTIONS.map((section) => {
+    const { to, label, icon: Icon } = section
+    const isActive = isSectionActive(section, pathname)
+    return (
+      <li key={to} className="flex-1 md:flex-none">
+        {/* NavLink only knows its own URL, and Más also has to stay marked on other routes. */}
+        <Link
+          to={to}
+          aria-current={isActive ? 'page' : undefined}
+          className={navItemClass(isActive, layout)}
+        >
+          <Icon aria-hidden size={iconSize} />
+          {label}
+        </Link>
+      </li>
+    )
+  })
 }
 
 export function AppShell() {

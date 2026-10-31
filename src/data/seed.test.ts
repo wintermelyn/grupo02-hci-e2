@@ -6,7 +6,8 @@ import { buildInitialFolders, buildInitialLibrary } from './seedLibrary'
 import { buildInitialActivities, buildInitialFriendships, me, users } from './seedSocial'
 
 // These checks pin the seed to PLAN.md section 4 and to the task data listed in docs/desarrollo/tareas.md.
-const T1_BOOK_ID = 'OL1811898W'
+const T1_BOOK_ID = 'OL81626W'
+const PROMPTED_FIRST_BOOK_ID = 'OL81613W'
 const catalog: Book[] = books
 const bookIds = new Set(catalog.map((book) => book.id))
 const initialLibrary = buildInitialLibrary()
@@ -32,18 +33,33 @@ describe('books.json', () => {
     expect(covers.every((url) => /^\/covers\/OL\d+W\.jpg$/.test(url))).toBe(true)
   })
 
-  it('includes the T1 book in Spanish', () => {
-    expect(catalog.find((book) => book.id === T1_BOOK_ID)?.title).toBe(
-      'El hombre que confundió a su mujer con un sombrero',
-    )
+  it('includes the T1 book', () => {
+    expect(catalog.find((book) => book.id === T1_BOOK_ID)).toMatchObject({
+      title: 'Carrie',
+      authors: ['Stephen King'],
+    })
   })
 })
 
 describe('initial library', () => {
-  it('has the counts per status from the plan', () => {
-    expect(withStatus('want')).toHaveLength(22)
+  it('has the counts per tag from the plan', () => {
+    expect(withStatus('want')).toHaveLength(17)
+    expect(withStatus('owned')).toHaveLength(5)
     expect(withStatus('reading')).toHaveLength(2)
     expect(withStatus('read')).toHaveLength(10)
+    expect(entries).toHaveLength(34)
+  })
+
+  it('has the five Lo tengo books from the task data, in their folders', () => {
+    expect(
+      Object.fromEntries(withStatus('owned').map((entry) => [entry.bookId, entry.folderIds])),
+    ).toEqual({
+      OL85892W: ['terror'], // Drácula
+      OL20901051W: ['proximos', 'terror'], // Nuestra parte de noche
+      OL14860424W: ['novela'], // Rayuela
+      OL17075811W: ['regalos'], // Sapiens
+      OL1811898W: [], // El hombre que confundió…
+    })
   })
 
   it('only references books from the catalog, keyed by their own id', () => {
@@ -53,11 +69,28 @@ describe('initial library', () => {
     expect(Object.keys(initialLibrary).filter((id) => !bookIds.has(id))).toEqual([])
   })
 
-  it('has the T1 book in Leyendo, started 12 days ago, and the other one 30 days ago', () => {
-    expect(initialLibrary[T1_BOOK_ID]).toMatchObject({ status: 'reading', startedAt: daysAgo(12) })
+  it('has the T1 book in Leyendo in Terror, started 12 days ago, and Dune 30 days ago', () => {
+    expect(initialLibrary[T1_BOOK_ID]).toMatchObject({
+      status: 'reading',
+      folderIds: ['terror'],
+      startedAt: daysAgo(12),
+    })
     expect(withStatus('reading').map((entry) => entry.startedAt)).toEqual(
       expect.arrayContaining([daysAgo(12), daysAgo(30)]),
     )
+  })
+
+  it('makes It the oldest Lo quiero book, so the D5 prompt asks about it first', () => {
+    const [oldest] = withStatus('want').toSorted((a, b) => a.addedAt.localeCompare(b.addedAt))
+    expect(oldest.bookId).toBe(PROMPTED_FIRST_BOOK_ID)
+    expect(oldest.addedAt).toBe(daysAgo(210))
+    expect(entries.every((entry) => entry.wantCheckedAt === undefined)).toBe(true)
+  })
+
+  it('only gives a start date to books that were started', () => {
+    for (const { status, startedAt } of entries) {
+      expect(startedAt !== undefined).toBe(status === 'reading' || status === 'read')
+    }
   })
 
   it('keeps dates in order and never in the future', () => {
@@ -96,7 +129,7 @@ describe('initial library', () => {
 
 describe('initial social data', () => {
   it('has me as Alex Muñoz', () => {
-    expect(me).toMatchObject({ name: 'Alex Muñoz', username: 'alexlee', code: 'LEE-1024' })
+    expect(me).toMatchObject({ name: 'Alex Muñoz', username: 'alexlee' })
   })
 
   it('has the three friends from the plan', () => {
@@ -112,7 +145,7 @@ describe('initial social data', () => {
     const camilas = users.filter((user) => user.name === 'Camila Torres')
     const target = camilas.find((user) => user.username === 'camitorres')
     const homonym = camilas.find((user) => user.username === 'ctorres_99')
-    expect(target).toMatchObject({ code: 'LEE-4821', mutualFriends: 3 })
+    expect(target).toMatchObject({ mutualFriends: 3 })
     expect(homonym).toMatchObject({ mutualFriends: 0 })
     expect(homonym?.avatarColor).not.toBe(target?.avatarColor)
     expect(friendIds).not.toContain(target?.id)
@@ -128,11 +161,14 @@ describe('initial social data', () => {
     expect(users).toHaveLength(3 + 2 + 4)
   })
 
-  it('has unique ids, usernames and codes', () => {
+  it('has unique ids and usernames', () => {
     const everyone = [me, ...users]
     expect(isUnique(everyone.map((user) => user.id))).toBe(true)
     expect(isUnique(everyone.map((user) => user.username))).toBe(true)
-    expect(isUnique(everyone.map((user) => user.code))).toBe(true)
+  })
+
+  it('has no friend codes', () => {
+    expect([me, ...users].some((user) => 'code' in user)).toBe(false)
   })
 
   it('only references books from the catalog', () => {

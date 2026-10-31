@@ -7,7 +7,7 @@ export const state = () => useStore.getState()
 type Action = (...args: never[]) => unknown
 
 type ActionName = {
-  [K in keyof StoreState]: StoreState[K] extends Action ? K : never
+  [K in keyof StoreState]-?: StoreState[K] extends Action ? K : never
 }[keyof StoreState]
 
 /**
