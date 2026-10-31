@@ -255,8 +255,12 @@ const beforeOtherEditions = (text) => {
   return parts.find((part) => part.trim().length >= MIN_DESCRIPTION) ?? parts[0]
 }
 
+// Invisible, and left by the page a text was copied from. A search would stumble on them.
+const HIDDEN_CHARACTERS = /[\u00ad\u200b]/g
+
 export function cleanMarkup(text) {
-  return beforeOtherEditions(text.replace(/\r\n?/g, '\n').replace(HEADING_MARKS, ''))
+  const plain = text.replace(HIDDEN_CHARACTERS, '').replace(/\r\n?/g, '\n')
+  return beforeOtherEditions(plain.replace(HEADING_MARKS, ''))
     .split(/Also contained in:/)[0]
     .replace(HTML_TAG, '')
     .replace(LINK_DEFINITION, '')
@@ -405,4 +409,41 @@ export function splitEvenly(items, parts) {
     lightest.size += item.description.length
   }
   return groups.map((group) => group.items)
+}
+
+// As many files as it takes for each to weigh about 20 KB compressed. src/lib/catalog.ts has the
+// same number, because it finds a book's file with no list to read, and a test compares them.
+export const DESCRIPTION_GROUPS = 16
+
+/** The file of a book's description, worked out from its id alone. */
+export const descriptionGroup = (id) => Number(id.match(/\d+/)[0]) % DESCRIPTION_GROUPS
+
+// English titles of other books are fine inside a Spanish sentence, so one or two words mean nothing.
+const ENGLISH_MARKS = new Set(
+  'the of and with that this from his her was were which who their they have has had into about after when would what there for'.split(
+    ' ',
+  ),
+)
+const MIN_ENGLISH_WORDS = 4
+const MIN_ENGLISH_SHARE = 0.25
+const MARKDOWN = /\*\*|__|^#{1,6}\s|^>\s?|\]\(|\]\[|`/m
+const LINK_IN_TEXT = /https?:|www\.|\.(?:com|org|net)\b/i
+const SOURCE_NOTE = /\[\d+\]|\b(?:Back cover|Jacket flap|Container|Publisher)\b|\s--\s/
+
+function hasEnglishSentence(text) {
+  return text.split(/(?<=[.!?…»])\s+/).some((sentence) => {
+    const words = sentence.toLowerCase().match(/\p{L}+/gu) ?? []
+    const english = words.filter((word) => ENGLISH_MARKS.has(word)).length
+    return english >= MIN_ENGLISH_WORDS && english / words.length >= MIN_ENGLISH_SHARE
+  })
+}
+
+/** What a translation still carries from its source. An empty list means it can be published. */
+export function translationProblems(text) {
+  return [
+    (detectLanguage(text) === 'en' || hasEnglishSentence(text)) && 'inglés',
+    MARKDOWN.test(text) && 'Markdown',
+    LINK_IN_TEXT.test(text) && 'enlace',
+    SOURCE_NOTE.test(text) && 'nota de la fuente',
+  ].filter(Boolean)
 }

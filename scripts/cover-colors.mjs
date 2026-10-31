@@ -1,6 +1,7 @@
-// Builds src/data/coverColors.json: the dominant colour of each cover in public/covers/, which
+// Builds scripts/cover-colors.json: the dominant colour of each cover in public/covers/, which
 // src/lib/coverTone.ts darkens into the background of a card. The output is committed, so the app
-// decodes no images.
+// decodes no images. The 54 books of books.json take theirs from src/data/coverColors.json, in the
+// bundle, and the rest of the catalog from public/catalog/index.json.
 //
 //   node scripts/cover-colors.mjs         adds the covers that have no colour yet
 //   node scripts/cover-colors.mjs --all   works out every cover again
@@ -14,7 +15,9 @@ import * as prettier from 'prettier'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const COVERS_DIR = join(ROOT, 'public/covers')
-const OUTPUT_FILE = join(ROOT, 'src/data/coverColors.json')
+const OUTPUT_FILE = join(ROOT, 'scripts/cover-colors.json')
+const BUNDLED_FILE = join(ROOT, 'src/data/coverColors.json')
+const BOOKS_FILE = join(ROOT, 'src/data/books.json')
 
 /** The cover is averaged into these cells, in its own 2:3 shape, which drops the grain of a photo. */
 const GRID_COLUMNS = 32
@@ -114,8 +117,10 @@ for (const file of files) {
 }
 
 const options = await prettier.resolveConfig(OUTPUT_FILE)
-await writeFile(
-  OUTPUT_FILE,
-  await prettier.format(JSON.stringify(colours), { ...options, filepath: OUTPUT_FILE }),
-)
+const write = async (file, data) =>
+  writeFile(file, await prettier.format(JSON.stringify(data), { ...options, filepath: file }))
+
+const bundled = JSON.parse(await readFile(BOOKS_FILE, 'utf-8')).map(({ id }) => id)
+await write(OUTPUT_FILE, colours)
+await write(BUNDLED_FILE, Object.fromEntries(bundled.toSorted().map((id) => [id, colours[id]])))
 console.log(`${files.length} portadas, ${added} calculadas.`)

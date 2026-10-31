@@ -1,12 +1,14 @@
 // Grows the catalog past the 54 books of seed-books.mjs, which stay as they are: same id, data,
-// cover and translation. The covers land in public/covers/; the rest is left in .claude/catalogo/,
-// which is not committed, until the descriptions are translated.
+// cover and translation. The covers land in public/covers/ and what the app reads in public/catalog/;
+// the steps in between are left in .claude/catalogo/, which is not committed.
 //
 //   node scripts/seed-catalog.mjs candidates   asks Open Library for the lists of books
 //   node scripts/seed-catalog.mjs works        downloads each work and its Spanish editions
 //   node scripts/seed-catalog.mjs select       applies the rules below; offline
 //   node scripts/seed-catalog.mjs covers       downloads and shrinks the covers
 //   node scripts/seed-catalog.mjs pending      writes libros.json and the files to translate
+//   node scripts/seed-catalog.mjs translations adds traducidas-*.json to translated-descriptions.json
+//   node scripts/seed-catalog.mjs publish      checks it all and writes public/catalog/
 //
 // Every answer from Open Library is kept in .claude/catalogo/, so a stage can run again without
 // asking twice. Node 22 and ImageMagick (`magick`), which is the only tool that gets a cover down
@@ -16,6 +18,7 @@ import { access, mkdir, readdir, readFile, rename, rm, stat, writeFile } from 'n
 import { basename, dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
+import { brotliCompressSync, gzipSync } from 'node:zlib'
 import {
   BOOK_FIXES,
   EXCLUDED_WORKS,
@@ -29,11 +32,14 @@ import {
   cleanAuthors,
   dedupeKeys,
   describe,
+  DESCRIPTION_GROUPS,
+  descriptionGroup,
   detectLanguage,
   dropReason,
   fold,
   lowercaseWords,
   splitEvenly,
+  translationProblems,
 } from './catalog-rules.mjs'
 
 const run = promisify(execFile)
@@ -50,6 +56,9 @@ const DROPPED_FILE = join(WORK_DIR, 'excluidos.json')
 const COVERED_FILE = join(WORK_DIR, 'con-portada.json')
 const MISSING_COVERS_FILE = join(WORK_DIR, 'sin-portada.json')
 const BOOKS_OUT_FILE = join(WORK_DIR, 'libros.json')
+const TRANSLATIONS_FILE = join(ROOT, 'scripts/translated-descriptions.json')
+const COLOURS_FILE = join(ROOT, 'scripts/cover-colors.json')
+const CATALOG_DIR = join(ROOT, 'public/catalog')
 
 const API_URL = 'https://openlibrary.org'
 const COVERS_URL = 'https://covers.openlibrary.org/b/id'
@@ -471,14 +480,18 @@ async function writePending() {
   const pending = []
   const report = { spanish: 0, toTranslate: 0, none: {} }
   for (const { id, title, authors, year, pages, description: raw } of covered) {
-    const { description, language, reason } = describe(raw, BOOK_FIXES[id]?.noDescription)
+    const fixes = BOOK_FIXES[id] ?? {}
+    const { description, language, reason } = describe(
+      fixes.description ?? raw,
+      fixes.noDescription,
+    )
     books.push({
       id,
-      title,
+      title: fixes.title ?? title,
       authors,
       coverUrl: `/covers/${id}.jpg`,
       ...(language === 'es' ? { description } : {}),
-      year,
+      year: 'year' in fixes ? (fixes.year ?? undefined) : year,
       pages,
     })
     if (language === 'es') report.spanish += 1
@@ -496,12 +509,116 @@ async function writePending() {
   console.log('pending files:', parts.map((part) => part.length).join(', '))
 }
 
+async function readPending() {
+  const parts = await Promise.all(
+    Array.from({ length: PENDING_FILES }, (_, index) =>
+      readJson(join(WORK_DIR, `pendientes-${index + 1}.json`)),
+    ),
+  )
+  return parts.flat()
+}
+
+/**
+ * An entry already in the file stays, so a correction made there survives another run. The first
+ * file wins when two of them translated the same book, and null means the text was left out on
+ * purpose: its book goes in BOOK_FIXES with noDescription.
+ */
+async function mergeTranslations() {
+  const merged = await readJson(TRANSLATIONS_FILE)
+  const pending = new Map((await readPending()).map((book) => [book.id, book]))
+  const files = (await readdir(WORK_DIR)).filter((file) => /^traducidas-.*\.json$/.test(file))
+  for (const file of files.toSorted()) {
+    for (const [id, description] of Object.entries(await readJson(join(WORK_DIR, file)))) {
+      const book = pending.get(id)
+      if (!description || !book || merged[id]) continue
+      merged[id] = { sourceLanguage: book.sourceLanguage, description }
+    }
+  }
+  const sorted = Object.keys(merged).toSorted()
+  await writeJson(TRANSLATIONS_FILE, Object.fromEntries(sorted.map((id) => [id, merged[id]])))
+  console.log(`${sorted.length} translations -> ${TRANSLATIONS_FILE}`)
+}
+
+/** Stops at the first run with a book left to translate or a text that is not ready to be shown. */
+async function checkTranslations(translations) {
+  const missing = (await readPending()).filter(({ id }) => !translations[id]).map(({ id }) => id)
+  const problems = Object.entries(translations).flatMap(([id, { description }]) => {
+    const found = translationProblems(description)
+    return found.length > 0 ? [`${id}: ${found.join(', ')}`] : []
+  })
+  if (missing.length > 0 || problems.length > 0) {
+    throw new Error(`Sin traducir: ${missing.join(' ')}\nPor corregir:\n${problems.join('\n')}`)
+  }
+}
+
+const bytes = (text) => ({
+  raw: Buffer.byteLength(text),
+  gzip: gzipSync(text, { level: 9 }).length,
+  brotli: brotliCompressSync(text).length,
+})
+
+/** The most read first, so a search shows them before the rest of the books that match it. */
+async function writeIndex(books) {
+  const reads = new Map(
+    (await readJson(CANDIDATES_FILE)).map(({ id, readinglog_count: count }) => [id, count ?? 0]),
+  )
+  const colours = await readJson(COLOURS_FILE)
+  const rows = books
+    .toSorted((a, b) => (reads.get(b.id) ?? 0) - (reads.get(a.id) ?? 0))
+    .map(({ id, title, authors, year, pages }) => [
+      id,
+      title,
+      authors,
+      year ?? null,
+      pages ?? null,
+      colours[id] ?? null,
+    ])
+  const text = JSON.stringify(rows)
+  await writeFile(join(CATALOG_DIR, 'index.json'), text)
+  console.log('index', rows.length, bytes(text))
+}
+
+/** The 54 books keep their text in books.json, so only the rest needs a file. */
+async function writeDescriptions(books, translations) {
+  const groups = Array.from({ length: DESCRIPTION_GROUPS }, () => ({}))
+  for (const { id, description } of books) {
+    const translated = translations[id]?.description
+    const text = description ?? translated
+    if (!text) continue
+    groups[descriptionGroup(id)][id] = translated
+      ? { description: text, descriptionTranslated: true }
+      : { description: text }
+  }
+  await mkdir(join(CATALOG_DIR, 'descriptions'), { recursive: true })
+  const sizes = await Promise.all(
+    groups.map(async (group, index) => {
+      const text = JSON.stringify(group)
+      await writeFile(join(CATALOG_DIR, 'descriptions', `${index}.json`), text)
+      return bytes(text).gzip
+    }),
+  )
+  console.log('descriptions', groups.flatMap(Object.keys).length, 'gzip per group', sizes.join(' '))
+}
+
+async function publishCatalog() {
+  const translations = await readJson(TRANSLATIONS_FILE)
+  await checkTranslations(translations)
+  const seeds = await readJson(BOOKS_FILE)
+  const books = await readJson(BOOKS_OUT_FILE)
+  await rm(CATALOG_DIR, { recursive: true, force: true })
+  await mkdir(CATALOG_DIR, { recursive: true })
+  await writeIndex([...seeds, ...books])
+  await writeDescriptions(books, translations)
+}
+
 const STAGES = {
   candidates: fetchCandidates,
   works: fetchWorks,
   select: selectBooks,
   covers: fetchCovers,
   pending: writePending,
+  translations: mergeTranslations,
+  publish: publishCatalog,
 }
 
 const stage = STAGES[process.argv[2]]

@@ -56,7 +56,8 @@ describe('books.json', () => {
     const marked = catalog.filter((book) => book.descriptionTranslated)
     const unmarked = catalog.filter((book) => book.description && !book.descriptionTranslated)
     expect(unmarked.map((book) => book.id)).toEqual(ORIGINAL_DESCRIPTION_IDS)
-    expect(marked.map((book) => book.id).toSorted()).toEqual(Object.keys(translations).toSorted())
+    const translated = Object.keys(translations).filter((id) => bookIds.has(id))
+    expect(marked.map((book) => book.id).toSorted()).toEqual(translated.toSorted())
     expect(marked.every((book) => book.description)).toBe(true)
   })
 
@@ -67,7 +68,7 @@ describe('books.json', () => {
   })
 
   it('records the language each translation came from', () => {
-    const languages = Object.values(translations).map(({ sourceLanguage }) => sourceLanguage)
+    const languages = catalog.flatMap(({ id }) => translations[id]?.sourceLanguage ?? [])
     expect(new Set(languages)).toEqual(new Set(['en', 'fr', 'nl']))
   })
 

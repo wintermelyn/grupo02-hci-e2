@@ -7,11 +7,14 @@ import {
   cutAtSentence,
   dedupeKeys,
   describe,
+  descriptionGroup,
   detectLanguage,
+  DESCRIPTION_GROUPS,
   dropReason,
   lowercaseWords,
   sentenceCase,
   splitEvenly,
+  translationProblems,
 } from './catalog-rules.mjs'
 
 const PARAGRAPH =
@@ -305,5 +308,42 @@ group('splitEvenly', () => {
     )
     expect(parts.map((part) => part.length)).toEqual([10, 10, 10, 10, 10, 10])
     expect(Math.max(...sizes) / Math.min(...sizes)).toBeLessThan(1.1)
+  })
+})
+
+group('cleanMarkup', () => {
+  it('drops the characters that cannot be seen', () => {
+    expect(cleanMarkup('Una aventu\u00adra apa\u200bsionante')).toBe('Una aventura apasionante')
+  })
+})
+
+group('translationProblems', () => {
+  it('lets a clean translation through, also with an English title inside', () => {
+    const text = 'Una novela sobre la memoria. Su autor también escribió The Lord of the Rings.'
+    expect(translationProblems(text)).toEqual([])
+  })
+
+  it.each([
+    [
+      'A boy finds the map of the island and sails with his friends to the end of the world.',
+      'inglés',
+    ],
+    ['Primera frase en español. He was afraid of the dark and of the sea.', 'inglés'],
+    ['Una novela **inolvidable** sobre la memoria.', 'Markdown'],
+    ['> Una cita suelta sobre la memoria.', 'Markdown'],
+    ['Mira [la ficha](/libro) de esta novela.', 'Markdown'],
+    ['Más en https://openlibrary.org sobre esta novela.', 'enlace'],
+    ['Más en www.ejemplo.cl sobre esta novela.', 'enlace'],
+    ['Una novela sobre la memoria [12] y el olvido.', 'nota de la fuente'],
+    ['Una novela sobre la memoria. -- Back cover', 'nota de la fuente'],
+  ])('finds what is left in %s', (text, problem) => {
+    expect(translationProblems(text)).toContain(problem)
+  })
+})
+
+group('descriptionGroup', () => {
+  it('stays inside the groups and needs only the id', () => {
+    expect(descriptionGroup('OL45804W')).toBe(45804 % DESCRIPTION_GROUPS)
+    expect(descriptionGroup('OL16W')).toBe(0)
   })
 })
