@@ -250,11 +250,25 @@ describe('toggleLike', () => {
     expect(state().likedActivityIds).toEqual(['act-2'])
   })
 
-  it('does not show a toast or touch the undo copy', () => {
-    state().setStatus('OL81626W', 'owned')
-    const { toast, undoSnapshot } = state()
+  it('tells who the like reaches, with no way to undo it', () => {
     state().toggleLike('act-1')
-    expect(state().toast).toBe(toast)
-    expect(state().undoSnapshot).toBe(undoSnapshot)
+    expect(state().toast).toMatchObject({
+      message: 'Valentina verá que te gustó',
+      undoable: false,
+    })
+    state().toggleLike('act-2')
+    expect(toastMessage()).toBe('Tomás verá que te gustó')
+  })
+
+  it('says nothing when the like is taken back', () => {
+    state().toggleLike('act-1')
+    state().dismissToast()
+    state().toggleLike('act-1')
+    expect(state().toast).toBeNull()
+  })
+
+  it('shows no toast for an activity that is not there', () => {
+    state().toggleLike('act-inexistente')
+    expect(state().toast).toBeNull()
   })
 })
