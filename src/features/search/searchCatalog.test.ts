@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Book } from '../../types'
-import { matchesAuthor, searchCatalog, toSearchable } from './searchCatalog'
+import { isAuthorName, matchesAuthor, searchCatalog, toSearchable } from './searchCatalog'
 
 const book = (title: string, ...authors: string[]): Book => ({ id: title, title, authors })
 
@@ -53,6 +53,33 @@ describe('searchCatalog', () => {
     expect(titles('j r r')).toEqual(['Rey y Jean-Paul'])
   })
 
+  it('takes initials together, with dots or with spaces for the same thing', () => {
+    const books = [
+      book('Harry Potter', 'J. K. Rowling'),
+      book('El hobbit', 'J. R. R. Tolkien'),
+      book('Las almas de Du Bois', 'W. E. B. Du Bois'),
+      book('Jaque', 'Julio Kramer'),
+    ].map(toSearchable)
+    const found = (query: string) => searchCatalog(books, query).map(({ title }) => title)
+    for (const query of ['jk rowling', 'j k rowling', 'j.k. rowling', 'J. K. Rowling', 'jk']) {
+      expect(found(query)).toEqual(['Harry Potter'])
+    }
+    expect(found('j k')).toEqual(['Harry Potter', 'Jaque'])
+    for (const query of ['jrr tolkien', 'j r r tolkien', 'j.r.r. tolkien', 'jrr']) {
+      expect(found(query)).toEqual(['El hobbit'])
+    }
+    expect(found('web du bois')).toEqual(['Las almas de Du Bois'])
+  })
+
+  it('still finds an initial on its own', () => {
+    expect(titles('r tolkien')).toEqual(['Rey y Jean-Paul'])
+  })
+
+  it('does not forgive a typing mistake, which is a decision of its own', () => {
+    expect(titles('jk rowlin')).toEqual([])
+    expect(titles('stephen kng')).toEqual([])
+  })
+
   it('asks every word to start a word, in any order, across the title and the authors', () => {
     expect(titles('soledad cien')).toEqual(['Cien años de soledad'])
     expect(titles('marquez cien')).toEqual(['Cien años de soledad'])
@@ -85,11 +112,26 @@ describe('searchCatalog', () => {
   })
 })
 
+describe('isAuthorName', () => {
+  it('compares the whole name, however its initials are written', () => {
+    for (const query of ['jk rowling', 'j k rowling', 'j.k. rowling', 'J. K. Rowling']) {
+      expect(isAuthorName('J. K. Rowling', query)).toBe(true)
+    }
+    expect(isAuthorName('J. K. Rowling', 'rowling')).toBe(false)
+  })
+})
+
 describe('matchesAuthor', () => {
   it('goes by the start of a word of the name', () => {
     expect(matchesAuthor('Stephen King', 'king')).toBe(true)
     expect(matchesAuthor('Stephen Hawking', 'king')).toBe(false)
     expect(matchesAuthor('Gabriel García Márquez', 'garcia marquez')).toBe(true)
+  })
+
+  it('takes initials together for the same thing', () => {
+    expect(matchesAuthor('J. K. Rowling', 'jk rowling')).toBe(true)
+    expect(matchesAuthor('J. K. Rowling', 'jk')).toBe(true)
+    expect(matchesAuthor('J. K. Rowling', 'k rowling')).toBe(true)
   })
 
   it('has nothing to say about an empty search', () => {

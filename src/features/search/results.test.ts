@@ -52,6 +52,19 @@ describe('matchRange', () => {
 })
 
 describe('arrangeResults', () => {
+  it('takes every way of writing the initials as the same author', () => {
+    const books = [book('1', 'J. K. Rowling'), book('2', 'J. K. Rowling')]
+    const written = ['jk rowling', 'j k rowling', 'j.k. rowling', 'J. K. Rowling']
+    for (const query of written) {
+      const { authors, summary, lead } = arrangeResults(books, query, NOTHING)
+      expect({ authors, summary, lead }).toEqual({
+        authors: [],
+        summary: '2 libros',
+        lead: undefined,
+      })
+    }
+  })
+
   const stephen = book('1', 'Stephen King')
   const hawking = book('2', 'Stephen Hawking')
 

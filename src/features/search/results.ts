@@ -1,6 +1,6 @@
 import type { Book, BookId, LibraryEntry } from '../../types'
 import { booksLabel, normalizeText } from '../library/filters'
-import { matchesAuthor } from './searchCatalog'
+import { isAuthorName, matchesAuthor } from './searchCatalog'
 
 export interface AuthorGroup {
   name: string
@@ -64,7 +64,7 @@ export function arrangeResults(
 ): ArrangedResults {
   const authors = groupByAuthor(results).filter(({ name }) => matchesAuthor(name, query))
   const wanted = normalizeText(query)
-  const exact = authors.find(({ name }) => normalizeText(name) === wanted)
+  const exact = authors.find(({ name }) => isAuthorName(name, query))
   const books = exact?.books ?? results
   const mine = books.filter(({ id }) => Object.hasOwn(library, id))
   const others = books.filter(({ id }) => !Object.hasOwn(library, id))

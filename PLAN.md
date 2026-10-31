@@ -121,7 +121,7 @@ Una app real tendría su propia base de datos indexada, con cada libro nuevo ya 
 - **ID de un libro:** la clave de la obra en Open Library, por ejemplo `OL45804W`. Se usa así tal cual en la URL.
 - **Búsqueda** (`src/features/search/searchCatalog.ts`, rol B):
   - Corre sobre el índice, en el render, así que cada letra tiene su lista sin esperar.
-  - Cada palabra escrita debe ser el inicio de una palabra del título o de los autores, en cualquier orden y sin distinguir tildes ni mayúsculas. "king" encuentra a Stephen King y no a Hawking, y "marquez cien" encuentra *Cien años de soledad*.
+  - Cada palabra escrita debe ser el inicio de una palabra del título o de los autores, en cualquier orden y sin distinguir tildes ni mayúsculas. "king" encuentra a Stephen King y no a Hawking, y "marquez cien" encuentra *Cien años de soledad*. Las iniciales de un autor valen pegadas, con puntos o con espacios: "jk rowling", "j k rowling" y "j.k. rowling" son la misma búsqueda. No hay tolerancia a errores de escritura.
   - Va primero el título exacto, luego el título que empieza así, una palabra del título, el autor y lo demás. Entre iguales, el más leído. Los libros de la biblioteca suben al principio de la lista.
   - La lista llega a 40 libros y dice de cuántos, salvo los libros de un autor, que van todos.
 - **Ficha de un libro que no está a mano** (por ejemplo, un enlace abierto en otro navegador): espera el índice con `BookSkeleton`. Si el libro no está en él, muestra "Libro no encontrado". Un id que no puede ser un libro lo dice sin bajar nada.

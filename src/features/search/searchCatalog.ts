@@ -10,11 +10,26 @@ function words(text: string): string {
 
 const startsWord = (text: string, wanted: string) => ` ${text}`.includes(` ${wanted}`)
 
+/** "j r r tolkien" as "jrr tolkien": once the dots are gone, initials are a run of single letters. */
+const joinInitials = (text: string) =>
+  text.replace(/(?<!\S)\p{L}(?: \p{L})+(?!\S)/gu, (initials) => initials.replaceAll(' ', ''))
+
+/** A name with its initials both ways, so "jk rowling" finds it just as "j.k. rowling" does. */
+function nameWords(name: string): string {
+  const written = words(name)
+  const joined = joinInitials(written)
+  return joined === written ? written : `${written} ${joined}`
+}
+
 /** By the start of a word of the name, so "king" finds Stephen King and not Hawking. */
 export function matchesAuthor(name: string, query: string): boolean {
   const wanted = words(query)
-  return wanted !== '' && startsWord(words(name), wanted)
+  return wanted !== '' && startsWord(nameWords(name), wanted)
 }
+
+/** The whole name, however its initials are written. */
+export const isAuthorName = (name: string, query: string) =>
+  joinInitials(words(name)) === joinInitials(words(query))
 
 export interface SearchableBook {
   book: Book
@@ -26,7 +41,7 @@ export interface SearchableBook {
 export const toSearchable = (book: Book): SearchableBook => ({
   book,
   title: words(book.title),
-  authors: words(book.authors.join(' ')),
+  authors: book.authors.map(nameWords).join(' '),
 })
 
 /** Lower goes first: the whole title, how it starts, a word in it, the author, and any other way. */
