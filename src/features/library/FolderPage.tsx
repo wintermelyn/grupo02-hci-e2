@@ -149,8 +149,9 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
               confirmLabel="Eliminar carpeta"
               onConfirm={onDelete}
               onCancel={stopEditing}
-              // 66 px on a place of 56: what is left over goes into the empty space around the tags.
-              className="mt-3 md:absolute md:inset-x-0 md:top-1/2 md:mt-0 md:-translate-y-1/2 md:py-1.5"
+              oneLine
+              // It takes the 56 px of the tags, which keep 8 px from the search and from the list.
+              className="mt-3 md:absolute md:inset-0 md:mt-0"
             >
               {!hasBooks
                 ? 'Esta carpeta no tiene libros.'

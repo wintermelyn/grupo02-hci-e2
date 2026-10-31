@@ -478,7 +478,7 @@ describe('FolderPage', () => {
       chooseOption('Eliminar carpeta')
       const question = main().getByRole('region', { name: 'Eliminar «Terror»' })
       const tags = screen.getByRole('group', { name: 'Filtrar por estado' })
-      expect(question).toHaveClass('md:absolute')
+      expect(question).toHaveClass('md:absolute', 'md:inset-0')
       expect(tags.parentElement).toHaveClass('md:invisible')
       expect(question.parentElement).toContainElement(tags)
       fireEvent.keyDown(question, { key: 'Escape' })
