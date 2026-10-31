@@ -49,6 +49,18 @@ afterEach(() => {
   delete Element.prototype.scrollTo
 })
 
+describe('the line over the title', () => {
+  it('stays in one line, and what does not fit is the end of the note', () => {
+    renderApp('/descubrir')
+    const line = screen.getByRole('heading', { level: 2 })
+    expect(line).toHaveClass('flex')
+    expect(within(line).getByText(forYou.title)).toHaveClass('shrink-0')
+    const note = within(line).getByText(new RegExp(forYou.note))
+    expect(note).toHaveClass('truncate')
+    expect(note.textContent).toMatch(/^.· /)
+  })
+})
+
 describe('the lists', () => {
   it('shows the four lists at the same level, "Seleccionados para ti" first and chosen', () => {
     renderApp('/descubrir')

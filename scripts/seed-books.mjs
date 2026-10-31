@@ -102,6 +102,8 @@ const CATALOG = [
 const OVERRIDES = {
   // The cover of the first Spanish edition has a library barcode over the author's name.
   OL81613W: { coverId: 8179786 },
+  // The cover of the first Spanish edition is taller than 2:3, and the box of a cover cut its title.
+  OL274518W: { coverId: 1055706 },
   OL81631W: { title: 'Cementerio de animales' },
   OL450063W: { title: 'Frankenstein o el moderno Prometeo' },
   OL274505W: { title: 'Cien años de soledad' },

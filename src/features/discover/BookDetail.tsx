@@ -37,9 +37,13 @@ export function BookDetail({ list, book, position, total, from }: BookDetailProp
   return (
     <div className="mt-2 flex min-w-0 flex-col sm:mt-4 lg:col-start-1 lg:row-start-1 lg:mt-0">
       <div className="flex h-42 flex-col sm:h-auto">
-        <h2 className="text-sm font-semibold text-muted lg:text-base">
-          {list.title}
-          <span className="hidden font-normal sm:inline"> · {list.note}</span>
+        {/* One line: what a narrow column does not fit is the end of the note. */}
+        <h2 className="flex text-sm font-semibold text-muted lg:text-base">
+          <span className="shrink-0">{list.title}</span>
+          <span className="hidden min-w-0 truncate font-normal sm:block">
+            {'\u00a0· '}
+            {list.note}
+          </span>
         </h2>
         <div
           key={book.id}
