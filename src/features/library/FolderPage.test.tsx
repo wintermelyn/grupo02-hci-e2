@@ -132,9 +132,10 @@ describe('FolderPage', () => {
 
     it('takes Opciones out of the way, so it cannot be reached under the field', () => {
       renderApp(TERROR)
-      expect(optionsButton().parentElement?.parentElement).not.toHaveClass('max-md:hidden')
+      const hiddenOnPhone = () => optionsButton().closest('.max-md\\:hidden')
+      expect(hiddenOnPhone()).toBeNull()
       fireEvent.click(openButton())
-      expect(optionsButton().parentElement?.parentElement).toHaveClass('max-md:hidden')
+      expect(hiddenOnPhone()).not.toBeNull()
     })
 
     it('keeps the title for screen readers while the field covers it', () => {
