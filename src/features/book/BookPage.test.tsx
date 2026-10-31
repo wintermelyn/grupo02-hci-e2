@@ -16,6 +16,7 @@ vi.mock('../../lib/openlibrary', async (importOriginal) => ({
 
 const CARRIE_ID = 'OL81626W'
 const CARRIE = `/libro/${CARRIE_ID}` // Leyendo, en Terror
+const IT = '/libro/OL81613W' // Lo quiero, en Terror
 const NOCHE = '/libro/OL20901051W' // Lo tengo, en Próximos y Terror, con descripción
 const HOMBRE = '/libro/OL1811898W' // Lo tengo, sin carpeta
 const OUTSIDE = '/libro/OL698173W' // En el catálogo, fuera de la biblioteca
@@ -451,12 +452,27 @@ describe('Quitar de Mis libros', () => {
   })
 
   it.each([
-    ['folders and dates', CARRIE, 'Pierdes 1 carpeta y las fechas'],
-    ['also a rating', CIEN_ANOS, 'Pierdes 1 carpeta, las fechas y el puntaje'],
+    ['one folder, by its name', IT, 'También sale de Terror'],
+    ['several folders, by how many', NOCHE, 'También sale de sus 2 carpetas'],
+    ['a folder and dates, in one line', CARRIE, 'También sale de Terror y pierdes las fechas'],
+    ['also a rating', CIEN_ANOS, 'También sale de Novela y pierdes las fechas y el puntaje'],
   ])('says what will be lost before choosing: %s', (_case, path, lost) => {
     renderApp(path)
     fireEvent.click(main().getByRole('button', { name: /Cambiar o quitar/ }))
-    expect(removeOption()).toHaveTextContent(lost)
+    expect(removeOption()?.textContent).toBe(`Quitar de Mis libros${lost}`)
+  })
+
+  it('says only what is lost when the book has no folder to leave', () => {
+    act(() => state().removeFromFolder([CIEN_ANOS_ID], 'novela'))
+    renderApp(CIEN_ANOS)
+    fireEvent.click(main().getByRole('button', { name: /Cambiar o quitar/ }))
+    expect(removeOption()?.textContent).toBe('Quitar de Mis librosPierdes las fechas y el puntaje')
+  })
+
+  it('has no line under Quitar when nothing goes with the book', () => {
+    renderApp(HOMBRE)
+    fireEvent.click(main().getByRole('button', { name: /Cambiar o quitar/ }))
+    expect(removeOption()?.textContent).toBe('Quitar de Mis libros')
   })
 
   it('leaves the focus on the same control, which now adds the book', () => {

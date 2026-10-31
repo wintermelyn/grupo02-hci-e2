@@ -1,8 +1,9 @@
 import { Pencil, Plus } from 'lucide-react'
 import { today } from '../lib/dates'
+import { foldersLeft } from '../lib/leaveLibrary'
 import { STATUS_LABELS, STATUS_ORDER } from '../lib/status'
 import { selectBook, selectEntry, useStore } from '../store'
-import type { Book, BookId, LibraryEntry, ReadingStatus } from '../types'
+import type { Book, BookId, Folder, LibraryEntry, ReadingStatus } from '../types'
 import { AnchoredMenu } from './AnchoredMenu'
 import { cx } from './cx'
 import { StatusTag } from './StatusTag'
@@ -23,16 +24,22 @@ const LIST = new Intl.ListFormat('es-CL', { style: 'long', type: 'conjunction' }
 /** Says both things the menu does, in step with "Agregar o quitar" on the row below. */
 const CHANGE_LABEL = 'Cambiar o quitar'
 
-/** Says what leaving costs for this book, so it is read before and not in the toast after. */
-function whatIsLost(entry: LibraryEntry): string | undefined {
+/**
+ * Says what leaving costs for this book, so it is read before and not in the toast after. The book
+ * goes out of its folders and they stay, in the same words as the D5 prompt, and only what is really
+ * gone is called a loss.
+ */
+function whatIsLost(entry: LibraryEntry, allFolders: Folder[]): string | undefined {
   const { folderIds, startedAt, finishedAt, rating } = entry
-  const folders = folderIds.length
+  const folders = foldersLeft(folderIds, allFolders)
   const lost = [
-    folders > 0 && (folders === 1 ? '1 carpeta' : `${folders} carpetas`),
     (startedAt || finishedAt) && 'las fechas',
     rating !== undefined && 'el puntaje',
   ].filter((item): item is string => Boolean(item))
-  return lost.length > 0 ? `Pierdes ${LIST.format(lost)}` : undefined
+  const data = lost.length > 0 ? LIST.format(lost) : undefined
+  if (folders && data) return `También sale de ${folders} y pierdes ${data}`
+  if (folders) return `También sale de ${folders}`
+  return data && `Pierdes ${data}`
 }
 
 /**
@@ -46,6 +53,7 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
   const finishBook = useStore((state) => state.finishBook)
   const upsertBook = useStore((state) => state.upsertBook)
   const removeFromLibrary = useStore((state) => state.removeFromLibrary)
+  const folders = useStore((state) => state.folders)
   const current = entry?.status
   const statusChanged = useChanged(current)
 
@@ -81,7 +89,7 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
           {
             id: 'remove',
             label: 'Quitar de Mis libros',
-            detail: whatIsLost(entry),
+            detail: whatIsLost(entry, folders),
             onSelect: () => removeFromLibrary([bookId]),
           },
         ]

@@ -75,8 +75,9 @@ describe('StatusControl', () => {
     renderControl(CIEN_ANOS)
     openMenu()
     const remove = removeOption()
-    expect(remove).toHaveTextContent('Pierdes 1 carpeta, las fechas y el puntaje')
-    expect(remove).toHaveAccessibleDescription('Pierdes 1 carpeta, las fechas y el puntaje')
+    const cost = 'También sale de Novela y pierdes las fechas y el puntaje'
+    expect(remove).toHaveTextContent(cost)
+    expect(remove).toHaveAccessibleDescription(cost)
     expect(screen.getByRole('separator')).toBeInTheDocument()
   })
 
