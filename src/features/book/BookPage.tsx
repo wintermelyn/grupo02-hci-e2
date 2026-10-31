@@ -23,8 +23,20 @@ function backTarget(state: unknown): { to: string; label: string } {
   return { to: from, label: isLibrary ? 'Mis libros' : 'Volver' }
 }
 
-function bookDetails({ authors, year, pages }: Book): string {
-  return [authors.join(', '), year, pages && `${pages} páginas`].filter(Boolean).join(' · ')
+function BookDetails({ authors, year, pages }: Book) {
+  // The number and its unit stay together, and in a narrow column the author gets its own line.
+  const edition = [year, pages && `${pages}\u00a0páginas`].filter(Boolean).join(' · ')
+  return (
+    <p className="mt-0.5 text-muted">
+      <span className="short:block">{authors.join(', ')}</span>
+      {edition && (
+        <>
+          <span className="short:hidden"> · </span>
+          <span className="short:block">{edition}</span>
+        </>
+      )}
+    </p>
+  )
 }
 
 function BookFolders({ entry }: { entry: LibraryEntry }) {
@@ -86,7 +98,7 @@ export function BookPage() {
 
       {/* On a short phone the cover moves next to the title, so the menu fits without scrolling. */}
       <div className="short:grid short:grid-cols-[5.5rem_minmax(0,1fr)] short:items-center short:gap-x-3.5 md:mt-2 md:grid md:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:items-start md:gap-x-10">
-        <div className="full-bleed flex justify-center bg-shell pt-1 pb-9 short:mx-0 short:bg-transparent short:p-0 short:pb-2 md:row-span-2 md:mx-0 md:rounded-card md:px-0 md:pt-6 md:pb-11">
+        <div className="full-bleed flex justify-center bg-shell pt-1 pb-9 short:mx-0 short:bg-transparent short:p-0 short:pb-4 md:row-span-2 md:mx-0 md:rounded-card md:px-0 md:pt-6 md:pb-11">
           <BookCover book={book} size="lg" status={entry?.status} />
         </div>
 
@@ -94,11 +106,11 @@ export function BookPage() {
           <h1 className="font-serif text-title font-semibold tracking-tight short:text-heading md:text-display">
             {book.title}
           </h1>
-          <p className="mt-0.5 text-muted">{bookDetails(book)}</p>
+          <BookDetails {...book} />
         </header>
 
         <div className="short:col-span-2 md:col-start-2">
-          <StatusControl bookId={book.id} book={book} className="mt-3.5 md:max-w-sm" />
+          <StatusControl bookId={book.id} book={book} className="mt-3.5 md:max-w-[34rem]" />
 
           {entry && <BookFolders entry={entry} />}
 

@@ -13,7 +13,9 @@ describe('BookPage', () => {
   it('shows the title and the data of the book', () => {
     renderApp(NOCHE)
     expect(main().getByRole('heading', { level: 1 })).toHaveTextContent('Nuestra parte de noche')
-    expect(main().getByText('Mariana Enríquez · 2019 · 640 páginas')).toBeInTheDocument()
+    expect(main().getByRole('heading', { level: 1 }).closest('header')).toHaveTextContent(
+      'Mariana Enríquez · 2019 · 640 páginas',
+    )
   })
 
   it('shows the description when the book has one', () => {
