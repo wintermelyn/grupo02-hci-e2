@@ -17,6 +17,10 @@ import {
 } from './filters'
 import { FolderCard } from './FolderCard'
 
+// Books outside every folder get a card too, so "Todos" shows all that it counts.
+const VIEW_PARAM = 'vista'
+const NO_FOLDER = 'sin-carpeta'
+
 function TagList({ status, books }: { status: ReadingStatus; books: Book[] }) {
   const label = STATUS_LABELS[status]
   if (books.length === 0) {
@@ -49,6 +53,17 @@ export function LibraryPage() {
       .sort(compareTitles)
   }, [entries, tag, bookOf])
 
+  const unfiledBooks = useMemo(
+    () =>
+      entries
+        .filter(({ folderIds }) => folderIds.length === 0)
+        .flatMap(({ bookId }) => bookOf(bookId) ?? [])
+        .sort(compareTitles),
+    [entries, bookOf],
+  )
+  const showUnfiled =
+    tag === 'all' && searchParams.get(VIEW_PARAM) === NO_FOLDER && unfiledBooks.length > 0
+
   const board = useMemo(() => {
     // A book can be in several folders, but each card should show covers of its own.
     const shown = new Set<string>()
@@ -76,7 +91,12 @@ export function LibraryPage() {
         <TagFilter value={tag} counts={counts} onChange={chooseTag} />
       </PageHeader>
 
-      {tag === 'all' ? (
+      {showUnfiled ? (
+        <section className="mt-5">
+          <h2 className="mb-1 font-serif text-heading font-semibold">Sin carpeta</h2>
+          <BookList title="Sin carpeta" books={unfiledBooks} />
+        </section>
+      ) : tag === 'all' ? (
         <section className="mt-5">
           <h2 className="mb-3 font-serif text-heading font-semibold">Mis carpetas</h2>
           <ul className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4 lg:grid-cols-5">
@@ -85,6 +105,16 @@ export function LibraryPage() {
                 <FolderCard folder={folder} count={count} covers={covers} />
               </li>
             ))}
+            {unfiledBooks.length > 0 && (
+              <li>
+                <FolderCard
+                  folder={{ id: NO_FOLDER, name: 'Sin carpeta' }}
+                  count={unfiledBooks.length}
+                  covers={unfiledBooks.slice(0, 2)}
+                  to={`?${VIEW_PARAM}=${NO_FOLDER}`}
+                />
+              </li>
+            )}
           </ul>
         </section>
       ) : (

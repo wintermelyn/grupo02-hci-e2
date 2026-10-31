@@ -17,12 +17,12 @@ export function MorePage() {
   return (
     <section>
       <PageHeader title="Más" />
-      <ul className="mt-5 flex flex-col gap-2.5 md:max-w-lg">
+      <ul className="mt-3 md:max-w-lg">
         {LINKS.map(({ to, label, icon: Icon }) => (
-          <li key={to}>
+          <li key={to} className="border-b border-line last:border-b-0">
             <Link
               to={to}
-              className="flex min-h-14 items-center gap-3 rounded-card bg-white px-3 font-semibold shadow-card transition-[background-color,box-shadow,translate] duration-100 hover:bg-shell active:translate-y-px active:shadow-none"
+              className="-mx-2 flex min-h-14 items-center gap-3 rounded-control px-2 font-semibold transition-colors duration-100 hover:bg-shell active:bg-sand"
             >
               <Icon aria-hidden size={22} className="shrink-0 text-muted" />
               <span className="min-w-0 flex-1">{label}</span>

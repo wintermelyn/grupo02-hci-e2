@@ -45,6 +45,20 @@ export function matchesQuery({ title, authors }: Book, query: string): boolean {
   return normalizeText([title, ...authors].join(' ')).includes(normalizeText(query))
 }
 
+/** Why a folder cannot take this name, in the person's words. */
+export function folderNameProblem(
+  folder: Folder,
+  name: string,
+  folders: Folder[],
+): string | undefined {
+  const wanted = normalizeText(name)
+  if (!wanted) return 'Escribe un nombre para la carpeta.'
+  const repeated = folders.some(
+    ({ id, name: other }) => id !== folder.id && normalizeText(other) === wanted,
+  )
+  return repeated ? 'Ya tienes una carpeta con ese nombre.' : undefined
+}
+
 export function useBookLookup() {
   const seedBooks = useStore((state) => state.seedBooks)
   const extraBooks = useStore((state) => state.extraBooks)

@@ -8,6 +8,8 @@ import { state } from '../../test/store'
 const main = () => within(screen.getByRole('main'))
 const heading = (name: string) => main().queryByRole('heading', { level: 2, name })
 const backLink = () => main().getByRole('link', { name: 'Amigos' })
+const removeButton = (username: string) =>
+  main().getByRole('button', { name: `Quitar a @${username} de amigos` })
 
 function sectionOf(title: string) {
   const section = heading(title)?.closest('section')
@@ -38,7 +40,7 @@ describe('PersonPage', () => {
     renderApp('/amigos/camila')
     expect(screen.getByRole('heading', { level: 1, name: 'Camila Torres' })).toBeInTheDocument()
     expect(main().getByText('@camitorres')).toBeInTheDocument()
-    expect(main().getByText('3 amigos en común')).toBeInTheDocument()
+    expect(main().getByText(/^3 amigos en común/)).toBeInTheDocument()
     expect(main().queryByText('Disponible pronto')).not.toBeInTheDocument()
   })
 
@@ -46,7 +48,7 @@ describe('PersonPage', () => {
     renderApp('/amigos/ctorres99')
     expect(screen.getByRole('heading', { level: 1, name: 'Camila Torres' })).toBeInTheDocument()
     expect(main().getByText('@ctorres_99')).toBeInTheDocument()
-    expect(main().getByText('Sin amigos en común')).toBeInTheDocument()
+    expect(main().getByText(/^Sin amigos en común/)).toBeInTheDocument()
   })
 
   it('goes back to Amigos without a search', () => {
@@ -69,56 +71,64 @@ describe('PersonPage', () => {
   })
 })
 
-describe('PersonPage books', () => {
-  it('says that the tags and stars of the rows are mine', () => {
-    renderApp('/amigos/camila')
-    expect(main().getByText(/son los tuyos/)).toBeInTheDocument()
-  })
-
-  it('does not say it when no book is in my library', () => {
-    state().removeFromLibrary(Object.keys(state().library))
-    renderApp('/amigos/camila')
-    expect(main().queryByText(/son los tuyos/)).not.toBeInTheDocument()
-  })
-})
-
 describe('PersonPage action', () => {
   it('offers a single Agregar, like the rows of Amigos', () => {
     renderApp('/amigos/camila')
     const button = main().getByRole('button', { name: 'Agregar a @camitorres' })
     expect(button).toHaveTextContent('Agregar')
-    expect(button).toHaveClass('bg-white')
+    expect(button).not.toHaveClass('bg-ink')
     expect(main().getAllByRole('button')).toHaveLength(1)
   })
 
-  it('shows the request with Cancelar, in the same weight and on the same button', () => {
+  it('gives Agregar, Cancelar and Quitar de amigos the same weight', () => {
+    vi.useFakeTimers()
+    renderApp('/amigos/camila')
+    const add = main().getByRole('button', { name: /^Agregar/ })
+    const weight = add.className
+    fireEvent.click(add)
+    expect(main().getByRole('button', { name: /^Cancelar/ }).className).toBe(weight)
+    act(() => vi.advanceTimersByTime(ACCEPT_AFTER_MS))
+    expect(removeButton('camitorres').className).toBe(weight)
+  })
+
+  it('states the request apart from Cancelar, which is not the button just tapped', () => {
+    renderApp('/amigos/camila')
+    const button = main().getByRole('button', { name: 'Agregar a @camitorres' })
+    fireEvent.click(button)
+    expect(button).not.toBeInTheDocument()
+    expect(main().getByText('Solicitud enviada')).toBeInTheDocument()
+    fireEvent.click(main().getByRole('button', { name: /^Cancelar/ }))
+    expect(main().getByRole('button', { name: 'Agregar a @camitorres' })).toBeInTheDocument()
+  })
+
+  it('keeps the focus near when the button leaves', () => {
     renderApp('/amigos/camila')
     const button = main().getByRole('button', { name: 'Agregar a @camitorres' })
     button.focus()
     fireEvent.click(button)
-    expect(main().getByText('Solicitud enviada')).toBeInTheDocument()
-    const cancel = main().getByRole('button', { name: /^Cancelar/ })
-    expect(cancel).toHaveClass('bg-white')
-    expect(cancel).toHaveFocus()
-    fireEvent.click(cancel)
-    expect(main().getByRole('button', { name: 'Agregar a @camitorres' })).toBeInTheDocument()
+    expect(document.activeElement).not.toBe(document.body)
+    expect(document.activeElement).toHaveTextContent('Solicitud enviada')
   })
 
-  it('becomes Amigos with Quitar de amigos after 4 s', () => {
+  it('states the friendship apart from the button that ends it, after 4 s', () => {
     vi.useFakeTimers()
     renderApp('/amigos/camila')
     fireEvent.click(main().getByRole('button', { name: /^Agregar/ }))
+    const cancel = main().getByRole('button', { name: /^Cancelar/ })
     act(() => vi.advanceTimersByTime(ACCEPT_AFTER_MS))
-    expect(main().getByText('Amigos', { selector: 'span' })).toBeInTheDocument()
-    expect(main().getByRole('button', { name: /^Quitar de amigos/ })).toHaveClass('bg-white')
+    expect(cancel).not.toBeInTheDocument()
     expect(main().queryByText('Solicitud enviada')).not.toBeInTheDocument()
+    expect(main().getByText('Amigos', { selector: 'span' })).toBeInTheDocument()
+    expect(removeButton('camitorres')).toBeInTheDocument()
   })
 
-  it('removes a friend with one step and offers to add them again', () => {
+  it('removes a friend in one tap, as many as adding, with Deshacer', () => {
     renderApp('/amigos/diego')
-    fireEvent.click(main().getByRole('button', { name: /^Quitar de amigos/ }))
+    fireEvent.click(removeButton('diegolee'))
     expect(main().getByRole('button', { name: 'Agregar a @diegolee' })).toBeInTheDocument()
     expect(screen.getByText('Diego Fuentes ya no está en tus amigos')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Deshacer' }))
+    expect(removeButton('diegolee')).toBeInTheDocument()
   })
 })
 
@@ -129,33 +139,34 @@ describe('PersonPage books', () => {
     expect(sectionOf('Últimos leídos').getAllByRole('listitem')).toHaveLength(2)
   })
 
-  it('counts as in common what the person reads or read and is in my library', () => {
+  it('shows each book once, marking on its row what is in common', () => {
     keepInLibrary('OL893414W', 'OL1168083W', 'OL81626W')
     renderApp('/amigos/diego')
-    expect(titlesIn('Libros en común')).toHaveLength(2)
-    expect(titlesIn('Libros en común').join()).toContain('Dune')
-    expect(titlesIn('Libros en común').join()).not.toContain('Carrie')
+    expect(main().getByText(/2 libros en común/)).toBeInTheDocument()
+    expect(main().getAllByText('En común')).toHaveLength(2)
+    expect(titlesIn('Está leyendo').join()).toContain('En común')
+    expect(heading('Libros en común')).not.toBeInTheDocument()
+    expect(main().queryByText(/Carrie/)).not.toBeInTheDocument()
+  })
+
+  it('does not show my tag or my stars, which could pass for theirs', () => {
+    renderApp('/amigos/diego')
+    expect(titlesIn('Está leyendo').join()).not.toMatch(/Lo quiero|Lo tengo|Leyendo|Leído/)
+    expect(main().queryByRole('img', { name: /estrellas/ })).not.toBeInTheDocument()
   })
 
   it('follows the library when a book leaves it', () => {
     keepInLibrary('OL893414W', 'OL1168083W')
     renderApp('/amigos/diego')
     act(() => keepInLibrary('OL893414W'))
-    expect(titlesIn('Libros en común')).toHaveLength(1)
-  })
-
-  it('shows them as covers that open the book and can come back here', () => {
-    keepInLibrary('OL893414W')
-    renderApp('/amigos/diego')
-    fireEvent.click(sectionOf('Libros en común').getByRole('link'))
-    expect(currentLocation()).toBe('/libro/OL893414W')
-    expect(main().getByRole('link', { name: 'Volver' })).toHaveAttribute('href', '/amigos/diego')
+    expect(main().getByText(/1 libro en común/)).toBeInTheDocument()
   })
 
   it('says so when there is nothing in common', () => {
     keepInLibrary()
     renderApp('/amigos/diego')
-    expect(main().getByText('Todavía no tienen libros en común.')).toBeInTheDocument()
+    expect(main().getByText(/Sin libros en común/)).toBeInTheDocument()
+    expect(main().queryByText('En común')).not.toBeInTheDocument()
   })
 
   it.each([
@@ -165,7 +176,6 @@ describe('PersonPage books', () => {
     withoutBooks('diego', list)
     renderApp('/amigos/diego')
     expect(heading(title)).not.toBeInTheDocument()
-    expect(heading('Libros en común')).toBeInTheDocument()
   })
 })
 

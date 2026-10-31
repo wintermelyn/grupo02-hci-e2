@@ -8,15 +8,15 @@ export interface PersonRowProps {
   user: User
   /** Undefined when there is no friendship or request yet. */
   status?: Friendship['status']
-  /** Keeps the action on its own line in every state, so accepting does not move the next row. */
-  stableHeight?: boolean
+  /** Keeps the state on a friend's row too, where a search mixes them with everyone else. */
+  showFriendState?: boolean
 }
 
-// On a phone the action has its own line, under the text, so the row keeps its shape as it changes.
-const ACTION_BELOW = 'w-full pb-2.5 pl-13 lg:w-auto lg:shrink-0 lg:pb-0 lg:pl-0'
+// A fixed slot, so the name does not move when the action turns into the state of the request.
+const ACTION_SLOT = 'w-26 shrink-0 justify-end text-right lg:w-auto'
 
 /** The link and the action are siblings: a button inside a link is not valid HTML. */
-export function PersonRow({ user, status, stableHeight = false }: PersonRowProps) {
+export function PersonRow({ user, status, showFriendState = false }: PersonRowProps) {
   // The search travels in the link, so the page of the person can go back to it.
   const { search } = useLocation()
 
@@ -25,7 +25,7 @@ export function PersonRow({ user, status, stableHeight = false }: PersonRowProps
       data-person={user.id}
       className="border-b border-line last:border-b-0 md:nth-last-2:odd:border-b-0"
     >
-      <div className="-mx-2 flex flex-wrap items-center gap-x-3 rounded-control px-2 transition-colors duration-100 has-[a:active]:bg-shell lg:flex-nowrap">
+      <div className="-mx-2 flex items-center gap-x-2 rounded-control px-2 transition-colors duration-100 has-[a:active]:bg-shell">
         <Link
           to={{ pathname: personPath(user.id), search }}
           className="flex min-w-0 flex-1 items-center gap-3 rounded-control py-2.5"
@@ -33,7 +33,6 @@ export function PersonRow({ user, status, stableHeight = false }: PersonRowProps
           <Avatar user={user} />
           <span className="min-w-0">
             <span className="block font-serif text-lg/snug font-semibold">{user.name}</span>
-            {/* Two lines in every state, so a row never changes height next to its neighbour. */}
             <span className="block text-sm text-muted">
               {/* Between homonyms, this is what tells them apart. */}
               <span className="block font-semibold text-ink">@{user.username}</span>
@@ -41,11 +40,9 @@ export function PersonRow({ user, status, stableHeight = false }: PersonRowProps
             </span>
           </span>
         </Link>
-        <PersonAction
-          user={user}
-          status={status}
-          className={status === 'friends' && !stableHeight ? 'shrink-0' : ACTION_BELOW}
-        />
+        {(status !== 'friends' || showFriendState) && (
+          <PersonAction user={user} status={status} className={ACTION_SLOT} />
+        )}
       </div>
     </li>
   )

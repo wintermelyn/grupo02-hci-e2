@@ -1,7 +1,7 @@
-import { SearchX, Users } from 'lucide-react'
+import { SearchX, UserPlus, Users } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router'
-import { EmptyState, PageHeader, SearchField } from '../../components'
+import { Button, EmptyState, PageHeader, SearchField } from '../../components'
 import { useStore } from '../../store'
 import type { Friendship, User } from '../../types'
 import { matchesPerson, searchTerm } from './people'
@@ -20,14 +20,19 @@ function compareNames(a: User, b: User): number {
 interface PeopleListProps {
   people: User[]
   statusOf: StatusOf
-  stableHeight?: boolean
+  showFriendState?: boolean
 }
 
-function PeopleList({ people, statusOf, stableHeight }: PeopleListProps) {
+function PeopleList({ people, statusOf, showFriendState }: PeopleListProps) {
   return (
     <RowList>
       {people.map((user) => (
-        <PersonRow key={user.id} user={user} status={statusOf(user)} stableHeight={stableHeight} />
+        <PersonRow
+          key={user.id}
+          user={user}
+          status={statusOf(user)}
+          showFriendState={showFriendState}
+        />
       ))}
     </RowList>
   )
@@ -54,7 +59,7 @@ function SearchResults({
   return (
     <section className="mt-2">
       <h2 className="sr-only">Resultados</h2>
-      <PeopleList people={people} statusOf={statusOf} stableHeight />
+      <PeopleList people={people} statusOf={statusOf} showFriendState />
     </section>
   )
 }
@@ -119,14 +124,30 @@ export function FriendsPage() {
 
   return (
     <section>
-      <PageHeader title="Amigos" backTo="/mas" backLabel="Más" />
-      <SearchField
-        label="Buscar personas"
-        placeholder="Nombre o @usuario"
-        value={query}
-        onChange={search}
-        className="mt-5 md:max-w-lg"
-      />
+      <PageHeader
+        title="Amigos"
+        backTo="/mas"
+        backLabel="Más"
+        action={
+          <Button
+            variant="quiet"
+            compact
+            icon={UserPlus}
+            onClick={() => showToast('Este prototipo no envía invitaciones')}
+            className="-mr-2.5"
+          >
+            Invitar contactos
+          </Button>
+        }
+      >
+        <SearchField
+          label="Buscar personas"
+          placeholder="Nombre o @usuario"
+          value={query}
+          onChange={search}
+          className="mb-4 md:max-w-lg"
+        />
+      </PageHeader>
 
       <div {...rows}>
         {term ? (
@@ -135,14 +156,6 @@ export function FriendsPage() {
           <FriendLists users={users} statusOf={statusOf} />
         )}
       </div>
-
-      <button
-        type="button"
-        onClick={() => showToast('Este prototipo no envía invitaciones')}
-        className="mt-5 -ml-2 inline-flex min-h-11 items-center rounded-control px-2 font-medium text-muted underline underline-offset-4 hover:text-ink active:bg-shell"
-      >
-        Invitar contactos
-      </button>
     </section>
   )
 }

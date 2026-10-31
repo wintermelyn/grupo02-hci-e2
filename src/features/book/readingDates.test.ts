@@ -10,9 +10,13 @@ describe('readingDatesProblem', () => {
     expect(readingDatesProblem(today(), today())).toBeUndefined()
   })
 
-  it('asks for both dates', () => {
-    expect(readingDatesProblem('', today())).toBe('Completa las dos fechas.')
-    expect(readingDatesProblem(today(), '')).toBe('Completa las dos fechas.')
+  it('asks for a date', () => {
+    expect(readingDatesProblem('', today())).toBe('Elige una fecha.')
+    expect(readingDatesProblem(today(), '')).toBe('Elige una fecha.')
+  })
+
+  it('rejects a year still being typed', () => {
+    expect(readingDatesProblem('0202-01-01', today())).toBe('Revisa el año.')
   })
 
   it('rejects future dates', () => {

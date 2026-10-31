@@ -1,22 +1,14 @@
 import { UserX } from 'lucide-react'
 import { useMemo } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router'
-import {
-  Avatar,
-  BookCover,
-  bookPath,
-  BookRow,
-  Button,
-  EmptyState,
-  PageHeader,
-} from '../../components'
+import { useLocation, useNavigate, useParams } from 'react-router'
+import { Avatar, BookRow, Button, EmptyState, PageHeader } from '../../components'
 import { useStore } from '../../store'
 import type { Book, BookId, User } from '../../types'
-import { FRIENDS_PATH, mutualFriendsLabel } from './people'
+import { FRIENDS_PATH, mutualFriendsLabel, sharedBooksLabel } from './people'
 import { PersonAction } from './PersonAction'
 import { RowList, Section } from './Section'
 
-function BookList({ books }: { books: Book[] }) {
+function BookList({ books, sharedIds }: { books: Book[]; sharedIds: Set<BookId> }) {
   return (
     <RowList>
       {books.map((book) => (
@@ -24,33 +16,17 @@ function BookList({ books }: { books: Book[] }) {
           key={book.id}
           className="border-b border-line last:border-b-0 md:nth-last-2:odd:border-b-0"
         >
-          <BookRow book={book} />
+          <BookRow
+            book={book}
+            note={
+              sharedIds.has(book.id) ? (
+                <span className="block text-sm font-semibold">En común</span>
+              ) : null
+            }
+          />
         </li>
       ))}
     </RowList>
-  )
-}
-
-/** Small covers instead of rows: these books are often listed just above, for the same person. */
-function SharedBooks({ books }: { books: Book[] }) {
-  const { pathname, search } = useLocation()
-  return (
-    <ul className="mt-2.5 grid grid-cols-[repeat(auto-fill,5rem)] gap-x-4 gap-y-3">
-      {books.map((book) => (
-        <li key={book.id}>
-          <Link
-            to={bookPath(book.id)}
-            state={{ from: pathname + search }}
-            className="block rounded-control active:bg-shell"
-          >
-            <BookCover book={book} />
-            <span className="mt-1.5 line-clamp-2 block font-serif text-sm font-semibold">
-              {book.title}
-            </span>
-          </Link>
-        </li>
-      ))}
-    </ul>
   )
 }
 
@@ -72,10 +48,11 @@ function PersonDetails({ user, backTo }: { user: User; backTo: string }) {
 
   const reading = useMemo(() => booksOf(user.readingIds), [booksOf, user.readingIds])
   const read = useMemo(() => booksOf(user.readIds), [booksOf, user.readIds])
-  const shared = useMemo(() => {
-    const ids = new Set([...user.readingIds, ...user.readIds])
-    return booksOf([...ids].filter((id) => Object.hasOwn(library, id)))
-  }, [booksOf, library, user.readingIds, user.readIds])
+  // Each book once: what they have in common is marked on their own lists, not listed again.
+  const sharedIds = useMemo(
+    () => new Set([...user.readingIds, ...user.readIds].filter((id) => Object.hasOwn(library, id))),
+    [library, user.readingIds, user.readIds],
+  )
 
   return (
     <section>
@@ -85,37 +62,25 @@ function PersonDetails({ user, backTo }: { user: User; backTo: string }) {
         media={<Avatar user={user} size="lg" />}
         backTo={backTo}
         backLabel="Amigos"
-      />
-
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 md:justify-start md:gap-x-6">
-        <p className="text-muted">{mutualFriendsLabel(user.mutualFriends)}</p>
-        <PersonAction user={user} status={status} canRemove />
-      </div>
-
-      {/* BookRow always shows my tag and my stars, which here could pass for the person's. */}
-      {shared.length > 0 && (
-        <p className="mt-3 text-sm text-muted">
-          Los estados y las estrellas de cada libro son los tuyos.
-        </p>
-      )}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 pb-3">
+          <p className="text-sm text-muted">
+            {mutualFriendsLabel(user.mutualFriends)} · {sharedBooksLabel(sharedIds.size)}
+          </p>
+          <PersonAction user={user} status={status} canRemove />
+        </div>
+      </PageHeader>
 
       {reading.length > 0 && (
         <Section title="Está leyendo">
-          <BookList books={reading} />
+          <BookList books={reading} sharedIds={sharedIds} />
         </Section>
       )}
       {read.length > 0 && (
         <Section title="Últimos leídos">
-          <BookList books={read} />
+          <BookList books={read} sharedIds={sharedIds} />
         </Section>
       )}
-      <Section title="Libros en común">
-        {shared.length > 0 ? (
-          <SharedBooks books={shared} />
-        ) : (
-          <p className="mt-2 text-muted">Todavía no tienen libros en común.</p>
-        )}
-      </Section>
     </section>
   )
 }

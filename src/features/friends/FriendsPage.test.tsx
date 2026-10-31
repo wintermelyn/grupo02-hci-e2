@@ -41,11 +41,19 @@ describe('FriendsPage without text', () => {
     expect(searchBox()).toHaveAttribute('placeholder', 'Nombre o @usuario')
   })
 
+  it('keeps the search in view from the start, as the main way to T3', () => {
+    renderApp('/amigos')
+    expect(searchBox().closest('header')).toContainElement(
+      screen.getByRole('heading', { level: 1, name: 'Amigos' }),
+    )
+    expect(searchBox().parentElement).toHaveClass('mb-4')
+  })
+
   it('lists the friends by name, and no section for requests while there are none', () => {
     renderApp('/amigos')
     expect(heading('Solicitudes pendientes')).not.toBeInTheDocument()
     expect(usernames()).toEqual(['@diegolee', '@tomasreads', '@valelee'])
-    expect(rowOf('diegolee').getByText('Amigos')).toBeInTheDocument()
+    expect(rowOf('diegolee').queryByText('Amigos')).not.toBeInTheDocument()
     expect(rowOf('diegolee').getByText('2 amigos en común')).toBeInTheDocument()
   })
 
@@ -176,24 +184,24 @@ describe('person row', () => {
     expect(rowOf('camitorres').getByRole('link')).not.toContainElement(button)
   })
 
-  it('keeps the action on its own line once accepted, so the next row does not move', () => {
+  it('keeps the same slot from Agregar to Amigos, so the row keeps its shape', () => {
     vi.useFakeTimers()
     renderApp('/amigos?q=Camila')
     const row = rowOf('camitorres')
-    const line = row.getByRole('button', { name: /^Agregar/ }).parentElement
+    const slot = row.getByRole('button', { name: /^Agregar/ }).parentElement
     fireEvent.click(row.getByRole('button', { name: /^Agregar/ }))
     act(() => vi.advanceTimersByTime(ACCEPT_AFTER_MS))
-    expect(row.getByText('Amigos').parentElement).toBe(line)
-    expect(line).toHaveClass('w-full')
+    expect(row.getByText('Amigos').closest('[tabindex]')).toBe(slot)
+    expect(slot).toHaveClass('w-26')
   })
 
-  it('offers Agregar as secondary, since there are several rows', () => {
+  it('offers Agregar without a fill, since it is an action of a row', () => {
     renderApp('/amigos?q=camila')
     const buttons = main().getAllByRole('button', { name: /^Agregar/ })
     expect(buttons).toHaveLength(2)
     for (const button of buttons) {
       expect(button).toHaveTextContent('Agregar')
-      expect(button).toHaveClass('bg-white')
+      expect(button).not.toHaveClass('bg-ink')
       expect(button.querySelector('svg')).not.toBeNull()
     }
   })
@@ -204,11 +212,11 @@ describe('person row', () => {
     expect(main().getByRole('button', { name: 'Agregar a @ctorres_99' })).toBeInTheDocument()
   })
 
-  it('changes at once to Solicitud enviada, with Cancelar in the same weight', () => {
+  it('changes at once to Solicitud enviada, with Cancelar apart from it', () => {
     renderApp('/amigos?q=camitorres')
     fireEvent.click(addButton('camitorres'))
     expect(rowOf('camitorres').getByText('Solicitud enviada')).toBeInTheDocument()
-    expect(cancelButton('camitorres')).toHaveClass('bg-white')
+    expect(cancelButton('camitorres')).toBeInTheDocument()
     expect(rowOf('camitorres').queryByRole('button', { name: /^Agregar/ })).toBeNull()
     expect(toast('Solicitud enviada a Camila Torres (@camitorres)')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Deshacer' })).not.toBeInTheDocument()
@@ -243,12 +251,12 @@ describe('person row', () => {
 })
 
 describe('focus on the rows', () => {
-  it('stays on the button when Agregar becomes Cancelar', () => {
+  it('goes to the link when Agregar leaves, so an extra Enter does not cancel', () => {
     renderApp('/amigos?q=camitorres')
     const button = addButton('camitorres')
     button.focus()
     fireEvent.click(button)
-    expect(cancelButton('camitorres')).toHaveFocus()
+    expect(rowOf('camitorres').getByRole('link')).toHaveFocus()
   })
 
   it('goes to the link when the accepted request loses its button', () => {
@@ -290,11 +298,10 @@ describe('focus on the rows', () => {
 })
 
 describe('Invitar contactos', () => {
-  it('is a quiet link at the end that only shows a notice', () => {
+  it('is a quiet button at the end that only shows a notice', () => {
     renderApp('/amigos')
     const invite = main().getByRole('button', { name: 'Invitar contactos' })
-    expect(invite).toHaveClass('underline')
-    expect(invite).not.toHaveClass('shadow-card')
+    expect(invite).not.toHaveClass('border')
     const before = state().friendships
     fireEvent.click(invite)
     expect(toast('Este prototipo no envía invitaciones')).toBeInTheDocument()

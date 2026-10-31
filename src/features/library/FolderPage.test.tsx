@@ -7,11 +7,15 @@ const TERROR = '/biblioteca/carpeta/terror' // 10 libros: 6 Lo quiero, 2 Lo teng
 const PROXIMOS = '/biblioteca/carpeta/proximos' // Fija
 
 const main = () => within(screen.getByRole('main'))
-const dialog = () => within(screen.getByRole('dialog'))
 const toast = () => screen.getByText(/./, { selector: '[role="status"] p' })
 const tagButton = (name: RegExp) => main().getByRole('button', { name })
 const searchBox = () => main().getByRole('searchbox')
 const optionsButton = () => main().getByRole('button', { name: 'Opciones' })
+const openButton = () => main().getByRole('button', { name: 'Buscar en «Terror»' })
+const closeButton = () => main().getByRole('button', { name: 'Cerrar búsqueda' })
+const band = () => screen.getByRole('heading', { level: 1 }).closest('header') as HTMLElement
+/** Tailwind is not loaded here, so what a phone shows is read from these classes. */
+const searchLayer = () => searchBox().parentElement?.parentElement
 
 function search(value: string) {
   fireEvent.change(searchBox(), { target: { value } })
@@ -32,17 +36,25 @@ describe('FolderPage', () => {
   it('shows the name of the folder, how many books it has and the way back', () => {
     renderApp(TERROR)
     expect(screen.getByRole('heading', { level: 1, name: 'Terror' })).toBeInTheDocument()
-    expect(main().getByText('10 libros')).toBeInTheDocument()
+    expect(tagButton(/^Todos: 10 libros/)).toBeInTheDocument()
     expect(main().getByRole('link', { name: 'Mis libros' })).toHaveAttribute('href', '/biblioteca')
     expect(screen.queryByText('Disponible pronto')).not.toBeInTheDocument()
   })
 
-  it('keeps "Goodreads / prototipo" in the band, next to the action', () => {
+  it('keeps "Goodreads / prototipo" in the band, next to the options', () => {
     renderApp(TERROR)
     const band = within(screen.getByRole('heading', { level: 1 }).closest('header') as HTMLElement)
     expect(band.getByText('Goodreads')).toBeInTheDocument()
     expect(band.getByText('prototipo')).toBeInTheDocument()
     expect(band.getByRole('button', { name: 'Opciones' })).toBeInTheDocument()
+  })
+
+  it('keeps a long name to two lines on a phone, whole for screen readers', () => {
+    const longName = 'Libros para regalar a mi mamá en Navidad'
+    act(() => state().renameFolder('terror', longName))
+    renderApp(TERROR)
+    const title = screen.getByRole('heading', { level: 1, name: longName })
+    expect(within(title).getByText(longName)).toHaveClass('max-md:line-clamp-2')
   })
 
   it('starts on Todos, counting only the books of this folder', () => {
@@ -91,6 +103,90 @@ describe('FolderPage', () => {
   })
 
   describe('search', () => {
+    it('sits in the row of the title, inside the band, so opening it moves no book', () => {
+      renderApp(TERROR)
+      expect(band()).toContainElement(searchBox())
+      const tags = screen.getByRole('group', { name: 'Filtrar por estado' })
+      expect(searchBox().compareDocumentPosition(tags)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    })
+
+    it('says where it searches, because the title is covered on a phone', () => {
+      renderApp(TERROR)
+      expect(searchBox()).toHaveAttribute('placeholder', 'Buscar en Terror')
+    })
+
+    it('waits for the button on a phone and is always there on a computer', () => {
+      renderApp(TERROR)
+      expect(searchLayer()).toHaveClass('max-md:hidden', 'md:w-72')
+      expect(openButton()).toHaveClass('md:hidden')
+    })
+
+    it('opens over the row that was touched, with the focus in the field', () => {
+      renderApp(TERROR)
+      fireEvent.click(openButton())
+      expect(searchBox()).toHaveFocus()
+      expect(searchLayer()).toHaveClass('max-md:absolute', 'max-md:inset-0', 'max-md:bg-shell')
+      expect(searchLayer()).not.toHaveClass('max-md:hidden')
+      expect(main().queryByRole('button', { name: 'Buscar en «Terror»' })).not.toBeInTheDocument()
+    })
+
+    it('takes Opciones out of the way, so it cannot be reached under the field', () => {
+      renderApp(TERROR)
+      expect(optionsButton().parentElement?.parentElement).not.toHaveClass('max-md:hidden')
+      fireEvent.click(openButton())
+      expect(optionsButton().parentElement?.parentElement).toHaveClass('max-md:hidden')
+    })
+
+    it('keeps the title for screen readers while the field covers it', () => {
+      renderApp(TERROR)
+      fireEvent.click(openButton())
+      expect(screen.getByRole('heading', { level: 1, name: 'Terror' })).toBeInTheDocument()
+    })
+
+    it.each([
+      ['Cerrar', () => fireEvent.click(closeButton())],
+      ['Escape', () => fireEvent.keyDown(searchBox(), { key: 'Escape' })],
+    ])('leaves with its text with %s and gives the focus back to Buscar', (_name, leave) => {
+      renderApp(TERROR)
+      fireEvent.click(openButton())
+      search('king')
+      expect(bookTitles().length).toBeLessThan(10)
+      leave()
+      expect(openButton()).toHaveFocus()
+      expect(searchLayer()).toHaveClass('max-md:hidden')
+      expect(searchBox()).toHaveValue('')
+      expect(currentLocation()).toBe(TERROR)
+      expect(bookTitles()).toHaveLength(10)
+    })
+
+    it('opens by itself for a search that comes from the URL, without taking the focus', () => {
+      renderApp(`${TERROR}?q=king`)
+      expect(searchLayer()).toHaveClass('max-md:absolute')
+      expect(searchBox()).not.toHaveFocus()
+    })
+
+    it('closes a search that came from the URL and gives the focus back to Buscar', () => {
+      renderApp(`${TERROR}?q=king`)
+      fireEvent.click(closeButton())
+      expect(openButton()).toHaveFocus()
+      expect(currentLocation()).toBe(TERROR)
+    })
+
+    it('keeps the second tap on Cerrar from landing on Opciones', () => {
+      renderApp(`${TERROR}?q=king`)
+      fireEvent.click(closeButton())
+      fireEvent.click(optionsButton(), { detail: 2 })
+      expect(main().queryByRole('menu')).not.toBeInTheDocument()
+    })
+
+    it('stays open with the text deleted, ready for another search', () => {
+      renderApp(TERROR)
+      fireEvent.click(openButton())
+      search('king')
+      search('')
+      expect(searchLayer()).toHaveClass('max-md:absolute')
+    })
+
     it('finds by title without caring for capitals or accents', () => {
       renderApp(TERROR)
       search('GOTICO')
@@ -158,7 +254,11 @@ describe('FolderPage', () => {
       state().createFolder('Vacía')
       renderApp('/biblioteca/carpeta/vacia')
       expect(main().getByRole('heading', { name: 'Esta carpeta está vacía' })).toBeInTheDocument()
+      expect(main().queryByRole('button', { name: /^Buscar en/ })).not.toBeInTheDocument()
       expect(main().queryByRole('searchbox')).not.toBeInTheDocument()
+      expect(
+        main().getByText('Abre un libro y toca «Agregar» en la fila Carpetas.'),
+      ).toBeInTheDocument()
       expect(tagButton(/^Todos: 0/)).toBeInTheDocument()
     })
 
@@ -178,7 +278,7 @@ describe('FolderPage', () => {
     it('tells what a tag without books in this folder is for', () => {
       renderApp('/biblioteca/carpeta/novela?tag=reading')
       expect(main().getByRole('heading', { name: 'Ningún libro en «Leyendo»' })).toBeInTheDocument()
-      expect(searchBox()).toBeInTheDocument()
+      expect(main().getByRole('button', { name: /^Buscar en/ })).toBeInTheDocument()
     })
 
     it('offers a way out of a folder that does not exist', () => {
@@ -204,7 +304,7 @@ describe('FolderPage', () => {
   describe('Próximos', () => {
     it('says it is fixed, and has no action to rename or delete it', () => {
       renderApp(PROXIMOS)
-      expect(main().getByText('2 libros · fija')).toBeInTheDocument()
+      expect(main().getByText('Carpeta fija')).toBeInTheDocument()
       expect(main().queryByRole('button', { name: 'Opciones' })).not.toBeInTheDocument()
       expect(screen.getByText('prototipo')).toBeInTheDocument()
     })
@@ -225,27 +325,44 @@ describe('FolderPage', () => {
   })
 
   describe('renaming', () => {
-    const nameField = () => dialog().getByRole('textbox', { name: 'Nombre' })
-    const saveButton = () => dialog().getByRole('button', { name: 'Guardar' })
+    const nameField = () => main().getByRole('textbox', { name: 'Nombre de «Terror»' })
+    const saveButton = () => main().getByRole('button', { name: 'Guardar' })
+    const cancelButton = () => main().getByRole('button', { name: 'Cancelar' })
 
     function type(value: string) {
       fireEvent.change(nameField(), { target: { value } })
     }
 
-    it('opens with the current name, ready to change', () => {
+    it('edits the name on the title, ready to change and with no panel', () => {
       renderApp(TERROR)
       chooseOption('Renombrar carpeta')
+      expect(within(screen.getByRole('heading', { level: 1 })).getByRole('textbox')).toBe(
+        nameField(),
+      )
       expect(nameField()).toHaveValue('Terror')
       expect(nameField()).toHaveFocus()
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     })
 
-    it('saves, closes the panel and can be undone', () => {
+    it('uses the same focus outline as the rest of the app', () => {
+      renderApp(TERROR)
+      chooseOption('Renombrar carpeta')
+      expect(nameField()).not.toHaveClass('outline-none')
+      expect(nameField()).toHaveClass('rounded-control')
+    })
+
+    it('keeps the list in view while the name changes', () => {
+      renderApp(TERROR)
+      chooseOption('Renombrar carpeta')
+      expect(bookTitles()).toHaveLength(10)
+    })
+
+    it('saves, goes back to the title and can be undone', () => {
       renderApp(TERROR)
       chooseOption('Renombrar carpeta')
       type('  Miedo ')
       fireEvent.click(saveButton())
       expect(screen.getByRole('heading', { level: 1, name: 'Miedo' })).toBeInTheDocument()
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
       expect(toast()).toHaveTextContent('Carpeta renombrada a «Miedo»')
       fireEvent.click(screen.getByRole('button', { name: 'Deshacer' }))
       expect(screen.getByRole('heading', { level: 1, name: 'Terror' })).toBeInTheDocument()
@@ -269,8 +386,8 @@ describe('FolderPage', () => {
       chooseOption('Renombrar carpeta')
       type(value)
       expect(saveButton()).toBeDisabled()
-      expect(dialog().getByText(reason)).toBeInTheDocument()
-      fireEvent.submit(nameField().closest('form') as HTMLFormElement)
+      expect(main().getByText(reason)).toBeInTheDocument()
+      fireEvent.keyDown(nameField(), { key: 'Enter' })
       expect(renameFolder).not.toHaveBeenCalled()
     })
 
@@ -278,7 +395,7 @@ describe('FolderPage', () => {
       renderApp(TERROR)
       chooseOption('Renombrar carpeta')
       type('Miedo')
-      fireEvent.submit(nameField().closest('form') as HTMLFormElement)
+      fireEvent.keyDown(nameField(), { key: 'Enter' })
       expect(state().folders.find(({ id }) => id === 'terror')?.name).toBe('Miedo')
     })
 
@@ -289,20 +406,23 @@ describe('FolderPage', () => {
       expect(saveButton()).toBeEnabled()
     })
 
-    it('leaves the name as it was on Cancelar', () => {
+    it.each([
+      ['Cancelar', () => fireEvent.click(cancelButton())],
+      ['Escape', () => fireEvent.keyDown(nameField(), { key: 'Escape' })],
+    ])('leaves the name as it was with %s and gives the focus back', (_name, leave) => {
       renderApp(TERROR)
       chooseOption('Renombrar carpeta')
       type('Miedo')
-      fireEvent.click(dialog().getByRole('button', { name: 'Cancelar' }))
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+      leave()
       expect(screen.getByRole('heading', { level: 1, name: 'Terror' })).toBeInTheDocument()
+      expect(optionsButton()).toHaveFocus()
     })
 
-    it('starts from the current name each time it opens', () => {
+    it('starts from the current name each time', () => {
       renderApp(TERROR)
       chooseOption('Renombrar carpeta')
       type('Miedo')
-      fireEvent.click(dialog().getByRole('button', { name: 'Cancelar' }))
+      fireEvent.click(cancelButton())
       chooseOption('Renombrar carpeta')
       expect(nameField()).toHaveValue('Terror')
     })
@@ -310,22 +430,24 @@ describe('FolderPage', () => {
     it('has a single primary action', () => {
       renderApp(TERROR)
       chooseOption('Renombrar carpeta')
-      const buttons = dialog().getAllByRole('button')
-      expect(buttons.filter((button) => button.className.includes('bg-ink'))).toEqual([
+      const buttons = main().getAllByRole('button')
+      expect(buttons.filter((button) => button.classList.contains('bg-ink'))).toEqual([
         saveButton(),
       ])
     })
   })
 
   describe('deleting', () => {
-    const confirmButton = () => dialog().getByRole('button', { name: 'Eliminar carpeta' })
+    const strip = () => within(main().getByRole('region', { name: 'Eliminar «Terror»' }))
+    const confirmButton = () => strip().getByRole('button', { name: 'Eliminar carpeta' })
 
-    it('asks first, telling how many books it has and that they stay in the library', () => {
+    it('asks in the page, telling how many books it has and that they stay in the library', () => {
       renderApp(TERROR)
       chooseOption('Eliminar carpeta')
-      expect(dialog().getByRole('heading', { name: 'Eliminar «Terror»' })).toBeInTheDocument()
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+      expect(bookTitles().length).toBeGreaterThan(0)
       expect(
-        dialog().getByText('Esta carpeta tiene 10 libros. Los libros siguen en tu biblioteca.'),
+        strip().getByText('Esta carpeta tiene 10 libros. Los libros siguen en tu biblioteca.'),
       ).toBeInTheDocument()
       expect(confirmButton().className).toContain('bg-danger')
       expect(state().folders.map(({ id }) => id)).toContain('terror')
@@ -334,7 +456,7 @@ describe('FolderPage', () => {
     it('counts the books of the folder, not those of the filter', () => {
       renderApp(`${TERROR}?tag=read`)
       chooseOption('Eliminar carpeta')
-      expect(dialog().getByText(/10 libros/)).toBeInTheDocument()
+      expect(strip().getByText(/10 libros/)).toBeInTheDocument()
     })
 
     it('words it for a single book', () => {
@@ -342,7 +464,7 @@ describe('FolderPage', () => {
       renderApp('/biblioteca/carpeta/regalos')
       chooseOption('Eliminar carpeta')
       expect(
-        dialog().getByText('Esta carpeta tiene 1 libro. El libro sigue en tu biblioteca.'),
+        main().getByText('Esta carpeta tiene 1 libro. El libro sigue en tu biblioteca.'),
       ).toBeInTheDocument()
     })
 
@@ -350,10 +472,10 @@ describe('FolderPage', () => {
       state().createFolder('Vacía')
       renderApp('/biblioteca/carpeta/vacia')
       chooseOption('Eliminar carpeta')
-      expect(dialog().getByText('Esta carpeta no tiene libros.')).toBeInTheDocument()
+      expect(main().getByText('Esta carpeta no tiene libros.')).toBeInTheDocument()
     })
 
-    it('goes back to Mis libros with the panel closed and Deshacer within reach', () => {
+    it('goes back to Mis libros with Deshacer within reach', () => {
       const books = Object.keys(state().library).length
       renderApp(TERROR)
       chooseOption('Eliminar carpeta')
@@ -361,7 +483,6 @@ describe('FolderPage', () => {
 
       expect(currentLocation()).toBe('/biblioteca')
       expect(screen.getByRole('heading', { level: 1, name: 'Mis libros' })).toBeInTheDocument()
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
       expect(toast()).toHaveTextContent('Carpeta «Terror» eliminada')
       expect(Object.keys(state().library)).toHaveLength(books)
 
@@ -381,11 +502,12 @@ describe('FolderPage', () => {
       expect(added.map((node) => node.textContent).join()).not.toContain('Carpeta no encontrada')
     })
 
-    it('deletes nothing on Cancelar', () => {
+    it('deletes nothing on Cancelar, and gives the focus back to Opciones', () => {
       renderApp(TERROR)
       chooseOption('Eliminar carpeta')
-      fireEvent.click(dialog().getByRole('button', { name: 'Cancelar' }))
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+      fireEvent.click(strip().getByRole('button', { name: 'Cancelar' }))
+      expect(main().queryByRole('region')).not.toBeInTheDocument()
+      expect(optionsButton()).toHaveFocus()
       expect(currentLocation()).toBe(TERROR)
       expect(state().folders.map(({ id }) => id)).toContain('terror')
     })

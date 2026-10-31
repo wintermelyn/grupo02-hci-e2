@@ -11,6 +11,11 @@ export function mutualFriendsLabel(count: number): string {
   return count === 1 ? '1 amigo en común' : `${count} amigos en común`
 }
 
+export function sharedBooksLabel(count: number): string {
+  if (count === 0) return 'Sin libros en común'
+  return count === 1 ? '1 libro en común' : `${count} libros en común`
+}
+
 /** Ignores case, accents and extra spaces, so "munoz" finds "Muñoz". */
 function normalize(text: string): string {
   return text
