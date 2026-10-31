@@ -66,7 +66,7 @@ D1 a D6 son las decisiones 1 a 6 del informe, con la misma numeración. La colum
 | D2 | **Tags visibles:** *Lo quiero · Lo tengo · Leyendo · Leído* junto al título en cada lista. Se cambian en la ficha: el tag con un lápiz abre el selector | N4 | Listas, ficha |
 | D3 | **Botones de tag:** *Todos · Lo quiero · Lo tengo · Leyendo · Leído*. En Mis libros muestran los libros de toda la biblioteca y dentro de una carpeta solo los de esa carpeta. El botón activo se ve marcado | N4 | Mis libros, carpeta |
 | D4 | **Buscar usuarios en Amigos:** la barra encuentra a cualquier usuario por nombre o @usuario. Cada resultado trae avatar, amigos en común y "+ Agregar". Estado "Solicitud enviada" visible. "Conectar con más amigos" pasa a llamarse "Invitar contactos" y queda como opción secundaria | N2 | Amigos |
-| D5 | **Aviso "¿Sigues queriendo leer este libro?":** un libro antiguo de "Lo quiero" a la vez, con portada, título y botones "Sí" y "No". "No" muestra "Quitado de tu lista" con Deshacer | N1 | Mis libros |
+| D5 | **Aviso "¿Sigues queriendo leer este libro?":** un libro antiguo de "Lo quiero" a la vez, con portada, título, lo que cuesta el "No" y botones "Sí" y "No". "No" muestra "«It» salió de Mis libros y de Terror" con Deshacer | N1 | Mis libros |
 | D6 | **"Seleccionados para ti" en Descubrir:** las recomendaciones según los gustos quedan al mismo nivel que las listas prehechas | N5 | Descubrir |
 | — | **Toast con Deshacer** después de cada cambio en la biblioteca | — | Global |
 | — | Pantallas de **carga, sin resultados y error** | — | Buscar y ficha. Amigos solo tiene "sin resultados" y "sin amigos", porque su directorio está en la app |
@@ -133,9 +133,9 @@ N3 no se atiende en esta entrega. Si el equipo cambia alguna decisión, se actua
 ### Aviso periódico (D5)
 - **A qué libro pregunta:** al libro en `want` con la fecha `wantCheckedAt ?? addedAt` más antigua, si tiene más de 90 días (`WANT_PROMPT_AFTER_DAYS`). Con el seed, el primero es *It*.
 - **Cuándo aparece:** como tarjeta arriba de Mis libros, sin bloquear la pantalla, si hay un libro que cumpla y `lastWantPromptOn` no es hoy. Sigue ahí hasta que la persona responde, así que una tarea no lo pierde por entrar y salir de la sección.
-- **"Sí":** deja `wantCheckedAt = today()` y muestra el toast "Sigue en tu lista", con Deshacer como todo cambio en la biblioteca.
-- **"No":** saca el libro de la biblioteca y de sus carpetas, y muestra el toast "Quitado de tu lista" con Deshacer.
-- **Después de responder:** `lastWantPromptOn = today()`, así que no aparece otro aviso ese día. Deshacer no cambia ese dato, porque `commit` solo guarda `library` y `folders`.
+- **"Sí":** deja `wantCheckedAt = today()` y muestra el toast "«It» sigue en Lo quiero", con Deshacer como todo cambio en la biblioteca.
+- **"No":** saca el libro de la biblioteca y de sus carpetas, y muestra el toast "«It» salió de Mis libros y de Terror" con Deshacer. Bajo la pregunta, el aviso ya dijo "Si dices No, sale de Mis libros y de Terror".
+- **Después de responder:** `lastWantPromptOn = today()`, así que no aparece otro aviso ese día. Deshacer también devuelve ese dato, en `undoSnapshot`, así que el aviso vuelve a preguntar por el mismo libro, igual que al deshacer "Quitar de Mis libros" en la ficha.
 
 ### Glosario (interfaz ↔ código)
 | Interfaz | Código | Nota |
@@ -237,7 +237,7 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 - **`TextField`:** un texto corto que se escribe donde se lee, con Enter para guardar, Escape para cancelar y `problem` para decir por qué no se puede guardar. Quien lo usa pone Guardar y Cancelar.
 - **`SearchField`:** campo de búsqueda que filtra mientras se escribe, con "Borrar". Con `onClose` suma "Cerrar", para un campo que el celular abre a pedido.
 - **`Avatar`:** círculo con las iniciales sobre `avatarColor`, siempre junto al nombre.
-- **`StatusControl`:** el tag de la ficha con su lápiz (D2). Al tocarlo abre un `AnchoredMenu` junto al control, con las cuatro opciones de 48 px de alto. El menú no oscurece la pantalla y deja ver el libro. Funciona con foco, flechas, Inicio, Fin, Escape y clic afuera. El informe solo pide una "vista de selección de opciones de tags". Si el libro no está en la biblioteca, muestra "Agregar a Mis libros" y abre el mismo menú. Si está, el menú suma "Quitar de mi biblioteca" bajo una línea, con lo que se pierde, así que entrar y salir cuestan dos toques. Recibe `bookId` y `book`.
+- **`StatusControl`:** el tag de la ficha con su lápiz (D2). Al tocarlo abre un `AnchoredMenu` junto al control, con las cuatro opciones de 48 px de alto. El menú no oscurece la pantalla y deja ver el libro. Funciona con foco, flechas, Inicio, Fin, Escape y clic afuera. El informe solo pide una "vista de selección de opciones de tags". Si el libro no está en la biblioteca, muestra "Agregar a Mis libros" y abre el mismo menú. Si está, el menú suma "Quitar de Mis libros" bajo una línea, con lo que se pierde, así que entrar y salir cuestan dos toques. Recibe `bookId` y `book`.
 - **`StatusTag`:** el tag en solo lectura, con ícono, texto y color, sin relleno. Tamaño `sm` para las listas.
 - **`TagFilter`:** los botones de tag (D3), con la cantidad de libros de cada uno. El activo se marca con la cinta. Lo usan Mis libros y la carpeta.
 - **`Ribbon`:** la cinta, la marca de lo activo.
@@ -346,7 +346,7 @@ Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarr
 - [x] **Carpeta:** `TagFilter`, lista de `BookRow`, buscador interno, renombrar y eliminar carpeta, y estado vacío. El título y la banda ya están.
 - [x] **Ficha**, sobre lo que dejó "Dirección visual":
   - agregar y quitar carpetas desde la fila "Carpetas", cuyos enlaces llevan a cada una;
-  - "Quitar de mi biblioteca", en el menú del tag;
+  - "Quitar de Mis libros", en el menú del tag;
   - estado de carga mientras se ejecuta `fetchWork`, antes de "Libro no encontrado".
 - [x] **Fechas y puntaje en la ficha:**
   - se muestran cuando el tag es "Leído";
@@ -419,7 +419,7 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Tag inicial de T1 | El paso 3 del journey 2.2.2 dice "Quiero leer", un nombre que no está entre los tags de la decisión 2 | T1 parte en "Leyendo". Falta corregir ese paso en el informe |
 | Selección múltiple | No aparece | Queda fuera. Los libros se agregan a carpetas y se quitan desde la ficha |
 | "Próximos" | No aparece | Se mantiene como carpeta fija porque es el destino de T2 |
-| "No" del aviso | "Lo quita de Lo quiero" y muestra "Quitado de tu lista" | El libro sale de la biblioteca y de sus carpetas. Deshacer lo devuelve |
+| "No" del aviso | "Lo quita de Lo quiero" y muestra "Quitado de tu lista" | El libro sale de Mis libros y de sus carpetas, y el aviso lo dice antes y después, con el título y sin hablar de "tu lista". Deshacer devuelve el libro y la pregunta |
 | "Cada cierto tiempo" y "mucho tiempo" | Sin valores | Un aviso respondido por día y 90 días en la lista |
 | "Mis carpetas" y "Mis libros" | La decisión 3 usa "Mis carpetas" y los journeys, "Mis libros" | "Mis libros" es la sección y "Mis carpetas", el título del tablero |
 | Libros sin carpeta | La decisión 3 habla de "todas las carpetas" | Los botones de tag en Mis libros filtran toda la biblioteca, así que también aparecen. En "Todos", una tarjeta "Sin carpeta" al final del tablero los reúne |
@@ -434,7 +434,7 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Orden de la lista por tag | No aparece | Por título, para encontrar un libro conocido en una lista larga |
 | Salir de "Leído" | No aparece | No se distingue un error de una relectura, así que nada se borra: inicio y puntaje quedan, y volver a "Leyendo" solo quita el fin. Una relectura corrige el inicio en la ficha, en su fila |
 | Sección marcada en la ficha | No aparece | Ninguna, porque la ficha se abre desde cualquier sección |
-| Nombre del selector | Habla de "un lápiz" | "Cambiar" junto al lápiz, porque todo ícono lleva texto. El selector se titula "Estado de «título»" |
+| Nombre del selector | Habla de "un lápiz" | "Cambiar o quitar" junto al lápiz, porque todo ícono lleva texto y el menú también saca el libro. Bajo 360 px va sin lápiz, para caber en una línea. El selector se titula "Estado de «título»" |
 | Libros sin descripción | No aparece | La ficha mantiene la misma forma en todos los anchos. "Sobre este libro" va siempre en el mismo lugar y, sin descripción, dice "Aún no tenemos descripción de este libro.". Hoy son 2 de 54 libros del catálogo. Un libro encontrado en vivo trae la suya al abrir la ficha, y mientras la busca dice "Buscando la descripción…" en ese mismo lugar |
 | Descripción traducida | No aparece | Bajo la descripción, "Traducción hecha con IA" como dato de procedencia, sin cinta ni color de acento, si el libro trae `descriptionTranslated` |
 | Estrellas | No aparece | De tinta. El naranja de Goodreads compite con las portadas y como ícono llega a 3,03:1 |
@@ -445,7 +445,7 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Carpetas de un libro sin carpetas | No aparece | La fila dice "Sin carpetas" y el botón, "Agregar". Con carpetas dice "Agregar o quitar", sin ícono, porque el más diría solo la mitad |
 | Libros en común | Persona debe mostrarlos | Cada libro aparece una vez, en "Está leyendo" o "Últimos leídos", marcado "En común", y la cantidad va en el encabezado. Esas filas no muestran mi tag ni mis estrellas |
 | Buscador de la carpeta | "Buscador interno" | En la fila del título, dentro de la banda. Desde 768 px está siempre visible. En celular, "Buscar" lo abre sobre esa misma fila y "Cerrar" lo vacía y lo cierra, así aparece donde se tocó y ningún libro se mueve. En Amigos sigue siempre visible, porque es el camino de T3 |
-| Quitar de mi biblioteca | No aparece | Dos toques en el menú del tag, que dice qué se pierde, con Deshacer y sin confirmación (reglas 10 y 11) |
+| Quitar de Mis libros | No aparece | Dos toques en el menú del tag, que dice qué se pierde, con Deshacer y sin confirmación (reglas 10 y 11) |
 | Aspecto de los botones | No aparece | Bloques de relleno, como describe `DESIGN.md`. Se revisan otra vez en la auditoría con todas las vistas |
 | Texto en agregar y quitar | Solo menciona "+" y un lápiz | Todo botón lleva texto (regla 1). Sin carpetas, el botón de la ficha dice "Agregar" |
 | Forma y color del avatar | No aparece | Círculo, para separarlo de una portada de un vistazo. Cinco fondos de la portada de reemplazo, sin el burdeo. Entre homónimos distingue el @usuario |

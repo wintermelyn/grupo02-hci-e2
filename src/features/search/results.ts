@@ -38,7 +38,7 @@ function amountLabel(total: number, more: boolean): string {
 
 function resultsSummary(total: number, inLibrary: number, more: boolean): string {
   const amount = amountLabel(total, more)
-  return inLibrary > 0 ? `${amount} · ${inLibrary} en tu biblioteca` : amount
+  return inLibrary > 0 ? `${amount} · ${inLibrary} en Mis libros` : amount
 }
 
 /**

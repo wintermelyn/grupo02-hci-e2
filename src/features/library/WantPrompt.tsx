@@ -1,7 +1,9 @@
 import { useId, useMemo, type MouseEvent } from 'react'
 import { BookCover, Button } from '../../components'
 import { ignoreSecondClick } from '../../components/ignoreSecondClick'
-import { selectBook, useStore } from '../../store'
+import { placesLeft } from '../../lib/leaveLibrary'
+import { STATUS_LABELS } from '../../lib/status'
+import { selectBook, selectEntry, useStore } from '../../store'
 import { findWantPrompt } from './findWantPrompt'
 
 export interface WantPromptProps {
@@ -17,6 +19,7 @@ export interface WantPromptProps {
 export function WantPrompt({ onAnswered }: WantPromptProps) {
   const library = useStore((state) => state.library)
   const lastWantPromptOn = useStore((state) => state.lastWantPromptOn)
+  const folders = useStore((state) => state.folders)
   const answerWantPrompt = useStore((state) => state.answerWantPrompt)
   const focusToast = useStore((state) => state.focusToast)
   const prompt = useMemo(
@@ -24,9 +27,11 @@ export function WantPrompt({ onAnswered }: WantPromptProps) {
     [library, lastWantPromptOn],
   )
   const book = useStore(selectBook(prompt?.bookId ?? ''))
+  const entry = useStore(selectEntry(prompt?.bookId ?? ''))
   const questionId = useId()
+  const costId = useId()
 
-  if (!prompt || !book) return null
+  if (!prompt || !book || !entry) return null
 
   function answer(keep: boolean, { detail }: MouseEvent) {
     // The list moves up as the row leaves, and the second tap would open whatever lands below it.
@@ -49,7 +54,10 @@ export function WantPrompt({ onAnswered }: WantPromptProps) {
               ¿Sigues queriendo leer este libro?
             </h2>
             <p className="line-clamp-2 text-sm wrap-break-word text-muted">
-              {book.title} · {prompt.days} días en tu lista
+              {book.title} · {prompt.days} días en {STATUS_LABELS.want}
+            </p>
+            <p id={costId} className="text-sm wrap-break-word text-muted">
+              Si dices No, sale de {placesLeft(entry.folderIds, folders)}
             </p>
           </div>
           <div
@@ -60,7 +68,7 @@ export function WantPrompt({ onAnswered }: WantPromptProps) {
             <Button compact onClick={(event) => answer(true, event)}>
               Sí
             </Button>
-            <Button compact onClick={(event) => answer(false, event)}>
+            <Button compact aria-describedby={costId} onClick={(event) => answer(false, event)}>
               No
             </Button>
           </div>

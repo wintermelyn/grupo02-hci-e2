@@ -198,8 +198,8 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
           {!hasBooks
             ? 'Esta carpeta no tiene libros.'
             : `Esta carpeta tiene ${booksLabel(counts.all)}. ${
-                counts.all === 1 ? 'El libro sigue' : 'Los libros siguen'
-              } en tu biblioteca.`}
+                counts.all === 1 ? 'Sigue' : 'Siguen'
+              } en Mis libros.`}
         </InlineConfirm>
       )}
 
@@ -216,7 +216,12 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
             {query && booksLabel(books.length)}
           </p>
           {books.length > 0 ? (
-            <BookList title={label ?? 'Libros'} books={books} />
+            <BookList
+              title={label ?? 'Libros'}
+              books={books}
+              showFolders={tag !== 'all'}
+              openFolderId={folder.id}
+            />
           ) : (
             <NoBooks
               folder={folder}

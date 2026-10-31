@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { daysAgo, today } from '../lib/dates'
 import { state, stubAction } from '../test/store'
+import { useStore } from '.'
 
 const CARRIE = 'OL81626W' // Leyendo, en Terror
 const NOCHE = 'OL20901051W' // Lo tengo, en Próximos y Terror
@@ -64,10 +65,18 @@ describe('removeFromLibrary', () => {
     state().removeFromLibrary([CARRIE, HOMBRE])
     expect(state().library).not.toHaveProperty(CARRIE)
     expect(state().library).not.toHaveProperty(HOMBRE)
-    expect(state().toast?.message).toBe('Quitado de tu biblioteca')
+    expect(state().toast?.message).toBe('2 libros salieron de Mis libros')
     expect(state().toast?.undoable).toBe(true)
     state().undo()
     expect(state().library[CARRIE]).toEqual(before)
+  })
+
+  it.each([
+    ['its folder', CARRIE, '«Carrie» salió de Mis libros y de Terror'],
+    ['that it had no folders', HOMBRE, /^«El hombre .*» salió de Mis libros$/],
+  ])('names the book and %s', (_case, bookId, message) => {
+    state().removeFromLibrary([bookId])
+    expect(state().toast?.message).toMatch(message)
   })
 
   it('changes nothing when no book is in the library', () => {
@@ -256,21 +265,41 @@ describe('answerWantPrompt', () => {
     expect(state().library[IT].wantCheckedAt).toBe(today())
     expect(state().library[IT].status).toBe('want')
     expect(state().lastWantPromptOn).toBe(today())
-    expect(state().toast?.message).toBe('Sigue en tu lista')
+    expect(state().toast?.message).toBe('«It» sigue en Lo quiero')
   })
 
   it('takes the book out of the library and its folders with No', () => {
     state().answerWantPrompt(IT, false)
     expect(state().library).not.toHaveProperty(IT)
     expect(state().lastWantPromptOn).toBe(today())
-    expect(state().toast).toMatchObject({ message: 'Quitado de tu lista', undoable: true })
+    expect(state().toast).toMatchObject({
+      message: '«It» salió de Mis libros y de Terror',
+      undoable: true,
+    })
   })
 
-  it('brings the book back with Deshacer, and the prompt stays answered', () => {
+  it.each([
+    ['Sí', true],
+    ['No', false],
+  ])('takes the answer back with Deshacer after %s, so it asks again', (_answer, keep) => {
     const before = state().library[IT]
-    state().answerWantPrompt(IT, false)
+    state().answerWantPrompt(IT, keep)
     state().undo()
     expect(state().library[IT]).toEqual(before)
+    expect(state().lastWantPromptOn).toBeUndefined()
+  })
+
+  it('brings back the day of the answer before', () => {
+    useStore.setState({ lastWantPromptOn: daysAgo(3) })
+    state().answerWantPrompt(IT, false)
+    state().undo()
+    expect(state().lastWantPromptOn).toBe(daysAgo(3))
+  })
+
+  it('leaves the answer alone when another change is the one undone', () => {
+    state().answerWantPrompt(IT, true)
+    state().setStatus(CARRIE, 'owned')
+    state().undo()
     expect(state().lastWantPromptOn).toBe(today())
   })
 

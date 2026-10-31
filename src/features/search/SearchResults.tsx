@@ -43,7 +43,7 @@ export function NoResults({ text, authors, onPickAuthor }: NoResultsProps) {
         description="Revisa cómo se escribe o prueba solo con el apellido del autor."
       />
       {authors.length > 0 && (
-        <AuthorList title="Autores de tu biblioteca" authors={authors} onPick={onPickAuthor} />
+        <AuthorList title="Autores de Mis libros" authors={authors} onPick={onPickAuthor} />
       )}
     </>
   )

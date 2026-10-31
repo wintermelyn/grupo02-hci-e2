@@ -400,6 +400,13 @@ describe('folders of a book', () => {
     expect(state().library[CARRIE_ID].folderIds).toEqual(['terror', 'proximos'])
   })
 
+  it('opens on the first folder, so a second Enter adds instead of taking one out', () => {
+    renderApp(CARRIE)
+    fireEvent.click(foldersButton())
+    expect(folderOption('Próximos')).toHaveFocus()
+    expect(folderOption('Terror')).toBeChecked()
+  })
+
   it('takes the same steps to remove one, and undo brings it back', () => {
     renderApp(CARRIE)
     fireEvent.click(foldersButton())
@@ -462,7 +469,7 @@ describe('Quitar de Mis libros', () => {
     const before = state().library[CARRIE_ID]
     renderApp(CARRIE)
     removeBook()
-    expect(toast()).toHaveTextContent('Quitado de tu biblioteca')
+    expect(toast()).toHaveTextContent('«Carrie» salió de Mis libros y de Terror')
     fireEvent.click(undoButton())
     expect(state().library[CARRIE_ID]).toEqual(before)
     expect(main().getByRole('link', { name: 'Terror' })).toBeInTheDocument()

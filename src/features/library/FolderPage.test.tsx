@@ -269,6 +269,15 @@ describe('FolderPage', () => {
       expect(main().getByText('Ningún libro de «Terror» coincide con «zzz».')).toBeInTheDocument()
     })
 
+    it('says the other folders of each book in a list of a tag, without this one', () => {
+      renderApp(`${TERROR}?tag=owned`)
+      const row = (name: RegExp) => main().getByRole('link', { name })
+      expect(row(/^Nuestra parte de noche/)).toHaveTextContent('Próximos')
+      expect(row(/^Nuestra parte de noche/)).not.toHaveTextContent('Terror')
+      expect(row(/^Nuestra parte de noche/)).not.toHaveTextContent('Lo tengo')
+      expect(row(/^Drácula/)).not.toHaveTextContent('Terror')
+    })
+
     it('says which tag held the search back', () => {
       renderApp(`${TERROR}?tag=read`)
       search('zzz')
@@ -448,7 +457,7 @@ describe('FolderPage', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
       expect(bookTitles().length).toBeGreaterThan(0)
       expect(
-        strip().getByText('Esta carpeta tiene 10 libros. Los libros siguen en tu biblioteca.'),
+        strip().getByText('Esta carpeta tiene 10 libros. Siguen en Mis libros.'),
       ).toBeInTheDocument()
       expect(confirmButton().className).toContain('bg-danger')
       expect(state().folders.map(({ id }) => id)).toContain('terror')
@@ -465,7 +474,7 @@ describe('FolderPage', () => {
       renderApp('/biblioteca/carpeta/regalos')
       chooseOption('Eliminar carpeta')
       expect(
-        main().getByText('Esta carpeta tiene 1 libro. El libro sigue en tu biblioteca.'),
+        main().getByText('Esta carpeta tiene 1 libro. Sigue en Mis libros.'),
       ).toBeInTheDocument()
     })
 

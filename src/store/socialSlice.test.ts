@@ -163,7 +163,10 @@ describe('removeFriend', () => {
     state().removeFromLibrary(['OL81626W'])
     vi.advanceTimersByTime(ACCEPT_AFTER_MS)
     expect(friendshipOf('camila')?.status).toBe('friends')
-    expect(state().toast).toMatchObject({ undoable: true, message: 'Quitado de tu biblioteca' })
+    expect(state().toast).toMatchObject({
+      undoable: true,
+      message: '«Carrie» salió de Mis libros y de Terror',
+    })
   })
 
   it('leaves a pending request alone', () => {

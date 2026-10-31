@@ -89,10 +89,8 @@ beforeEach(() => {
 describe('before typing', () => {
   it('shows the authors of the library and what friends read, and no recent searches', () => {
     renderApp('/buscar')
-    expect(
-      within(section('Autores de tu biblioteca')).getByText('Stephen King'),
-    ).toBeInTheDocument()
-    expect(within(section('Autores de tu biblioteca')).getByText('4 libros')).toBeInTheDocument()
+    expect(within(section('Autores de Mis libros')).getByText('Stephen King')).toBeInTheDocument()
+    expect(within(section('Autores de Mis libros')).getByText('4 libros')).toBeInTheDocument()
     expect(within(section('Lo que leen tus amigos')).getByText('Dune')).toBeInTheDocument()
     expect(screen.queryByText('Búsquedas recientes')).not.toBeInTheDocument()
     expect(fetchMock).not.toHaveBeenCalled()
@@ -138,7 +136,7 @@ describe('with results', () => {
     type('carrie')
     expect(screen.getByRole('link', { name: /Carrie/ })).toBeInTheDocument()
     expect(screen.getByText('Buscando más…')).toBeInTheDocument()
-    expect(await screen.findByText('2 libros · 1 en tu biblioteca')).toBeInTheDocument()
+    expect(await screen.findByText('2 libros · 1 en Mis libros')).toBeInTheDocument()
     expect(screen.queryByText('Buscando más…')).not.toBeInTheDocument()
     expect(currentLocation()).toBe('/buscar?q=carrie')
   })
@@ -178,7 +176,7 @@ describe('with results', () => {
       byOtherKing(2, 'Billie Jean King'),
       byOtherKing(3, 'Coretta Scott King'),
     )
-    await screen.findByText(/en tu biblioteca/)
+    await screen.findByText(/en Mis libros/)
     expect(within(section('Autores')).getAllByRole('button')).toHaveLength(4)
     expect(authorRowsOnAPhone()).toBe(4)
     expect(within(section('Libros')).getAllByRole('link')[0]).toBe(firstBook)
@@ -189,7 +187,7 @@ describe('with results', () => {
     renderApp('/buscar?q=king')
     await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce())
     deliver()
-    await screen.findByText(/en tu biblioteca/)
+    await screen.findByText(/en Mis libros/)
     expect(authorRowsOnAPhone()).toBe(1)
   })
 
@@ -300,7 +298,7 @@ describe('with results', () => {
   it('leaves out of the authors an amount that would only be the one of this page', async () => {
     answerPage(295526, APOCALYPSE)
     renderApp('/buscar?q=king')
-    await screen.findByText('Los 5 más relevantes · 4 en tu biblioteca')
+    await screen.findByText('Los 5 más relevantes · 4 en Mis libros')
     const authors = within(section('Autores'))
     expect(authors.getByRole('button', { name: /Stephen King/ })).toBeInTheDocument()
     expect(authors.queryByText(/\d libros?/)).not.toBeInTheDocument()
@@ -327,7 +325,7 @@ describe('with results', () => {
     fireEvent.click(screen.getByRole('button', { name: /Stephen King/ }))
     expect(screen.getByRole('heading', { name: 'Libros' })).toHaveFocus()
     expect(screen.getByText('Apocalipsis')).toBeInTheDocument()
-    expect(await screen.findByText(/en tu biblioteca/)).toBeInTheDocument()
+    expect(await screen.findByText(/en Mis libros/)).toBeInTheDocument()
   })
 
   it('takes Back from an author to the search it was found in, not out of Buscar', async () => {
@@ -396,7 +394,7 @@ describe('without results', () => {
     renderApp('/buscar?q=zzzz')
     expect(await screen.findByText('No encontramos «zzzz»')).toBeInTheDocument()
     fireEvent.click(
-      within(section('Autores de tu biblioteca')).getByRole('button', { name: /George Orwell/ }),
+      within(section('Autores de Mis libros')).getByRole('button', { name: /George Orwell/ }),
     )
     expect(currentLocation()).toBe('/buscar?q=George+Orwell')
   })

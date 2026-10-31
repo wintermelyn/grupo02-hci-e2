@@ -44,7 +44,7 @@ function NoResults({ query, tag, onShowAll }: NoResultsProps) {
       <EmptyState
         icon={SearchX}
         title="Sin resultados"
-        description={`Ningún libro de tu biblioteca coincide con «${query}». Para buscar fuera de ella, usa Buscar en el menú.`}
+        description={`Nada en Mis libros coincide con «${query}». Para buscar fuera, usa Buscar en el menú.`}
       />
     )
   }
@@ -111,7 +111,7 @@ export function LibraryPage() {
       )
     }
     if (books.length === 0) return <NoTaggedBooks status={tag} />
-    return <BookList title={STATUS_LABELS[tag]} books={books} />
+    return <BookList title={STATUS_LABELS[tag]} books={books} showFolders />
   }
 
   return (
@@ -140,7 +140,7 @@ export function LibraryPage() {
 
       {query ? (
         books.length > 0 ? (
-          <BookList title="Resultados" books={books} />
+          <BookList title="Resultados" books={books} showFolders={tag !== 'all'} />
         ) : (
           <NoResults query={query} tag={tag} onShowAll={() => chooseTag('all')} />
         )

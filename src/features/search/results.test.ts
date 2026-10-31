@@ -74,7 +74,7 @@ describe('arrangeResults', () => {
       2: entry('2'),
     })
     expect(books.map(({ id }) => id)).toEqual(['2', '3', '1'])
-    expect(summary).toBe('3 libros · 2 en tu biblioteca')
+    expect(summary).toBe('3 libros · 2 en Mis libros')
   })
 
   it('uses the singular for one book', () => {
@@ -85,7 +85,7 @@ describe('arrangeResults', () => {
     const results = [book('1'), book('2')]
     expect(arrangeResults(results, 'libro', NOTHING, true).summary).toBe('Los 2 más relevantes')
     expect(arrangeResults(results, 'libro', { 1: entry('1') }, true).summary).toBe(
-      'Los 2 más relevantes · 1 en tu biblioteca',
+      'Los 2 más relevantes · 1 en Mis libros',
     )
   })
 

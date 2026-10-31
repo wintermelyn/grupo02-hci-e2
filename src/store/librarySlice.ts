@@ -1,4 +1,5 @@
 import { today } from '../lib/dates'
+import { placesLeft } from '../lib/leaveLibrary'
 import { STATUS_LABELS } from '../lib/status'
 import type { AppState, BookId, ISODate, LibraryEntry } from '../types'
 import type { SliceCreator } from '.'
@@ -82,6 +83,17 @@ export const createLibrarySlice: SliceCreator<LibraryActions> = (set, get) => {
     return [...new Set(bookIds)].flatMap((bookId) => selectEntry(bookId)(get()) ?? [])
   }
 
+  function bookName(bookId: BookId): string {
+    const title = get().getBook(bookId)?.title
+    return title ? `«${title}»` : 'El libro'
+  }
+
+  /** Names the book and every place it left, because the row it was in may not be on screen. */
+  function leftLabel([first, ...others]: LibraryEntry[]): string {
+    if (others.length > 0) return `${others.length + 1} libros salieron de Mis libros`
+    return `${bookName(first.bookId)} salió de ${placesLeft(first.folderIds, get().folders)}`
+  }
+
   return {
     finishBook: (bookId, { startedAt, finishedAt, rating }) => {
       if (!get().getBook(bookId)) return
@@ -110,10 +122,13 @@ export const createLibrarySlice: SliceCreator<LibraryActions> = (set, get) => {
     },
 
     removeFromLibrary: (bookIds) => {
-      const removed = entriesOf(bookIds).map(({ bookId }) => bookId)
+      const removed = entriesOf(bookIds)
       if (removed.length === 0) return
-      get().commit('Quitado de tu biblioteca', ({ library }) => ({
-        library: without(library, removed),
+      get().commit(leftLabel(removed), ({ library }) => ({
+        library: without(
+          library,
+          removed.map(({ bookId }) => bookId),
+        ),
       }))
     },
 
@@ -178,17 +193,21 @@ export const createLibrarySlice: SliceCreator<LibraryActions> = (set, get) => {
     answerWantPrompt: (bookId, keep) => {
       const current = selectEntry(bookId)(get())
       if (current?.status !== 'want') return
-      // Apart from commit, so Deshacer brings the book back without asking about another one today.
-      set({ lastWantPromptOn: today() })
+      const { lastWantPromptOn } = get()
       if (keep) {
-        get().commit('Sigue en tu lista', ({ library }) => ({
+        get().commit(`${bookName(bookId)} sigue en ${STATUS_LABELS.want}`, ({ library }) => ({
           library: { ...library, [bookId]: { ...current, wantCheckedAt: today() } },
         }))
       } else {
-        get().commit('Quitado de tu lista', ({ library }) => ({
+        get().commit(leftLabel([current]), ({ library }) => ({
           library: without(library, [bookId]),
         }))
       }
+      // In the copy of commit, so Deshacer takes the answer back too and the prompt asks again.
+      set(({ undoSnapshot }) => ({
+        lastWantPromptOn: today(),
+        undoSnapshot: undoSnapshot && { ...undoSnapshot, lastWantPromptOn },
+      }))
     },
   }
 }

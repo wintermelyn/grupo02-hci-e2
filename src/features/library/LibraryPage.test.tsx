@@ -4,6 +4,8 @@ import { daysAgo, today } from '../../lib/dates'
 import { currentLocation, renderApp } from '../../test/router'
 import { state, stubAction } from '../../test/store'
 
+const FUNDACION = 'OL46125W'
+
 const main = () => within(screen.getByRole('main'))
 const tagButton = (name: RegExp) => main().getByRole('button', { name })
 const board = () => main().queryByRole('heading', { name: 'Mis carpetas' })
@@ -73,7 +75,7 @@ describe('LibraryPage', () => {
     expect(titles).toHaveLength(5)
     expect(titles[0]).toMatch(/^Drácula/)
     expect(titles.at(-1)).toMatch(/^Sapiens/)
-    for (const title of titles) expect(title).toContain('Lo tengo')
+    for (const title of titles) expect(title).not.toContain('Lo tengo')
   })
 
   it('shows the 17 books of Lo quiero, as T2 expects', () => {
@@ -112,14 +114,57 @@ describe('LibraryPage', () => {
     expect(main().getByText(/estado «Leyendo»/)).toBeInTheDocument()
   })
 
+  describe('list of a tag', () => {
+    const row = (name: RegExp) => main().getByRole('link', { name })
+
+    it('says the folders of each book, since the filter already says the tag', () => {
+      renderApp('/biblioteca?tag=want')
+      expect(row(/^Fundación/)).toHaveTextContent('Ciencia ficción')
+      expect(row(/^Fundación/)).not.toHaveTextContent('Lo quiero')
+      expect(row(/^La sombra del viento/)).toHaveTextContent('Próximos · Novela')
+    })
+
+    it('shows at once that a book reached Próximos, first of its folders', () => {
+      renderApp('/biblioteca?tag=want')
+      act(() => state().addToFolder([FUNDACION], 'proximos'))
+      expect(row(/^Fundación/)).toHaveTextContent('Próximos · Ciencia ficción')
+    })
+
+    it('keeps saying the folders while searching inside the tag', () => {
+      renderApp('/biblioteca?tag=want&q=fundaci')
+      expect(row(/^Fundación/)).toHaveTextContent('Ciencia ficción')
+      expect(row(/^Fundación/)).not.toHaveTextContent('Lo quiero')
+    })
+
+    it('keeps the tag in the results of Todos, where nothing else says it', () => {
+      renderApp('/biblioteca?q=fundaci')
+      expect(row(/^Fundación/)).toHaveTextContent('Lo quiero')
+      expect(row(/^Fundación/)).not.toHaveTextContent('Ciencia ficción')
+    })
+  })
+
   describe('prompt', () => {
     const IT = 'OL81613W'
 
     it('asks about It, with how long it has been waiting, in Todos and in Lo quiero', () => {
       renderApp('/biblioteca')
-      expect(prompt()).toHaveTextContent('It · 210 días en tu lista')
+      expect(prompt()).toHaveTextContent('It · 210 días en Lo quiero')
       fireEvent.click(tagButton(/^Lo quiero/))
-      expect(prompt()).toHaveTextContent('It · 210 días en tu lista')
+      expect(prompt()).toHaveTextContent('It · 210 días en Lo quiero')
+    })
+
+    it('says what No costs before it is pressed, also to a screen reader', () => {
+      renderApp('/biblioteca')
+      const cost = 'Si dices No, sale de Mis libros y de Terror'
+      expect(prompt()).toHaveTextContent(cost)
+      expect(main().getByRole('button', { name: 'No' })).toHaveAccessibleDescription(cost)
+    })
+
+    it('does not mention folders for a book in none', () => {
+      act(() => state().removeFromFolder([IT], 'terror'))
+      renderApp('/biblioteca')
+      expect(prompt()).toHaveTextContent('Si dices No, sale de Mis libros')
+      expect(prompt()).not.toHaveTextContent('Terror')
     })
 
     it.each(['owned', 'reading', 'read'])('stays out of the list of %s', (tag) => {
@@ -138,20 +183,20 @@ describe('LibraryPage', () => {
       renderApp('/biblioteca')
       fireEvent.click(main().getByRole('button', { name: 'Sí' }))
       expect(state().library[IT].wantCheckedAt).toBe(today())
-      expect(toast()).toHaveTextContent('Sigue en tu lista')
+      expect(toast()).toHaveTextContent('«It» sigue en Lo quiero')
       expect(prompt()).not.toBeInTheDocument()
     })
 
-    it('takes the book out with No, and Deshacer brings it back without a new prompt', () => {
+    it('takes the book out with No, and Deshacer brings back the book and the question', () => {
       renderApp('/biblioteca')
       fireEvent.click(main().getByRole('button', { name: 'No' }))
       expect(state().library).not.toHaveProperty(IT)
-      expect(toast()).toHaveTextContent('Quitado de tu lista')
+      expect(toast()).toHaveTextContent('«It» salió de Mis libros y de Terror')
       expect(main().getByRole('link', { name: /Terror/ })).toHaveTextContent('9 libros')
 
       fireEvent.click(screen.getByRole('button', { name: 'Deshacer' }))
       expect(state().library[IT].folderIds).toEqual(['terror'])
-      expect(prompt()).not.toBeInTheDocument()
+      expect(prompt()).toHaveTextContent('It · 210 días en Lo quiero')
     })
 
     it('calls the action with the book it asks about', () => {
@@ -289,7 +334,7 @@ describe('LibraryPage', () => {
       renderApp('/biblioteca')
       search('zzz')
       expect(main().getByRole('heading', { name: 'Sin resultados' })).toBeInTheDocument()
-      expect(main().getByText(/tu biblioteca coincide con «zzz»/)).toBeInTheDocument()
+      expect(main().getByText(/Nada en Mis libros coincide con «zzz»/)).toBeInTheDocument()
       expect(main().queryByRole('button', { name: 'Ver todos los libros' })).toBeNull()
     })
 
