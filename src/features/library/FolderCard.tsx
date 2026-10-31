@@ -19,7 +19,8 @@ export function FolderCard({ folder, count, covers, to }: FolderCardProps) {
   return (
     <Link
       to={to ?? folderPath(folder.id)}
-      className="relative block rounded-card border border-line bg-white p-3 transition-[border-color,translate] duration-100 hover:border-edge active:translate-y-px"
+      // h-full: a name in two lines must not leave the other card of its row shorter.
+      className="relative block h-full rounded-card border border-line bg-white p-3 transition-[border-color,translate] duration-100 hover:border-edge active:translate-y-px"
     >
       {folder.pinned && (
         <Ribbon className="absolute -top-px right-2.5 z-10 h-6.5 w-2.25 bg-ribbon" />
@@ -33,7 +34,9 @@ export function FolderCard({ folder, count, covers, to }: FolderCardProps) {
           ),
         )}
       </span>
-      <span className="mt-2.5 block font-serif text-lg font-semibold">{folder.name}</span>
+      <span className="mt-2.5 line-clamp-2 font-serif text-lg font-semibold wrap-anywhere">
+        {folder.name}
+      </span>
       <span className="block text-sm text-muted">
         {booksLabel(count)}
         {folder.pinned && ' · fija'}

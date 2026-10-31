@@ -1,57 +1,81 @@
-import { Bookmark } from 'lucide-react'
-import { useMemo } from 'react'
-import { useSearchParams } from 'react-router'
-import { EmptyState, PageHeader, TagFilter, type TagFilterValue } from '../../components'
+import { Bookmark, SearchX } from 'lucide-react'
+import { useMemo, useRef } from 'react'
+import { Button, EmptyState, PageHeader, TagFilter, type TagFilterValue } from '../../components'
 import { STATUS_LABELS } from '../../lib/status'
 import { useStore } from '../../store'
-import type { Book, ReadingStatus } from '../../types'
+import type { ReadingStatus } from '../../types'
+import { BandSearch } from './BandSearch'
 import { BookList } from './BookList'
 import {
   booksLabel,
   compareTitles,
   countByTag,
-  parseTag,
-  pinnedFirst,
+  matchesQuery,
   TAG_PARAM,
   useBookLookup,
 } from './filters'
-import { FolderCard } from './FolderCard'
+import { FolderBoard } from './FolderBoard'
+import { useListFilters } from './useListFilters'
+import { WantPrompt } from './WantPrompt'
 
-// Books outside every folder get a card too, so "Todos" shows all that it counts.
+const SEARCH_LABEL = 'Buscar en Mis libros'
 const VIEW_PARAM = 'vista'
 const NO_FOLDER = 'sin-carpeta'
 
-function TagList({ status, books }: { status: ReadingStatus; books: Book[] }) {
-  const label = STATUS_LABELS[status]
-  if (books.length === 0) {
+function NoTaggedBooks({ status }: { status: ReadingStatus }) {
+  return (
+    <EmptyState
+      icon={Bookmark}
+      title="Aún no hay libros aquí"
+      description={`Cuando un libro tenga el estado «${STATUS_LABELS[status]}», va a aparecer en esta lista.`}
+    />
+  )
+}
+
+interface NoResultsProps {
+  query: string
+  tag: TagFilterValue
+  onShowAll: () => void
+}
+
+function NoResults({ query, tag, onShowAll }: NoResultsProps) {
+  if (tag === 'all') {
     return (
       <EmptyState
-        icon={Bookmark}
-        title="Aún no hay libros aquí"
-        description={`Cuando un libro tenga el estado «${label}», va a aparecer en esta lista.`}
+        icon={SearchX}
+        title="Sin resultados"
+        description={`Ningún libro de tu biblioteca coincide con «${query}». Para buscar fuera de ella, usa Buscar en el menú.`}
       />
     )
   }
-  return <BookList title={label} books={books} />
+  return (
+    <EmptyState
+      icon={SearchX}
+      title="Sin resultados"
+      description={`Ningún libro con el estado «${STATUS_LABELS[tag]}» coincide con «${query}».`}
+      action={<Button onClick={onShowAll}>Ver todos los libros</Button>}
+    />
+  )
 }
 
 export function LibraryPage() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const tag = parseTag(searchParams.get(TAG_PARAM))
+  const { searchParams, setParams, tag, typed, query, search } = useListFilters()
   const library = useStore((state) => state.library)
-  const folders = useStore((state) => state.folders)
   const bookOf = useBookLookup()
+  const contentRef = useRef<HTMLDivElement>(null)
 
   const entries = useMemo(() => Object.values(library), [library])
   const counts = useMemo(() => countByTag(entries), [entries])
 
-  const taggedBooks = useMemo(() => {
-    if (tag === 'all') return []
-    return entries
-      .filter(({ status }) => status === tag)
-      .flatMap(({ bookId }) => bookOf(bookId) ?? [])
-      .sort(compareTitles)
-  }, [entries, tag, bookOf])
+  const books = useMemo(
+    () =>
+      entries
+        .filter(({ status }) => tag === 'all' || status === tag)
+        .flatMap(({ bookId }) => bookOf(bookId) ?? [])
+        .filter((book) => matchesQuery(book, query))
+        .sort(compareTitles),
+    [entries, tag, query, bookOf],
+  )
 
   const unfiledBooks = useMemo(
     () =>
@@ -64,61 +88,72 @@ export function LibraryPage() {
   const showUnfiled =
     tag === 'all' && searchParams.get(VIEW_PARAM) === NO_FOLDER && unfiledBooks.length > 0
 
-  const board = useMemo(() => {
-    // A book can be in several folders, but each card should show covers of its own.
-    const shown = new Set<string>()
-    return pinnedFirst(folders).map((folder) => {
-      const books = entries
-        .filter(({ folderIds }) => folderIds.includes(folder.id))
-        .flatMap(({ bookId }) => bookOf(bookId) ?? [])
-      const covers = [
-        ...books.filter(({ id }) => !shown.has(id)),
-        ...books.filter(({ id }) => shown.has(id)),
-      ].slice(0, 2)
-      for (const { id } of covers) shown.add(id)
-      return { folder, count: books.length, covers }
-    })
-  }, [folders, entries, bookOf])
-
-  // Replaces the entry, so Back leaves Mis libros instead of undoing each filter.
   function chooseTag(value: TagFilterValue) {
-    setSearchParams(value === 'all' ? {} : { [TAG_PARAM]: value }, { replace: true })
+    setParams({ [TAG_PARAM]: value === 'all' ? '' : value, [VIEW_PARAM]: '' })
   }
 
-  return (
-    <section>
-      <PageHeader title="Mis libros" subtitle={`${booksLabel(counts.all)} en tu biblioteca`}>
-        <TagFilter value={tag} counts={counts} onChange={chooseTag} />
-      </PageHeader>
-
-      {showUnfiled ? (
+  function content() {
+    if (showUnfiled) {
+      return (
         <section className="mt-5">
           <h2 className="mb-1 font-serif text-heading font-semibold">Sin carpeta</h2>
           <BookList title="Sin carpeta" books={unfiledBooks} />
         </section>
-      ) : tag === 'all' ? (
-        <section className="mt-5">
-          <h2 className="mb-3 font-serif text-heading font-semibold">Mis carpetas</h2>
-          <ul className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4 lg:grid-cols-5">
-            {board.map(({ folder, count, covers }) => (
-              <li key={folder.id}>
-                <FolderCard folder={folder} count={count} covers={covers} />
-              </li>
-            ))}
-            {unfiledBooks.length > 0 && (
-              <li>
-                <FolderCard
-                  folder={{ id: NO_FOLDER, name: 'Sin carpeta' }}
-                  count={unfiledBooks.length}
-                  covers={unfiledBooks.slice(0, 2)}
-                  to={`?${VIEW_PARAM}=${NO_FOLDER}`}
-                />
-              </li>
-            )}
-          </ul>
-        </section>
+      )
+    }
+    if (tag === 'all') {
+      return (
+        <FolderBoard
+          entries={entries}
+          unfiledBooks={unfiledBooks}
+          unfiledTo={`?${VIEW_PARAM}=${NO_FOLDER}`}
+        />
+      )
+    }
+    if (books.length === 0) return <NoTaggedBooks status={tag} />
+    return <BookList title={STATUS_LABELS[tag]} books={books} />
+  }
+
+  return (
+    <section>
+      <PageHeader
+        title="Mis libros"
+        wordmarkBeside
+        action={
+          counts.all > 0 && (
+            <BandSearch
+              label={SEARCH_LABEL}
+              placeholder={SEARCH_LABEL}
+              value={typed}
+              onChange={search}
+            />
+          )
+        }
+      >
+        <TagFilter value={tag} counts={counts} onChange={chooseTag} />
+      </PageHeader>
+
+      {/* The list changes while typing, which a screen reader would not otherwise hear. */}
+      <p role="status" className="sr-only">
+        {query && booksLabel(books.length)}
+      </p>
+
+      {query ? (
+        books.length > 0 ? (
+          <BookList title="Resultados" books={books} />
+        ) : (
+          <NoResults query={query} tag={tag} onShowAll={() => chooseTag('all')} />
+        )
       ) : (
-        <TagList status={tag} books={taggedBooks} />
+        <>
+          {(tag === 'all' || tag === 'want') && (
+            <WantPrompt onAnswered={() => contentRef.current?.focus({ preventScroll: true })} />
+          )}
+          {/* An answered prompt takes its buttons with it, so the focus continues here. */}
+          <div ref={contentRef} tabIndex={-1} className="outline-none">
+            {content()}
+          </div>
+        </>
       )}
     </section>
   )
