@@ -513,8 +513,8 @@ El diseño parte del celular. `AppShell` pone el marco y cada pantalla solo llen
 - **Listas de libros:** una columna de `BookRow` en celular y dos desde `md`, con 32 px entre columnas. Cada fila va en un `li` con `border-b border-line last:border-b-0`, como en `BookList`. Desde `md`, las dos últimas filas pierden su línea si quedan una al lado de la otra, con `md:nth-last-2:odd:border-b-0`.
 - **Ficha:** sin `PageHeader`, con `BackLink` y `Wordmark` en la primera fila. Tiene la misma forma para todo libro, con o sin descripción.
   - **Bajo 768 px:** la portada de 112 px a la izquierda y, a 16 px, el título en Heading con el autor, el año y las páginas. Debajo van el registro y "Sobre este libro", a todo el ancho.
-  - **Desde 768 px:** dos columnas, con 32 px entre ambas: la de la portada, de 280 px, y lo que se lee. La portada de 224 px queda arriba y a la izquierda de su columna.
-  - **Desde 1024 px:** las mismas dos columnas en proporción 4 a 7, con 48 px entre ambas y la de la portada de 264 px como mínimo. A 1024 px deja 392 px para el registro, donde dos carpetas y "Agregar o quitar" caben en una línea.
+  - **Desde 768 px:** dos columnas, con 32 px entre ambas: la de la portada, de 224 px como ella, y lo que se lee.
+  - **Desde 1024 px:** las mismas dos columnas, con 48 px entre ambas. A 1024 px deja 432 px para lo que se lee, donde dos carpetas y "Agregar o quitar" caben en una línea.
   - La portada sigue la lectura desde 768 px (`sticky`), para que una descripción larga no deje su columna vacía.
 - **Áreas táctiles:** 44 px como mínimo en todo control. Las secciones de la barra inferior miden 56 px de alto, y a 320 px de ancho, 62 × 56 px. `TagFilter` mide 56 px y las opciones del menú 44 px. El recorrido final no encontró ningún control bajo 44 px ni scroll horizontal, en los cuatro dispositivos.
 
@@ -584,7 +584,7 @@ Importa todo desde `src/components/`. Son del bloque base: si necesitas cambiar 
 | Mostrar a una persona                              | `Avatar`, siempre junto a su nombre; `xs` dentro de una línea de texto                                                                    |
 | Confirmar después de un cambio y permitir deshacer | El toast del store, que `AppShell` ya muestra; no montes otro                                                                             |
 | Lista vacía o sin resultados                       | `EmptyState`, con ícono, título, descripción y acción opcional                                                                            |
-| Esperar resultados                                 | `LoadingState`                                                                                                                            |
+| Esperar resultados                                 | `SearchSkeleton` en Buscar y `BookSkeleton` en la ficha                                                                                   |
 | Algo falló                                         | `ErrorState`, con `onRetry` si se puede reintentar                                                                                        |
 | Enlaces a un libro o una carpeta                   | `bookPath` y `folderPath`                                                                                                                 |
 
@@ -598,7 +598,7 @@ Todas las pantallas tienen su forma final. Esto dice qué piezas locales usa cad
 | Mis libros | `FolderBoard`, `FolderCard`, `NewFolderCard`, `WantPrompt`, `BandSearch`, `BookList`; también en Carpeta y Sin carpeta                                     |
 | Ficha      | `LedgerRow` (registro), `ReadingDetails` (fechas y puntaje), `BookFolders`, `BookSkeleton` (carga), `MissingBook` (libro que no está)                      |
 | Descubrir  | `ListPicker` (selector de listas), `BookCarousel` (carrusel y sus zonas de flecha), `BookDetail`                                                           |
-| Buscar     | `AuthorList` (tarjetas de autor), `BestBook` (mejor resultado), `FriendsShelf` (riel), `RecentSearches`, `Highlight`                                       |
+| Buscar     | `AuthorList` (tarjetas de autor), `BestBook` (mejor resultado), `FriendsShelf` (riel), `RecentSearches`, `Highlight`, `SearchSkeleton` (carga)             |
 | Amigos     | `PersonRow`, `PersonAction`, `PersonBooks` (los libros de una persona), `Section` y `RowList`                                                              |
 
 La actividad completa es `/?actividad=1`, dentro de Inicio: no tiene ruta propia, y `AppShell` deja Inicio activa y a todo el ancho ahí.
@@ -626,7 +626,7 @@ Viven en la carpeta de su pantalla. Sirven de ejemplo, y se vuelven compartidas 
 - **Carpeta fija:** solo dice "Carpeta fija" de subtítulo.
 - **Sin carpeta:** `UnfiledPage`, en `src/features/library/`. Se ve como una carpeta en el tablero, así que es la misma pantalla, con "Mis libros" para volver, `TagFilter` y `BandSearch`, y sin Opciones. De subtítulo dice "Libros que no están en ninguna carpeta". Sin libros, un `EmptyState` lo dice en el mismo lugar, en vez de sacar a la persona de la página.
 - **Buscar antes de escribir:** la marca va a la derecha del título, en su fila. Del título al campo hay 20 px (24 px desde `lg`), 28 px sobre "Búsquedas recientes" y "Autores de Mis libros", y 32 px sobre "Lo que leen tus amigos", en todos los anchos. Cada tarjeta de autor cuenta los libros del catálogo, no los de la biblioteca. Mientras baja el índice, o si no se pudo bajar, la línea de la cantidad queda vacía y conserva su alto.
-- **Buscar mientras se escribe:** sin espera ni esqueletos entre letras, porque cada letra tiene su lista en el mismo render. `LoadingState` y `ErrorState` aparecen solo si el índice todavía no llega o no se pudo bajar. Como lo que hay en pantalla ya es la respuesta completa, no se reserva lugar para lo que podría llegar.
+- **Buscar mientras se escribe:** sin espera ni esqueletos entre letras, porque cada letra tiene su lista en el mismo render. `SearchSkeleton` y `ErrorState` aparecen solo si el índice todavía no llega o no se pudo bajar. El esqueleto reserva la línea del recuento y dibuja una fila de autores y los libros; desde `lg`, la tarjeta grande con los libros al lado, que es el lugar de los dos tipos de mejor resultado. No lleva títulos escritos, porque ese lugar puede ser "Autores" o "Mejor resultado". Con el índice en la mano, lo que hay en pantalla ya es la respuesta completa, así que no se reserva lugar para lo que podría llegar.
 - **Título de una carpeta:** en celular llega a dos líneas, porque comparte la fila con dos botones y un nombre de 40 caracteres dejaría el primer libro a media pantalla. Desde `md` se muestra entero.
 - **Portada de la ficha:** la portada `lg` sola, sin bloque de color detrás ni `raised`, y con 12 px bajo ella (20 px desde `md`) para que la cinta baje a la vista cuando cambia el tag. `BookSkeleton` tiene la misma forma, con el título, el autor y el año en el alto de su texto, para que el registro no salte al cargar. El título corta una palabra larga en vez de salirse de su columna.
 - **Sobre este libro:** el bloque va siempre en el mismo lugar, con su título en `section-title`. La descripción va en Body, entera, sin cortar ni "Leer más", hasta `max-w-[60ch]`. Sin descripción dice "Aún no tenemos descripción de este libro." en Body `muted`, sin ícono ni `EmptyState`, porque es un caso normal y no un problema. Mientras baja el archivo, en ese mismo lugar y en el mismo estilo dice "Buscando la descripción…". Si la bajada falla, va una fila `shell` en Small con "No pudimos cargar la descripción." y Reintentar `quiet` y `compact`, porque el resto de la ficha sigue sirviendo.
@@ -695,7 +695,7 @@ Un círculo con las iniciales blancas en serif sobre `avatarColor`, que viene de
 
 ### InlineConfirm
 
-Pregunta dentro de la página, junto a lo que afecta, para que siga a la vista. Es un bloque `shell` con radio de bloque y 20 px de relleno: título en Book title, lo que va a pasar en Body, y un `Button` `danger` con la acción junto a Cancelar en `secondary`. Desde `md`, el texto y los botones van en una fila, con el título en una línea. Al eliminar una carpeta, desde `md` toma el lugar de `TagFilter`, que conserva su alto, con 6 px de relleno vertical: mide 66 px y lo que sobra de los 56 px cae en el espacio vacío alrededor, así que la lista no se mueve ni queda tapada. En celular no cabe, y va bajo `TagFilter`. El foco parte en Cancelar, para que un Enter de más no confirme, y Escape cancela. Quien la muestra devuelve el foco al cancelar.
+Pregunta dentro de la página, junto a lo que afecta, para que siga a la vista. Es un bloque `shell` con radio de bloque y 20 px de relleno: título en Book title, lo que va a pasar en Body, y un `Button` `danger` con la acción junto a Cancelar en `secondary`. Desde `md`, el texto y los botones van en una fila, con el título en una línea. Al eliminar una carpeta, desde `md` toma los 56 px de `TagFilter`, que conserva su alto, con 16 px de relleno a los lados y 6 px arriba y abajo. Quedan 8 px hasta el campo y hasta la lista, y la lista no se mueve. Para caber, el título de 16 px y la frase en Small van en una sola línea, y los botones usan el relleno de `compact`. La frase va entera y el título se corta, porque repite el nombre que está justo arriba. En celular no cabe, y va bajo `TagFilter`. El foco parte en Cancelar, para que un Enter de más no confirme, y Escape cancela. Quien la muestra devuelve el foco al cancelar.
 
 ### Buttons
 
@@ -835,7 +835,7 @@ Un riel que solo vive en celular y en computador es grilla usa `lg:grid lg:snap-
 
 **Portadas que viajan.** Un enlace a la ficha desde una pantalla ancha lleva `viewTransition`, con su `state={{ from }}` para volver.
 
-**Estados.** Lo vacío, lo que falla y lo que carga van en el lugar donde iría el contenido, con `EmptyState`, `ErrorState` y `LoadingState`. Una pantalla mantiene su forma con el dato presente o ausente. Un vacío al que se llega por un filtro trae una salida.
+**Estados.** Lo vacío, lo que falla y lo que carga van en el lugar donde iría el contenido, con `EmptyState`, `ErrorState` y los esqueletos de cada pantalla. Una pantalla mantiene su forma con el dato presente o ausente. Un vacío al que se llega por un filtro trae una salida.
 
 **Contraste.** Texto solo en los pares de "Contrastes medidos". Sobre un tono, solo blanco y blanco al 88 %. El tinte de Descubrir nunca queda bajo texto.
 
