@@ -5,16 +5,14 @@ import { ignoreSecondClick } from '../../components/ignoreSecondClick'
 import { useStore } from '../../store'
 import { folderNameProblem, MAX_FOLDER_NAME_LENGTH } from './filters'
 
-const FULL_WIDTH_ON_PHONE = 'max-md:col-span-2'
-
 /**
  * Takes the place of covers, name and count, so from a tablet up this card measures the same as a
  * FolderCard, also when it is alone in its row. The content goes over it, in the same grid cell.
  */
-function CardShape() {
+function CardShape({ covers }: { covers: string }) {
   return (
     <span aria-hidden className="invisible col-start-1 row-start-1 max-md:hidden">
-      <span className="grid grid-cols-2 gap-1.5">
+      <span className={covers}>
         <span className="aspect-2/3" />
       </span>
       <span className="mt-2.5 block h-7" />
@@ -25,8 +23,9 @@ function CardShape() {
 
 /**
  * The last card of the board. It goes from a block, which is pressed, to a white card with a field,
- * which is written on, so it never passes for a folder. A phone gives it the whole row: half of it
- * would show the last dozen letters of a name of up to 40.
+ * which is written on, so it never passes for a folder. At rest, a phone gives it what the row left
+ * free. To write it gets two cells on every screen: half of a phone's row would show the last dozen
+ * letters of a name of up to 40, and one cell of a tablet would not fit Crear and Cancelar.
  */
 export function NewFolderCard() {
   const folders = useStore((state) => state.folders)
@@ -75,14 +74,15 @@ export function NewFolderCard() {
 
   if (!writing) {
     return (
-      <li className={FULL_WIDTH_ON_PHONE}>
+      // An odd place starts a row, so the row is all free.
+      <li className="max-md:odd:col-span-2">
         <button
           ref={openRef}
           type="button"
           onClick={start}
           className="grid h-full w-full rounded-card border border-edge bg-sand p-3 text-left transition-[background-color,border-color,translate] duration-100 hover:bg-sand-deep active:translate-y-px active:border-ink active:bg-sand-deep"
         >
-          <CardShape />
+          <CardShape covers="grid grid-cols-2 gap-1.5" />
           <span className="col-start-1 row-start-1 self-end">
             <span className="block font-serif text-lg font-semibold">
               <Plus aria-hidden size={18} className="mr-1 inline align-[-2px]" />
@@ -98,14 +98,16 @@ export function NewFolderCard() {
   }
 
   return (
-    <li className={FULL_WIDTH_ON_PHONE}>
+    <li className="col-span-2">
       <div
         ref={formRef}
         className="grid h-full scroll-mb-20 rounded-card border border-edge bg-white p-3 md:scroll-mb-4"
       >
-        <CardShape />
+        {/* In two cells and the gap between them, this gap leaves a cover of the same height. */}
+        <CardShape covers="grid grid-cols-4 gap-4.5" />
         <div className="col-start-1 row-start-1 flex min-w-0 flex-col justify-between gap-1.5">
-          <div className="font-serif text-lg">
+          {/* Room for the name, the field and the reason, which takes two lines at 320 px. */}
+          <div className="min-h-23.5 font-serif text-lg max-[22rem]:min-h-28.5">
             {/* What was pressed stays on screen, so the empty field says what it is waiting for. */}
             <span aria-hidden className="mb-1.5 block font-sans text-sm font-semibold">
               Nueva carpeta
@@ -121,17 +123,11 @@ export function NewFolderCard() {
               maxLength={MAX_FOLDER_NAME_LENGTH}
             />
           </div>
-          <div className="flex flex-wrap gap-1">
-            <Button
-              compact
-              variant="primary"
-              disabled={Boolean(problem)}
-              onClick={save}
-              className="flex-1"
-            >
+          <div className="grid grid-cols-2 gap-1">
+            <Button compact variant="primary" disabled={Boolean(problem)} onClick={save}>
               Crear
             </Button>
-            <Button compact onClick={stop} className="flex-1">
+            <Button compact onClick={stop}>
               Cancelar
             </Button>
           </div>

@@ -1,4 +1,4 @@
-import { useId, useMemo } from 'react'
+import { useId, useMemo, type MouseEvent } from 'react'
 import { BookCover, Button } from '../../components'
 import { ignoreSecondClick } from '../../components/ignoreSecondClick'
 import { selectBook, useStore } from '../../store'
@@ -18,6 +18,7 @@ export function WantPrompt({ onAnswered }: WantPromptProps) {
   const library = useStore((state) => state.library)
   const lastWantPromptOn = useStore((state) => state.lastWantPromptOn)
   const answerWantPrompt = useStore((state) => state.answerWantPrompt)
+  const focusToast = useStore((state) => state.focusToast)
   const prompt = useMemo(
     () => findWantPrompt({ library, lastWantPromptOn }),
     [library, lastWantPromptOn],
@@ -27,11 +28,13 @@ export function WantPrompt({ onAnswered }: WantPromptProps) {
 
   if (!prompt || !book) return null
 
-  function answer(keep: boolean) {
+  function answer(keep: boolean, { detail }: MouseEvent) {
     // The list moves up as the row leaves, and the second tap would open whatever lands below it.
     ignoreSecondClick()
     answerWantPrompt(book!.id, keep)
     onAnswered()
+    // Enter and Space send a click with no clicks counted. By keyboard, Deshacer is too far away.
+    if (detail === 0) focusToast()
   }
 
   return (
@@ -54,10 +57,10 @@ export function WantPrompt({ onAnswered }: WantPromptProps) {
             aria-label={`¿Sigues queriendo leer ${book.title}?`}
             className="mt-2 grid max-w-52 grid-cols-2 gap-2 md:mt-0 md:w-52 md:shrink-0"
           >
-            <Button compact onClick={() => answer(true)}>
+            <Button compact onClick={(event) => answer(true, event)}>
               Sí
             </Button>
-            <Button compact onClick={() => answer(false)}>
+            <Button compact onClick={(event) => answer(false, event)}>
               No
             </Button>
           </div>

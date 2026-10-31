@@ -25,6 +25,7 @@ export function BandSearch({ label, placeholder, value, onChange, children }: Ba
   const fieldRef = useRef<HTMLDivElement>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const giveFocusBack = useRef(false)
+  const sentValue = useRef(value)
 
   // The field is mounted from the start, for computers, so autoFocus would not run on opening it.
   useEffect(() => {
@@ -39,11 +40,23 @@ export function BandSearch({ label, placeholder, value, onChange, children }: Ba
     buttonRef.current?.focus()
   }, [open])
 
+  // A search that changes from outside, such as the section in the navigation bar, starts over.
+  useEffect(() => {
+    if (value === sentValue.current) return
+    sentValue.current = value
+    setOpened(false)
+  }, [value])
+
+  function change(next: string) {
+    sentValue.current = next
+    onChange(next)
+  }
+
   function close() {
     // What shares the row takes the place of Cerrar, under the second tap of a double tap.
     ignoreSecondClick()
     giveFocusBack.current = true
-    onChange('')
+    change('')
     setOpened(false)
   }
 
@@ -62,7 +75,7 @@ export function BandSearch({ label, placeholder, value, onChange, children }: Ba
           label={label}
           placeholder={placeholder}
           value={value}
-          onChange={onChange}
+          onChange={change}
           onClose={close}
           className="w-full"
         />

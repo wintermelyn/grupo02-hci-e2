@@ -35,11 +35,42 @@ describe('NewFolderCard', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  it('takes the whole row on a phone in both states, so a long name can be read', () => {
+  it('takes the whole row on a phone when it starts one', () => {
     renderApp(LIBRARY)
-    expect(card().closest('li')).toHaveClass('max-md:col-span-2')
+    const item = card().closest('li') as HTMLElement
+    expect(item.matches(':nth-child(odd)')).toBe(true)
+    expect(item).toHaveClass('max-md:odd:col-span-2')
+  })
+
+  it('takes the half that seven cards leave free on a phone, so no card stands alone', () => {
+    act(() => state().createFolder('Para las vacaciones'))
+    renderApp(LIBRARY)
+    const item = card().closest('li') as HTMLElement
+    expect(within(item.parentElement as HTMLElement).getAllByRole('link')).toHaveLength(7)
+    expect(item.matches(':nth-child(odd)')).toBe(false)
+    expect(item).toHaveClass('max-md:odd:col-span-2')
+  })
+
+  it.each([
+    ['six cards', 0],
+    ['seven cards', 1],
+  ])('writes in two cells after %s, so the buttons fit in one row', (_name, extra) => {
+    if (extra) act(() => state().createFolder('Para las vacaciones'))
+    renderApp(LIBRARY)
     fireEvent.click(card())
-    expect(field().closest('li')).toHaveClass('max-md:col-span-2')
+    expect(field().closest('li')).toHaveClass('col-span-2')
+    expect(create().parentElement).toHaveClass('grid', 'grid-cols-2')
+    expect(cancel().parentElement).toBe(create().parentElement)
+  })
+
+  it('has room for the reason before it appears, so it moves nothing', () => {
+    renderApp(LIBRARY)
+    fireEvent.click(card())
+    const block = field().parentElement as HTMLElement
+    expect(block).toHaveClass('min-h-23.5')
+    write('Terror')
+    expect(field().parentElement).toBe(block)
+    expect(block).toContainElement(main().getByText('Ya tienes una carpeta con ese nombre.'))
   })
 
   it('keeps Crear and Cancelar clear of the bottom bar', () => {

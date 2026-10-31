@@ -179,10 +179,38 @@ describe('LibraryPage', () => {
       })
     })
 
-    it('leaves the focus on the content, not lost with its buttons', () => {
+    it('leaves the focus on the content after a tap, not lost with its buttons', () => {
       renderApp('/biblioteca')
-      fireEvent.click(main().getByRole('button', { name: 'Sí' }))
+      fireEvent.click(main().getByRole('button', { name: 'Sí' }), { detail: 1 })
       expect(document.activeElement).toContainElement(board())
+    })
+
+    describe('from the keyboard', () => {
+      function answerNo() {
+        renderApp('/biblioteca?tag=want')
+        const no = main().getByRole('button', { name: 'No' })
+        no.focus()
+        // The click of Enter or Space counts no clicks.
+        fireEvent.click(no, { detail: 0 })
+        return screen.getByRole('button', { name: 'Deshacer' })
+      }
+
+      it('takes the focus to Deshacer, so it can be reached in time', () => {
+        expect(answerNo()).toHaveFocus()
+      })
+
+      it('brings the book back and stays in the list with Enter on Deshacer', () => {
+        const undo = answerNo()
+        fireEvent.click(undo, { detail: 0 })
+        expect(state().library[IT].folderIds).toEqual(['terror'])
+        expect(document.activeElement).toContainElement(main().getAllByRole('link')[0])
+      })
+
+      it('goes on through the list with Tab', () => {
+        const undo = answerNo()
+        fireEvent.keyDown(undo, { key: 'Tab' })
+        expect(document.activeElement).toContainElement(main().getAllByRole('link')[0])
+      })
     })
 
     it('does not appear with every wanted book checked lately', () => {
@@ -279,6 +307,43 @@ describe('LibraryPage', () => {
       act(() => state().removeFromLibrary(Object.keys(state().library)))
       renderApp('/biblioteca')
       expect(main().queryByRole('searchbox')).not.toBeInTheDocument()
+    })
+
+    describe('when the section is touched again', () => {
+      const section = () => screen.getAllByRole('link', { name: 'Mis libros' })[0]
+
+      it('goes back to the board with an empty field', () => {
+        renderApp('/biblioteca')
+        search('king')
+        fireEvent.click(section())
+        expect(currentLocation()).toBe('/biblioteca')
+        expect(searchBox()).toHaveValue('')
+        expect(board()).toBeInTheDocument()
+      })
+
+      it('also leaves the active tag', () => {
+        renderApp('/biblioteca?tag=want&q=stephen')
+        fireEvent.click(section())
+        expect(searchBox()).toHaveValue('')
+        expect(tagButton(/^Todos/)).toHaveAttribute('aria-pressed', 'true')
+        expect(board()).toBeInTheDocument()
+      })
+
+      it('closes the field that a phone opened, which covers the title', () => {
+        renderApp('/biblioteca')
+        fireEvent.click(main().getByRole('button', { name: 'Buscar en Mis libros' }))
+        search('king')
+        fireEvent.click(section())
+        expect(main().getByRole('button', { name: 'Buscar en Mis libros' })).toBeInTheDocument()
+      })
+
+      it('keeps the field open on a phone after deleting what was written', () => {
+        renderApp('/biblioteca')
+        fireEvent.click(main().getByRole('button', { name: 'Buscar en Mis libros' }))
+        search('king')
+        search('')
+        expect(main().queryByRole('button', { name: 'Buscar en Mis libros' })).toBeNull()
+      })
     })
 
     it('leaves the list of books without a folder with its tag', () => {
