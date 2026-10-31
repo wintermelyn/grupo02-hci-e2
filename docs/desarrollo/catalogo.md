@@ -1,11 +1,11 @@
 # Catálogo de libros
 
-El catálogo tiene 1.170 libros y se prepara desde Open Library con scripts. Todo queda en el repo como archivos estáticos, así que la app nunca le pide nada a Open Library.
+El catálogo tiene 1.046 libros y se prepara desde Open Library con scripts. Todo queda en el repo como archivos estáticos, así que la app nunca le pide nada a Open Library.
 
 | Archivo | Qué trae | Cuándo se baja |
 | --- | --- | --- |
 | `src/data/books.json` | Los 54 libros que usan los seeds, con su descripción | Con el bundle |
-| `public/catalog/index.json` | Los 1.170 libros, los más leídos primero: id, título, autores, año, páginas y color de portada. 37 KB comprimido | Al entrar a Buscar o al abrir una ficha que no está a mano |
+| `public/catalog/index.json` | Los 1.046 libros, los más leídos primero: id, título, autores, año, páginas y color de portada. 33 KB comprimido | Al entrar a Buscar o al abrir una ficha que no está a mano |
 | `public/catalog/descriptions/0.json` a `15.json` | Las descripciones de los libros que no están en `books.json`, por id. De 16 a 23 KB comprimidos cada uno | Al abrir una ficha, solo el de ese libro |
 | `public/covers/{id}.jpg` | Una portada por libro | Cuando se ve |
 
@@ -42,15 +42,17 @@ node scripts/seed-catalog.mjs publish      # revisa todo y escribe public/catalo
 npm test
 ```
 
-- Lo que se decide a mano está en `scripts/catalog-lists.mjs`: los autores hispanos con su cuota, las exclusiones y su motivo, los títulos que en español son iguales al original, las portadas descartadas al revisarlas y, en `BOOK_FIXES`, las correcciones de título, autor, año y descripción.
-- Un texto que no describe su libro queda sin descripción con `noDescription` en `BOOK_FIXES`, y la ficha dice lo mismo que para un libro que no trae. Son 30 libros, además de los 92 que no trajeron un texto utilizable.
+- Lo que se decide a mano está en `scripts/catalog-lists.mjs`: los autores hispanos con su cuota, las exclusiones y su motivo, los libros sacados del catálogo, los títulos que en español son iguales al original, las portadas descartadas al revisarlas y, en `BOOK_FIXES`, las correcciones de título, autor, año y descripción.
+- Todo libro nuevo tiene descripción. Un texto que no describe su libro se marca con `noDescription` en `BOOK_FIXES`, y el libro se saca en `REMOVED_WORKS`, con su motivo. Son 30 libros, además de los 92 que no trajeron un texto utilizable. También salen ahí los 2 libros cuya portada era de audiolibro y no tienen otra que sirva.
+- `REMOVED_WORKS` se aplica al final de `select`: cada libro sacado conserva su lugar en las listas, así que no entra otro en su reemplazo sin portada ni traducción.
 - Una traducción que ya está en `scripts/translated-descriptions.json` no se reemplaza, así que una corrección hecha ahí sobrevive a otra corrida. Si dos archivos traducen el mismo libro, gana el primero.
 - `publish` se detiene si falta una traducción o si a alguna le queda inglés evidente, Markdown, un enlace o una nota de la fuente, con las reglas de `translationProblems`. El nombre de otra obra en inglés dentro de una frase no cuenta.
 - Las reglas están en `scripts/catalog-rules.mjs`, con sus tests. El título es el que más repiten las ediciones en español. Una edición con título en otro idioma trae mal la marca de idioma: no vota y su portada no se usa.
-- El año de Open Library es el de la edición más antigua que tiene registrada, y muchas veces es un relleno como 1900 o 2000. Los que se conocen están corregidos en `BOOK_FIXES`.
+- El año de Open Library es el de la edición más antigua que tiene registrada, y muchas veces es un relleno como 1900 o 2000. Los que se conocen están corregidos en `BOOK_FIXES`: los que contradicen el propio texto de la obra y, en un libro escrito en español, los anteriores a su edición en español más antigua. Un año sin ese respaldo en `.claude/catalogo/obras` se deja como está.
 - Una obra sin título español confiable o sin portada de una edición en español queda fuera, con su motivo en `.claude/catalogo/excluidos.json` y `sin-portada.json`.
 - Las descripciones que no vienen en español quedan en `pendientes-1.json` a `pendientes-6.json`. Cada objeto trae además `sourceLanguage`, que `scripts/translated-descriptions.json` necesita.
 - Una traducción sigue las reglas de arriba: es fiel al original y deja fuera las notas de una edición en otro idioma, como el traductor o el material extra.
+- Una portada con marco de audiolibro va a `REJECTED_COVERS`, para que entre la siguiente edición en español. Las de audiolibro traen una banda arriba (`AUDIOBOOK` o `Audio Libro en Español`), y sus ediciones son de Audible, Brilliance Audio o FonoLibro.
 
 ## Colores de portada
 
