@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, CircleUser, Users, type LucideIcon } from 'lucide-react'
 import { useMemo, type ReactNode } from 'react'
 import { Link } from 'react-router'
 import { Avatar, PageHeader } from '../../components'
@@ -9,6 +9,7 @@ import { compareNames, friendsLabel, requestsLabel } from '../friends/people'
 interface MoreCardProps {
   to: string
   label: string
+  icon: LucideIcon
   /** What the person finds there, in their own words. */
   hint: string
   /** Who is behind the link, with data the app already has. */
@@ -19,14 +20,15 @@ interface MoreCardProps {
  * The link names the card and reaches over all of it, so only the name is announced as the link and
  * the rest can be read on its own.
  */
-function MoreCard({ to, label, hint, children }: MoreCardProps) {
+function MoreCard({ to, label, icon: Icon, hint, children }: MoreCardProps) {
   return (
     <li className="group relative flex min-w-0 flex-col rounded-tile bg-shell px-5 pt-2 pb-5 transition-[background-color,translate] duration-150 hover:bg-sand active:translate-y-px active:bg-sand-deep">
       <Link
         to={to}
-        className="flex min-h-14 items-center justify-between gap-3 section-title outline-none after:absolute after:inset-0 after:rounded-tile focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-ink"
+        className="flex min-h-14 items-center gap-3 section-title outline-none after:absolute after:inset-0 after:rounded-tile focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-ink"
       >
-        {label}
+        <Icon aria-hidden size={22} className="shrink-0 text-muted" />
+        <span className="min-w-0 flex-1">{label}</span>
         <ArrowRight
           aria-hidden
           size={22}
@@ -99,10 +101,15 @@ export function MorePage() {
     <section>
       <PageHeader title="Más" />
       <ul className="grid gap-2.5 md:grid-cols-2 md:gap-4">
-        <MoreCard to="/amigos" label="Amigos" hint="Busca a una persona y agrégala">
+        <MoreCard to="/amigos" label="Amigos" icon={Users} hint="Busca a una persona y agrégala">
           <FriendsSummary />
         </MoreCard>
-        <MoreCard to="/perfil" label="Mi perfil" hint="Tus datos y Reiniciar demo">
+        <MoreCard
+          to="/perfil"
+          label="Mi perfil"
+          icon={CircleUser}
+          hint="Tus datos y Reiniciar demo"
+        >
           <ProfileSummary />
         </MoreCard>
       </ul>
