@@ -37,6 +37,7 @@ describe('LibraryPage', () => {
       '/biblioteca/carpeta/novela',
       '/biblioteca/carpeta/ciencia-ficcion',
       '/biblioteca/carpeta/regalos',
+      '/biblioteca?vista=sin-carpeta',
     ])
   })
 
@@ -49,8 +50,8 @@ describe('LibraryPage', () => {
   it('shows different covers on each card, even for a book in two folders', () => {
     renderApp('/biblioteca')
     const covers = [...screen.getByRole('main').querySelectorAll('img')].map((img) => img.src)
-    expect(covers).toHaveLength(10)
-    expect(new Set(covers).size).toBe(10)
+    expect(covers).toHaveLength(12)
+    expect(new Set(covers).size).toBe(12)
   })
 
   it('replaces the board with the books of the chosen tag, in title order', () => {

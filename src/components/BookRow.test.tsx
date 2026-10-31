@@ -26,6 +26,14 @@ describe('BookRow', () => {
     expect(currentLocation()).toBe(`/libro/${apiBook.id}`)
   })
 
+  it('swaps my tag and stars for a note in a list about someone else', () => {
+    const book = libraryBook('OL274505W') // Leído, 5 estrellas
+    renderWithRouter(<BookRow book={book} note={<span>En común</span>} />)
+    expect(screen.getByText('En común')).toBeInTheDocument()
+    expect(screen.queryByText('Leído')).not.toBeInTheDocument()
+    expect(screen.queryByRole('img', { name: /estrellas/ })).not.toBeInTheDocument()
+  })
+
   it('shows no tag for a book outside the library', () => {
     renderRow(apiBook)
     expect(screen.queryByText(/Lo quiero|Lo tengo|Leyendo|Leído/)).not.toBeInTheDocument()

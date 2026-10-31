@@ -3,7 +3,7 @@
     "id": "me",
     "name": "Alex Muñoz",
     "username": "alexlee",
-    "avatarColor": "#7c4a2d",
+    "avatarColor": "#5f564d",
     "mutualFriends": 0,
     "readingIds": [],
     "readIds": []
@@ -12,7 +12,7 @@
     "id": "diego",
     "name": "Diego Fuentes",
     "username": "diegolee",
-    "avatarColor": "#1d4ed8",
+    "avatarColor": "#1e1915",
     "mutualFriends": 2,
     "readingIds": ["OL893414W"],
     "readIds": ["OL1168083W", "OL46125W", "OL103123W", "OL2172356W", "OL17267881W"]
@@ -21,7 +21,7 @@
     "id": "valentina",
     "name": "Valentina Soto",
     "username": "valelee",
-    "avatarColor": "#7c3aed",
+    "avatarColor": "#6b3a63",
     "mutualFriends": 2,
     "readingIds": ["OL20901051W"],
     "readIds": ["OL17319533W", "OL81633W", "OL3171069W", "OL274505W", "OL1905255W"]
@@ -30,7 +30,7 @@
     "id": "tomas",
     "name": "Tomás Rojas",
     "username": "tomasreads",
-    "avatarColor": "#166534",
+    "avatarColor": "#5f564d",
     "mutualFriends": 2,
     "readingIds": ["OL17075811W"],
     "readIds": ["OL1811898W", "OL1892617W", "OL15829966W", "OL1966488W"]
@@ -39,7 +39,7 @@
     "id": "camila",
     "name": "Camila Torres",
     "username": "camitorres",
-    "avatarColor": "#be123c",
+    "avatarColor": "#85490f",
     "mutualFriends": 3,
     "readingIds": ["OL278437W"],
     "readIds": ["OL14860424W", "OL1731119W", "OL10263W", "OL274518W"]
@@ -48,7 +48,7 @@
     "id": "ctorres99",
     "name": "Camila Torres",
     "username": "ctorres_99",
-    "avatarColor": "#0f766e",
+    "avatarColor": "#2f4a78",
     "mutualFriends": 0,
     "readingIds": ["OL3140822W"],
     "readIds": ["OL66554W"]
@@ -57,7 +57,7 @@
     "id": "ignacio",
     "name": "Ignacio Pérez",
     "username": "nachoperez",
-    "avatarColor": "#4338ca",
+    "avatarColor": "#6b3a63",
     "mutualFriends": 1,
     "readingIds": ["OL52114W"],
     "readIds": ["OL109524W", "OL59800W"]
@@ -66,7 +66,7 @@
     "id": "fernanda",
     "name": "Fernanda Castillo",
     "username": "fercastillo",
-    "avatarColor": "#a21caf",
+    "avatarColor": "#1e1915",
     "mutualFriends": 1,
     "readingIds": ["OL698173W"],
     "readIds": ["OL266178W", "OL1268413W"]
@@ -75,7 +75,7 @@
     "id": "martina",
     "name": "Martina Vargas",
     "username": "martireads",
-    "avatarColor": "#c2410c",
+    "avatarColor": "#2f4a78",
     "mutualFriends": 0,
     "readingIds": ["OL450063W"],
     "readIds": ["OL85892W", "OL927199W"]
@@ -84,7 +84,7 @@
     "id": "benjamin",
     "name": "Benjamín Reyes",
     "username": "benjareyes",
-    "avatarColor": "#475569",
+    "avatarColor": "#85490f",
     "mutualFriends": 0,
     "readingIds": ["OL468431W"],
     "readIds": ["OL503666W", "OL498556W"]

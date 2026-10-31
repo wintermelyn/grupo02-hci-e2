@@ -6,7 +6,7 @@ export interface StarsProps {
   value?: number
   /** Turns the display into an input. undefined clears the rating, which is optional. */
   onChange?: (value: number | undefined) => void
-  /** Legend of the input. */
+  /** Legend of the input, for screen readers: on screen, the row around it names it. */
   label?: string
 }
 
@@ -37,8 +37,9 @@ export function Stars({ value, onChange, label = 'Puntaje' }: StarsProps) {
   // Native radios give arrow-key navigation and a single tab stop for free.
   return (
     <fieldset>
-      <legend className="mb-1 font-medium">{label}</legend>
-      <div className="flex flex-wrap items-center">
+      <legend className="sr-only">{label}</legend>
+      {/* Each star is centred in its 44 px target, so this lines it up with the rows around it. */}
+      <div className="-ml-2 flex flex-wrap items-center">
         {RATINGS.map((rating) => (
           <label
             key={rating}
@@ -52,20 +53,18 @@ export function Stars({ value, onChange, label = 'Puntaje' }: StarsProps) {
               onChange={() => onChange(rating)}
               className="sr-only"
             />
-            <StarIcon filled={rating <= (value ?? 0)} size={28} />
+            <StarIcon filled={rating <= (value ?? 0)} size={26} />
             <span className="sr-only">{rating === 1 ? '1 estrella' : `${rating} estrellas`}</span>
           </label>
         ))}
-        <span className="ml-2 text-muted" aria-hidden>
-          {value ? `${value} de ${MAX_RATING}` : 'Sin puntaje'}
-        </span>
         {value !== undefined && (
           <button
             type="button"
+            aria-label="Quitar puntaje"
             onClick={() => onChange(undefined)}
-            className="ml-1 min-h-11 rounded-control px-2 font-medium underline underline-offset-2 active:bg-shell"
+            className="min-h-11 rounded-control px-2 text-sm font-semibold transition-colors duration-100 hover:bg-sand active:bg-sand-deep"
           >
-            Quitar puntaje
+            Quitar
           </button>
         )}
       </div>

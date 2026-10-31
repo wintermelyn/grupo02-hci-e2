@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-31T02:54:55.391Z",
+  "generatedAt": "2026-10-31T06:32:59.000Z",
   "title": "Design System: Goodreads · Prototipo de rediseño",
   "extensions": {
     "colorMeta": {
@@ -184,6 +184,21 @@
           "#f0eeeb"
         ]
       },
+      "sand-dark": {
+        "role": "neutral",
+        "displayName": "Arena oscura",
+        "canonical": "#d3c4b1",
+        "tonalRamp": [
+          "#0f0a05",
+          "#2c2318",
+          "#4a4034",
+          "#6a5f52",
+          "#8b8073",
+          "#afa395",
+          "#d0c8be",
+          "#f0eeeb"
+        ]
+      },
       "line": {
         "role": "neutral",
         "displayName": "Línea",
@@ -197,6 +212,21 @@
           "#aba49b",
           "#cdc8c2",
           "#f0eeec"
+        ]
+      },
+      "edge": {
+        "role": "neutral",
+        "displayName": "Borde",
+        "canonical": "#857a6e",
+        "tonalRamp": [
+          "#0e0a06",
+          "#2c251e",
+          "#4d4339",
+          "#6f6458",
+          "#92877b",
+          "#b7aca0",
+          "#d5ccc3",
+          "#f1eeea"
         ]
       },
       "muted": {
@@ -222,19 +252,19 @@
       },
       "title": {
         "displayName": "Title",
-        "purpose": "Título de la ficha en celular."
+        "purpose": "H1 de cada sección en celular."
       },
       "heading": {
         "displayName": "Heading",
-        "purpose": "Títulos de sección dentro de la página."
+        "purpose": "Títulos de sección dentro de la página y título de la ficha en celular."
       },
       "subheading": {
         "displayName": "Subheading",
-        "purpose": "Títulos de panel y de estados, y cantidades de TagFilter."
+        "purpose": "Títulos de EmptyState y ErrorState."
       },
       "book-title": {
         "displayName": "Book title",
-        "purpose": "Nombre de un libro o una carpeta."
+        "purpose": "Nombre de un libro, una persona o una carpeta, \"Sobre este libro\" y título de InlineConfirm."
       },
       "body": {
         "displayName": "Body",
@@ -246,11 +276,11 @@
       },
       "small": {
         "displayName": "Small",
-        "purpose": "Subtítulo de la banda, autores y cantidades."
+        "purpose": "Subtítulo de la banda, autores, cantidades y etiquetas de LedgerRow."
       },
       "small-label": {
         "displayName": "Small label",
-        "purpose": "StatusTag en listas y títulos de bloque de la ficha."
+        "purpose": "StatusTag en listas, @usuario, estado de una persona y \"En común\"."
       },
       "caption": {
         "displayName": "Caption",
@@ -259,14 +289,9 @@
     },
     "shadows": [
       {
-        "name": "card",
-        "value": "0 1px 2px rgb(30 25 21 / 7%), 0 3px 10px -5px rgb(30 25 21 / 14%)",
-        "purpose": "Tarjetas de carpeta, Button y StatusControl."
-      },
-      {
         "name": "float",
         "value": "0 2px 4px rgb(30 25 21 / 14%), 0 18px 34px -8px rgb(30 25 21 / 40%)",
-        "purpose": "Menú de StatusControl, toast y BottomSheet."
+        "purpose": "AnchoredMenu y toast."
       },
       {
         "name": "book",
@@ -293,7 +318,7 @@
       {
         "name": "menu",
         "value": "150ms",
-        "purpose": "Aparición del menú de StatusControl, con 4 px de desplazamiento."
+        "purpose": "Aparición de AnchoredMenu, con 4 px de desplazamiento."
       },
       {
         "name": "tag-in",
@@ -319,10 +344,6 @@
       {
         "name": "lg",
         "value": "1024px"
-      },
-      {
-        "name": "short",
-        "value": "(max-height: 640px) and (width < 48rem)"
       }
     ]
   },
@@ -331,17 +352,25 @@
       "name": "Botón principal",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "Button primary: una sola acción principal por pantalla o panel.",
+      "description": "Button primary: una sola acción principal por pantalla.",
       "html": "<button class=\"ds-btn-primary\">Guardar</button>",
-      "css": ".ds-btn-primary { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: var(--radius-control, 6px); background: var(--color-ink, #1e1915); color: #fff; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; box-shadow: var(--shadow-card, 0 1px 2px rgb(30 25 21 / 7%), 0 3px 10px -5px rgb(30 25 21 / 14%)); transition: background-color 100ms, box-shadow 100ms, translate 100ms; } .ds-btn-primary:hover { background: color-mix(in srgb, var(--color-ink, #1e1915) 90%, transparent); } .ds-btn-primary:active { background: color-mix(in srgb, var(--color-ink, #1e1915) 80%, transparent); translate: 0 1px; box-shadow: none; } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+      "css": ".ds-btn-primary { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: var(--radius-control, 6px); background: var(--color-ink, #1e1915); color: #fff; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; transition: background-color 100ms, translate 100ms; } .ds-btn-primary:hover { background: color-mix(in srgb, var(--color-ink, #1e1915) 90%, transparent); } .ds-btn-primary:active { background: color-mix(in srgb, var(--color-ink, #1e1915) 80%, transparent); translate: 0 1px; } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
     },
     {
       "name": "Botón secundario",
       "kind": "button",
       "refersTo": "button-secondary",
-      "description": "Button secondary: la variante por defecto.",
+      "description": "Button secondary: la variante por defecto, arena profunda con borde; se invierte con su menú abierto.",
       "html": "<button class=\"ds-btn-secondary\">Cancelar</button>",
-      "css": ".ds-btn-secondary { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: var(--radius-control, 6px); background: var(--color-white, #ffffff); color: var(--color-ink, #1e1915); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; box-shadow: var(--shadow-card, 0 1px 2px rgb(30 25 21 / 7%), 0 3px 10px -5px rgb(30 25 21 / 14%)); transition: background-color 100ms, box-shadow 100ms, translate 100ms; } .ds-btn-secondary:hover { background: var(--color-shell, #f4f1ea); } .ds-btn-secondary:active { background: var(--color-sand, #ebe2d7); translate: 0 1px; box-shadow: none; } .ds-btn-secondary:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+      "css": ".ds-btn-secondary { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 1px solid var(--color-edge, #857a6e); border-radius: var(--radius-control, 6px); background: var(--color-sand-deep, #dfd3c4); color: var(--color-ink, #1e1915); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; transition: background-color 100ms, translate 100ms; } .ds-btn-secondary:hover { background: var(--color-sand-dark, #d3c4b1); } .ds-btn-secondary:active { border-color: var(--color-ink, #1e1915); background: var(--color-sand-dark, #d3c4b1); translate: 0 1px; } .ds-btn-secondary[aria-expanded='true'] { border-color: var(--color-ink, #1e1915); background: var(--color-ink, #1e1915); color: #fff; } .ds-btn-secondary:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+    },
+    {
+      "name": "Botón discreto",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Button quiet: la acción de una fila y lo secundario de la página, sin relleno en reposo.",
+      "html": "<button class=\"ds-btn-quiet\">Invitar contactos</button>",
+      "css": ".ds-btn-quiet { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: var(--radius-control, 6px); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; transition: background-color 100ms, translate 100ms; background: transparent; color: var(--color-ink, #1e1915); } .ds-btn-quiet:hover { background: var(--color-sand, #ebe2d7); } .ds-btn-quiet:active { background: var(--color-sand-deep, #dfd3c4); translate: 0 1px; } .ds-btn-quiet[aria-expanded='true'] { background: var(--color-sand-deep, #dfd3c4); } .ds-btn-quiet:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
     },
     {
       "name": "Botón de peligro",
@@ -349,12 +378,12 @@
       "refersTo": "button-danger",
       "description": "Button danger: lo destructivo que pide confirmación.",
       "html": "<button class=\"ds-btn-danger\">Eliminar carpeta</button>",
-      "css": ".ds-btn-danger { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: var(--radius-control, 6px); background: var(--color-danger, #a3341c); color: #fff; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; box-shadow: var(--shadow-card, 0 1px 2px rgb(30 25 21 / 7%), 0 3px 10px -5px rgb(30 25 21 / 14%)); transition: background-color 100ms, box-shadow 100ms, translate 100ms; } .ds-btn-danger:hover { background: color-mix(in srgb, var(--color-danger, #a3341c) 90%, transparent); } .ds-btn-danger:active { background: color-mix(in srgb, var(--color-danger, #a3341c) 80%, transparent); translate: 0 1px; box-shadow: none; } .ds-btn-danger:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+      "css": ".ds-btn-danger { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: var(--radius-control, 6px); background: var(--color-danger, #a3341c); color: #fff; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; transition: background-color 100ms, translate 100ms; } .ds-btn-danger:hover { background: color-mix(in srgb, var(--color-danger, #a3341c) 90%, transparent); } .ds-btn-danger:active { background: color-mix(in srgb, var(--color-danger, #a3341c) 80%, transparent); translate: 0 1px; } .ds-btn-danger:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
     },
     {
       "name": "Tags de estado",
       "kind": "chip",
-      "refersTo": "status-menu-item",
+      "refersTo": "anchored-menu-item",
       "description": "StatusTag: ícono, texto y color, sin relleno.",
       "html": "<div class=\"ds-tags\"><span class=\"ds-tag\" style=\"color: var(--color-want, #2f4a78)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z\"/></svg>Lo quiero</span><span class=\"ds-tag\" style=\"color: var(--color-owned, #6b3a63)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20\"/></svg>Lo tengo</span><span class=\"ds-tag\" style=\"color: var(--color-reading, #85490f)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v16\"/><path d=\"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z\"/></svg>Leyendo</span><span class=\"ds-tag\" style=\"color: var(--color-read, #2a6249)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m16 9-5.5 5.5L8 12\"/></svg>Leído</span></div>",
       "css": ".ds-tags { display: flex; flex-wrap: wrap; gap: 16px; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; } .ds-tag { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }"
@@ -363,9 +392,9 @@
       "name": "Control de tag con su menú",
       "kind": "custom",
       "refersTo": "status-control",
-      "description": "StatusControl: la tarjeta del tag y el menú anclado, que no oscurece la página.",
-      "html": "<div class=\"ds-status\"><button class=\"ds-status-trigger\" aria-expanded=\"true\"><span class=\"ds-tag\" style=\"color: var(--color-reading, #85490f)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v16\"/><path d=\"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z\"/></svg>Leyendo</span><span class=\"ds-status-edit\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"/><path d=\"m15 5 4 4\"/></svg>Cambiar</span></button><div class=\"ds-status-menu\"><button class=\"ds-status-item\"><span class=\"ds-tag\" style=\"color: var(--color-want, #2f4a78)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z\"/></svg>Lo quiero</span></button><button class=\"ds-status-item\"><span class=\"ds-tag\" style=\"color: var(--color-owned, #6b3a63)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20\"/></svg>Lo tengo</span></button><button class=\"ds-status-item ds-status-item-on\"><span class=\"ds-tag\" style=\"color: var(--color-reading, #85490f)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v16\"/><path d=\"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z\"/></svg>Leyendo</span><span class=\"ds-status-now\">Actual</span></button><button class=\"ds-status-item\"><span class=\"ds-tag\" style=\"color: var(--color-read, #2a6249)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m16 9-5.5 5.5L8 12\"/></svg>Leído</span></button></div></div>",
-      "css": ".ds-status { width: 320px; max-width: 100%; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; color: var(--color-ink, #1e1915); } .ds-status-trigger { display: flex; width: 100%; min-height: 52px; align-items: center; justify-content: space-between; gap: 12px; padding: 0 14px; border: 0; border-radius: var(--radius-card, 8px); background: var(--color-white, #ffffff); color: inherit; font: inherit; font-weight: 600; box-shadow: var(--shadow-card, 0 1px 2px rgb(30 25 21 / 7%), 0 3px 10px -5px rgb(30 25 21 / 14%)); transition: background-color 100ms, box-shadow 100ms, translate 100ms; } .ds-status-trigger:hover { background: var(--color-shell, #f4f1ea); } .ds-status-trigger:active { background: var(--color-sand, #ebe2d7); translate: 0 1px; box-shadow: none; } .ds-status-edit { display: inline-flex; align-items: center; gap: 6px; } .ds-status-menu { margin-top: 6px; padding: 6px; border-radius: var(--radius-float, 10px); background: var(--color-white, #ffffff); box-shadow: var(--shadow-float, 0 2px 4px rgb(30 25 21 / 14%), 0 18px 34px -8px rgb(30 25 21 / 40%)); } .ds-status-item { display: flex; width: 100%; min-height: 48px; align-items: center; justify-content: space-between; gap: 12px; padding: 0 10px; border: 0; border-radius: var(--radius-control, 6px); background: transparent; font: inherit; transition: background-color 100ms; } .ds-status-item:hover, .ds-status-item-on { background: var(--color-shell, #f4f1ea); } .ds-status-item:active { background: var(--color-sand, #ebe2d7); } .ds-status-now { font-size: 14px; font-weight: 600; color: var(--color-muted, #5f564d); } .ds-tag { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; } .ds-status-trigger:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; } .ds-status-item:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: -2px; }"
+      "description": "StatusControl: la fila del tag con su botón Cambiar, y el menú anclado, que no oscurece la página.",
+      "html": "<div class=\"ds-status\"><button class=\"ds-status-trigger\" aria-expanded=\"true\"><span class=\"ds-tag\" style=\"color: var(--color-reading, #85490f)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v16\"/><path d=\"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z\"/></svg>Leyendo</span><span class=\"ds-status-edit\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"/><path d=\"m15 5 4 4\"/></svg>Cambiar</span></button><div class=\"ds-status-menu\"><button class=\"ds-status-item\"><span class=\"ds-tag\" style=\"color: var(--color-want, #2f4a78)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z\"/></svg>Lo quiero</span></button><button class=\"ds-status-item\"><span class=\"ds-tag\" style=\"color: var(--color-owned, #6b3a63)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20\"/></svg>Lo tengo</span></button><button class=\"ds-status-item ds-status-item-on\"><span class=\"ds-tag\" style=\"color: var(--color-reading, #85490f)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v16\"/><path d=\"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z\"/></svg>Leyendo</span><span class=\"ds-status-now\">Actual</span></button><button class=\"ds-status-item\"><span class=\"ds-tag\" style=\"color: var(--color-read, #2a6249)\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m16 9-5.5 5.5L8 12\"/></svg>Leído</span></button><div class=\"ds-status-line\" role=\"separator\"></div><button class=\"ds-status-command\">Quitar de mi biblioteca<span class=\"ds-status-detail\">Pierdes 1 carpeta y el puntaje</span></button></div></div>",
+      "css": ".ds-status { width: 320px; max-width: 100%; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; color: var(--color-ink, #1e1915); } .ds-status-trigger { display: flex; width: 100%; min-height: 44px; align-items: center; justify-content: space-between; gap: 12px; padding: 0; border: 0; border-radius: var(--radius-control, 6px); background: transparent; color: inherit; font: inherit; font-weight: 600; transition: background-color 100ms, translate 100ms; } .ds-status-edit { display: inline-flex; min-height: 44px; align-items: center; gap: 6px; padding: 0 8px; border-radius: var(--radius-control, 6px); transition: background-color 100ms, color 100ms, translate 100ms; } .ds-status-trigger:hover { background: color-mix(in srgb, var(--color-ink, #1e1915) 5%, transparent); } .ds-status-edit:hover { background: var(--color-sand, #ebe2d7); } .ds-status-trigger[aria-expanded='true'] .ds-status-edit { background: var(--color-sand-deep, #dfd3c4); } .ds-status-menu { margin-top: 6px; padding: 6px; border-radius: var(--radius-float, 10px); background: var(--color-white, #ffffff); box-shadow: var(--shadow-float, 0 2px 4px rgb(30 25 21 / 14%), 0 18px 34px -8px rgb(30 25 21 / 40%)); } .ds-status-item { display: flex; width: 100%; min-height: 44px; align-items: center; justify-content: space-between; gap: 12px; padding: 0 10px; border: 0; border-radius: var(--radius-control, 6px); background: transparent; font: inherit; transition: background-color 100ms; } .ds-status-item:hover { background: var(--color-shell, #f4f1ea); } .ds-status-item-on, .ds-status-item-on:hover { background: var(--color-sand, #ebe2d7); } .ds-status-item:active { background: var(--color-sand, #ebe2d7); } .ds-status-now { font-size: 14px; font-weight: 600; color: var(--color-muted, #5f564d); } .ds-tag { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; } .ds-status-trigger:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; } .ds-status-item:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: -2px; } .ds-status-line { margin: 6px 0; border-top: 1px solid var(--color-line, #e9e2d8); } .ds-status-command { display: block; width: 100%; min-height: 44px; padding: 6px 10px; border: 0; border-radius: var(--radius-control, 6px); background: transparent; font: inherit; font-weight: 600; text-align: left; transition: background-color 100ms; } .ds-status-command:hover { background: var(--color-shell, #f4f1ea); } .ds-status-command:active { background: var(--color-sand, #ebe2d7); } .ds-status-detail { display: block; font-size: 14px; font-weight: 400; color: var(--color-muted, #5f564d); } .ds-status-command:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: -2px; }"
     },
     {
       "name": "Botones de tag",
@@ -373,7 +402,7 @@
       "refersTo": "tag-filter-item-active",
       "description": "TagFilter: el activo se abre hacia la página, con la cinta burdeo.",
       "html": "<div class=\"ds-filter\"><button class=\"ds-filter-item ds-filter-item-on\" aria-pressed=\"true\"><span class=\"ds-filter-ribbon\"></span><span class=\"ds-filter-count\">34</span>Todos</button><button class=\"ds-filter-item\"><span class=\"ds-filter-count\">17</span>Lo quiero</button><button class=\"ds-filter-item\"><span class=\"ds-filter-count\">5</span>Lo tengo</button><button class=\"ds-filter-item\"><span class=\"ds-filter-count\">2</span>Leyendo</button><button class=\"ds-filter-item\"><span class=\"ds-filter-count\">10</span>Leído</button></div>",
-      "css": ".ds-filter { display: grid; grid-template-columns: repeat(5, 1fr); max-width: 512px; padding-top: 12px; background: var(--color-shell, #f4f1ea); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-filter-item { position: relative; display: flex; min-height: 64px; flex-direction: column; align-items: center; justify-content: flex-end; padding: 12px 0 10px; border: 0; border-radius: var(--radius-card, 8px) var(--radius-card, 8px) 0 0; background: transparent; color: var(--color-muted, #5f564d); font-family: inherit; font-size: 12px; font-weight: 500; white-space: nowrap; transition: color 100ms; } .ds-filter-item:hover { color: var(--color-ink, #1e1915); } .ds-filter-item:active { background: var(--color-sand, #ebe2d7); } .ds-filter-item-on { background: var(--color-paper, #faf8f6); color: var(--color-ink, #1e1915); font-weight: 700; } .ds-filter-ribbon { position: absolute; top: 0; left: 50%; width: 9px; height: 12px; translate: -50% 0; background: var(--color-ribbon, #7a2334); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); } .ds-filter-count { font-family: 'Source Serif 4', Georgia, serif; font-size: 20px; line-height: 28px; font-weight: 600; font-variant-numeric: tabular-nums; } .ds-filter-item:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+      "css": ".ds-filter { display: grid; grid-template-columns: repeat(5, 1fr); max-width: 512px; padding-top: 12px; background: var(--color-shell, #f4f1ea); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-filter-item { position: relative; display: flex; min-height: 56px; flex-direction: column; align-items: center; justify-content: flex-end; padding: 12px 0 6px; border: 0; border-radius: var(--radius-card, 8px) var(--radius-card, 8px) 0 0; background: transparent; color: var(--color-muted, #5f564d); font-family: inherit; font-size: 12px; font-weight: 500; white-space: nowrap; transition: color 100ms; } .ds-filter-item:hover { color: var(--color-ink, #1e1915); } .ds-filter-item:active { background: var(--color-sand, #ebe2d7); } .ds-filter-item-on { background: var(--color-paper, #faf8f6); color: var(--color-ink, #1e1915); font-weight: 700; } .ds-filter-ribbon { position: absolute; top: 0; left: 50%; width: 9px; height: 12px; translate: -50% 0; background: var(--color-ribbon, #7a2334); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); } .ds-filter-count { font-family: 'Source Serif 4', Georgia, serif; font-size: 16px; line-height: 20px; font-weight: 600; font-variant-numeric: tabular-nums; } .ds-filter-item:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
     },
     {
       "name": "Tarjeta de carpeta",
@@ -381,15 +410,23 @@
       "refersTo": "folder-card",
       "description": "FolderCard: la tarjeta de referencia, aquí en su versión fija con cinta.",
       "html": "<a class=\"ds-folder\" href=\"#\"><span class=\"ds-folder-ribbon\"></span><span class=\"ds-folder-covers\"><span class=\"ds-folder-cover\"></span><span class=\"ds-folder-cover\"></span></span><span class=\"ds-folder-name\">Próximos</span><span class=\"ds-folder-count\">2 libros · fija</span></a>",
-      "css": ".ds-folder { position: relative; display: block; width: 180px; padding: 12px; border-radius: var(--radius-card, 8px); background: var(--color-white, #ffffff); color: var(--color-ink, #1e1915); text-decoration: none; box-shadow: var(--shadow-card, 0 1px 2px rgb(30 25 21 / 7%), 0 3px 10px -5px rgb(30 25 21 / 14%)); transition: background-color 100ms, box-shadow 100ms, translate 100ms; } .ds-folder:hover { background: var(--color-shell, #f4f1ea); } .ds-folder:active { translate: 0 1px; box-shadow: none; } .ds-folder-ribbon { position: absolute; top: 0; right: 10px; z-index: 1; width: 9px; height: 26px; background: var(--color-ribbon, #7a2334); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); } .ds-folder-covers { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; } .ds-folder-cover { aspect-ratio: 2 / 3; border-radius: 2px 3px 3px 2px; background: var(--color-sand, #ebe2d7); box-shadow: var(--shadow-book, 0 1px 1px rgb(30 25 21 / 20%), 0 6px 12px -5px rgb(30 25 21 / 35%)); } .ds-folder-name { display: block; margin-top: 10px; font-family: 'Source Serif 4', Georgia, serif; font-size: 18px; line-height: 28px; font-weight: 600; } .ds-folder-count { display: block; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 14px; line-height: 20px; color: var(--color-muted, #5f564d); } .ds-folder:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+      "css": ".ds-folder { position: relative; display: block; width: 180px; padding: 12px; border: 1px solid var(--color-line, #e9e2d8); border-radius: var(--radius-card, 8px); background: var(--color-white, #ffffff); color: var(--color-ink, #1e1915); text-decoration: none; transition: border-color 100ms, translate 100ms; } .ds-folder:hover { border-color: var(--color-edge, #857a6e); } .ds-folder:active { translate: 0 1px; } .ds-folder-ribbon { position: absolute; top: -1px; right: 10px; z-index: 1; width: 9px; height: 26px; background: var(--color-ribbon, #7a2334); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); } .ds-folder-covers { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; } .ds-folder-cover { aspect-ratio: 2 / 3; border-radius: 2px 3px 3px 2px; background: var(--color-sand, #ebe2d7); box-shadow: var(--shadow-book, 0 1px 1px rgb(30 25 21 / 20%), 0 6px 12px -5px rgb(30 25 21 / 35%)); } .ds-folder-name { display: block; margin-top: 10px; font-family: 'Source Serif 4', Georgia, serif; font-size: 18px; line-height: 28px; font-weight: 600; } .ds-folder-count { display: block; font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 14px; line-height: 20px; color: var(--color-muted, #5f564d); } .ds-folder:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+    },
+    {
+      "name": "Confirmación en la página",
+      "kind": "card",
+      "refersTo": "inline-confirm",
+      "description": "InlineConfirm: pide confirmar junto a lo que afecta, solo para eliminar carpeta y Reiniciar demo.",
+      "html": "<section class=\"ds-confirm\"><h2 class=\"ds-confirm-title\">Eliminar «Verano»</h2><p class=\"ds-confirm-text\">Esta carpeta tiene 3 libros. Los libros siguen en tu biblioteca.</p><div class=\"ds-confirm-actions\"><button class=\"ds-confirm-danger\">Eliminar carpeta</button><button class=\"ds-confirm-cancel\">Cancelar</button></div></section>",
+      "css": ".ds-confirm { max-width: 448px; padding: 12px; border: 1px solid var(--color-edge, #857a6e); border-radius: var(--radius-card, 8px); background: var(--color-white, #ffffff); color: var(--color-ink, #1e1915); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; line-height: 24px; } .ds-confirm-title { margin: 0; font-family: 'Source Serif 4', Georgia, serif; font-size: 18px; line-height: 28px; font-weight: 600; } .ds-confirm-text { margin: 2px 0 0; } .ds-confirm-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; } .ds-confirm-danger, .ds-confirm-cancel { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; padding: 0 16px; border: 0; border-radius: var(--radius-control, 6px); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; font-size: 16px; font-weight: 600; transition: background-color 100ms, translate 100ms; } .ds-confirm-danger { background: var(--color-danger, #a3341c); color: #fff; } .ds-confirm-danger:hover { background: color-mix(in srgb, var(--color-danger, #a3341c) 90%, transparent); } .ds-confirm-danger:active { background: color-mix(in srgb, var(--color-danger, #a3341c) 80%, transparent); translate: 0 1px; } .ds-confirm-cancel { border: 1px solid var(--color-edge, #857a6e); background: var(--color-sand-deep, #dfd3c4); color: var(--color-ink, #1e1915); } .ds-confirm-cancel:hover { background: var(--color-sand-dark, #d3c4b1); } .ds-confirm-cancel:active { border-color: var(--color-ink, #1e1915); background: var(--color-sand-dark, #d3c4b1); translate: 0 1px; } .ds-confirm-danger:focus-visible, .ds-confirm-cancel:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
     },
     {
       "name": "Portada con cinta de estado",
       "kind": "custom",
       "refersTo": "ribbon-cover-lg",
-      "description": "BookCover lg: la cinta del tag sale por debajo de la portada, en el color del estado.",
+      "description": "BookCover lg en celular: la cinta del tag sale por debajo de la portada, en el color del estado.",
       "html": "<span class=\"ds-cover\"><span class=\"ds-cover-book\">Carrie</span><span class=\"ds-cover-ribbon\"></span></span>",
-      "css": ".ds-cover { position: relative; isolation: isolate; display: block; width: 164px; margin-bottom: 24px; } .ds-cover-book { position: relative; display: flex; aspect-ratio: 2 / 3; align-items: center; justify-content: center; overflow: hidden; border-radius: 2px 3px 3px 2px; background: var(--color-want, #2f4a78); color: #fff; font-family: 'Source Serif 4', Georgia, serif; font-size: 30px; font-weight: 600; box-shadow: var(--shadow-book-lg, 0 2px 3px rgb(30 25 21 / 22%), 0 16px 26px -10px rgb(30 25 21 / 50%)); } .ds-cover-book::after { content: ''; position: absolute; inset: 0 auto 0 0; width: 8px; background: linear-gradient(to right, color-mix(in srgb, var(--color-ink, #1e1915) 15%, transparent), transparent); pointer-events: none; } .ds-cover-ribbon { position: absolute; right: 24px; bottom: -20px; z-index: -1; width: 13px; height: 36px; background: var(--color-reading, #85490f); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); }"
+      "css": ".ds-cover { position: relative; isolation: isolate; display: block; width: 112px; margin-bottom: 12px; } .ds-cover-book { position: relative; display: flex; aspect-ratio: 2 / 3; align-items: center; justify-content: center; overflow: hidden; border-radius: 2px 3px 3px 2px; background: var(--color-want, #2f4a78); color: #fff; font-family: 'Source Serif 4', Georgia, serif; font-size: 24px; font-weight: 600; box-shadow: var(--shadow-book-lg, 0 2px 3px rgb(30 25 21 / 22%), 0 16px 26px -10px rgb(30 25 21 / 50%)); } .ds-cover-book::after { content: ''; position: absolute; inset: 0 auto 0 0; width: 2px; background: color-mix(in srgb, var(--color-ink, #1e1915) 15%, transparent); pointer-events: none; } .ds-cover-ribbon { position: absolute; right: 16px; bottom: -12px; z-index: -1; width: 10px; height: 24px; background: var(--color-reading, #85490f); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); }"
     },
     {
       "name": "Barra de navegación",
@@ -397,18 +434,20 @@
       "refersTo": "nav-bar",
       "description": "AppShell en celular: cinco secciones con ícono y texto; la activa lleva cinta y peso 700.",
       "html": "<nav class=\"ds-nav\" aria-label=\"Principal\"><a class=\"ds-nav-item\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8\"/><path d=\"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/></svg>Inicio</a><a class=\"ds-nav-item ds-nav-item-on\" href=\"#\" aria-current=\"page\"><span class=\"ds-nav-ribbon\"></span><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect width=\"8\" height=\"18\" x=\"3\" y=\"3\" rx=\"1\"/><path d=\"M7 3v18\"/><path d=\"M20.4 18.9c.2.5-.1 1.1-.6 1.3l-1.9.7c-.5.2-1.1-.1-1.3-.6L11.1 5.1c-.2-.5.1-1.1.6-1.3l1.9-.7c.5-.2 1.1.1 1.3.6Z\"/></svg>Mis libros</a><a class=\"ds-nav-item\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z\"/></svg>Descubrir</a><a class=\"ds-nav-item\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m21 21-4.34-4.34\"/><circle cx=\"11\" cy=\"11\" r=\"8\"/></svg>Buscar</a><a class=\"ds-nav-item\" href=\"#\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"19\" cy=\"12\" r=\"1\"/><circle cx=\"5\" cy=\"12\" r=\"1\"/></svg>Más</a></nav>",
-      "css": ".ds-nav { display: flex; padding: 0 4px; background: var(--color-white, #ffffff); box-shadow: 0 -1px 0 var(--color-line, #e9e2d8); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-nav-item { position: relative; display: flex; flex: 1; min-height: 64px; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--color-muted, #5f564d); font-size: 12px; font-weight: 500; text-decoration: none; transition: color 100ms; } .ds-nav-item:hover { color: var(--color-ink, #1e1915); } .ds-nav-item:active { background: var(--color-shell, #f4f1ea); } .ds-nav-item-on { color: var(--color-ink, #1e1915); font-weight: 700; } .ds-nav-ribbon { position: absolute; top: 0; left: 50%; width: 9px; height: 10px; translate: -50% 0; background: var(--color-ribbon, #7a2334); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); } .ds-nav-item:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
+      "css": ".ds-nav { display: flex; padding: 0 4px; background: var(--color-paper, #faf8f6); border-top: 1px solid var(--color-edge, #857a6e); font-family: Figtree, ui-sans-serif, system-ui, sans-serif; } .ds-nav-item { position: relative; display: flex; flex: 1; min-height: 64px; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--color-muted, #5f564d); font-size: 12px; font-weight: 600; text-decoration: none; transition: color 100ms; } .ds-nav-item:hover { color: var(--color-ink, #1e1915); } .ds-nav-item:active { background: var(--color-sand, #ebe2d7); } .ds-nav-item-on { color: var(--color-ink, #1e1915); font-weight: 700; } .ds-nav-ribbon { position: absolute; top: 0; left: 50%; width: 9px; height: 10px; translate: -50% 0; background: var(--color-ribbon, #7a2334); clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%); } .ds-nav-item:focus-visible { outline: 2px solid var(--color-ink, #1e1915); outline-offset: 2px; }"
     }
   ],
   "narrative": {
     "northStar": "Cinta marcapáginas",
-    "overview": "La biblioteca se ve como Goodreads en sus neutros y su tinta, sin color de marca: fondos de papel, títulos serif y portadas reales sin teñir. Sobre esa calma, una cinta con la punta cortada es el único gesto propio. Marca lo activo, lo fijo y el estado de un libro, y nada más. La app es para ordenar libros, así que los controles son estándar y las pantallas se reconocen primero como una herramienta de trabajo.\n\nLa densidad es de app, no de página de lectura: márgenes de 16 px, tarjetas compactas y mucha información por pantalla. La jerarquía viene de capas (fondo, banda, tarjeta y menú) con sombra suave. Las portadas ponen casi todo el color de la pantalla; por eso la interfaz casi no lo usa.\n\nEste documento fija tipografía, color, densidad, formas y el gesto de la cinta. Las pantallas, los flujos, los textos y las decisiones D1 a D6 salen de `docs/e2/informe-e2.pdf` y de `PLAN.md`. El orden de autoridad es el informe, después `PLAN.md` y después este documento. **Ante un choque con las 14 reglas de interfaz de `PLAN.md`, ganan las reglas.** Lo que el sistema no cubra se anota como decisión para el CP.\n\nEste sistema se escribió desde lo construido. Las páginas de referencia son Mis libros (`src/features/library/LibraryPage.tsx` y `FolderCard.tsx`) y la ficha (`src/features/book/BookPage.tsx`). Los tokens viven en `src/index.css`, y si este archivo y el código difieren, se corrige este archivo. Los títulos de sección quedan en inglés porque las herramientas de este formato los buscan por su nombre exacto.",
+    "overview": "La biblioteca se ve como Goodreads en sus neutros y su tinta, sin color de marca: fondos de papel, títulos serif y portadas reales sin teñir. Sobre esa calma, una cinta con la punta cortada es el único gesto propio. Marca lo activo, lo fijo y el estado de un libro, y nada más. La app es para ordenar libros, así que los controles son estándar y las pantallas se reconocen primero como una herramienta de trabajo.\n\nLa densidad es de app, no de página de lectura: márgenes de 16 px, tarjetas compactas y mucha información por pantalla. La jerarquía viene del fondo, las filas y el espacio, como en un libro mayor: solo el menú y el toast flotan con sombra. Lo blanco con borde es un campo y lo que se presiona es un bloque relleno, así que un campo y un botón nunca se confunden. No hay modales: lo que se edita se edita en su lugar. Las portadas ponen casi todo el color de la pantalla; por eso la interfaz casi no lo usa.\n\nEste documento fija tipografía, color, densidad, formas y el gesto de la cinta. Las pantallas, los flujos, los textos y las decisiones D1 a D6 salen de `docs/e2/informe-e2.pdf` y de `PLAN.md`. El orden de autoridad es el informe, después `PLAN.md` y después este documento. **Ante un choque con las 14 reglas de interfaz de `PLAN.md`, ganan las reglas.** Lo que el sistema no cubra se anota como decisión para el CP.\n\nEste sistema se escribió desde lo construido. Las páginas de referencia son Mis libros (`src/features/library/LibraryPage.tsx` y `FolderCard.tsx`) y la ficha (`src/features/book/BookPage.tsx`). Los tokens viven en `src/index.css`, y si este archivo y el código difieren, se corrige este archivo. Los títulos de sección quedan en inglés porque las herramientas de este formato los buscan por su nombre exacto.",
     "keyCharacteristics": [
       "Neutros cálidos y tinta, sin color de marca ni acento que tiña la app.",
       "Una cinta con punta cortada como única marca de lo activo, lo fijo y el estado.",
       "Títulos en Source Serif 4 semibold e interfaz en Figtree.",
       "Tags sin relleno: ícono, texto y color, siempre juntos.",
-      "Capas con sombra suave en vez de bordes gruesos.",
+      "Jerarquía por fondo, filas y espacio; sombra solo en lo que flota y en las portadas.",
+      "Botones de relleno; lo blanco con borde es un campo.",
+      "Lo que se edita se edita en su lugar, sin modales ni paneles.",
       "Portadas sin teñir, con sombra física.",
       "Movimiento corto y solo como respuesta a una acción."
     ],
@@ -439,8 +478,13 @@
         "section": "typography"
       },
       {
+        "name": "La regla de lo que flota",
+        "body": "Solo `AnchoredMenu` y el toast flotan con sombra. Una tarjeta, un botón o un campo no llevan sombra: se separan con fondo, borde y espacio.",
+        "section": "elevation"
+      },
+      {
         "name": "La regla de la presión",
-        "body": "Lo que se toca baja 1 px y pierde su sombra al presionarlo. Las tarjetas, `Button` y `StatusControl` lo hacen en 100 ms.",
+        "body": "Lo que se toca baja 1 px al presionarlo. `FolderCard`, `Button` y \"Cambiar\" lo hacen en 100 ms.",
         "section": "elevation"
       },
       {
@@ -464,13 +508,30 @@
         "section": "components"
       },
       {
+        "name": "La regla de editar en su lugar",
+        "body": "No hay modales ni paneles. Lo que se edita se edita donde se lee, sin tapar ni oscurecer la página.",
+        "section": "components"
+      },
+      {
         "name": "La regla del cambio rápido",
-        "body": "Un cambio rápido y reversible, con pocas opciones, se resuelve en un menú anclado junto al control. El contenido largo o un formulario va en un panel. Elegir un tag nunca abre un panel ni un modal.",
+        "body": "Un cambio rápido y reversible, con pocas opciones, se resuelve en un menú anclado junto al control. Elegir un tag nunca lleva a otra pantalla.",
+        "section": "components"
+      },
+      {
+        "name": "La regla de confirmar en la página",
+        "body": "Solo eliminar carpeta y Reiniciar demo piden confirmación, con `InlineConfirm`. Lo demás se aplica de inmediato y ofrece Deshacer.",
+        "section": "components"
+      },
+      {
+        "name": "La regla del relleno de página",
+        "body": "Lo que actúa sobre la página va en la banda y lleva relleno. Lo que actúa sobre una fila va al final de ella y no lleva relleno en reposo.",
         "section": "components"
       }
     ],
     "dos": [
-      "Do parte cada sección con `PageHeader`, salvo la ficha, que usa su propia banda.",
+      "Do parte cada sección con `PageHeader`, salvo la ficha, que parte sobre el papel, sin banda.",
+      "Do edita cada dato en su lugar, en la fila o el título donde se lee.",
+      "Do da una salida en los estados vacíos a los que se llega por un filtro o un enlace malo: un botón \"Ver todos los libros\" o \"Ir a Mis libros\".",
       "Do usa solo los tokens de `src/index.css`: colores, tamaños, radios y sombras.",
       "Do muestra cada estado con texto además de color, como pide la regla 3.",
       "Do pon los tags solo sobre `white`, `paper`, `shell` o `sand`, donde el test vigila que lleguen a 4,5:1.",
@@ -486,9 +547,11 @@
       "Don't pongas una cinta burdeo bajo una portada ni uses burdeo en texto, botones o superficies de la interfaz.",
       "Don't uses un color de marca, el naranja de las estrellas de Goodreads ni su logo.",
       "Don't rellenes un tag ni lo conviertas en píldora de color.",
-      "Don't abras un panel o un modal para cambiar un tag.",
+      "Don't abras un panel o un modal: no existen en este sistema.",
+      "Don't pongas sombra en lo que no flota, salvo las portadas.",
+      "Don't dibujes un botón blanco: es el aspecto de un campo.",
       "Don't agregues un \"¿Estás seguro?\" a lo reversible: se resuelve con Deshacer.",
-      "Don't pongas más de un `primary` por pantalla o panel; \"Agregar a Mis libros\" también cuenta.",
+      "Don't pongas más de un `primary` por pantalla; \"Agregar a Mis libros\" también cuenta.",
       "Don't apiles tarjetas dentro de tarjetas ni uses bordes de 2 px para separar capas.",
       "Don't escribas colores, tamaños o sombras sueltos en una pantalla, ni uses la paleta por defecto de Tailwind, que no existe.",
       "Don't copies \"Disponible pronto\" como patrón: son textos temporales de las pantallas pendientes.",

@@ -12,9 +12,11 @@ export interface BookRowProps {
   book: Book
   /** Extra content at the top right, e.g. a "Quitar" button. */
   trailing?: ReactNode
+  /** In a list about someone else: replaces my tag and stars, which could pass for theirs. */
+  note?: ReactNode
 }
 
-export function BookRow({ book, trailing }: BookRowProps) {
+export function BookRow({ book, trailing, note }: BookRowProps) {
   const upsertBook = useStore((state) => state.upsertBook)
   const entry = useStore(selectEntry(book.id))
   const { pathname, search } = useLocation()
@@ -33,7 +35,7 @@ export function BookRow({ book, trailing }: BookRowProps) {
         aria-hidden
         className="shrink-0 py-2.5"
       >
-        <BookCover book={book} size="sm" status={entry?.status} />
+        <BookCover book={book} size="sm" status={note === undefined ? entry?.status : undefined} />
       </Link>
       <Link
         to={bookPath(book.id)}
@@ -43,10 +45,13 @@ export function BookRow({ book, trailing }: BookRowProps) {
       >
         <span className="line-clamp-2 font-serif text-lg/snug font-semibold">{book.title}</span>
         <span className="flex flex-wrap items-center gap-x-2 text-sm text-muted">
-          {entry && <StatusTag status={entry.status} size="sm" />}
+          {entry && note === undefined && <StatusTag status={entry.status} size="sm" />}
           <span>{book.authors.join(', ')}</span>
         </span>
-        {entry?.rating !== undefined && <Stars value={entry.rating} />}
+        {note}
+        {note === undefined && entry?.status === 'read' && entry.rating !== undefined && (
+          <Stars value={entry.rating} />
+        )}
       </Link>
       {trailing && <div className="shrink-0">{trailing}</div>}
     </div>

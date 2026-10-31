@@ -1,7 +1,7 @@
 // Builds the preloaded catalog: src/data/books.json plus the covers in public/covers/.
 // Run once with `node scripts/seed-books.mjs`; the output is committed so the app never
 // depends on Open Library to start. Node 22, no dependencies beyond the project's prettier.
-import { access, mkdir, writeFile } from 'node:fs/promises'
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import * as prettier from 'prettier'
@@ -9,6 +9,8 @@ import * as prettier from 'prettier'
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const OUTPUT_FILE = join(ROOT, 'src/data/books.json')
 const COVERS_DIR = join(ROOT, 'public/covers')
+// Spanish translations of Open Library's descriptions, by work key, with the source language.
+const TRANSLATIONS_FILE = join(ROOT, 'scripts/translated-descriptions.json')
 
 const SEARCH_URL = 'https://openlibrary.org/search.json'
 const SEARCH_FIELDS = [
@@ -179,7 +181,7 @@ const ENGLISH_WORDS = /\b(the|and|of|is|with)\b/gi
 const countMatches = (text, pattern) => text.match(pattern)?.length ?? 0
 
 // The UI is in Spanish and many works only carry an English, French or Dutch description. Those
-// are dropped instead of shown in another language: the description is optional in the app.
+// are never shown in another language: they come from TRANSLATIONS_FILE, or the book has none.
 function isSpanish(text) {
   const spanish = countMatches(text, SPANISH_WORDS)
   return spanish >= 3 && spanish > countMatches(text, ENGLISH_WORDS)
@@ -202,6 +204,14 @@ function cleanDescription(raw) {
 async function fetchDescription(id) {
   const work = await requestJson(`https://openlibrary.org/works/${id}.json`)
   return cleanDescription(work?.description)
+}
+
+// A description that comes in Spanish wins: it needs no translation, so it carries no mark.
+async function buildDescription(id, translations) {
+  const description = await fetchDescription(id)
+  if (description) return { description }
+  const translation = translations[id]
+  return translation ? { description: translation.description, descriptionTranslated: true } : {}
 }
 
 async function fileExists(path) {
@@ -227,7 +237,7 @@ async function downloadCover(id, coverId) {
   return publicUrl
 }
 
-async function buildBook(query) {
+async function buildBook(query, translations) {
   const doc = await searchWork(query)
   if (!doc) return undefined
   const id = workId(doc)
@@ -238,7 +248,7 @@ async function buildBook(query) {
     title: edition?.title ?? doc.title,
     authors: doc.author_name ?? [query.author],
     coverUrl: await downloadCover(id, coverId ?? edition?.cover_i ?? doc.cover_i),
-    description: await fetchDescription(id),
+    ...(await buildDescription(id, translations)),
     // Open Library sometimes reports 0 for an unknown year.
     year: doc.first_publish_year || undefined,
     pages: doc.number_of_pages_median || undefined,
@@ -248,12 +258,13 @@ async function buildBook(query) {
 
 async function main() {
   await mkdir(COVERS_DIR, { recursive: true })
+  const translations = JSON.parse(await readFile(TRANSLATIONS_FILE, 'utf8'))
   const books = []
   const problems = []
 
   for (const query of CATALOG) {
     const label = `${query.title} (${query.author})`
-    const result = await buildBook(query)
+    const result = await buildBook(query, translations)
     if (!result) {
       problems.push(`not found: ${label}`)
       continue

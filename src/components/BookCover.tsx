@@ -19,13 +19,13 @@ export interface BookCoverProps {
 const SIZE_CLASSES: Record<BookCoverSize, string> = {
   sm: 'w-14 text-sm md:w-16',
   fill: 'w-full text-xl',
-  lg: 'w-41 text-3xl short:w-22 md:w-56',
+  lg: 'w-28 text-2xl md:w-56 md:text-3xl',
 }
 
 const RIBBON_CLASSES: Record<BookCoverSize, string> = {
   sm: '-bottom-1.5 right-2 h-4 w-1.75',
   fill: '-bottom-2 right-3 h-6 w-2.5',
-  lg: '-bottom-5 right-6 h-9 w-3.25',
+  lg: '-bottom-3 right-4 h-6 w-2.5 md:-bottom-5 md:right-6 md:h-9 md:w-3.25',
 }
 
 // Dark enough for white initials at 4.5:1 or more.
@@ -51,7 +51,7 @@ const BOX_RATIO = 2 / 3
 
 // The hinge of a printed cover, which also separates pale covers from a pale background.
 const HINGE =
-  'after:pointer-events-none after:absolute after:inset-y-0 after:left-0 after:w-2 after:bg-linear-to-r after:from-ink/15 after:to-transparent'
+  'after:pointer-events-none after:absolute after:inset-y-0 after:left-0 after:w-0.5 after:bg-ink/15'
 
 /**
  * Decorative: every screen shows the title next to the cover, so screen readers skip it.

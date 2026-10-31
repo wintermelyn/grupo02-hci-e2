@@ -1,6 +1,6 @@
 import { today } from '../lib/dates'
 import { STATUS_LABELS } from '../lib/status'
-import type { AppState, Book, BookId, ISODate, LibraryEntry, ReadingStatus } from '../types'
+import type { AppState, Book, BookId, LibraryEntry, ReadingStatus } from '../types'
 import type { SliceCreator } from '.'
 
 /** The part of the state that undo restores. */
@@ -24,10 +24,10 @@ export interface CoreActions {
   upsertBook: (book: Book) => void
   /**
    * Adds the book to the library or changes its status. Ignores ids that getBook does not know,
-   * so call upsertBook first for an API book. Leaving Leído drops finishedAt and rating, which
-   * describe that finished reading; undo brings them back. Leído → Leyendo is a re-read, so
-   * startedAt becomes today. Moving to Lo quiero sets wantCheckedAt to today, so the D5 prompt does
-   * not ask about a book the person just chose.
+   * so call upsertBook first for an API book. Leaving Leído deletes nothing, so a mistaken Leído
+   * can be fixed at any time: only Leyendo drops finishedAt, because that reading is not over.
+   * Moving to Lo quiero sets wantCheckedAt to today, so the D5 prompt does not ask about a book the
+   * person just chose.
    */
   setStatus: (bookId: BookId, status: DirectStatus) => void
   /** Looks in seedBooks first, then in extraBooks. In a component, use `useStore(selectBook(id))`. */
@@ -66,15 +66,6 @@ export const selectBook =
   (state: AppState): Book | undefined =>
     lookup(state.seedBooks, bookId) ?? lookup(state.extraBooks, bookId)
 
-function startedAtFor(
-  current: LibraryEntry | undefined,
-  status: DirectStatus,
-): ISODate | undefined {
-  if (status !== 'reading') return current?.startedAt
-  const rereading = current?.status === 'read'
-  return rereading ? today() : (current?.startedAt ?? today())
-}
-
 export const createCoreSlice: SliceCreator<CoreActions> = (set, get) => ({
   commit: (label, mutator) => {
     const { library, folders } = get()
@@ -87,6 +78,8 @@ export const createCoreSlice: SliceCreator<CoreActions> = (set, get) => ({
     if (!undoSnapshot) return
     set({ ...undoSnapshot, undoSnapshot: null })
     get().showToast('Cambio deshecho')
+    // A request in the copy may have been accepted since, and its timer does not fire twice.
+    if (undoSnapshot.friendships) get().processPendingRequests()
   },
 
   showToast: (message, { undoable = false } = {}) => {
@@ -129,9 +122,12 @@ export const createCoreSlice: SliceCreator<CoreActions> = (set, get) => ({
       folderIds: [],
       addedAt: today(),
     }
-    const { finishedAt: _finishedAt, rating: _rating, ...kept } = base
-    const entry: LibraryEntry = { ...kept, status, startedAt: startedAtFor(current, status) }
+    const entry: LibraryEntry = { ...base, status }
     if (status === 'want') entry.wantCheckedAt = today()
+    if (status === 'reading') {
+      entry.startedAt ??= today()
+      delete entry.finishedAt
+    }
     const label = current
       ? `Estado cambiado a «${STATUS_LABELS[status]}»`
       : `Agregado a Mis libros como «${STATUS_LABELS[status]}»`

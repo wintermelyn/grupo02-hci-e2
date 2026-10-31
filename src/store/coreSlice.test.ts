@@ -137,13 +137,10 @@ describe('setStatus', () => {
     expect(state().library[reading.bookId]).toEqual({ ...reading, status: 'owned' })
   })
 
-  it('moves a Leído book to Lo tengo without finishedAt or rating', () => {
+  it('moves a Leído book to Lo tengo keeping its dates and rating', () => {
     const read = seedEntry('read')
     state().setStatus(read.bookId, 'owned')
-    const entry = state().library[read.bookId]
-    expect(entry).toMatchObject({ status: 'owned', startedAt: read.startedAt })
-    expect(entry).not.toHaveProperty('finishedAt')
-    expect(entry).not.toHaveProperty('rating')
+    expect(state().library[read.bookId]).toEqual({ ...read, status: 'owned' })
   })
 
   it('sets startedAt when a Lo tengo book moves to Leyendo', () => {
@@ -181,26 +178,30 @@ describe('setStatus', () => {
     expect(state().library[reading.bookId].startedAt).toBe(reading.startedAt)
   })
 
-  it('drops finishedAt and rating when a book leaves Leído, and undo brings them back', () => {
+  it('deletes nothing when a book leaves Leído, so a mistake costs no data', () => {
     const read = seedEntry('read')
     expect(read.finishedAt).toBeDefined()
     state().setStatus(read.bookId, 'want')
-    const entry = state().library[read.bookId]
-    expect(entry).toMatchObject({ status: 'want', startedAt: read.startedAt })
-    expect(entry).not.toHaveProperty('finishedAt')
-    expect(entry).not.toHaveProperty('rating')
+    expect(state().library[read.bookId]).toMatchObject({
+      status: 'want',
+      startedAt: read.startedAt,
+      finishedAt: read.finishedAt,
+      rating: read.rating,
+    })
     state().undo()
     expect(state().library[read.bookId]).toBe(read)
   })
 
-  it('starts a re-read today when a Leído book moves to Leyendo', () => {
+  it('keeps the start and rating of a Leído book back in Leyendo, which has no end yet', () => {
     const read = seedEntry('read')
-    expect(read.startedAt).not.toBe(today())
     state().setStatus(read.bookId, 'reading')
     const entry = state().library[read.bookId]
-    expect(entry).toMatchObject({ status: 'reading', startedAt: today() })
+    expect(entry).toMatchObject({
+      status: 'reading',
+      startedAt: read.startedAt,
+      rating: read.rating,
+    })
     expect(entry).not.toHaveProperty('finishedAt')
-    expect(entry).not.toHaveProperty('rating')
   })
 
   it('ignores a book that getBook does not know', () => {
