@@ -398,8 +398,8 @@ Los cuatro colores de estado se usan en el texto y el ícono de `StatusTag`, y e
 ### Neutral
 
 - **Papel** (`paper`, #fdfafa): el fondo de la app, de las dos barras y el `theme-color` del navegador.
-- **Concha** (`shell`, #f9f1f2): los bloques de la página, como `EmptyState`, `ErrorState`, `InlineConfirm` o un aviso. También el hover de las filas y de las secciones inactivas de la barra lateral.
-- **Blanco** (`white`, #ffffff): tarjetas, filas de actividad en Inicio, campos, menú, flechas de un riel y la píldora de un tag sobre una tarjeta de tono.
+- **Concha** (`shell`, #f9f1f2): los bloques de la página, como `EmptyState`, `ErrorState`, `InlineConfirm` o un aviso. También las filas de actividad en Inicio, y el hover de las filas y de las secciones inactivas de la barra lateral.
+- **Blanco** (`white`, #ffffff): tarjetas, campos, menú, flechas de un riel y la píldora de un tag sobre una tarjeta de tono.
 - **Arena** (`sand`, #f3e4e6): la sección activa de las dos barras, el hover de `secondary`, `quiet` y las opciones del menú, la presión de las filas, el botón deshabilitado, los huecos de portada, los esqueletos de carga, la selección de texto, el fondo de un selector de listas y el bloque de "+ Nueva carpeta".
 - **Arena profunda** (`sand-deep`, #ead4d8): la presión de `secondary`, `quiet` y las opciones del menú, el resaltado de una coincidencia en Buscar y el hover de un selector de listas. Solo da 1,4:1 sobre papel, así que nunca es la única señal de un control.
 - **Arena oscura** (`sand-dark`, #dfc2c8): un paso más, solo para la presión dentro de un selector de listas.
@@ -411,7 +411,7 @@ Los cuatro colores de estado se usan en el texto y el ícono de `StatusTag`, y e
 
 `coverTone(bookId)`, de `src/lib/coverTone.ts`, toma el color dominante de la portada, que viene de `src/data/coverColors.json`, y lo oscurece hasta dar 8,5:1 con texto blanco. El texto secundario va en blanco al 88 %. Un azul que deriva a índigo se queda en azul y un amarillo, que oscuro se vuelve oliva, pasa a ámbar. Una portada sin color propio, o un libro de una búsqueda en vivo, toma un tono de tinta (`rgb(50 43 38)`).
 
-- **Inicio, Buscar y Persona:** el tono es el fondo de la tarjeta que carga ese libro o autor. En una fila de actividad de Inicio, es el bloque detrás de la portada, y separa de un vistazo una fila de otra. En Persona, solo la tarjeta de "Está leyendo".
+- **Inicio, Buscar y Persona:** el tono es el fondo de la tarjeta que carga ese libro o autor. En Persona, solo la tarjeta de "Está leyendo".
 - **Descubrir:** solo es un tinte al 12 % sobre papel detrás de los libros (`tone-scene`, con `--tone`), y nunca queda bajo el texto, así que no cambia ningún contraste.
 - **Ficha:** el mismo tinte, en la escena donde se para la portada, sin texto encima.
 - **Ninguna otra superficie** se tiñe, y las portadas mismas nunca se tiñen.
@@ -475,10 +475,10 @@ Todos superan el 3:1 que pide el borde de un control. Sobre `sand-deep` da 2,88:
 
 - **Título de página** (600, 32 px, línea 1,1, tracking -0,03 em; 28 px bajo 360 px y 40 px desde 1024 px): el h1 de cada sección. Es la utilidad `page-title`, y `PageHeader` ya la usa.
 - **Título de sección** (600, 24 px, línea 1,2, tracking -0,02 em; 28 px desde 1024 px): títulos dentro de la página, como "Mis carpetas", "Tus amigos" o "Está leyendo". Es la utilidad `section-title`.
-- **Título de tarjeta** (600, 24 px y línea 1,12; 32 px desde 1024 px, tracking -0,02 em): el libro en una tarjeta de tono, con `font-serif text-[1.5rem]/[1.12] lg:text-[2rem]/[1.1]`.
+- **Título de tarjeta** (600, 24 px y línea 1,12; 32 px desde 1024 px, tracking -0,02 em): el libro o el autor en una tarjeta de tono, con `font-serif text-[1.5rem]/[1.12] lg:text-[2rem]/[1.1]`.
 - **Título del libro en Descubrir** (600, tracking -0,02 em): 22 px en celular, 28 px desde 640 px y 44 px desde 1024 px.
 - **Display** (600, 32 px, 38 px de línea, tracking -0,025 em) y **Heading** (600, 22 px, 28 px de línea): quedaron sin uso desde que la ficha pasó a `page-title`.
-- **Subheading** (600, 20 px, 28 px de línea): las iniciales de `Avatar` `lg`, y el nombre en una tarjeta de autor desde 1024 px.
+- **Subheading** (600, 20 px, 28 px de línea): las iniciales de `Avatar` `lg`.
 - **Book title** (600, 18 px): el nombre de un libro en `BookRow` (línea 1,375, máximo dos líneas), el de una persona en `PersonRow` (16 px bajo 360 px), el de una carpeta en `FolderCard` y el título de `EmptyState`, `ErrorState` e `InlineConfirm`.
 - **Fila compacta** (600, 17 px, línea 1,375): el libro en una fila de actividad, en `BookRow` con `compact` o en el estante de una persona, con `font-serif text-[1.0625rem]/snug`.
 - **Body** (400, 16 px, 24 px de línea): texto de lectura y datos del libro.
@@ -587,17 +587,20 @@ Importa todo desde `src/components/`. Son del bloque base: si necesitas cambiar 
 | Algo falló                                         | `ErrorState`, con `onRetry` si se puede reintentar                                                                                        |
 | Enlaces a un libro o una carpeta                   | `bookPath` y `folderPath`                                                                                                                 |
 
-### Lo que falta por pantalla
+### Piezas por pantalla
 
-Esto dice qué piezas existen para cada pantalla que todavía no toma su forma final. Su contenido y sus textos salen de `PLAN.md`.
+Todas las pantallas tienen su forma final. Esto dice qué piezas locales usa cada una, y su contenido y sus textos salen de `PLAN.md`.
 
-| Pantalla  | Piezas locales, en su carpeta                                                                      |
-| --------- | -------------------------------------------------------------------------------------------------- |
-| Inicio    | `ReadingNow` (tarjeta de lectura), `ActivityRow` y `ActivityEntry` (filas de actividad)            |
-| Descubrir | `ListPicker` (selector de listas), `BookCarousel` (carrusel y sus zonas de flecha), `BookDetail`   |
-| Buscar    | `AuthorList` (tarjetas de autor), `BestBook` (mejor resultado), `FriendsShelf` (riel), `Highlight` |
+| Pantalla   | Piezas locales, en su carpeta                                                                                                                              |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Inicio     | `ReadingNow` (tarjeta de lectura), `ActivityPreview` y `ActivityRow` (filas de actividad), `ActivityView` y `ActivityEntry` (vista completa), `LikeButton` |
+| Mis libros | `FolderBoard`, `FolderCard`, `NewFolderCard`, `WantPrompt`, `BandSearch`, `BookList`; también en Carpeta y Sin carpeta                                     |
+| Ficha      | `LedgerRow` (registro), `ReadingDetails` (fechas y puntaje), `BookFolders`, `BookSkeleton` (carga), `MissingBook` (libro que no está)                      |
+| Descubrir  | `ListPicker` (selector de listas), `BookCarousel` (carrusel y sus zonas de flecha), `BookDetail`                                                           |
+| Buscar     | `AuthorList` (tarjetas de autor), `BestBook` (mejor resultado), `FriendsShelf` (riel), `RecentSearches`, `Highlight`                                       |
+| Amigos     | `PersonRow`, `PersonAction`, `PersonBooks` (los libros de una persona), `Section` y `RowList`                                                              |
 
-`/actividad` todavía no es una ruta: hoy la actividad completa es `/?actividad=1`, dentro de Inicio. `AppShell` ya deja Inicio activa y a todo el ancho en esa ruta para cuando exista.
+La actividad completa es `/?actividad=1`, dentro de Inicio: no tiene ruta propia, y `AppShell` deja Inicio activa y a todo el ancho ahí.
 
 **Lo que no está en `src/components/` no tiene aspecto definido.** Arma lo que falte solo con estos tokens, respeta las 14 reglas y anótalo como decisión para el CP. Una pieza que dos pantallas necesiten se propone como compartida, para que los dos roles no construyan versiones distintas. Los campos de texto ya heredan el foco global, el acento de tinta (`accent-color`) y el cursor burdeo. `FolderCard` es de `src/features/library/`: sirve de ejemplo para una tarjeta, pero no es un componente compartido.
 
@@ -617,7 +620,7 @@ Viven en la carpeta de su pantalla. Sirven de ejemplo, y se vuelven compartidas 
 - **Fila del registro:** `LedgerRow`, en `src/features/book/`, dentro de un `dl`. La etiqueta va en Small `muted`, en una columna de 60 px (80 px desde `md`), y el valor va a la derecha, editable ahí mismo. Mide 44 px más 4 px arriba y abajo, con una línea debajo. Las filas son Estado, Inicio, Fin, Puntaje y Carpetas: Inicio aparece en Leyendo y Leído, Fin y Puntaje solo en Leído, y Carpetas si el libro está en la biblioteca. La acción de una fila es un botón `quiet` `compact`, siempre al final, con el texto sobre el margen. Solo la fecha y la fila Estado sobresalen 8 px a la izquierda con el cursor, para que su texto quede alineado.
 - **Fecha en una fila:** sin borde ni fondo, con su ícono `CalendarDays` en `muted` y hover de tinta al 5 %. Abre el calendario al tocar cualquier parte, así que las partes de la fecha se editan con el teclado. Chrome ignora `:focus` sobre ellas, por lo que un filtro convierte su azul en un tono cercano a `sand` y deja marcada la parte que se edita. La fecha del calendario se guarda de inmediato, y la escrita al presionar Enter o al salir del campo.
 - **Carpetas de un libro:** enlaces de texto en la fila Carpetas, en peso 500, con subrayado `muted` al 50 % que pasa a tinta con el cursor, y 44 × 44 px como mínimo. Son un lugar, no un estado: no llevan cinta ni color de tag. Al final de la fila, un `Button` `quiet` `compact` abre el menú y se llama según lo que se puede hacer: "Agregar", con un más, si no hay ninguna, y "Agregar o quitar", sin ícono, si hay, porque el más diría solo la mitad. Su nombre accesible dice "Agregar a carpeta". Sin carpetas, a su izquierda dice "Sin carpetas" en `muted`. El botón no se mueve de la primera línea: lo que no cabe son los enlaces, que bajan.
-- **Nombre de una carpeta:** `TextField` toma el lugar del título con el mismo tipo, con Guardar y Cancelar debajo.
+- **Nombre de una carpeta:** `TextField` toma el lugar del título con el mismo tipo. En celular, Guardar y Cancelar van debajo. Desde `md` van en la fila del campo, que mide hasta 480 px, y la lista no se mueve.
 - **Búsqueda en una lista de libros:** `BandSearch`, en `src/features/library/`, la usan Mis libros y la carpeta. El nombre viene de cuando había una banda. `SearchField` va en la fila del título, porque `TagFilter` ocupa lo que sigue al título. Respeta el botón de tag activo, y cambiarlo no borra lo escrito. En Mis libros reemplaza el tablero y el aviso por los resultados. Con otro tag activo, "Sin resultados" ofrece "Ver todos los libros"; en "Todos", dice que Buscar sirve para lo que está fuera de la biblioteca. Desde `md` está siempre a la vista, con 288 px de ancho, junto a Opciones. En celular no cabe junto al título, así que el botón `compact` "Buscar", sin ícono para que el título quepa a 320 px, lo abre sobre esa misma fila, con el foco en el campo: aparece bajo el dedo y ningún libro se mueve. Cubre la fila con el fondo `paper`. El título sigue en la página para los lectores de pantalla, y el `placeholder` dice en qué carpeta se busca. "Cerrar" vacía la búsqueda, cierra el campo y devuelve el foco a "Buscar". Una búsqueda que vuelve desde la URL abre el campo sola, sin tomar el foco.
 - **Carpeta fija:** solo dice "Carpeta fija" de subtítulo.
 - **Sin carpeta:** `UnfiledPage`, en `src/features/library/`. Se ve como una carpeta en el tablero, así que es la misma pantalla, con "Mis libros" para volver, `TagFilter` y `BandSearch`, y sin Opciones. De subtítulo dice "Libros que no están en ninguna carpeta". Sin libros, un `EmptyState` lo dice en el mismo lugar, en vez de sacar a la persona de la página.
@@ -626,7 +629,7 @@ Viven en la carpeta de su pantalla. Sirven de ejemplo, y se vuelven compartidas 
 - **Sobre este libro:** el bloque va siempre en el mismo lugar, con su título en `section-title`. La descripción va en Body, entera, sin cortar ni "Leer más", hasta `max-w-[60ch]`. Sin descripción dice "Aún no tenemos descripción de este libro." en Body `muted`, sin ícono ni `EmptyState`, porque es el caso normal y no un problema.
 - **Procedencia de una descripción:** en Small `muted` y a 8 px bajo la descripción. "Traducción hecha con IA", con el ícono de destellos que pide `PLAN.md`, si el libro trae `descriptionTranslated`. "Descripción de Open Library, sin traducir", sin ícono, si es un libro en vivo que la tiene, venga de Buscar o de un enlace directo. Es un dato sobre el texto, como la línea del autor, y no un aviso: sin cinta ni color de acento. Da 7,22:1 sobre `paper`.
 - **Motivo de un botón deshabilitado:** Small en tinta con `CircleAlert` en `muted`, dentro de una región `status`.
-- **Libros de una persona:** cada libro aparece una vez. "Está leyendo" es una tarjeta de tono como la de "Leyendo ahora" en Inicio, una o dos columnas desde `md`, con las páginas desde `lg`. "Últimos leídos" es un estante de portadas con `raised`: un riel en celular y tablet, y una grilla de seis columnas desde `lg`, donde todo cabe y no hacen falta flechas. Bajo cada portada, el título en Fila compacta, hasta dos líneas, y el autor en Small `muted`. Los compartidos dicen "En común", en Small label, sobre la tarjeta o bajo el autor. Ninguno lleva cinta, tag ni estrellas míos, porque podrían pasar por los de esa persona. El encabezado de Persona suma los amigos y libros en común, y `PersonAction`.
+- **Libros de una persona:** cada libro aparece una vez. "Está leyendo" es una tarjeta de tono como la de "Leyendo ahora" en Inicio, una o dos columnas desde `md`, con las páginas desde `lg`; un libro solo usa todo el ancho. "Últimos leídos" es un estante de portadas con `raised`: un riel en celular y tablet, y una grilla de seis columnas desde `lg`, donde todo cabe y no hacen falta flechas. Bajo cada portada, el título en Fila compacta, hasta dos líneas, y el autor en Small `muted`. Los compartidos dicen "En común", en Small label, sobre la tarjeta o bajo el autor. Ninguno lleva cinta, tag ni estrellas míos, porque podrían pasar por los de esa persona. El encabezado de Persona suma los amigos y libros en común, y `PersonAction`.
 
 ### Cinta
 
@@ -689,13 +692,13 @@ Un círculo con las iniciales blancas en serif sobre `avatarColor`, que viene de
 
 ### InlineConfirm
 
-Pregunta dentro de la página, junto a lo que afecta, para que siga a la vista. Es un bloque `shell` con radio de bloque y 20 px de relleno: título en Book title, lo que va a pasar en Body, y un `Button` `danger` con la acción junto a Cancelar en `secondary`. Desde `md`, el texto y los botones van en una fila. El foco parte en Cancelar, para que un Enter de más no confirme, y Escape cancela. Quien la muestra devuelve el foco al cancelar.
+Pregunta dentro de la página, junto a lo que afecta, para que siga a la vista. Es un bloque `shell` con radio de bloque y 20 px de relleno: título en Book title, lo que va a pasar en Body, y un `Button` `danger` con la acción junto a Cancelar en `secondary`. Desde `md`, el texto y los botones van en una fila, con el título en una línea. Al eliminar una carpeta, desde `md` toma el lugar de `TagFilter`, que conserva su alto, con 6 px de relleno vertical: mide 66 px y lo que sobra de los 56 px cae en el espacio vacío alrededor, así que la lista no se mueve ni queda tapada. En celular no cabe, y va bajo `TagFilter`. El foco parte en Cancelar, para que un Enter de más no confirme, y Escape cancela. Quien la muestra devuelve el foco al cancelar.
 
 ### Buttons
 
 Píldoras con texto en peso 600, con un solo llamado por pantalla. Solo `primary` y `danger` van rellenos, así que la pantalla tiene una sola forma negra y el ojo sabe a dónde ir. Los demás se dibujan con su borde o con nada. Un campo se distingue porque es blanco y trae su lupa o su texto; por eso ningún botón es blanco.
 
-- **Shape:** píldora, 44 px de alto, 16 px de relleno lateral y texto Control. El ícono mide 18 px y va antes del texto. Nunca hay botones de solo ícono, salvo la flecha de un riel y el corazón de "Me gusta" en celular, las dos excepciones aprobadas en `PLAN.md`. Si algo sobra en una fila angosta, sobra el ícono, no el texto.
+- **Shape:** píldora, 44 px de alto, 16 px de relleno lateral y texto Control. El ícono mide 18 px y va antes del texto. Nunca hay botones de solo ícono, salvo la flecha de un riel y el corazón de "Me gusta" en celular y en las filas de Inicio en tablet, las dos excepciones aprobadas en `PLAN.md`. Si algo sobra en una fila angosta, sobra el ícono, no el texto.
 - **Primary:** relleno de tinta con texto blanco. Al pasar el cursor baja al 90 % y al presionar al 80 %.
 - **Secondary:** sin relleno, con borde `edge` de 1 px y texto de tinta. Al pasar el cursor toma `sand`, y al presionar, `sand-deep`. Con su menú abierto (`aria-expanded`) se invierte a tinta con texto blanco, con o sin cursor: la tinta significa abierto. Es la variante por defecto.
 - **Quiet:** texto de tinta sin borde ni relleno. Al pasar el cursor y con su menú abierto toma `sand`, y al presionar, `sand-deep`. Es para las acciones de una fila, como "Agregar o quitar" o "+ Agregar", y para lo secundario de la página, como "Invitar contactos". En una fila, el texto queda sobre el margen y el relleno sobresale con el cursor.
@@ -733,7 +736,7 @@ Estrellas de 14 px para mostrar un puntaje y de 26 px, en áreas de 44 px, cuand
 - **Tarjeta blanca** (`FolderCard`): radio de tarjeta, fondo blanco, 1 px `line` que pasa a `edge` con el cursor y 12 px de relleno. Dos portadas con 6 px de separación, nombre serif a 10 px y cantidad en Small. Si falta una portada, su hueco se rellena con `sand`.
 - **Bloque** (`EmptyState`, `ErrorState`, `InlineConfirm`, las tarjetas de Más y Demo en Mi perfil): radio de bloque, fondo `shell`, sin borde y 20 px de relleno.
 - **Fila tintada** (fila de persona, aviso): radio de fila, fondo `shell` que pasa a `sand` con el cursor.
-- **Fila de actividad** (Inicio): radio de fila, fondo blanco con 1 px `line`, que pasa a `shell` con el cursor. A la izquierda, un bloque de 64 px (80 px desde `lg`) con el tono del libro y su portada `raised`. Cada fila lleva así su propio color, y por eso ya no van todas sobre `shell`.
+- **Fila de actividad** (Inicio): radio de fila, fondo `shell` que pasa a `sand` con el cursor y a `sand-deep` al presionar, sin borde. La portada va suelta, de 40 px (48 px desde `lg`), sin `raised`. En la línea de la persona van el avatar y la fecha corta, como "Hoy" o "3 d", que nunca se corta: lo que cede es la frase. Debajo, el título en Fila compacta, en una línea. Bajo `lg` termina con el corazón solo; desde `lg` suma el autor bajo el título y "Me gusta" con texto.
 - **Tarjeta de tono** (lectura, también la de otra persona, autor, mejor resultado): radio de bloque o de tarjeta, fondo `coverTone`, texto `text-white` y `text-white/88`, portada con `raised`. La de lectura muestra la portada entera siempre: sobre el texto en dos o tres columnas, y al lado desde `md` si hay espacio.
 - **Mejor resultado:** desde `lg` va junto a los primeros cinco libros, y lo demás sigue debajo. Si es un autor, es la primera tarjeta de "Autores" y sus portadas la llenan. Si es un libro, trae su descripción. Con un solo libro no se llama "mejor".
 - **Shadow Strategy:** ninguna. Nunca una tarjeta dentro de otra.
@@ -760,7 +763,7 @@ Una capa de tinta de hasta 448 px, con radio `float` y `shadow-float`. Bajo `lg`
 
 ### Estados de pantalla
 
-`EmptyState` y `ErrorState` son un bloque `shell` en el lugar donde iría el contenido, a 16 px de lo anterior: ícono de 24 px a la izquierda, título en Book title, descripción `muted` y la acción al final, que baja de línea si no cabe. La descripción corta una palabra larga para no salirse del margen. El ícono de error va en `danger`. `LoadingState` dibuja tres filas de esqueleto en `sand` con la forma de `BookRow`, para que la página no salte, y pulsa solo si la persona no pidió reducir movimiento.
+`EmptyState` y `ErrorState` son un bloque `shell` en el lugar donde iría el contenido, a 16 px de lo anterior: ícono de 24 px a la izquierda, título en Book title, descripción `muted` y la acción al final, que baja de línea si no cabe. La descripción corta una palabra larga para no salirse del margen. El ícono de error va en `danger`. `LoadingState` dibuja tres filas de esqueleto en `sand` con la forma de `BookRow`, para que la página no salte, y pulsa solo si la persona no pidió reducir movimiento. La ficha de un libro que viene de Open Library espera con `BookSkeleton`, en `src/features/book/`, con su misma forma: la escena, el título y el registro, y sin autor dice "Autor desconocido" en ese mismo lugar.
 
 ### Movimiento
 
@@ -845,7 +848,7 @@ Un riel que solo vive en celular y en computador es grilla usa `lg:grid lg:snap-
 - **Do** usa solo los tokens de `src/index.css`: colores, tamaños, radios y sombras.
 - **Do** muestra cada estado con texto además de color, como pide la regla 3.
 - **Do** pon los tags solo sobre `white`, `paper`, `shell` o `sand`, donde el test vigila que lleguen a 4,5:1, o en su píldora blanca sobre un tono.
-- **Do** escribe etiqueta de texto junto a cada ícono, también en la barra de navegación. Las únicas excepciones son las flechas de un riel y el corazón en celular.
+- **Do** escribe etiqueta de texto junto a cada ícono, también en la barra de navegación. Las únicas excepciones son las flechas de un riel y el corazón en celular y en las filas de Inicio en tablet.
 - **Do** mantén 44 px como mínimo en todo control, y que nada dependa solo del hover.
 - **Do** usa el color de una portada solo con `coverTone`, en una tarjeta que carga ese libro, o como tinte detrás de portadas.
 - **Do** deja que un riel sea un scroll nativo, y usa `useRail` para lo que el navegador no da.
