@@ -1,30 +1,72 @@
 import { BookOpen } from 'lucide-react'
 import { Link, useNavigate } from 'react-router'
-import { BookCover, bookPath, Button, EmptyState } from '../../components'
+import { Avatar, BookCover, bookPath, Button, EmptyState } from '../../components'
 import { cx } from '../../components/cx'
-import { readingTime } from './feed'
+import { coverTone } from '../../lib/coverTone'
+import { ACTIVITY_VERBS, firstName, readingTime, type FeedItem } from './feed'
 import type { ReadingBook } from './useHome'
 
 const THREE_COLUMNS = 3
 
-function ReadingTile({ book, entry, narrow }: ReadingBook & { narrow: boolean }) {
+interface ReadingCardProps extends ReadingBook {
+  /** How the card shares the row: alone, with one more book, or with two or more. */
+  company: 'alone' | 'pair' | 'many'
+  /** What a friend did with this same book. */
+  friend?: FeedItem
+}
+
+/** The whole cover, always. Next to its text where the column has room, and over it where not. */
+function ReadingCard({ book, entry, company, friend }: ReadingCardProps) {
+  const beside = company === 'alone' ? 'flex-row' : company === 'pair' ? 'md:flex-row' : ''
   return (
     <Link
       to={bookPath(book.id)}
       state={{ from: '/' }}
-      className="block rounded-control transition-[translate] duration-100 active:translate-y-px"
+      viewTransition
+      style={{ backgroundColor: coverTone(book.id) }}
+      className={cx(
+        'flex h-full flex-col gap-3 rounded-tile text-white transition-[translate] duration-200 active:translate-y-px md:gap-4 md:p-4 lg:gap-5 lg:p-5',
+        company === 'many' ? 'p-2 min-[360px]:p-3' : 'p-3',
+        beside,
+        company === 'alone' && 'lg:max-w-xl',
+      )}
     >
-      <BookCover book={book} status={entry.status} />
-      {/*
-        16 px, because the ribbon hangs 8 px below the cover. A long word breaks by syllables: three
-        columns leave 85 px at 320, less than "Frankenstein".
-      */}
-      <span className="mt-4 line-clamp-2 font-serif text-lg/snug font-semibold wrap-anywhere hyphens-auto">
-        {book.title}
+      <span
+        className={cx(
+          'cover-lift block shrink-0',
+          company === 'many' ? 'w-full max-w-36' : 'w-full md:w-26 lg:w-32',
+          company === 'alone' && 'w-26',
+        )}
+      >
+        <BookCover book={book} status={entry.status} raised />
       </span>
-      {/* Three columns leave 85 px at 320, and "Llevas 30 días" takes one line at this size. */}
-      <span className={cx('block text-sm text-muted', narrow && 'max-[359px]:text-xs')}>
-        {readingTime(entry.startedAt)}
+      <span className="flex min-w-0 flex-1 flex-col">
+        {/* A long word breaks by syllables: three columns leave 73 px at 320. */}
+        <span className="line-clamp-3 font-serif text-lg/[1.15] font-semibold tracking-[-0.02em] wrap-anywhere hyphens-auto md:text-[1.5rem]/[1.12] lg:text-[2rem]/[1.1]">
+          {book.title}
+        </span>
+        <span className="mt-1 line-clamp-1 text-sm text-white/88 max-md:hidden lg:mt-1.5 lg:text-base">
+          {book.authors[0]}
+        </span>
+        <span className="mt-auto pt-2 text-sm md:pt-3">
+          {friend && (
+            <span className="mb-1 flex items-center gap-1.5 text-white/88 max-md:hidden">
+              <Avatar user={friend.user} size="xs" />
+              <span className="min-w-0 truncate">
+                {firstName(friend.user.name)} {ACTIVITY_VERBS[friend.activity.kind]}
+              </span>
+            </span>
+          )}
+          <span className={cx('block font-semibold', company === 'many' && 'max-[359px]:text-xs')}>
+            {readingTime(entry.startedAt)}
+            {book.pages && (
+              <span className="font-normal text-white/88 max-lg:hidden">
+                {' '}
+                · {book.pages} páginas
+              </span>
+            )}
+          </span>
+        </span>
       </span>
     </Link>
   )
@@ -42,22 +84,34 @@ function NothingReading() {
   )
 }
 
-export function ReadingNow({ reading }: { reading: ReadingBook[] }) {
+export interface ReadingNowProps {
+  reading: ReadingBook[]
+  feed: FeedItem[]
+}
+
+/** Almost nobody reads more than two or three books at a time, so all of them are in sight. */
+export function ReadingNow({ reading, feed }: ReadingNowProps) {
+  const many = reading.length >= THREE_COLUMNS
+  const company = many ? 'many' : reading.length === 2 ? 'pair' : 'alone'
   return (
-    <section className="mt-5">
-      <h2 className="mb-3 section-title">Leyendo ahora</h2>
+    <section>
+      <h2 className="page-title">Leyendo ahora</h2>
       {reading.length === 0 ? (
         <NothingReading />
       ) : (
         <ul
           className={cx(
-            'grid gap-x-4 gap-y-5',
-            reading.length >= THREE_COLUMNS ? 'grid-cols-3' : 'grid-cols-2',
+            'mt-4 grid gap-2.5 lg:gap-4',
+            many ? 'grid-cols-3' : reading.length === 2 ? 'grid-cols-2' : 'grid-cols-1',
           )}
         >
           {reading.map((item) => (
-            <li key={item.book.id}>
-              <ReadingTile {...item} narrow={reading.length >= THREE_COLUMNS} />
+            <li key={item.book.id} className="min-w-0">
+              <ReadingCard
+                {...item}
+                company={company}
+                friend={feed.find(({ book }) => book.id === item.book.id)}
+              />
             </li>
           ))}
         </ul>

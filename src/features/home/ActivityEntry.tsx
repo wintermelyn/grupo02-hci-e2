@@ -1,7 +1,6 @@
 import { Link } from 'react-router'
-import { Avatar, BookCover, bookPath, Stars } from '../../components'
-import { personPath } from '../friends/people'
-import { ActivityLine } from './ActivityLine'
+import { BookCover, bookPath, Stars } from '../../components'
+import { ActivityAvatar, ActivityLine } from './ActivityLine'
 import { timeAgo, type FeedItem } from './feed'
 import { LikeButton } from './LikeButton'
 
@@ -14,45 +13,51 @@ export interface ActivityEntryProps {
 }
 
 /**
- * The row of Inicio with room for what a longer list needs: the cover, to recognise the book, and
- * the score. On a phone the actions go under the text, because next to it they leave 136 px at 320,
- * and the date goes with them, where it can take a line of its own.
+ * The row of Inicio with room for what a longer list needs: a larger cover, the author and the score.
+ * All of it opens the book; the avatar and the heart go over that link.
  */
 export function ActivityEntry({ item, from, dated }: ActivityEntryProps) {
   const { activity, user, book } = item
-  const toBook = { to: bookPath(book.id), state: { from } }
 
   return (
     <li className="border-b border-line last:border-b-0">
-      <div className="-mx-2 flex items-start gap-3 rounded-control px-2 py-2 transition-colors duration-100 has-[a:active]:bg-shell md:items-center">
-        <Link
-          to={personPath(user.id)}
-          aria-label={`Ver a ${user.name}`}
-          className="flex size-11 shrink-0 items-center justify-center rounded-full"
-        >
-          <Avatar user={user} />
-        </Link>
-        <div className="min-w-0 flex-1 md:flex md:items-center md:gap-3">
-          <Link {...toBook} data-activity-link className="block min-w-0 flex-1 rounded-control">
+      <div className="relative -mx-2 flex items-center gap-3.5 rounded-row px-2 py-3 transition-colors duration-100 has-[[data-activity-link]:active]:bg-sand hover:bg-shell">
+        <span className="w-14 shrink-0">
+          <BookCover book={book} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <ActivityAvatar user={user} />
+          <Link
+            to={bookPath(book.id)}
+            state={{ from }}
+            viewTransition
+            data-activity-link
+            className="block outline-none after:absolute after:inset-0 after:rounded-row focus-visible:after:outline-2 focus-visible:after:outline-ink"
+          >
             <ActivityLine item={item}>
-              {dated && <span className="max-md:hidden"> · {timeAgo(activity.date)}</span>}
+              {dated && (
+                <span className="whitespace-pre max-md:hidden"> · {timeAgo(activity.date)}</span>
+              )}
             </ActivityLine>
-            <span className="line-clamp-3 font-serif text-lg/snug font-semibold">{book.title}</span>
+            <span className="mt-0.5 line-clamp-2 font-serif text-lg/snug font-semibold">
+              {book.title}
+            </span>
           </Link>
-          <div className="-ml-2 flex flex-wrap items-center md:ml-0 md:shrink-0 md:flex-row-reverse md:gap-2">
-            <LikeButton item={item} />
-            {activity.rating !== undefined && <Stars value={activity.rating} />}
+          <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-sm text-muted">
+            {activity.rating !== undefined ? (
+              <Stars value={activity.rating} />
+            ) : (
+              <span>{book.authors[0]}</span>
+            )}
             {dated && (
-              <span className="pl-2 text-sm whitespace-nowrap text-muted md:hidden">
+              <span className="md:hidden">
+                <span aria-hidden>· </span>
                 {timeAgo(activity.date)}
               </span>
             )}
-          </div>
+          </p>
         </div>
-        {/* The title link is the one announced; the cover is a second target, as in BookRow. */}
-        <Link {...toBook} tabIndex={-1} aria-hidden className="mt-1 w-11 shrink-0 md:mt-0">
-          <BookCover book={book} />
-        </Link>
+        <LikeButton item={item} className="relative z-10 shrink-0" />
       </div>
     </li>
   )

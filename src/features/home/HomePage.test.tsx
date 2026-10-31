@@ -75,6 +75,39 @@ describe('Inicio', () => {
     expect(within(section).getByRole('list')).toHaveClass(columns)
   })
 
+  it('gives one book the whole width', () => {
+    setReadingBooks(1)
+    renderApp('/')
+    const section = screen.getByRole('heading', { name: 'Leyendo ahora' }).closest('section')!
+    expect(within(section).getByRole('list')).toHaveClass('grid-cols-1')
+  })
+
+  it('tints each reading card with the colour of its book', () => {
+    renderApp('/')
+    expect(screen.getByRole('link', { name: /Carrie/ }).style.backgroundColor).not.toBe('')
+  })
+
+  it('says on a reading card which friend has the same book', () => {
+    renderApp('/')
+    const section = screen.getByRole('heading', { name: 'Leyendo ahora' }).closest('section')!
+    expect(within(section).getByRole('link', { name: /Dune/ })).toHaveTextContent('Diego empezó')
+  })
+
+  it('tells the rows apart with the colour of each book', () => {
+    renderApp('/')
+    const tones = activityRows().map((row) => row.querySelector('[style]')?.getAttribute('style'))
+    expect(new Set(tones).size).toBe(PREVIEW_LENGTH)
+  })
+
+  it('opens the book from the whole row, with the avatar and the heart over it', () => {
+    renderApp('/')
+    const [row] = activityRows()
+    expect(within(row).getByRole('link', { name: /Nuestra parte de noche/ })).toHaveClass(
+      'after:inset-0',
+    )
+    expect(within(row).getByRole('button', { name: /gusta/ })).toHaveClass('relative', 'z-10')
+  })
+
   it('shows the last 5 activities and a way to the rest, with how many there are', () => {
     renderApp('/')
     expect(activityRows()).toHaveLength(PREVIEW_LENGTH)
@@ -145,6 +178,30 @@ describe('like', () => {
     expect(button).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByText('Valentina verá que te gustó')).toBeInTheDocument()
     expect(button.textContent).not.toMatch(/\d/)
+  })
+
+  it('is only the heart on a phone, with the word from a wider screen', () => {
+    renderApp('/')
+    const [button] = likeButtons()
+    expect(within(button).getByText('Me gusta')).toHaveClass('max-md:hidden')
+  })
+
+  it('shows the heart filled once it is given, in the shape and not only in the colour', () => {
+    renderApp('/')
+    const [button] = likeButtons()
+    const heart = () => button.querySelector('svg')?.getAttribute('fill')
+    expect(heart()).toBe('none')
+    fireEvent.click(button)
+    expect(heart()).toBe('currentColor')
+  })
+
+  it('does not take Deshacer away from a change in the library', () => {
+    state().setStatus('OL81626W', 'want')
+    renderApp('/')
+    fireEvent.click(likeButtons()[0])
+    expect(screen.queryByText('Valentina verá que te gustó')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Deshacer/ })).toBeInTheDocument()
+    expect(likeButtons()[0]).toHaveAttribute('aria-pressed', 'true')
   })
 
   it('says which activity it acts on, with a name that does not depend on its state', () => {
