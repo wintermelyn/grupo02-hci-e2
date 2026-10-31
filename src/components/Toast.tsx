@@ -17,7 +17,7 @@ export function Toast() {
     <div
       role="status"
       aria-live="polite"
-      className="pointer-events-none fixed inset-x-0 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-50 flex justify-center px-4 md:bottom-6"
+      className="pointer-events-none fixed inset-x-0 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-50 flex justify-center px-4 lg:bottom-6 lg:pl-[calc(var(--sidebar)+1rem)]"
     >
       {toast && <ToastCard key={toast.id} toast={toast} />}
     </div>
@@ -97,7 +97,7 @@ function ToastCard({ toast }: { toast: ToastData }) {
           type="button"
           onClick={undoAndRestoreFocus}
           onKeyDown={onUndoKeyDown}
-          className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-control px-3 font-semibold text-shell hover:bg-white/10 focus-visible:outline-white active:bg-white/20"
+          className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-3 font-semibold text-shell hover:bg-white/10 focus-visible:outline-white active:bg-white/20"
         >
           <Undo2 aria-hidden size={18} />
           Deshacer

@@ -1,6 +1,8 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { MemoryRouter, Route, Routes } from 'react-router'
 import { describe, expect, it } from 'vitest'
 import { renderApp } from '../test/router'
+import { AppShell } from './AppShell'
 
 const SECTIONS = ['Inicio', 'Mis libros', 'Descubrir', 'Buscar', 'Más']
 
@@ -63,6 +65,58 @@ describe('AppShell', () => {
   it('marks no section on a book page', () => {
     renderApp('/libro/OL81626W')
     for (const nav of navigationBars()) expect(activeSections(nav)).toEqual([])
+  })
+
+  // The page has its own path, so the shell is checked alone, with one page at that path.
+  it('keeps Inicio active on /actividad, where touching it goes back to where the list was', () => {
+    render(
+      <MemoryRouter initialEntries={['/actividad']}>
+        <Routes>
+          <Route element={<AppShell />}>
+            <Route path="actividad" element={<h1>Actividad</h1>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>,
+    )
+    for (const nav of navigationBars()) {
+      expect(activeSections(nav)).toEqual(['Inicio'])
+      expect(within(nav).getByRole('link', { name: 'Inicio' })).toHaveAttribute(
+        'aria-current',
+        'true',
+      )
+    }
+  })
+
+  it('keeps the bottom bar on the edge, solid, up to lg', () => {
+    renderApp('/')
+    const bar = navigationBars().find((nav) => nav.hasAttribute('data-bottom-bar'))
+    expect(bar).toHaveClass('fixed', 'inset-x-0', 'bottom-0', 'bg-paper', 'lg:hidden')
+    expect(bar?.className).not.toContain('backdrop-blur')
+  })
+
+  it('names the product and says it is a prototype on the sidebar', () => {
+    renderApp('/')
+    const sidebar = screen.getByRole('complementary')
+    expect(within(sidebar).getByRole('link', { name: 'Goodreads' })).toHaveAttribute('href', '/')
+    expect(within(sidebar).getByText(/^Prototipo de rediseño/)).toBeInTheDocument()
+  })
+
+  it.each(['/', '/descubrir', '/buscar'])('gives %s all the width', (path) => {
+    renderApp(path)
+    expect(screen.getByRole('main')).not.toHaveClass('max-w-app')
+  })
+
+  it.each(['/biblioteca', '/biblioteca/carpeta/terror', '/libro/OL81626W', '/amigos'])(
+    'keeps %s in the column',
+    (path) => {
+      renderApp(path)
+      expect(screen.getByRole('main')).toHaveClass('max-w-app')
+    },
+  )
+
+  it('leaves room under the last row for the bar and the toast', () => {
+    renderApp('/')
+    expect(screen.getByRole('main').className).toContain('pb-[calc(8rem+')
   })
 
   describe('scroll between pages', () => {
