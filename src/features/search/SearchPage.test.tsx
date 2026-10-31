@@ -401,6 +401,17 @@ describe('the best result', () => {
     expect(name).not.toHaveClass('lg:text-xl/[1.15]')
   })
 
+  it('keeps its covers clear of the longest amount under 360 px', () => {
+    renderApp('/buscar')
+    const author = within(section('Autores de Mis libros')).getByRole('button', {
+      name: /Stephen King/,
+    })
+    expect(author.querySelector('.absolute')).toHaveClass(
+      'max-[360px]:right-1.5',
+      'max-[360px]:w-12',
+    )
+  })
+
   it('keeps the small name in the cards of Mis libros', () => {
     renderApp('/buscar')
     const author = within(section('Autores de Mis libros')).getByRole('button', {

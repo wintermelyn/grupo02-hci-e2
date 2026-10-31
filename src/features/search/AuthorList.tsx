@@ -9,11 +9,12 @@ const FEATURED_COVERS = 3
 
 // Each cover and where it leans, cut by the foot of the card. Under 400 px they step aside, because
 // the card is 139 px wide, with a name of up to three lines and the amount of books at its feet.
+// Under 360 px they shrink a little more and clear "48 libros", the longest amount of the catalog.
 // Alone in its row, up to lg, the card has room to spare, and they grow to fill it.
 const FIRST_COVER =
-  'z-10 right-7 -bottom-12 w-17 -rotate-[7deg] max-[399px]:right-4 max-[399px]:-bottom-9 max-[399px]:w-13 group-only/tile:max-lg:right-18 group-only/tile:max-lg:-bottom-16 group-only/tile:max-lg:w-24'
+  'z-10 right-7 -bottom-12 w-17 -rotate-[7deg] max-[399px]:right-4 max-[399px]:-bottom-9 max-[399px]:w-13 max-[360px]:right-1.5 max-[360px]:w-12 group-only/tile:max-lg:right-18 group-only/tile:max-lg:-bottom-16 group-only/tile:max-lg:w-24'
 const SECOND_COVER =
-  '-right-3 -bottom-14 w-17 rotate-[9deg] max-[399px]:-right-5 max-[399px]:-bottom-8 max-[399px]:w-13 group-only/tile:max-lg:right-1 group-only/tile:max-lg:-bottom-18 group-only/tile:max-lg:w-24'
+  '-right-3 -bottom-14 w-17 rotate-[9deg] max-[399px]:-right-5 max-[399px]:-bottom-8 max-[399px]:w-13 max-[360px]:w-12 group-only/tile:max-lg:right-1 group-only/tile:max-lg:-bottom-18 group-only/tile:max-lg:w-24'
 
 const COVER_PLACES = [
   `${FIRST_COVER} lg:right-8 lg:-bottom-14 lg:w-20`,
