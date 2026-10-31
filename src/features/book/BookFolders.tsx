@@ -1,10 +1,10 @@
 import { Plus } from 'lucide-react'
 import { useMemo } from 'react'
 import { Link } from 'react-router'
-import { Button, folderPath } from '../../components'
+import { AnchoredMenu, Button, folderPath } from '../../components'
 import { useStore } from '../../store'
 import type { Book, LibraryEntry } from '../../types'
-import { FolderMenu } from '../library/FolderMenu'
+import { pinnedFirst } from '../library/filters'
 import { LedgerRow } from './LedgerRow'
 
 export interface BookFoldersProps {
@@ -19,9 +19,24 @@ export interface BookFoldersProps {
  */
 export function BookFolders({ book, entry }: BookFoldersProps) {
   const folders = useStore((state) => state.folders)
+  const addToFolder = useStore((state) => state.addToFolder)
+  const removeFromFolder = useStore((state) => state.removeFromFolder)
   const bookFolders = useMemo(
     () => folders.filter(({ id }) => entry.folderIds.includes(id)),
     [folders, entry.folderIds],
+  )
+  const options = useMemo(
+    () =>
+      pinnedFirst(folders).map(({ id, name }) => {
+        const checked = entry.folderIds.includes(id)
+        return {
+          id,
+          label: name,
+          checked,
+          onSelect: () => (checked ? removeFromFolder : addToFolder)([book.id], id),
+        }
+      }),
+    [folders, entry.folderIds, book.id, addToFolder, removeFromFolder],
   )
   // Named after what the person came to do. With no folders, there is nothing to take out yet.
   const hasFolders = bookFolders.length > 0
@@ -48,11 +63,15 @@ export function BookFolders({ book, entry }: BookFoldersProps) {
         ) : (
           <p className="flex min-h-11 items-center text-muted">Sin carpetas</p>
         )}
-        <FolderMenu
-          book={book}
-          folderIds={entry.folderIds}
+        <AnchoredMenu
+          label={`Carpetas de «${book.title}»`}
+          kind="checkbox"
+          checkedLabel="Agregado"
+          align="end"
+          resetKey={book.id}
           // Its text ends where "Cambiar o quitar" ends, on the row above.
           className="-mr-2 shrink-0"
+          options={options}
           trigger={(triggerProps) => (
             <Button
               {...triggerProps}

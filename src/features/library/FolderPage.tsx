@@ -1,4 +1,4 @@
-import { FolderOpen, FolderX, Plus } from 'lucide-react'
+import { FolderOpen, FolderX } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import {
@@ -26,18 +26,13 @@ import {
   useFilteredBooks,
 } from './filters'
 import { FolderOptions } from './FolderOptions'
-import { FolderToggle } from './FolderToggle'
 import { NoBooks } from './NoBooks'
-import { QUERY_PARAM, useListFilters } from './useListFilters'
-
-/** In the URL, so the book page goes back to the same list of books to add. */
-const ADD_PARAM = 'agregar'
+import { useListFilters } from './useListFilters'
 
 type Editing = 'rename' | 'delete'
 
 function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => void }) {
-  const { searchParams, tag, typed, query, search, setParams } = useListFilters()
-  const adding = searchParams.has(ADD_PARAM)
+  const { tag, typed, query, search, setParams } = useListFilters()
   const [editing, setEditing] = useState<Editing>()
   const [name, setName] = useState('')
   const library = useStore((state) => state.library)
@@ -54,25 +49,16 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
     optionsRef.current?.querySelector('button')?.focus()
   }, [editing])
 
-  // While adding, the same filters and the same search run over the whole library.
-  const entries = useMemo(() => {
-    const all = Object.values(library)
-    return adding ? all : all.filter(({ folderIds }) => folderIds.includes(folder.id))
-  }, [library, folder.id, adding])
+  const entries = useMemo(
+    () => Object.values(library).filter(({ folderIds }) => folderIds.includes(folder.id)),
+    [library, folder.id],
+  )
   const counts = useMemo(() => countByTag(entries), [entries])
 
   const books = useFilteredBooks(entries, tag, query)
 
   function chooseTag(value: TagFilterValue) {
     setParams({ [TAG_PARAM]: value === 'all' ? '' : value })
-  }
-
-  function startAdding() {
-    setParams({ [ADD_PARAM]: '1', [QUERY_PARAM]: '' })
-  }
-
-  function stopAdding() {
-    setParams({ [ADD_PARAM]: '', [TAG_PARAM]: '', [QUERY_PARAM]: '' })
   }
 
   function startRename() {
@@ -94,7 +80,7 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
   const label = tag === 'all' ? undefined : STATUS_LABELS[tag]
   const renaming = editing === 'rename'
   const hasBooks = counts.all > 0
-  const options = !folder.pinned && !adding && (
+  const options = !folder.pinned && (
     <div ref={optionsRef}>
       <FolderOptions folder={folder} onRename={startRename} onDelete={() => setEditing('delete')} />
     </div>
@@ -126,8 +112,8 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
           !renaming &&
           (hasBooks ? (
             <BandSearch
-              label={adding ? 'Buscar en Mis libros' : `Buscar en «${folder.name}»`}
-              placeholder={adding ? 'Buscar en Mis libros' : `Buscar en ${folder.name}`}
+              label={`Buscar en «${folder.name}»`}
+              placeholder={`Buscar en ${folder.name}`}
               value={typed}
               onChange={search}
             >
@@ -146,24 +132,7 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
             <Button onClick={stopEditing}>Cancelar</Button>
           </div>
         )}
-        <div className="md:flex md:items-end md:justify-between md:gap-4">
-          <div className="min-w-0 md:flex-1">
-            <TagFilter value={tag} counts={counts} onChange={chooseTag} />
-          </div>
-          {!editing && (
-            <div className="mt-1 flex items-center justify-end gap-3 md:mt-0">
-              {adding && <p className="min-w-0 flex-1 text-sm text-muted">Elige de Mis libros</p>}
-              {/* One button that changes its words, so the focus stays on it. */}
-              <Button
-                compact
-                icon={adding ? undefined : Plus}
-                onClick={adding ? stopAdding : startAdding}
-              >
-                {adding ? 'Listo' : 'Agregar libros'}
-              </Button>
-            </div>
-          )}
-        </div>
+        <TagFilter value={tag} counts={counts} onChange={chooseTag} />
       </PageHeader>
 
       {editing === 'delete' && (
@@ -185,12 +154,8 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
       {!hasBooks ? (
         <EmptyState
           icon={FolderOpen}
-          title={adding ? 'Aún no tienes libros' : 'Esta carpeta está vacía'}
-          description={
-            adding
-              ? 'Agrégalos a Mis libros desde Buscar o Descubrir.'
-              : 'Abre un libro y toca «Agregar» en la fila Carpetas.'
-          }
+          title="Esta carpeta está vacía"
+          description="Abre un libro y toca «Agregar» en la fila Carpetas."
         />
       ) : (
         <>
@@ -200,21 +165,17 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
           </p>
           {books.length > 0 ? (
             <BookList
-              title={adding ? `Agregar a «${folder.name}»` : (label ?? 'Libros')}
+              title={label ?? 'Libros'}
               books={books}
-              showFolders={adding || tag !== 'all'}
-              openFolderId={adding ? undefined : folder.id}
-              rowAction={
-                adding ? (book) => <FolderToggle book={book} folder={folder} /> : undefined
-              }
+              showFolders={tag !== 'all'}
+              openFolderId={folder.id}
             />
           ) : (
             <NoBooks
-              name={adding ? 'Mis libros' : folder.name}
+              name={folder.name}
               label={label}
               query={query}
               total={counts.all}
-              place={adding ? 'Mis libros' : undefined}
               onShowAll={() => chooseTag('all')}
             />
           )}

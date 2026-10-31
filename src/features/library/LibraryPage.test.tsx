@@ -79,13 +79,6 @@ describe('LibraryPage', () => {
     expect(rows.at(-1)).toHaveTextContent(/^Un mundo feliz/)
   })
 
-  it('offers the menu of folders on the rows of Todos too', () => {
-    renderApp('/biblioteca')
-    expect(main().getByRole('button', { name: 'Carpetas de «Fundación»' })).toHaveTextContent(
-      'Carpetas',
-    )
-  })
-
   it('has no list in Todos without books, only the board', () => {
     useStore.setState({ library: {} })
     renderApp('/biblioteca')
@@ -161,19 +154,6 @@ describe('LibraryPage', () => {
       renderApp('/biblioteca?tag=want&q=fundaci')
       expect(row(/^Fundación/)).toHaveTextContent('Ciencia ficción')
       expect(row(/^Fundación/)).toHaveTextContent('Lo quiero')
-    })
-
-    it('adds a book to a folder from its row, without opening it, with Deshacer', () => {
-      renderApp('/biblioteca?tag=want')
-      fireEvent.click(main().getByRole('button', { name: 'Carpetas de «Fundación»' }))
-      const menu = main().getByRole('menu', { name: 'Carpetas de «Fundación»' })
-      fireEvent.click(within(menu).getByRole('menuitemcheckbox', { name: 'Próximos' }))
-
-      expect(currentLocation()).toBe('/biblioteca?tag=want')
-      expect(row(/^Fundación/)).toHaveTextContent('Próximos · Ciencia ficción')
-      expect(toast()).toHaveTextContent('Agregado a «Próximos»')
-      fireEvent.click(screen.getByRole('button', { name: 'Deshacer' }))
-      expect(row(/^Fundación/)).not.toHaveTextContent('Próximos')
     })
 
     it('keeps the tag in the results of Todos, where nothing else says it', () => {

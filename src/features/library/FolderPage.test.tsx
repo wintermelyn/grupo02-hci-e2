@@ -1,11 +1,9 @@
 import { act, fireEvent, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { useStore } from '../../store'
 import { currentLocation, renderApp } from '../../test/router'
 import { state, stubAction } from '../../test/store'
 
 const TERROR = '/biblioteca/carpeta/terror' // 10 libros: 6 Lo quiero, 2 Lo tengo, 1 Leyendo, 1 Leído
-const FUNDACION = 'OL46125W'
 const PROXIMOS = '/biblioteca/carpeta/proximos' // Fija
 
 const main = () => within(screen.getByRole('main'))
@@ -33,139 +31,6 @@ function chooseOption(name: string) {
   fireEvent.click(optionsButton())
   fireEvent.click(main().getByRole('menuitem', { name }))
 }
-
-describe('row of a folder', () => {
-  it('takes a book out of the folder from its menu, and the focus stays in the list', () => {
-    renderApp(TERROR)
-    const button = main().getByRole('button', { name: 'Carpetas de «Carrie»' })
-    button.focus()
-    fireEvent.click(button)
-    fireEvent.click(
-      within(main().getByRole('menu', { name: 'Carpetas de «Carrie»' })).getByRole(
-        'menuitemcheckbox',
-        { name: /^Terror/ },
-      ),
-    )
-    expect(main().queryByRole('link', { name: /^Carrie/ })).not.toBeInTheDocument()
-    expect(document.activeElement).toBe(main().getByRole('list'))
-    expect(toast()).toHaveTextContent('Quitado de «Terror»')
-  })
-})
-
-describe('Agregar libros', () => {
-  const PROXIMOS_ADDING = `${PROXIMOS}?agregar=1`
-  const addButton = () => main().getByRole('button', { name: 'Agregar libros' })
-  const doneButton = () => main().getByRole('button', { name: 'Listo' })
-  const addTo = (title: string) =>
-    main().getByRole('button', { name: `Agregar «${title}» a «Próximos»` })
-  const removeFrom = (title: string) =>
-    main().getByRole('button', { name: `Quitar «${title}» de «Próximos»` })
-  const rowTitled = (name: RegExp) => main().getByRole('link', { name })
-
-  it('is in a pinned folder', () => {
-    renderApp(PROXIMOS)
-    expect(addButton()).toBeInTheDocument()
-  })
-
-  it('is in an empty folder too, in the same place', () => {
-    state().createFolder('Vacía')
-    renderApp('/biblioteca/carpeta/vacia')
-    expect(addButton()).toBeInTheDocument()
-  })
-
-  it('shows the whole library in the same page, keeping the title and the way back', () => {
-    renderApp(PROXIMOS)
-    fireEvent.click(addButton())
-    expect(currentLocation()).toBe(PROXIMOS_ADDING)
-    expect(screen.getByRole('heading', { level: 1, name: 'Próximos' })).toBeInTheDocument()
-    expect(main().getByRole('link', { name: 'Mis libros' })).toBeInTheDocument()
-    expect(tagButton(/^Todos: 34 libros/)).toBeInTheDocument()
-    expect(main().getByRole('heading', { name: 'Agregar a «Próximos»' })).toBeInTheDocument()
-    expect(bookTitles()).toHaveLength(34)
-  })
-
-  it('keeps the focus on the button, which changes its words', () => {
-    renderApp(PROXIMOS)
-    const button = addButton()
-    button.focus()
-    fireEvent.click(button)
-    expect(doneButton()).toBe(button)
-    expect(button).toHaveFocus()
-  })
-
-  it('goes down to the 17 of Lo quiero with its tag button, as T2 needs', () => {
-    renderApp(PROXIMOS_ADDING)
-    fireEvent.click(tagButton(/^Lo quiero: 17/))
-    expect(bookTitles()).toHaveLength(17)
-  })
-
-  it('searches the library, not the folder', () => {
-    renderApp(PROXIMOS_ADDING)
-    fireEvent.change(main().getByRole('searchbox', { name: 'Buscar en Mis libros' }), {
-      target: { value: 'fundaci' },
-    })
-    expect(bookTitles()).toHaveLength(1)
-  })
-
-  it('adds a book in one tap, without moving it, and says where it is now', () => {
-    renderApp(PROXIMOS_ADDING)
-    const before = bookTitles().length
-    const button = addTo('Fundación')
-    fireEvent.click(button)
-
-    expect(state().library[FUNDACION].folderIds).toEqual(['ciencia-ficcion', 'proximos'])
-    expect(bookTitles()).toHaveLength(before)
-    expect(removeFrom('Fundación')).toBe(button)
-    expect(rowTitled(/^Fundación/)).toHaveTextContent('Próximos · Ciencia ficción')
-    expect(toast()).toHaveTextContent('Agregado a «Próximos»')
-  })
-
-  it('takes a book out in one tap, and Deshacer brings it back', () => {
-    renderApp(PROXIMOS_ADDING)
-    fireEvent.click(addTo('Fundación'))
-    fireEvent.click(removeFrom('Fundación'))
-    expect(addTo('Fundación')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Deshacer' }))
-    expect(removeFrom('Fundación')).toBeInTheDocument()
-  })
-
-  it('does not take the book out with the second click of a double tap', () => {
-    renderApp(PROXIMOS_ADDING)
-    fireEvent.click(addTo('Fundación'), { detail: 1 })
-    fireEvent.click(removeFrom('Fundación'), { detail: 2 })
-    expect(state().library[FUNDACION].folderIds).toContain('proximos')
-  })
-
-  it('goes back to the folder with Listo, without the filters of the library', () => {
-    renderApp(`${PROXIMOS_ADDING}&tag=want&q=fundaci`)
-    fireEvent.click(addTo('Fundación'))
-    fireEvent.click(doneButton())
-    expect(currentLocation()).toBe(PROXIMOS)
-    expect(tagButton(/^Todos: 3 libros/)).toHaveAttribute('aria-pressed', 'true')
-    expect(addButton()).toBeInTheDocument()
-    expect(bookTitles()).toHaveLength(3)
-  })
-
-  it('comes back from a book with the list as it was', () => {
-    renderApp(`${PROXIMOS_ADDING}&tag=want`)
-    fireEvent.click(rowTitled(/^Fundación/))
-    fireEvent.click(main().getByRole('link', { name: 'Próximos' }))
-    expect(currentLocation()).toBe(`${PROXIMOS_ADDING}&tag=want`)
-    expect(addTo('Fundación')).toBeInTheDocument()
-  })
-
-  it('leaves Opciones out while choosing', () => {
-    renderApp(`${TERROR}?agregar=1`)
-    expect(main().queryByRole('button', { name: 'Opciones' })).not.toBeInTheDocument()
-  })
-
-  it('says so when the library has nothing to add', () => {
-    useStore.setState({ library: {} })
-    renderApp(PROXIMOS_ADDING)
-    expect(main().getByRole('heading', { name: 'Aún no tienes libros' })).toBeInTheDocument()
-    expect(doneButton()).toBeInTheDocument()
-  })
-})
 
 describe('FolderPage', () => {
   it('shows the name of the folder, how many books it has and the way back', () => {

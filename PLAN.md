@@ -47,7 +47,7 @@ Es una página web responsiva. En el celular y la tablet tiene una barra de nave
 | `/` | **Inicio:** tarjeta "Leyendo ahora", que abre la ficha, + actividad de amigos | B |
 | `/actividad` | **Toda la actividad:** vista aparte dentro de Inicio, por Hoy, Esta semana y Antes | B |
 | `/biblioteca` | **Mis libros:** aviso periódico, botones de tag, tablero "Mis carpetas" (2 portadas, nombre, cantidad), "+ Nueva carpeta" y, en "Todos", la lista de todos los libros debajo. Con un tag activo, la lista de libros con ese tag en vez del tablero | A |
-| `/biblioteca/carpeta/:folderId` | **Carpeta:** botones de tag, lista de libros con su tag, buscador interno, "Agregar libros" | A |
+| `/biblioteca/carpeta/:folderId` | **Carpeta:** botones de tag, lista de libros con su tag, buscador interno | A |
 | `/biblioteca/sin-carpeta` | **Sin carpeta:** la misma pantalla de una carpeta, con los libros que no están en ninguna, sin renombrar ni eliminar | A |
 | `/libro/:bookId` | **Ficha:** portada, datos, tag con lápiz, carpetas del libro, fechas y puntaje | A |
 | `/descubrir` | **Descubrir:** carrusel con "Seleccionados para ti" y las listas prehechas, al mismo nivel y siempre a la vista | B |
@@ -422,8 +422,7 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | "Lo tengo" | "Cada libro tiene un estado", el selector ofrece una opción entre cuatro y el filtro muestra los que "tiene y no ha leído" | Es el cuarto valor de `status`, excluyente. Reemplaza a "Poseo", así que un libro en "Leído" no registra si lo tengo |
 | Fechas y puntaje al terminar | El journey 2.2.2 pasa de elegir "Leído" a volver a Mis libros, sin un paso intermedio. N4 nombra fechas y puntaje | "Leído" se aplica de inmediato con fin = hoy. Las fechas y el puntaje se editan después en la ficha |
 | Tag inicial de T1 | El paso 3 del journey 2.2.2 dice "Quiero leer", un nombre que no está entre los tags de la decisión 2 | T1 parte en "Leyendo". Falta corregir ese paso en el informe |
-| Selección múltiple | No aparece | Queda fuera. Los libros se agregan a carpetas y se quitan de a uno: desde la ficha, desde "Carpetas" en su fila o con "Agregar libros" en una carpeta |
-| Agregar libros a una carpeta | Solo dice que un libro puede estar en varias | Cada fila de una lista trae "Carpetas", el mismo menú de la ficha, sin pasos previos. Dentro de una carpeta, "Agregar libros" muestra toda la biblioteca en esa misma pantalla, con sus botones de tag y su buscador, y cada fila ofrece "+ Agregar" o "Quitar". T2 cuesta dos toques por libro desde "Lo quiero", sin abrir fichas |
+| Selección múltiple | No aparece | Queda fuera. Los libros se agregan a carpetas y se quitan desde la ficha |
 | "Próximos" | No aparece | Se mantiene como carpeta fija porque es el destino de T2 |
 | "No" del aviso | "Lo quita de Lo quiero" y muestra "Quitado de tu lista" | El libro sale de Mis libros y de sus carpetas, y el aviso lo dice antes y después, con el título y sin hablar de "tu lista". Deshacer devuelve el libro y la pregunta |
 | "Cada cierto tiempo" y "mucho tiempo" | Sin valores | Un aviso respondido por día y 90 días en la lista |
@@ -461,7 +460,7 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Campo de fecha | No aparece | Campo nativo con un solo ícono. En Firefox queda su ícono, y el formato sigue el idioma del navegador |
 | Campo de formulario | No aparece | Pieza compartida desde la fase 4, para renombrar carpeta, "+ Nueva carpeta" y lo que venga |
 | Nombres de carpeta | No aparece | Máximo 40 caracteres. Los repetidos se comparan sin mayúsculas, tildes ni espacios externos |
-| Carpeta vacía | No aparece | Se oculta el buscador, queda "Agregar libros" y se explica cómo agregarlos desde la ficha |
+| Carpeta vacía | No aparece | Se oculta el buscador y se explica cómo agregar libros desde la ficha |
 | Límites del calendario | Fechas futuras deshabilitadas | Inicio llega hasta hoy y fin va de inicio a hoy. Si inicio queda después de fin, un texto lo explica y no se guarda |
 | Falla de red en una ficha | No aparece | Error con Reintentar, separado de "Libro no encontrado" |
 | Orden en Amigos | No aparece | Amigos y solicitudes por nombre. Los resultados siguen el orden del directorio |
