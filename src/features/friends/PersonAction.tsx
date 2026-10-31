@@ -1,6 +1,6 @@
 import { Clock, Plus, UserCheck, type LucideIcon } from 'lucide-react'
 import type { MouseEvent, ReactNode } from 'react'
-import { Button, type ButtonVariant } from '../../components'
+import { Button } from '../../components'
 import { useStore } from '../../store'
 import type { Friendship, User } from '../../types'
 
@@ -8,8 +8,6 @@ export interface PersonActionProps {
   user: User
   /** Undefined when there is no friendship or request yet. */
   status?: Friendship['status']
-  /** Variant of the button. The same for adding and removing, as rule 11 asks. */
-  variant?: ButtonVariant
   /** Offers "Quitar de amigos", which only the page of the person has. */
   canRemove?: boolean
   className?: string
@@ -36,7 +34,6 @@ function StateLabel({ icon: Icon, children }: { icon: LucideIcon; children: Reac
 export function PersonAction({
   user,
   status,
-  variant = 'secondary',
   canRemove = false,
   className = '',
 }: PersonActionProps) {
@@ -72,12 +69,12 @@ export function PersonAction({
   }
 
   return (
-    <div className={`flex flex-wrap items-center gap-x-2 gap-y-1 ${className}`}>
+    <div className={`flex min-h-11 flex-wrap items-center gap-x-2 gap-y-1 ${className}`}>
       {status === 'pending' && <StateLabel icon={Clock}>Solicitud enviada</StateLabel>}
       {status === 'friends' && <StateLabel icon={UserCheck}>Amigos</StateLabel>}
       {/* Always in this slot, so the button keeps the focus when its action changes. */}
       {action && (
-        <Button variant={variant} icon={action.icon} aria-label={action.name} onClick={runOnce}>
+        <Button icon={action.icon} aria-label={action.name} onClick={runOnce}>
           {action.label}
         </Button>
       )}

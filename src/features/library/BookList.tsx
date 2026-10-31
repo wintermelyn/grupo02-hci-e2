@@ -13,7 +13,10 @@ export function BookList({ title, books }: BookListProps) {
       <h2 className="sr-only">{title}</h2>
       <ul className="md:grid md:grid-cols-2 md:gap-x-8">
         {books.map((book) => (
-          <li key={book.id} className="border-b border-line last:border-b-0">
+          <li
+            key={book.id}
+            className="border-b border-line last:border-b-0 md:nth-last-2:odd:border-b-0"
+          >
             <BookRow book={book} />
           </li>
         ))}

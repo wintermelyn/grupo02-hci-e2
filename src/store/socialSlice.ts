@@ -19,7 +19,14 @@ export const ACCEPT_AFTER_MS = 4000
 
 // None of these actions touch library or folders, so they skip commit and their toasts have no undo.
 export const createSocialSlice: SliceCreator<SocialActions> = (set, get) => {
-  const nameOf = (userId: string) => get().users.find(({ id }) => id === userId)?.name
+  /** A homonym goes with the username, or the toast would not say who it was. */
+  function nameOf(userId: string) {
+    const { users } = get()
+    const user = users.find(({ id }) => id === userId)
+    if (!user) return undefined
+    const hasHomonym = users.some(({ id, name }) => id !== userId && name === user.name)
+    return hasHomonym ? `${user.name} (@${user.username})` : user.name
+  }
 
   /** Timers are never cleared: cancelling or resetting the demo leaves nothing here to accept. */
   function accept({ userId, since }: Friendship) {

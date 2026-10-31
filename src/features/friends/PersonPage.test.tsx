@@ -69,12 +69,25 @@ describe('PersonPage', () => {
   })
 })
 
+describe('PersonPage books', () => {
+  it('says that the tags and stars of the rows are mine', () => {
+    renderApp('/amigos/camila')
+    expect(main().getByText(/son los tuyos/)).toBeInTheDocument()
+  })
+
+  it('does not say it when no book is in my library', () => {
+    state().removeFromLibrary(Object.keys(state().library))
+    renderApp('/amigos/camila')
+    expect(main().queryByText(/son los tuyos/)).not.toBeInTheDocument()
+  })
+})
+
 describe('PersonPage action', () => {
-  it('offers a single primary Agregar', () => {
+  it('offers a single Agregar, like the rows of Amigos', () => {
     renderApp('/amigos/camila')
     const button = main().getByRole('button', { name: 'Agregar a @camitorres' })
     expect(button).toHaveTextContent('Agregar')
-    expect(button).toHaveClass('bg-ink')
+    expect(button).toHaveClass('bg-white')
     expect(main().getAllByRole('button')).toHaveLength(1)
   })
 
@@ -85,7 +98,7 @@ describe('PersonPage action', () => {
     fireEvent.click(button)
     expect(main().getByText('Solicitud enviada')).toBeInTheDocument()
     const cancel = main().getByRole('button', { name: /^Cancelar/ })
-    expect(cancel).toHaveClass('bg-ink')
+    expect(cancel).toHaveClass('bg-white')
     expect(cancel).toHaveFocus()
     fireEvent.click(cancel)
     expect(main().getByRole('button', { name: 'Agregar a @camitorres' })).toBeInTheDocument()
@@ -97,7 +110,7 @@ describe('PersonPage action', () => {
     fireEvent.click(main().getByRole('button', { name: /^Agregar/ }))
     act(() => vi.advanceTimersByTime(ACCEPT_AFTER_MS))
     expect(main().getByText('Amigos', { selector: 'span' })).toBeInTheDocument()
-    expect(main().getByRole('button', { name: /^Quitar de amigos/ })).toHaveClass('bg-ink')
+    expect(main().getByRole('button', { name: /^Quitar de amigos/ })).toHaveClass('bg-white')
     expect(main().queryByText('Solicitud enviada')).not.toBeInTheDocument()
   })
 

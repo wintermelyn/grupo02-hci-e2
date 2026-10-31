@@ -176,6 +176,17 @@ describe('person row', () => {
     expect(rowOf('camitorres').getByRole('link')).not.toContainElement(button)
   })
 
+  it('keeps the action on its own line once accepted, so the next row does not move', () => {
+    vi.useFakeTimers()
+    renderApp('/amigos?q=Camila')
+    const row = rowOf('camitorres')
+    const line = row.getByRole('button', { name: /^Agregar/ }).parentElement
+    fireEvent.click(row.getByRole('button', { name: /^Agregar/ }))
+    act(() => vi.advanceTimersByTime(ACCEPT_AFTER_MS))
+    expect(row.getByText('Amigos').parentElement).toBe(line)
+    expect(line).toHaveClass('w-full')
+  })
+
   it('offers Agregar as secondary, since there are several rows', () => {
     renderApp('/amigos?q=camila')
     const buttons = main().getAllByRole('button', { name: /^Agregar/ })
@@ -199,7 +210,7 @@ describe('person row', () => {
     expect(rowOf('camitorres').getByText('Solicitud enviada')).toBeInTheDocument()
     expect(cancelButton('camitorres')).toHaveClass('bg-white')
     expect(rowOf('camitorres').queryByRole('button', { name: /^Agregar/ })).toBeNull()
-    expect(toast('Solicitud enviada a Camila Torres')).toBeInTheDocument()
+    expect(toast('Solicitud enviada a Camila Torres (@camitorres)')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Deshacer' })).not.toBeInTheDocument()
   })
 
@@ -308,13 +319,13 @@ describe('T3', () => {
     fireEvent.click(addButton('camitorres'))
 
     expect(rowOf('camitorres').getByText('Solicitud enviada')).toBeInTheDocument()
-    expect(toast('Solicitud enviada a Camila Torres')).toBeInTheDocument()
+    expect(toast('Solicitud enviada a Camila Torres (@camitorres)')).toBeInTheDocument()
 
     act(() => vi.advanceTimersByTime(ACCEPT_AFTER_MS - 1))
     expect(rowOf('camitorres').getByText('Solicitud enviada')).toBeInTheDocument()
 
     act(() => vi.advanceTimersByTime(1))
-    expect(toast('Camila Torres aceptó tu solicitud')).toBeInTheDocument()
+    expect(toast('Camila Torres (@camitorres) aceptó tu solicitud')).toBeInTheDocument()
     expect(rowOf('camitorres').getByText('Amigos')).toBeInTheDocument()
     expect(rowOf('camitorres').queryByText('Solicitud enviada')).toBeNull()
     expect(addButton('ctorres_99')).toBeInTheDocument()
@@ -329,6 +340,6 @@ describe('T3', () => {
     fireEvent.click(addButton('camitorres'))
     fireEvent.click(screen.getAllByRole('link', { name: 'Inicio' })[0])
     act(() => vi.advanceTimersByTime(ACCEPT_AFTER_MS))
-    expect(toast('Camila Torres aceptó tu solicitud')).toBeInTheDocument()
+    expect(toast('Camila Torres (@camitorres) aceptó tu solicitud')).toBeInTheDocument()
   })
 })

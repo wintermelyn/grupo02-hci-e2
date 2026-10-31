@@ -17,11 +17,17 @@ function compareNames(a: User, b: User): number {
   return a.name.localeCompare(b.name, 'es-CL')
 }
 
-function PeopleList({ people, statusOf }: { people: User[]; statusOf: StatusOf }) {
+interface PeopleListProps {
+  people: User[]
+  statusOf: StatusOf
+  stableHeight?: boolean
+}
+
+function PeopleList({ people, statusOf, stableHeight }: PeopleListProps) {
   return (
     <RowList>
       {people.map((user) => (
-        <PersonRow key={user.id} user={user} status={statusOf(user)} />
+        <PersonRow key={user.id} user={user} status={statusOf(user)} stableHeight={stableHeight} />
       ))}
     </RowList>
   )
@@ -48,7 +54,7 @@ function SearchResults({
   return (
     <section className="mt-2">
       <h2 className="sr-only">Resultados</h2>
-      <PeopleList people={people} statusOf={statusOf} />
+      <PeopleList people={people} statusOf={statusOf} stableHeight />
     </section>
   )
 }

@@ -75,8 +75,21 @@ describe('FolderPage', () => {
   it('follows the store when a tag changes', () => {
     renderApp(`${TERROR}?tag=reading`)
     act(() => state().setStatus('OL81626W', 'owned'))
-    expect(main().getByRole('heading', { name: 'Aún no hay libros aquí' })).toBeInTheDocument()
+    expect(
+      main().getByRole('heading', { name: 'Ningún libro con el estado «Leyendo»' }),
+    ).toBeInTheDocument()
     expect(tagButton(/^Lo tengo: 3/)).toBeInTheDocument()
+  })
+
+  it('shows the way back to a book that left the active tag', () => {
+    renderApp(`${TERROR}?tag=reading`)
+    act(() => state().setStatus('OL81626W', 'owned'))
+    expect(
+      main().getByText('Los 10 libros de esta carpeta tienen otro estado.'),
+    ).toBeInTheDocument()
+    fireEvent.click(main().getByRole('button', { name: 'Ver todos los libros' }))
+    expect(currentLocation()).toBe(TERROR)
+    expect(bookTitles()).toHaveLength(10)
   })
 
   describe('search', () => {
@@ -161,12 +174,14 @@ describe('FolderPage', () => {
       renderApp(`${TERROR}?tag=read`)
       search('zzz')
       expect(main().getByText(/estado «Leído» coincide con «zzz»/)).toBeInTheDocument()
+      expect(main().getByRole('button', { name: 'Ver todos los libros' })).toBeInTheDocument()
     })
 
     it('tells what a tag without books in this folder is for', () => {
       renderApp('/biblioteca/carpeta/novela?tag=reading')
-      expect(main().getByRole('heading', { name: 'Aún no hay libros aquí' })).toBeInTheDocument()
-      expect(main().getByText(/esta carpeta tenga el estado «Leyendo»/)).toBeInTheDocument()
+      expect(
+        main().getByRole('heading', { name: 'Ningún libro con el estado «Leyendo»' }),
+      ).toBeInTheDocument()
       expect(searchBox()).toBeInTheDocument()
     })
 

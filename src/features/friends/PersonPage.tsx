@@ -12,7 +12,10 @@ function BookList({ books }: { books: Book[] }) {
   return (
     <RowList>
       {books.map((book) => (
-        <li key={book.id} className="border-b border-line last:border-b-0">
+        <li
+          key={book.id}
+          className="border-b border-line last:border-b-0 md:nth-last-2:odd:border-b-0"
+        >
           <BookRow book={book} />
         </li>
       ))}
@@ -56,9 +59,16 @@ function PersonDetails({ user, backTo }: { user: User; backTo: string }) {
         <Avatar user={user} size="lg" />
         <div className="flex min-w-0 flex-col gap-2">
           <p className="text-muted">{mutualFriendsLabel(user.mutualFriends)}</p>
-          <PersonAction user={user} status={status} variant="primary" canRemove />
+          <PersonAction user={user} status={status} canRemove />
         </div>
       </div>
+
+      {/* BookRow always shows my tag and my stars, which here could pass for the person's. */}
+      {shared.length > 0 && (
+        <p className="mt-3 text-sm text-muted">
+          Los estados y las estrellas de cada libro son los tuyos.
+        </p>
+      )}
 
       {reading.length > 0 && (
         <Section title="Está leyendo">

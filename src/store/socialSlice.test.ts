@@ -27,7 +27,7 @@ describe('sendFriendRequest', () => {
       since: '2026-11-01T02:30:00.000Z',
     })
     expect(state().toast).toMatchObject({
-      message: 'Solicitud enviada a Camila Torres',
+      message: 'Solicitud enviada a Camila Torres (@camitorres)',
       undoable: false,
     })
   })
@@ -39,9 +39,16 @@ describe('sendFriendRequest', () => {
     vi.advanceTimersByTime(1)
     expect(friendshipOf('camila')?.status).toBe('friends')
     expect(state().toast).toMatchObject({
-      message: 'Camila Torres aceptó tu solicitud',
+      message: 'Camila Torres (@camitorres) aceptó tu solicitud',
       undoable: false,
     })
+  })
+
+  it('names a homonym by the username and anyone else by the name alone', () => {
+    state().sendFriendRequest('ctorres99')
+    expect(toastMessage()).toBe('Solicitud enviada a Camila Torres (@ctorres_99)')
+    state().sendFriendRequest('ignacio')
+    expect(toastMessage()).toBe('Solicitud enviada a Ignacio Pérez')
   })
 
   it('ignores an id that is not in the directory', () => {
@@ -82,7 +89,7 @@ describe('cancelFriendRequest', () => {
     state().cancelFriendRequest('camila')
     expect(friendshipOf('camila')).toBeUndefined()
     expect(state().toast).toMatchObject({
-      message: 'Solicitud a Camila Torres cancelada',
+      message: 'Solicitud a Camila Torres (@camitorres) cancelada',
       undoable: false,
     })
   })
@@ -92,7 +99,7 @@ describe('cancelFriendRequest', () => {
     state().cancelFriendRequest('camila')
     vi.advanceTimersByTime(ACCEPT_AFTER_MS)
     expect(friendshipOf('camila')).toBeUndefined()
-    expect(toastMessage()).toBe('Solicitud a Camila Torres cancelada')
+    expect(toastMessage()).toBe('Solicitud a Camila Torres (@camitorres) cancelada')
   })
 
   it('leaves a friend alone', () => {
@@ -112,7 +119,7 @@ describe('cancelFriendRequest', () => {
     // The first timer fires here. It must not accept the new request.
     vi.advanceTimersByTime(ACCEPT_AFTER_MS - 3000)
     expect(friendshipOf('camila')).toEqual(resent)
-    expect(toastMessage()).toBe('Solicitud enviada a Camila Torres')
+    expect(toastMessage()).toBe('Solicitud enviada a Camila Torres (@camitorres)')
 
     vi.advanceTimersByTime(3000)
     expect(friendshipOf('camila')?.status).toBe('friends')
@@ -158,7 +165,7 @@ describe('processPendingRequests', () => {
     setPending('camila', ACCEPT_AFTER_MS + 1)
     state().processPendingRequests()
     expect(friendshipOf('camila')?.status).toBe('friends')
-    expect(toastMessage()).toBe('Camila Torres aceptó tu solicitud')
+    expect(toastMessage()).toBe('Camila Torres (@camitorres) aceptó tu solicitud')
   })
 
   it('accepts a request of exactly 4 s', () => {

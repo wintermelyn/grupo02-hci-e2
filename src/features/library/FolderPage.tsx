@@ -1,7 +1,14 @@
 import { FolderOpen, FolderX, SearchX } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router'
-import { EmptyState, PageHeader, SearchField, TagFilter } from '../../components'
+import {
+  Button,
+  EmptyState,
+  PageHeader,
+  SearchField,
+  TagFilter,
+  type TagFilterValue,
+} from '../../components'
 import { ignoreSecondClick } from '../../components/ignoreSecondClick'
 import { STATUS_LABELS } from '../../lib/status'
 import { useStore } from '../../store'
@@ -21,7 +28,19 @@ import { FolderOptions } from './FolderOptions'
 const LIBRARY_PATH = '/biblioteca'
 const QUERY_PARAM = 'q'
 
-function NoBooks({ folder, label, query }: { folder: Folder; label?: string; query: string }) {
+interface NoBooksProps {
+  folder: Folder
+  label?: string
+  query: string
+  /** How many books the folder has, whatever their tag. */
+  total: number
+  onShowAll: () => void
+}
+
+function NoBooks({ folder, label, query, total, onShowAll }: NoBooksProps) {
+  // A book that changes its tag leaves this list but stays in the folder, so the way back is here.
+  const showAll = label && <Button onClick={onShowAll}>Ver todos los libros</Button>
+
   if (query) {
     return (
       <EmptyState
@@ -29,17 +48,23 @@ function NoBooks({ folder, label, query }: { folder: Folder; label?: string; que
         title="Sin resultados"
         description={
           label
-            ? `Ningún libro con el estado «${label}» coincide con «${query}». Prueba con «Todos».`
+            ? `Ningún libro con el estado «${label}» coincide con «${query}».`
             : `Ningún libro de «${folder.name}» coincide con «${query}».`
         }
+        action={showAll}
       />
     )
   }
   return (
     <EmptyState
       icon={FolderOpen}
-      title="Aún no hay libros aquí"
-      description={`Cuando un libro de esta carpeta tenga el estado «${label}», va a aparecer en esta lista.`}
+      title={`Ningún libro con el estado «${label}»`}
+      description={
+        total === 1
+          ? 'El libro de esta carpeta tiene otro estado.'
+          : `Los ${total} libros de esta carpeta tienen otro estado.`
+      }
+      action={showAll}
     />
   )
 }
@@ -87,6 +112,10 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
     setParam(QUERY_PARAM, value)
   }
 
+  function chooseTag(value: TagFilterValue) {
+    setParam(TAG_PARAM, value === 'all' ? '' : value)
+  }
+
   const label = tag === 'all' ? undefined : STATUS_LABELS[tag]
 
   return (
@@ -102,11 +131,7 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
           )
         }
       >
-        <TagFilter
-          value={tag}
-          counts={counts}
-          onChange={(value) => setParam(TAG_PARAM, value === 'all' ? '' : value)}
-        />
+        <TagFilter value={tag} counts={counts} onChange={chooseTag} />
       </PageHeader>
 
       {counts.all === 0 ? (
@@ -131,7 +156,13 @@ function FolderContent({ folder, onDelete }: { folder: Folder; onDelete: () => v
           {books.length > 0 ? (
             <BookList title={label ?? 'Libros'} books={books} />
           ) : (
-            <NoBooks folder={folder} label={label} query={query} />
+            <NoBooks
+              folder={folder}
+              label={label}
+              query={query}
+              total={counts.all}
+              onShowAll={() => chooseTag('all')}
+            />
           )}
         </>
       )}
