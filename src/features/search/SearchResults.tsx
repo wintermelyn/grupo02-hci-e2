@@ -8,7 +8,7 @@ import { BestBook } from './BestBook'
 import { Highlight } from './Highlight'
 import type { ArrangedResults, AuthorGroup } from './results'
 
-// A word this long still fits at 320 px, and a title cannot break inside one.
+/** The title breaks a word that does not fit, so this only keeps it from taking over the block. */
 const MAX_QUERY_IN_TITLE = 24
 /** As many as the best result can stand beside. */
 const BOOKS_BESIDE_LEAD = 5
