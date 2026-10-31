@@ -79,16 +79,21 @@ export function SearchPage() {
 
   return (
     <section>
-      <PageHeader title="Buscar">
-        <div ref={field} onKeyDown={onKeyDown} className="mb-4 md:max-w-2xl">
-          <SearchField
-            label="Buscar libros y autores"
-            placeholder="Título o autor"
-            value={query}
-            onChange={setQuery}
-          />
-        </div>
-      </PageHeader>
+      <PageHeader title="Buscar" />
+      {/* Solid and to the edges of the column: what scrolls under it does not show through. */}
+      <div
+        ref={field}
+        onKeyDown={onKeyDown}
+        className="full-bleed sticky top-0 z-30 -mt-2 bg-paper py-2"
+      >
+        <SearchField
+          size="lg"
+          label="Buscar libros y autores"
+          placeholder="Título o autor"
+          value={query}
+          onChange={setQuery}
+        />
+      </div>
 
       {!text ? (
         <SearchStart
