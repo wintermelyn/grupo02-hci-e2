@@ -1,26 +1,25 @@
-import { BookX } from 'lucide-react'
-import { useMemo } from 'react'
-import { Link, useLocation, useParams } from 'react-router'
-import {
-  BackLink,
-  BookCover,
-  EmptyState,
-  folderPath,
-  PageHeader,
-  StatusControl,
-  Wordmark,
-} from '../../components'
+import { BookMinus } from 'lucide-react'
+import { useRef } from 'react'
+import { matchPath, useLocation, useParams } from 'react-router'
+import { BackLink, BookCover, Button, StatusControl, Wordmark } from '../../components'
 import { selectBook, selectEntry, useStore } from '../../store'
-import type { Book, LibraryEntry } from '../../types'
+import type { Book, Folder } from '../../types'
+import { BookFolders } from './BookFolders'
+import { MissingBook } from './MissingBook'
+import { ReadingDetails } from './ReadingDetails'
 
 const LIBRARY_PATH = '/biblioteca'
+const FOLDER_PATTERN = `${LIBRARY_PATH}/carpeta/:folderId`
 
 /** BookRow says which list the book was opened from; a shared link has no such state. */
-function backTarget(state: unknown): { to: string; label: string } {
+function backTarget(state: unknown, folders: Folder[]): { to: string; label: string } {
   const from = (state as { from?: string } | null)?.from
   if (!from) return { to: LIBRARY_PATH, label: 'Mis libros' }
-  const isLibrary = from === LIBRARY_PATH || from.startsWith(`${LIBRARY_PATH}?`)
-  return { to: from, label: isLibrary ? 'Mis libros' : 'Volver' }
+  const [pathname] = from.split('?')
+  if (pathname === LIBRARY_PATH) return { to: from, label: 'Mis libros' }
+  const folderId = matchPath(FOLDER_PATTERN, pathname)?.params.folderId
+  const folder = folders.find(({ id }) => id === folderId)
+  return { to: from, label: folder?.name ?? 'Volver' }
 }
 
 function BookDetails({ authors, year, pages }: Book) {
@@ -39,54 +38,22 @@ function BookDetails({ authors, year, pages }: Book) {
   )
 }
 
-function BookFolders({ entry }: { entry: LibraryEntry }) {
-  const folders = useStore((state) => state.folders)
-  const bookFolders = useMemo(
-    () => folders.filter(({ id }) => entry.folderIds.includes(id)),
-    [folders, entry.folderIds],
-  )
-
-  return (
-    <section className="mt-5">
-      <h2 className="text-sm font-semibold text-muted">Carpetas</h2>
-      {bookFolders.length > 0 ? (
-        <ul className="mt-1 flex flex-wrap gap-2">
-          {bookFolders.map(({ id, name }) => (
-            <li key={id}>
-              <Link
-                to={folderPath(id)}
-                className="inline-flex min-h-11 items-center rounded-control bg-sand px-3 font-medium transition-[background-color,translate] duration-100 hover:bg-sand-deep active:translate-y-px active:bg-sand-deep"
-              >
-                {name}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-1 text-muted">Este libro no está en ninguna carpeta.</p>
-      )}
-    </section>
-  )
-}
-
 export function BookPage() {
   const { bookId = '' } = useParams()
   const { state } = useLocation()
   const book = useStore(selectBook(bookId))
   const entry = useStore(selectEntry(bookId))
-  const back = backTarget(state)
+  const folders = useStore((state) => state.folders)
+  const removeFromLibrary = useStore((state) => state.removeFromLibrary)
+  const titleRef = useRef<HTMLHeadingElement>(null)
+  const back = backTarget(state, folders)
 
-  if (!book) {
-    return (
-      <section>
-        <PageHeader title="Libro no encontrado" backTo={back.to} backLabel={back.label} />
-        <EmptyState
-          icon={BookX}
-          title="No encontramos este libro"
-          description="Puede que el enlace esté incompleto. Vuelve a Mis libros para seguir."
-        />
-      </section>
-    )
+  if (!book) return <MissingBook key={bookId} bookId={bookId} back={back} />
+
+  function remove() {
+    removeFromLibrary([bookId])
+    // The button leaves with the book, and the focus must not fall back to the top of the page.
+    titleRef.current?.focus()
   }
 
   return (
@@ -103,7 +70,11 @@ export function BookPage() {
         </div>
 
         <header className="pt-6 text-center short:pt-0 short:text-left md:pt-0 md:text-left">
-          <h1 className="font-serif text-title font-semibold tracking-tight short:text-heading md:text-display">
+          <h1
+            ref={titleRef}
+            tabIndex={-1}
+            className="font-serif text-title font-semibold tracking-tight short:text-heading md:text-display"
+          >
             {book.title}
           </h1>
           <BookDetails {...book} />
@@ -112,7 +83,9 @@ export function BookPage() {
         <div className="short:col-span-2 md:col-start-2">
           <StatusControl bookId={book.id} book={book} className="mt-3.5 md:max-w-[34rem]" />
 
-          {entry && <BookFolders entry={entry} />}
+          {entry?.status === 'read' && <ReadingDetails bookId={book.id} entry={entry} />}
+
+          {entry && <BookFolders book={book} entry={entry} />}
 
           <section className="mt-5">
             <h2 className="text-sm font-semibold text-muted">Sobre este libro</h2>
@@ -122,6 +95,12 @@ export function BookPage() {
               <p className="mt-1 text-muted">Aún no tenemos descripción de este libro.</p>
             )}
           </section>
+
+          {entry && (
+            <Button icon={BookMinus} onClick={remove} className="mt-5">
+              Quitar de mi biblioteca
+            </Button>
+          )}
         </div>
       </div>
     </article>
