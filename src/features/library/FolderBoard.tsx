@@ -35,7 +35,7 @@ export function FolderBoard({ entries, unfiledBooks, unfiledTo }: FolderBoardPro
 
   return (
     <section className="mt-5">
-      <h2 className="mb-3 font-serif text-heading font-semibold">Mis carpetas</h2>
+      <h2 className="mb-3 section-title">Mis carpetas</h2>
       <ul className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4 lg:grid-cols-5">
         {board.map(({ folder, count, covers }) => (
           <li key={folder.id}>

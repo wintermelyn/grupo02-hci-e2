@@ -45,7 +45,7 @@ function NothingReading() {
 export function ReadingNow({ reading }: { reading: ReadingBook[] }) {
   return (
     <section className="mt-5">
-      <h2 className="mb-3 font-serif text-heading font-semibold">Leyendo ahora</h2>
+      <h2 className="mb-3 section-title">Leyendo ahora</h2>
       {reading.length === 0 ? (
         <NothingReading />
       ) : (

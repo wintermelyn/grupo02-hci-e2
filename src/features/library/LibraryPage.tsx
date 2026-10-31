@@ -96,7 +96,7 @@ export function LibraryPage() {
     if (showUnfiled) {
       return (
         <section className="mt-5">
-          <h2 className="mb-1 font-serif text-heading font-semibold">Sin carpeta</h2>
+          <h2 className="mb-1 section-title">Sin carpeta</h2>
           <BookList title="Sin carpeta" books={unfiledBooks} />
         </section>
       )

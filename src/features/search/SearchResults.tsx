@@ -105,11 +105,7 @@ export function SearchResults({
         />
       )}
       <section className="mt-5">
-        <h2
-          ref={booksHeading}
-          tabIndex={-1}
-          className="w-fit rounded-control font-serif text-heading font-semibold"
-        >
+        <h2 ref={booksHeading} tabIndex={-1} className="w-fit rounded-control section-title">
           Libros
         </h2>
         {books.length > 0 && (

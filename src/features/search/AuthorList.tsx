@@ -68,7 +68,7 @@ export function AuthorList({
   const reserved = reserving ? Math.max(MAX_AUTHORS - authors.length, 0) : 0
   return (
     <section className="mt-5">
-      <h2 className="font-serif text-heading font-semibold">{title}</h2>
+      <h2 className="section-title">{title}</h2>
       <ul className="mt-1 max-md:[&>li:nth-child(n+5)]:hidden md:grid md:grid-cols-2 md:gap-x-8 lg:grid-cols-3">
         {authors.map((author) => (
           <li key={author.name} className={ROW_LINES}>

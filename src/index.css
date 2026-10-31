@@ -46,20 +46,21 @@
     U+A720-A7FF;
 }
 
-/* The default palette is cleared, so only these colours exist. Text colours keep 4.5:1 or more on
-   white, paper, shell and sand (WCAG 1.4.3). */
+/* The default palette is cleared, so only these colours exist. The ground is a ladder of pale tones
+   of the ribbon's burgundy. Text colours keep 4.5:1 or more on white, paper, shell and sand
+   (WCAG 1.4.3). */
 @theme {
   --color-*: initial;
   --color-white: #ffffff;
-  --color-paper: #faf8f6;
-  --color-shell: #f4f1ea;
-  --color-sand: #ebe2d7;
-  --color-sand-deep: #dfd3c4;
-  --color-sand-dark: #d3c4b1;
-  --color-line: #e9e2d8;
-  --color-edge: #857a6e;
+  --color-paper: #fdfafa;
+  --color-shell: #f9f1f2;
+  --color-sand: #f3e4e6;
+  --color-sand-deep: #ead4d8;
+  --color-sand-dark: #dfc2c8;
+  --color-line: #f0e4e6;
+  --color-edge: #8b7a7d;
   --color-ink: #1e1915;
-  --color-muted: #5f564d;
+  --color-muted: #5e5251;
   --color-ribbon: #7a2334;
   --color-want: #2f4a78;
   --color-owned: #6b3a63;
@@ -72,18 +73,21 @@
 
   --text-display: 2rem;
   --text-display--line-height: 2.375rem;
-  --text-title: 1.75rem;
-  --text-title--line-height: 2.125rem;
   --text-heading: 1.375rem;
   --text-heading--line-height: 1.75rem;
 
-  --radius-control: 6px;
-  --radius-card: 8px;
-  --radius-float: 10px;
+  --radius-control: 10px;
+  --radius-row: 14px;
+  --radius-card: 16px;
+  --radius-float: 16px;
+  --radius-tile: 20px;
+  --radius-tab: 22px;
+  --radius-stage: 24px;
 
   --shadow-float: 0 2px 4px rgb(30 25 21 / 14%), 0 18px 34px -8px rgb(30 25 21 / 40%);
   --shadow-book: 0 1px 1px rgb(30 25 21 / 20%), 0 6px 12px -5px rgb(30 25 21 / 35%);
   --shadow-book-lg: 0 2px 3px rgb(30 25 21 / 22%), 0 16px 26px -10px rgb(30 25 21 / 50%);
+  --shadow-cover: 0 1px 2px rgb(20 12 8 / 22%), 0 14px 28px -12px rgb(20 12 8 / 55%);
 
   --ease-quick: cubic-bezier(0.16, 1, 0.3, 1);
   --animate-tag-in: tag-in 180ms var(--ease-quick);
@@ -105,10 +109,17 @@
   }
 }
 
-/* Reaches the edges of the screen from inside the app's centred column, keeping its text aligned. */
+/* The colour behind a scene of covers. A registered property, so that changing it can animate. */
+@property --tone {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #1b1714;
+}
+
+/* Reaches the edges of the column from inside main's gutter, keeping its text aligned. */
 @utility full-bleed {
-  margin-inline: calc(50% - 50vw);
-  padding-inline: calc(50vw - 50%);
+  margin-inline: calc(var(--gut) * -1);
+  padding-inline: var(--gut);
 }
 
 /* The notched end of the ribbon, the one mark of what is active. */
@@ -116,7 +127,138 @@
   clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
 }
 
+/* The name of the page: nothing behind it, so its size is what gives it the first place. Under
+   360 px it steps down, for a short title to keep one line next to a button and the product name. */
+@utility page-title {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+
+  @media (width < 22.5rem) {
+    font-size: 1.75rem;
+  }
+
+  @media (width >= 64rem) {
+    font-size: 2.5rem;
+  }
+}
+
+@utility section-title {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+
+  @media (width >= 64rem) {
+    font-size: 1.75rem;
+  }
+}
+
+/* A horizontal rail: no bar of its own, and useRail marks it while the mouse drags it, when it has
+   to follow the hand instead of the snap points. */
+@utility rail {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &[data-dragging] {
+    scroll-snap-type: none !important;
+    cursor: grabbing;
+    user-select: none;
+  }
+
+  &[data-dragging] a {
+    pointer-events: none;
+  }
+}
+
+/* On what wraps a cover inside a link: it answers the hand, and never moves on its own. */
+@utility cover-lift {
+  transition: translate 220ms var(--ease-quick);
+
+  @media (hover: hover) {
+    a:hover > & {
+      translate: 0 -6px;
+    }
+  }
+
+  a:focus-visible > & {
+    translate: 0 -6px;
+  }
+
+  a:active > & {
+    translate: 0 -1px;
+  }
+}
+
+/* The tone of a cover behind other covers, never under text: it changes no contrast. */
+@utility tone-scene {
+  background-color: color-mix(in srgb, var(--tone) 12%, var(--color-paper));
+  transition: --tone 420ms var(--ease-quick);
+}
+
+/* A cover of the carousel: grows while it reaches the centre, without waiting for the end. */
+@utility carousel-item {
+  scale: 0.76;
+  opacity: 0.78;
+  transition:
+    scale 260ms var(--ease-quick),
+    opacity 260ms var(--ease-quick);
+
+  &[data-active='true'] {
+    scale: 1;
+    opacity: 1;
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      transition: none;
+      animation: carousel-focus linear both;
+      animation-timeline: view(inline);
+      animation-range: cover 0% cover 100%;
+    }
+  }
+}
+
+@keyframes carousel-focus {
+  0%,
+  28% {
+    scale: 0.76;
+    opacity: 0.78;
+  }
+
+  50% {
+    scale: 1;
+    opacity: 1;
+  }
+
+  72%,
+  100% {
+    scale: 0.76;
+    opacity: 0.78;
+  }
+}
+
 @layer base {
+  /* Measures of the frame. The gutter also lives on main, and full-bleed undoes it. */
+  :root {
+    --gut: 16px;
+    --sidebar: 14.5rem;
+
+    @media (width >= 48rem) {
+      --gut: 28px;
+    }
+
+    @media (width >= 64rem) {
+      --gut: 44px;
+    }
+  }
+
   html {
     overflow-x: clip;
     scrollbar-color: var(--color-sand) transparent;
@@ -124,6 +266,7 @@
 
   body {
     @apply bg-paper font-sans text-ink antialiased;
+    font-optical-sizing: auto;
     caret-color: var(--color-ribbon);
     accent-color: var(--color-ink);
   }
@@ -144,6 +287,17 @@
     outline-offset: 2px;
   }
 
+  /* For a link with viewTransition: the cover travels, and the page behind it only crossfades. */
+  ::view-transition-group(*) {
+    animation-duration: 320ms;
+    animation-timing-function: var(--ease-quick);
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 160ms;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     ::before,
@@ -151,6 +305,12 @@
       animation-duration: 1ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 1ms !important;
+    }
+
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
     }
   }
 }

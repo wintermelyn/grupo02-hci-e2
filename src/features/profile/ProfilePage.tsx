@@ -43,7 +43,7 @@ export function ProfilePage() {
         backLabel="Más"
       />
       <section className="mt-5 md:max-w-lg">
-        <h2 className="font-serif text-heading font-semibold">Demo</h2>
+        <h2 className="section-title">Demo</h2>
         <p className="mt-1 text-muted">
           Vuelve a los libros, carpetas y amigos del comienzo, para repetir una tarea desde cero.
         </p>

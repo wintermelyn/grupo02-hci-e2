@@ -16,7 +16,7 @@ export interface ActivityPreviewProps {
 export function ActivityPreview({ feed, viewLinkRef }: ActivityPreviewProps) {
   return (
     <section className="mt-6 md:mt-5">
-      <h2 className="font-serif text-heading font-semibold">Actividad de tus amigos</h2>
+      <h2 className="section-title">Actividad de tus amigos</h2>
       {feed.length === 0 ? (
         <div className="mt-3">
           <NoActivity />

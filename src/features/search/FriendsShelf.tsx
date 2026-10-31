@@ -20,7 +20,7 @@ function ShelfBook({ book }: { book: Book }) {
 export function FriendsShelf({ books }: { books: Book[] }) {
   return (
     <section className="mt-6">
-      <h2 className="font-serif text-heading font-semibold">Lo que leen tus amigos</h2>
+      <h2 className="section-title">Lo que leen tus amigos</h2>
       {books.length === 0 ? (
         <p className="mt-1 text-muted">Cuando agregues amigos, aquí vas a ver qué están leyendo.</p>
       ) : (

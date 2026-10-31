@@ -11,7 +11,7 @@ export function RecentSearches({ terms, onPick, onClear }: RecentSearchesProps) 
   return (
     <section className="mt-5">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="font-serif text-heading font-semibold">Búsquedas recientes</h2>
+        <h2 className="section-title">Búsquedas recientes</h2>
         <Button
           compact
           variant="quiet"
