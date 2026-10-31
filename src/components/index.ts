@@ -1,4 +1,13 @@
+export {
+  AnchoredMenu,
+  type AnchoredMenuAlign,
+  type AnchoredMenuKind,
+  type AnchoredMenuOption,
+  type AnchoredMenuProps,
+  type AnchoredMenuTriggerProps,
+} from './AnchoredMenu'
 export { AppShell } from './AppShell'
+export { Avatar, type AvatarProps, type AvatarSize } from './Avatar'
 export { BookCover, type BookCoverProps, type BookCoverSize } from './BookCover'
 export { BookRow, type BookRowProps } from './BookRow'
 export { BottomSheet, type BottomSheetProps } from './BottomSheet'
@@ -15,6 +24,7 @@ export {
 } from './PageHeader'
 export { bookPath, folderPath } from './paths'
 export { Ribbon } from './Ribbon'
+export { SearchField, type SearchFieldProps } from './SearchField'
 export { Stars, type StarsProps } from './Stars'
 export { StatusControl, type StatusControlProps } from './StatusControl'
 export { StatusTag, type StatusTagProps } from './StatusTag'

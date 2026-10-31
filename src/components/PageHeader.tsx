@@ -23,7 +23,7 @@ export function BackLink({ to, label = 'Volver' }: BackLinkProps) {
 /** On phones there is no top bar, so the band carries the name of the product. */
 export function Wordmark() {
   return (
-    <p className="flex shrink-0 flex-col items-end md:hidden">
+    <p className="ml-auto flex shrink-0 flex-col items-end md:hidden">
       <span className="font-serif text-sm/tight font-semibold">Goodreads</span>
       <span className="text-xs/tight text-muted">prototipo</span>
     </p>
@@ -37,7 +37,7 @@ export interface PageHeaderProps {
   /** Where "Volver" goes. A fixed path, not history.back(), so it also works on a shared link. */
   backTo?: string
   backLabel?: string
-  /** A single action on the right, e.g. a <Button/>. */
+  /** A single action next to the title, e.g. a <Button/>. The product name moves above it. */
   action?: ReactNode
   /** Sits on the band's bottom edge, e.g. a <TagFilter/>. */
   children?: ReactNode
@@ -52,15 +52,24 @@ export function PageHeader({
   action,
   children,
 }: PageHeaderProps) {
+  // Next to the title it would leave no room for an action on a phone, or for a long title.
+  const wordmarkAbove = Boolean(backTo || action)
+
   return (
     <header className={cx('full-bleed bg-shell pt-4 md:pt-8', !children && 'pb-5')}>
-      {backTo && <BackLink to={backTo} label={backLabel} />}
+      {wordmarkAbove && (
+        <div className="flex items-center justify-between gap-3">
+          {backTo && <BackLink to={backTo} label={backLabel} />}
+          <Wordmark />
+        </div>
+      )}
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <h1 className="font-serif text-display font-semibold tracking-tight">{title}</h1>
           {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
         </div>
-        {action ? <div className="shrink-0">{action}</div> : <Wordmark />}
+        {action && <div className="shrink-0">{action}</div>}
+        {!wordmarkAbove && <Wordmark />}
       </div>
       {children && <div className="mt-3">{children}</div>}
     </header>

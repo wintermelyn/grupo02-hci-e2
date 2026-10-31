@@ -6,6 +6,7 @@ Cada test va junto al código que prueba (`*.test.ts` o `*.test.tsx`). `src/test
 - `stubAction('nombreDeAccion')`: reemplaza una acción por un mock solo durante ese test, para revisar qué llama un componente.
 - `renderWithRouter(ui, { route, path })` y `currentLocation()`: montan un componente en una ruta y dicen a qué URL navegó.
 - `renderApp(path)`: monta la app completa, con `AppShell`, en una URL.
+- `contrast(a, b)`: la razón de contraste WCAG entre dos colores hexadecimales.
 
 `src/routes.test.tsx` falla si se agrega una ruta sin agregarle una URL de ejemplo.
 

@@ -1,10 +1,10 @@
 import type { LucideIcon } from 'lucide-react'
-import type { ButtonHTMLAttributes } from 'react'
+import type { ComponentProps } from 'react'
 import { cx } from './cx'
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger'
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends ComponentProps<'button'> {
   /** Use `primary` for at most one action per screen or panel. */
   variant?: ButtonVariant
   /** Shown before the text; the text label is always required. */

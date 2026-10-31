@@ -75,6 +75,7 @@ rounded:
   card: '8px'
   float: '10px'
   sheet: '16px'
+  avatar: '9999px'
 spacing:
   menu: '6px'
   row: '10px'
@@ -131,19 +132,38 @@ components:
     rounded: '{rounded.card}'
     padding: '0 14px'
     height: '52px'
-  status-menu:
+  anchored-menu:
     backgroundColor: '{colors.white}'
     rounded: '{rounded.float}'
     padding: '6px'
-  status-menu-item:
+  anchored-menu-item:
     rounded: '{rounded.control}'
     padding: '0 10px'
     height: '48px'
-  status-menu-item-selected:
+  anchored-menu-item-selected:
     backgroundColor: '{colors.shell}'
     rounded: '{rounded.control}'
     padding: '0 10px'
     height: '48px'
+  search-field:
+    backgroundColor: '{colors.white}'
+    textColor: '{colors.ink}'
+    typography: '{typography.body}'
+    rounded: '{rounded.control}'
+    padding: '0 0 0 12px'
+    height: '44px'
+  avatar-sm:
+    textColor: '{colors.white}'
+    typography: '{typography.small-label}'
+    rounded: '{rounded.avatar}'
+    width: '40px'
+    height: '40px'
+  avatar-lg:
+    textColor: '{colors.white}'
+    typography: '{typography.subheading}'
+    rounded: '{rounded.avatar}'
+    width: '64px'
+    height: '64px'
   page-header:
     backgroundColor: '{colors.shell}'
     textColor: '{colors.ink}'
@@ -282,7 +302,7 @@ Los cuatro colores de estado se usan en el texto y el ícono de `StatusTag`, y e
 
 - **Papel** (`paper`, #faf8f6): el fondo de la app. También rellena el botón activo de `TagFilter`, que así se abre hacia la página.
 - **Concha** (`shell`, #f4f1ea): la banda superior de cada sección, el hover de las tarjetas y la opción actual del menú. También es el `theme-color` del navegador.
-- **Blanco** (`white`, #ffffff): tarjetas, barras de navegación, menú y panel.
+- **Blanco** (`white`, #ffffff): tarjetas, barras de navegación, campo de búsqueda, menú y panel.
 - **Arena** (`sand`, #ebe2d7): enlaces a carpetas, estado presionado de los controles blancos, botón deshabilitado, esqueletos de carga y selección de texto.
 - **Arena profunda** (`sand-deep`, #dfd3c4): solo el hover y la presión de los enlaces a carpetas.
 - **Línea** (`line`, #e9e2d8): separadores de 1 px entre filas, en el panel y bajo las barras. Es decorativa (1,21:1 sobre papel), así que nunca es la única señal de un control o un estado.
@@ -372,8 +392,8 @@ El sistema se ordena por capas de fondo y sombras suaves teñidas de tinta, nunc
 
 ### Shadow Vocabulary
 
-- **Tarjeta** (`--shadow-card`: `0 1px 2px rgb(30 25 21 / 7%), 0 3px 10px -5px rgb(30 25 21 / 14%)`): tarjetas de carpeta, `Button` y `StatusControl`.
-- **Flotante** (`--shadow-float`: `0 2px 4px rgb(30 25 21 / 14%), 0 18px 34px -8px rgb(30 25 21 / 40%)`): menú de `StatusControl`, toast y `BottomSheet`.
+- **Tarjeta** (`--shadow-card`: `0 1px 2px rgb(30 25 21 / 7%), 0 3px 10px -5px rgb(30 25 21 / 14%)`): tarjetas de carpeta, `Button`, `StatusControl` y `SearchField`.
+- **Flotante** (`--shadow-float`: `0 2px 4px rgb(30 25 21 / 14%), 0 18px 34px -8px rgb(30 25 21 / 40%)`): `AnchoredMenu`, toast y `BottomSheet`.
 - **Libro** (`--shadow-book`: `0 1px 1px rgb(30 25 21 / 20%), 0 6px 12px -5px rgb(30 25 21 / 35%)`): portadas en tamaños `sm` y `fill`.
 - **Libro grande** (`--shadow-book-lg`: `0 2px 3px rgb(30 25 21 / 22%), 0 16px 26px -10px rgb(30 25 21 / 50%)`): la portada `lg` de la ficha.
 
@@ -388,13 +408,15 @@ El sistema se ordena por capas de fondo y sombras suaves teñidas de tinta, nunc
 La forma es de papelería: esquinas apenas redondeadas que crecen con la altura de la capa.
 
 - **Portada** (2 px en el lomo y 3 px en el borde exterior): portadas, sus huecos en `FolderCard` y sus esqueletos en `LoadingState`. Una banda de 8 px con degradado de tinta al 15 % dibuja la bisagra del libro y separa las portadas claras del fondo.
-- **Control** (6 px): botones, enlaces a carpetas y opciones del menú.
+- **Control** (6 px): botones, campo de búsqueda, enlaces a carpetas y opciones del menú.
 - **Tarjeta** (8 px): tarjetas de carpeta, `StatusControl` y bloque de portada de la ficha. Solo arriba en `TagFilter`, para que parezca una pestaña.
 - **Flotante** (10 px): menú y toast. También `BottomSheet` como modal desde `md`.
 - **Panel** (16 px, solo arriba): `BottomSheet` en celular.
 - **Cinta:** rectángulo con muesca en V, con `clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%)`. Se dibuja solo con `Ribbon`.
 
-No hay formas de píldora ni círculos en lo construido.
+- **Avatar:** un círculo, la única forma redonda del sistema. Separa a una persona de un libro de un vistazo, porque las portadas son rectángulos.
+
+No hay formas de píldora.
 
 ## Components
 
@@ -414,7 +436,10 @@ Importa todo desde `src/components/`. Son del bloque base: si necesitas cambiar 
 | Cambiar o agregar el tag de un libro               | `StatusControl`, y no otro control. Recibe `book` si el libro puede no estar en el store |
 | Mostrar o elegir un puntaje                        | `Stars`; con `onChange` es un campo                                                      |
 | Acción con botón                                   | `Button`: `primary`, `secondary` o `danger`                                              |
+| Cambio rápido con pocas opciones, junto al control | `AnchoredMenu`                                                                           |
 | Contenido largo o un formulario                    | `BottomSheet`                                                                            |
+| Buscar o filtrar mientras se escribe               | `SearchField`, en la página, justo bajo la banda                                         |
+| Mostrar a una persona                              | `Avatar`, siempre junto a su nombre                                                      |
 | Confirmar después de un cambio y permitir deshacer | El toast del store, que `AppShell` ya muestra; no montes otro                            |
 | Lista vacía o sin resultados                       | `EmptyState`, con ícono, título, descripción y acción opcional                           |
 | Esperar resultados                                 | `LoadingState`                                                                           |
@@ -425,20 +450,20 @@ Importa todo desde `src/components/`. Son del bloque base: si necesitas cambiar 
 
 Esto dice qué piezas existen para cada pantalla. Su contenido y sus textos salen de `PLAN.md`.
 
-| Pantalla  | Piezas existentes                                                               | Sin componente todavía                     |
-| --------- | ------------------------------------------------------------------------------- | ------------------------------------------ |
-| Carpeta   | `PageHeader` con `backTo` y `TagFilter`, `BookRow`, `EmptyState`, `BottomSheet` | Buscador interno                           |
-| Inicio    | `PageHeader`, `BookCover`, `StatusTag`, `EmptyState`                            | Tarjeta "Leyendo ahora", fila de actividad |
-| Descubrir | `PageHeader`, `BookCover` con `fill`; título de sección en Heading              | Tarjeta de libro para las secciones        |
-| Buscar    | `PageHeader`, `BookRow`, `LoadingState`, `EmptyState`, `ErrorState`             | Campo de búsqueda                          |
-| Más       | `PageHeader`                                                                    | Fila de enlace                             |
-| Amigos    | `PageHeader`, `Button`, `EmptyState`, `LoadingState`, `ErrorState`              | Campo de búsqueda, avatar, fila de persona |
-| Persona   | `PageHeader` con `backTo`, `BookRow`, `Button`                                  | Avatar                                     |
-| Mi perfil | `PageHeader`, `Button` con `danger`, `BottomSheet` para la confirmación         | Avatar                                     |
+| Pantalla  | Piezas existentes                                                                                              | Sin componente todavía                     |
+| --------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Carpeta   | `PageHeader` con `backTo` y `TagFilter`, `BookRow`, `SearchField`, `AnchoredMenu`, `EmptyState`, `BottomSheet` | Nada                                       |
+| Inicio    | `PageHeader`, `BookCover`, `StatusTag`, `EmptyState`                                                           | Tarjeta "Leyendo ahora", fila de actividad |
+| Descubrir | `PageHeader`, `BookCover` con `fill`; título de sección en Heading                                             | Tarjeta de libro para las secciones        |
+| Buscar    | `PageHeader`, `SearchField`, `BookRow`, `LoadingState`, `EmptyState`, `ErrorState`                             | Nada                                       |
+| Más       | `PageHeader`                                                                                                   | Fila de enlace                             |
+| Amigos    | `PageHeader`, `SearchField`, `Avatar`, `Button`, `EmptyState`, `LoadingState`, `ErrorState`                    | Fila de persona                            |
+| Persona   | `PageHeader` con `backTo`, `Avatar`, `BookRow`, `Button`                                                       | Nada                                       |
+| Mi perfil | `PageHeader`, `Avatar`, `Button` con `danger`, `BottomSheet` para la confirmación                              | Nada                                       |
 
-Usar `BottomSheet` para confirmar es una inferencia de este documento: el plan pide confirmación, pero no dice con qué pieza. Conviene revisarlo en el CP.
+`BottomSheet` confirma Reiniciar demo y eliminar carpeta, según la sección 6 de `PLAN.md`.
 
-Tampoco existen todavía el aviso de D5, los campos de fecha, el selector de carpetas ni un menú anclado genérico. **Lo que no está en `src/components/` no tiene aspecto definido.** Arma lo que falte solo con estos tokens, respeta las 14 reglas y anótalo como decisión para el CP. Una pieza que dos pantallas necesiten se propone como compartida, para que los dos roles no construyan versiones distintas. Los campos de texto ya heredan el foco global, el acento de tinta (`accent-color`) y el cursor burdeo. `FolderCard` es de `src/features/library/`: sirve de modelo para una tarjeta, pero no es un componente compartido.
+Tampoco existen todavía el aviso de D5 ni los campos de fecha. **Lo que no está en `src/components/` no tiene aspecto definido.** Arma lo que falte solo con estos tokens, respeta las 14 reglas y anótalo como decisión para el CP. Una pieza que dos pantallas necesiten se propone como compartida, para que los dos roles no construyan versiones distintas. Los campos de texto ya heredan el foco global, el acento de tinta (`accent-color`) y el cursor burdeo. `FolderCard` es de `src/features/library/`: sirve de modelo para una tarjeta, pero no es un componente compartido.
 
 ### Cinta
 
@@ -459,21 +484,48 @@ La firma del sistema. `Ribbon` es decorativo y lleva `aria-hidden`: lo que marca
 
 **La regla del cambio rápido.** Un cambio rápido y reversible, con pocas opciones, se resuelve en un menú anclado junto al control. El contenido largo o un formulario va en un panel. Elegir un tag nunca abre un panel ni un modal.
 
-| Pregunta   | Menú anclado                                                         | Panel inferior                                               |
-| ---------- | -------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Componente | Solo dentro de `StatusControl`                                       | `BottomSheet`                                                |
-| Para qué   | Cambiar o agregar el tag de un libro                                 | Contenido largo, como "Editar lectura", y las confirmaciones |
-| Se aplica  | Al elegir, sin botón de guardar                                      | Con un botón al pie, en `footer`                             |
-| Fondo      | La página sigue visible y sin oscurecer                              | Oscurece con `ink` al 40 % y bloquea el scroll               |
-| Posición   | Pegado al control, a 6 px, y del mismo ancho                         | Abajo en celular y modal centrado de 512 px desde `md`       |
-| Altura     | Cuatro opciones de 48 px, 204 px en total                            | Hasta 85 % de la pantalla, con scroll interno                |
-| Teclado    | Foco en la opción actual, flechas, Inicio, Fin, Escape y clic afuera | Foco atrapado, Escape, y el foco vuelve al control           |
+| Pregunta   | Menú anclado                                                                           | Panel inferior                                                                                    |
+| ---------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Componente | `AnchoredMenu`                                                                         | `BottomSheet`                                                                                     |
+| Para qué   | Tag de un libro, carpetas de un libro y acciones de una pantalla                       | Contenido largo, formularios, como "Editar lectura" o renombrar una carpeta, y las confirmaciones |
+| Se aplica  | Al elegir, sin botón de guardar                                                        | Con un botón al pie, en `footer`                                                                  |
+| Fondo      | La página sigue visible y sin oscurecer                                                | Oscurece con `ink` al 40 % y bloquea el scroll                                                    |
+| Posición   | Pegado al control, a 6 px, y del mismo ancho, o de 256 px si el control es más angosto | Abajo en celular y modal centrado de 512 px desde `md`                                            |
+| Altura     | Opciones de 48 px, hasta 60 % de la pantalla, con scroll interno                       | Hasta 85 % de la pantalla, con scroll interno                                                     |
+| Teclado    | Foco en la opción actual, flechas, Inicio, Fin, Escape y clic afuera                   | Foco atrapado, Escape, y el foco vuelve al control                                                |
 
 - **Dónde abre el menú:** debajo del control siempre que pueda, porque arriba taparía el libro. Si no cabe, la página hace scroll primero. Solo abre hacia arriba cuando la página ya no puede moverse.
+- **Agregar o quitar carpetas de un libro:** es un cambio rápido y reversible, así que va en un menú anclado con todas las carpetas. Tocar una la agrega o la quita, y las dos cosas cuestan lo mismo, como pide la regla 11.
+- **Nombrar una carpeta:** escribir es un formulario, así que crear o renombrar va en el panel.
 - **Toast y panel:** mientras el panel está abierto, el toast no se puede tocar. Quien guarde un cambio en la biblioteca debe cerrar también el panel, para que Deshacer quede disponible.
 - **Pie del panel:** Cancelar y un solo botón `primary`, salvo cuando la acción sea destructiva, que usa `danger`.
 
-`BottomSheet` todavía no aparece en una pantalla real: su aspecto sale del código, no de una captura.
+### AnchoredMenu
+
+El menú anclado de `src/components/AnchoredMenu.tsx`, el mismo de `StatusControl`. Quien lo usa dibuja el control en `trigger`, esparce ahí las props que recibe y le pasa `options`, cada una con `id`, `label` y `onSelect`. `Button` acepta esas props, incluida `ref`.
+
+- **`kind`:** `radio` cuando una opción es la actual, como los tags. `checkbox` cuando pueden ser varias, como las carpetas de un libro. `action` para comandos, sin opción marcada.
+- **`checkedLabel`:** dice con texto que la opción está activa, junto al check. Por defecto es "Actual"; en las carpetas de un libro es "Agregado".
+- **`align`:** `fill` usa el ancho del control. `start` y `end` dan 256 px y alinean el menú con ese borde del control, para botones angostos.
+- **`resetKey`:** al cambiar cierra el menú, como cuando el botón Atrás lleva a otro libro.
+
+Elegir aplica el cambio, cierra el menú y devuelve el foco al control. Un cambio en la biblioteca ya muestra el toast con Deshacer.
+
+### SearchField
+
+Un campo blanco con `shadow-card`, 44 px de alto y radio de control, con la lupa a la izquierda. Filtra mientras se escribe, así que no tiene botón de enviar. Al escribir aparece "Borrar" con su ícono, que limpia el campo y deja el foco ahí.
+
+- **Dónde va:** en la página, 20 px bajo la banda, y no dentro de ella. Así no choca con `TagFilter`, que ocupa el borde inferior de la banda.
+- **Etiqueta:** `label` nombra el campo para lectores de pantalla. `placeholder` dice qué se puede buscar, como "Nombre o @usuario", en `muted`.
+- **Foco:** el contorno global rodea todo el campo, no solo el texto.
+
+### Avatar
+
+Un círculo con las iniciales blancas en serif sobre `avatarColor`, que viene del directorio. `sm` mide 40 px, con Small label, para las filas. `lg` mide 64 px, con Subheading, para el encabezado de una persona. Es decorativo: el nombre siempre va escrito al lado, y entre homónimos los distingue el @usuario, no el color. Un test vigila que todos los colores del directorio den 4,5:1 con el blanco.
+
+### BottomSheet
+
+Todavía no aparece en una pantalla real: su aspecto sale del código, no de una captura.
 
 ### Buttons
 
@@ -490,7 +542,7 @@ Sobrios y estándar, con un solo llamado por pantalla o panel.
 
 ### StatusControl
 
-La tarjeta del tag en la ficha, a todo el ancho y de 52 px de alto. A la izquierda va `StatusTag` y a la derecha el lápiz con "Cambiar". Es blanca con `shadow-card`, con hover `shell` y presión `sand`. Si el libro no está en la biblioteca, se llena de tinta con un más y "Agregar a Mis libros", y abre el mismo menú. El menú es una capa `float` blanca con 6 px de relleno. La opción actual tiene fondo `shell` y un check con "Actual". Aparece en 150 ms con un desplazamiento de 4 px y se aplica de inmediato. "Leído" se elige aquí mismo, sin pasos intermedios.
+La tarjeta del tag en la ficha, a todo el ancho y de 52 px de alto. A la izquierda va `StatusTag` y a la derecha el lápiz con "Cambiar". Es blanca con `shadow-card`, con hover `shell` y presión `sand`. Si el libro no está en la biblioteca, se llena de tinta con un más y "Agregar a Mis libros", y abre el mismo menú. El menú es un `AnchoredMenu`, una capa `float` blanca con 6 px de relleno. La opción actual tiene fondo `shell` y un check con "Actual". Aparece en 150 ms con un desplazamiento de 4 px y se aplica de inmediato. "Leído" se elige aquí mismo, sin pasos intermedios.
 
 ### StatusTag
 
@@ -531,7 +583,7 @@ El único chip construido es el enlace a una carpeta en la ficha, hoy local en `
 - **Celular:** `AppShell` fija una barra blanca abajo, de 64 px más el área segura, con cinco secciones repartidas por igual, ícono de 22 px y etiqueta Caption.
 - **Desde `md`:** barra superior fija, blanca, de 64 px, con "Goodreads" en serif, "Prototipo de rediseño" e íconos de 20 px.
 - **Estados:** la sección activa es de tinta, con peso 700 y cinta. Las demás son `muted` con peso 500 y pasan a tinta con el cursor. "Más" sigue activa en Amigos y Mi perfil.
-- **Marca en celular:** `PageHeader` y la ficha muestran `Wordmark`, porque no hay barra superior. Si a `PageHeader` le pasas `action`, el `Wordmark` no aparece: en esa pantalla el aviso de prototipo se pierde en celular.
+- **Marca en celular:** `PageHeader` y la ficha muestran `Wordmark`, porque no hay barra superior. Va a la derecha del título. Si `PageHeader` recibe `backTo` o `action`, sube a la fila de arriba, para que el título y la acción tengan el ancho. Ninguna pantalla pierde el aviso de prototipo.
 
 ### Toast
 
@@ -547,7 +599,7 @@ Una sola curva, `--ease-quick` (`cubic-bezier(0.16, 1, 0.3, 1)`). Respuestas al 
 
 ### Foco
 
-Un solo estilo: contorno de 2 px de tinta a 2 px de distancia, definido de forma global. No lo reemplaces ni lo quites. Solo el toast lo cambia a blanco, por su fondo oscuro, y las opciones del menú lo dibujan hacia adentro.
+Un solo estilo: contorno de 2 px de tinta a 2 px de distancia, definido de forma global. No lo reemplaces ni lo quites. Solo el toast lo cambia a blanco, por su fondo oscuro, las opciones del menú lo dibujan hacia adentro y `SearchField` lo dibuja alrededor de todo el campo.
 
 ## Do's and Don'ts
 
