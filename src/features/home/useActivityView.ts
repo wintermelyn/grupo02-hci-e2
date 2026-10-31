@@ -57,6 +57,26 @@ export function useActivityViewScroll(viewOpen: boolean) {
   }, [viewOpen])
 }
 
+/**
+ * Inicio stays mounted when the view opens, so nothing else tells a keyboard or a screen reader that
+ * the page changed. Opening goes to the title, and leaving goes back to the link it was opened from.
+ * Opening the URL directly moves nothing: there the page starts as any other.
+ */
+export function useActivityViewFocus(viewOpen: boolean) {
+  const viewTitle = useRef<HTMLSpanElement>(null)
+  const viewLink = useRef<HTMLAnchorElement>(null)
+  const wasOpen = useRef(viewOpen)
+
+  useEffect(() => {
+    if (wasOpen.current === viewOpen) return
+    wasOpen.current = viewOpen
+    const target = viewOpen ? viewTitle : viewLink
+    target.current?.focus({ preventScroll: true })
+  }, [viewOpen])
+
+  return { viewTitle, viewLink }
+}
+
 /** Moves the focus to the first new row after "Ver más", which otherwise stays below all of them. */
 export function useFocusNewRow(rowCount: number) {
   const list = useRef<HTMLDivElement>(null)

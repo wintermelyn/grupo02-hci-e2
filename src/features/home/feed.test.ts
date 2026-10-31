@@ -2,7 +2,14 @@ import { describe, expect, it } from 'vitest'
 import { daysAgo, today } from '../../lib/dates'
 import { state } from '../../test/store'
 import type { Activity, Book } from '../../types'
-import { buildFeed, groupByPeriod, readingTime, timeAgo, type FeedItem } from './feed'
+import {
+  activitySentence,
+  buildFeed,
+  groupByPeriod,
+  readingTime,
+  timeAgo,
+  type FeedItem,
+} from './feed'
 
 const book: Book = { id: 'OL1W', title: 'Un libro', authors: ['Una autora'] }
 const bookOf = (id: string) => (id === book.id ? book : undefined)
@@ -24,6 +31,14 @@ describe('timeAgo', () => {
     [30, 'Hace 30 días'],
   ])('%i days ago reads "%s"', (days, expected) => {
     expect(timeAgo(daysAgo(days))).toBe(expected)
+  })
+})
+
+describe('activitySentence', () => {
+  it('reads as who did what with which book', () => {
+    const user = state().users.find(({ id }) => id === 'diego')!
+    const item = { activity: activity('a', daysAgo(0), { kind: 'want' }), user, book }
+    expect(activitySentence(item)).toBe('Diego quiere leer Un libro')
   })
 })
 

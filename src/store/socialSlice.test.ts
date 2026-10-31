@@ -260,6 +260,16 @@ describe('toggleLike', () => {
     expect(toastMessage()).toBe('Tomás verá que te gustó')
   })
 
+  it('does not take Deshacer away from a change in the library', () => {
+    state().setStatus('OL81626W', 'want')
+    const { toast } = state()
+    state().toggleLike('act-1')
+    expect(state().likedActivityIds).toEqual(['act-1'])
+    expect(state().toast).toEqual(toast)
+    state().undo()
+    expect(state().library.OL81626W.status).toBe('reading')
+  })
+
   it('says nothing when the like is taken back', () => {
     state().toggleLike('act-1')
     state().dismissToast()

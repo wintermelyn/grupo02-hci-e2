@@ -16,6 +16,7 @@ const activityRows = () =>
     .filter((item) => within(item).queryByRole('button', { name: /gusta/ }))
 
 const likeButtons = () => screen.getAllByRole('button', { name: /gusta/ })
+const viewTitle = () => screen.getByText('Actividad de tus amigos', { selector: 'h1 span' })
 
 function scrollPageTo(top: number) {
   page.scrollTop = top
@@ -52,6 +53,16 @@ describe('Inicio', () => {
       'href',
       '/libro/OL81626W',
     )
+  })
+
+  it('lets a long word of a title break, so three columns do not cut it', () => {
+    setReadingBooks(3)
+    renderApp('/')
+    const section = screen.getByRole('heading', { name: 'Leyendo ahora' }).closest('section')!
+    const [{ book }] = Object.values(state().library).flatMap(({ bookId, status }) =>
+      status === 'reading' ? [{ book: state().getBook(bookId)! }] : [],
+    )
+    expect(within(section).getByText(book.title)).toHaveClass('hyphens-auto', 'wrap-anywhere')
   })
 
   it.each([
@@ -92,6 +103,14 @@ describe('Inicio', () => {
     )
   })
 
+  it('moves the date under the title on the narrowest screen, where the line has no room', () => {
+    renderApp('/')
+    const rows = activityRows()
+    const dated = rows[rows.length - 1]
+    expect(within(dated).getByText(/^· Hace \d+ días$/)).toHaveClass('max-[359px]:hidden')
+    expect(within(dated).getByText(/^Hace \d+ días$/)).toHaveClass('min-[360px]:hidden')
+  })
+
   it('offers a way out when nothing is being read', () => {
     setReadingBooks(0)
     renderApp('/')
@@ -113,20 +132,35 @@ describe('like', () => {
   it('shows the state and who it reaches, with no counter or names', () => {
     renderApp('/')
     const [button] = likeButtons()
-    expect(button).toHaveAccessibleName('Me gusta')
+    expect(button).toHaveTextContent('Me gusta')
     expect(button).toHaveAttribute('aria-pressed', 'false')
 
     fireEvent.click(button)
-    expect(button).toHaveAccessibleName('Te gusta')
+    expect(button).toHaveTextContent('Te gusta')
     expect(button).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByText('Valentina verá que te gustó')).toBeInTheDocument()
     expect(button.textContent).not.toMatch(/\d/)
   })
 
+  it('says which activity it acts on, with a name that does not depend on its state', () => {
+    renderApp('/')
+    const [button] = likeButtons()
+    const name = 'Me gusta: Valentina empezó Nuestra parte de noche'
+    expect(button).toHaveAccessibleName(name)
+    fireEvent.click(button)
+    expect(button).toHaveAccessibleName(name)
+  })
+
+  it('gives each button its own name', () => {
+    renderApp('/')
+    const names = likeButtons().map((button) => button.getAttribute('aria-label'))
+    expect(new Set(names).size).toBe(names.length)
+  })
+
   it('stays in the activity view, which shares it with Inicio', () => {
     state().toggleLike('act-1')
     renderApp('/?actividad=1')
-    expect(likeButtons()[0]).toHaveAccessibleName('Te gusta')
+    expect(likeButtons()[0]).toHaveAttribute('aria-pressed', 'true')
   })
 })
 
@@ -190,6 +224,31 @@ describe('activity view', () => {
     renderApp('/?actividad=1')
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Actividad de tus amigos')
     expect(screen.getByText('Aún no hay actividad')).toBeInTheDocument()
+  })
+
+  it('moves the focus to its title, and back to the link when it closes', () => {
+    renderApp('/')
+    const link = () => screen.getByRole('link', { name: /Ver toda la actividad/ })
+    fireEvent.click(link())
+    expect(viewTitle()).toHaveFocus()
+
+    fireEvent.click(screen.getByRole('link', { name: 'Inicio', current: false }))
+    expect(link()).toHaveFocus()
+  })
+
+  it('leaves the focus alone when the view is opened directly', () => {
+    renderApp('/?actividad=1')
+    expect(document.body).toHaveFocus()
+  })
+
+  it('says the date of each activity, except where the period already says it', () => {
+    renderApp('/?actividad=2')
+    const [today, ...rest] = activityRows()
+    expect(today).toHaveTextContent('Valentina empezó')
+    expect(today).not.toHaveTextContent('Hoy')
+    const last = rest[rest.length - 1]
+    // Twice in the page, for the place it takes on each width.
+    expect(within(last).getAllByText(/Hace \d+ días/)).toHaveLength(2)
   })
 
   it('starts at the top, and Inicio comes back to where it was', () => {

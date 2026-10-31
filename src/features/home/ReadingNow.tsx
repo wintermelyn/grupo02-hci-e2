@@ -15,8 +15,13 @@ function ReadingTile({ book, entry, narrow }: ReadingBook & { narrow: boolean })
       className="block rounded-control transition-[translate] duration-100 active:translate-y-px"
     >
       <BookCover book={book} status={entry.status} />
-      {/* 16 px, because the ribbon hangs 8 px below the cover. */}
-      <span className="mt-4 line-clamp-2 font-serif text-lg/snug font-semibold">{book.title}</span>
+      {/*
+        16 px, because the ribbon hangs 8 px below the cover. A long word breaks by syllables: three
+        columns leave 85 px at 320, less than "Frankenstein".
+      */}
+      <span className="mt-4 line-clamp-2 font-serif text-lg/snug font-semibold wrap-anywhere hyphens-auto">
+        {book.title}
+      </span>
       {/* Three columns leave 85 px at 320, and "Llevas 30 días" takes one line at this size. */}
       <span className={cx('block text-sm text-muted', narrow && 'max-[359px]:text-xs')}>
         {readingTime(entry.startedAt)}

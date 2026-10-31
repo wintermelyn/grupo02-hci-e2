@@ -1,3 +1,4 @@
+import type { Ref } from 'react'
 import { ActivityRow } from './ActivityRow'
 import type { FeedItem } from './feed'
 import { NoActivity } from './NoActivity'
@@ -6,7 +7,13 @@ import { ACTIVITY_PATH } from './useActivityView'
 
 export const PREVIEW_LENGTH = 5
 
-export function ActivityPreview({ feed }: { feed: FeedItem[] }) {
+export interface ActivityPreviewProps {
+  feed: FeedItem[]
+  /** Where the focus returns when the view closes. */
+  viewLinkRef: Ref<HTMLAnchorElement>
+}
+
+export function ActivityPreview({ feed, viewLinkRef }: ActivityPreviewProps) {
   return (
     <section className="mt-6 md:mt-5">
       <h2 className="font-serif text-heading font-semibold">Actividad de tus amigos</h2>
@@ -22,7 +29,9 @@ export function ActivityPreview({ feed }: { feed: FeedItem[] }) {
         </ul>
       )}
       {feed.length > PREVIEW_LENGTH && (
-        <QuietLink to={ACTIVITY_PATH}>Ver toda la actividad ({feed.length})</QuietLink>
+        <QuietLink ref={viewLinkRef} to={ACTIVITY_PATH}>
+          Ver toda la actividad ({feed.length})
+        </QuietLink>
       )}
     </section>
   )

@@ -2,7 +2,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import { MemoryRouter, Routes, useNavigate } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { daysAgo, today } from '../../lib/dates'
-import { fetchWork } from '../../lib/openlibrary'
+import { fetchDescription, fetchWork } from '../../lib/openlibrary'
 import { appRoutes } from '../../routes'
 import { currentLocation, renderApp } from '../../test/router'
 import { state } from '../../test/store'
@@ -11,6 +11,7 @@ import type { Book } from '../../types'
 vi.mock('../../lib/openlibrary', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../lib/openlibrary')>()),
   fetchWork: vi.fn(),
+  fetchDescription: vi.fn(),
 }))
 
 const CARRIE_ID = 'OL81626W'
@@ -40,6 +41,14 @@ const foldersButton = () => main().getByRole('button', { name: /^Agregar (o quit
 const folderOption = (name: string) => main().getByRole('menuitemcheckbox', { name })
 
 const dateField = (label: string) => main().getByLabelText(label)
+
+function deferred<T>() {
+  let resolve: (value: T) => void = () => {}
+  const promise = new Promise<T>((done) => {
+    resolve = done
+  })
+  return { promise, resolve }
+}
 
 /** The way the calendar does it: a whole date, with no keys pressed. */
 function pickDate(label: string, value: string) {
@@ -80,6 +89,7 @@ function removeBook() {
 
 beforeEach(() => {
   vi.mocked(fetchWork).mockReset().mockResolvedValue(null)
+  vi.mocked(fetchDescription).mockReset().mockResolvedValue(undefined)
 })
 
 describe('BookPage', () => {
@@ -133,6 +143,74 @@ describe('BookPage', () => {
     expect(description.compareDocumentPosition(main().getByText(TRANSLATED))).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     )
+  })
+
+  describe('book found in a live search', () => {
+    const LIVE: Book = {
+      id: 'OL81634W',
+      title: 'Misery',
+      authors: ['Stephen King'],
+      year: 1978,
+      coverUrl: 'https://covers.openlibrary.org/b/id/1-L.jpg',
+    }
+
+    function openLive(book: Partial<Book> = {}) {
+      state().upsertBook({ ...LIVE, ...book })
+      renderApp(`/libro/${LIVE.id}`)
+    }
+
+    it('brings its description and leaves the rest of the book as it was', async () => {
+      vi.mocked(fetchDescription).mockResolvedValue('Una enfermera y un escritor.')
+      openLive()
+      expect(await main().findByText('Una enfermera y un escritor.')).toBeInTheDocument()
+      expect(state().extraBooks[LIVE.id]).toEqual({
+        ...LIVE,
+        description: 'Una enfermera y un escritor.',
+      })
+    })
+
+    it('does not say it has no description while it is looking for one', async () => {
+      const description = deferred<string | undefined>()
+      vi.mocked(fetchDescription).mockReturnValue(description.promise)
+      openLive()
+      expect(main().getByText('Buscando la descripción…')).toBeInTheDocument()
+      expect(main().queryByText(NO_DESCRIPTION)).not.toBeInTheDocument()
+
+      await act(async () => description.resolve(undefined))
+      expect(main().getByText(NO_DESCRIPTION)).toBeInTheDocument()
+    })
+
+    it('keeps the same shape while it looks for the description', async () => {
+      const description = deferred<string | undefined>()
+      vi.mocked(fetchDescription).mockReturnValue(description.promise)
+      openLive()
+      const loading = pageShape()
+      await act(async () => description.resolve('Texto'))
+      expect(pageShape()).toEqual(loading)
+    })
+
+    it('does not ask again for a work that has none', async () => {
+      openLive({ description: '' })
+      expect(main().getByText(NO_DESCRIPTION)).toBeInTheDocument()
+      expect(fetchDescription).not.toHaveBeenCalled()
+    })
+
+    it('does not ask for a description it already has', () => {
+      openLive({ description: 'Ya la tiene.' })
+      expect(fetchDescription).not.toHaveBeenCalled()
+    })
+
+    it('does not ask for the books of the catalogue, which already came with what there is', () => {
+      renderApp(CRONICA)
+      expect(fetchDescription).not.toHaveBeenCalled()
+    })
+
+    it('falls back when it fails, and the next visit asks again', async () => {
+      vi.mocked(fetchDescription).mockRejectedValueOnce(new Error('sin red'))
+      openLive()
+      expect(await main().findByText(NO_DESCRIPTION)).toBeInTheDocument()
+      expect(state().extraBooks[LIVE.id].description).toBeUndefined()
+    })
   })
 
   describe('machine-translated description', () => {
@@ -544,14 +622,6 @@ describe('a Leído chosen by mistake', () => {
 describe('loading a book the store does not have', () => {
   const REMOTE: Book = { id: 'OL999W', title: 'Un libro remoto', authors: ['Una Autora'] }
 
-  function deferred<T>() {
-    let resolve: (value: T) => void = () => {}
-    const promise = new Promise<T>((done) => {
-      resolve = done
-    })
-    return { promise, resolve }
-  }
-
   function GoTo({ to }: { to: string }) {
     const navigate = useNavigate()
     return <button onClick={() => navigate(to)}>Ir</button>
@@ -585,7 +655,7 @@ describe('loading a book the store does not have', () => {
 
     await act(async () => work.resolve(REMOTE))
     expect(main().getByRole('heading', { level: 1 })).toHaveTextContent('Un libro remoto')
-    expect(state().extraBooks.OL999W).toEqual(REMOTE)
+    expect(state().extraBooks.OL999W).toMatchObject(REMOTE)
   })
 
   it('does not look for a book the store has', () => {

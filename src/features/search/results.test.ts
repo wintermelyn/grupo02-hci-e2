@@ -67,6 +67,18 @@ describe('arrangeResults', () => {
     expect(arrangeResults([book('1')], 'libro', NOTHING).summary).toBe('1 libro')
   })
 
+  it('does not present a page of a search as its total', () => {
+    const results = [book('1'), book('2')]
+    expect(arrangeResults(results, 'libro', NOTHING, true).summary).toBe('Los 2 más relevantes')
+    expect(arrangeResults(results, 'libro', { 1: entry('1') }, true).summary).toBe(
+      'Los 2 más relevantes · 1 en tu biblioteca',
+    )
+  })
+
+  it('uses the singular for the only relevant one of a long search', () => {
+    expect(arrangeResults([book('1')], 'libro', NOTHING, true).summary).toBe('El más relevante')
+  })
+
   it('caps the list of authors', () => {
     const many = Array.from({ length: MAX_AUTHORS + 2 }, (_, index) =>
       book(String(index), `Autor ${index}`),

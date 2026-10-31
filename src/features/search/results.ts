@@ -28,8 +28,15 @@ export function groupByAuthor(books: Book[]): AuthorGroup[] {
     .sort((a, b) => b.books.length - a.books.length || a.name.localeCompare(b.name, 'es-CL'))
 }
 
-function resultsSummary(total: number, inLibrary: number): string {
-  return inLibrary > 0 ? `${booksLabel(total)} · ${inLibrary} en tu biblioteca` : booksLabel(total)
+/** A page of a search is not its total: "king" has thousands of books and the page, 20. */
+function amountLabel(total: number, more: boolean): string {
+  if (!more) return booksLabel(total)
+  return total === 1 ? 'El más relevante' : `Los ${total} más relevantes`
+}
+
+function resultsSummary(total: number, inLibrary: number, more: boolean): string {
+  const amount = amountLabel(total, more)
+  return inLibrary > 0 ? `${amount} · ${inLibrary} en tu biblioteca` : amount
 }
 
 /**
@@ -40,6 +47,7 @@ export function arrangeResults(
   results: Book[],
   query: string,
   library: Record<BookId, LibraryEntry>,
+  more = false,
 ): ArrangedResults {
   const authors = groupByAuthor(results).filter(({ name }) => matchesAuthor(name, query))
   const wanted = normalizeText(query)
@@ -50,6 +58,6 @@ export function arrangeResults(
   return {
     authors: exact ? [] : authors.slice(0, MAX_AUTHORS),
     books: [...mine, ...others],
-    summary: resultsSummary(books.length, mine.length),
+    summary: resultsSummary(books.length, mine.length, more),
   }
 }

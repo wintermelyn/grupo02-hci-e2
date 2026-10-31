@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { useSearchParams } from 'react-router'
 import { ErrorState, LoadingState, PageHeader, SearchField } from '../../components'
 import { useStore } from '../../store'
+import { useBookLookup } from '../library/filters'
 import { addRecentSearch, clearRecentSearches, readRecentSearches } from './recentSearchStore'
 import { arrangeResults } from './results'
 import { SearchStart } from './SearchStart'
@@ -33,16 +34,37 @@ export function SearchPage() {
   const friendsBooks = useFriendsBooks()
   const [recent, setRecent] = useState(readRecentSearches)
   const field = useFocusOnWideScreen(query === '')
-  const { text, loading, books, offline, retry } = search
+  const { text, loading, books, offline, more, retry } = search
+  const bookOf = useBookLookup()
+  const booksHeading = useRef<HTMLHeadingElement>(null)
+  const focusOnBooks = useRef(false)
 
-  const results = useMemo(() => arrangeResults(books, text, library), [books, text, library])
+  const results = useMemo(
+    // The store's copy can know more than the search did, like a description found on the book page.
+    () =>
+      arrangeResults(
+        books.map((book) => bookOf(book.id) ?? book),
+        text,
+        library,
+        more,
+      ),
+    [books, bookOf, text, library, more],
+  )
 
+  useEffect(() => {
+    if (!focusOnBooks.current) return
+    focusOnBooks.current = false
+    booksHeading.current?.focus({ preventScroll: true })
+  }, [text])
+
+  // Typing does not fill the history, but an author is a step: Back returns to the search before it.
   const setQuery = (value: string) => setParams(value ? { q: value } : {}, { replace: true })
   const remember = (term: string) => setRecent((current) => addRecentSearch(term, current))
 
   function pickAuthor(name: string) {
     remember(name)
-    setQuery(name)
+    focusOnBooks.current = true
+    setParams({ q: name })
   }
 
   function clearRecent() {
@@ -76,7 +98,7 @@ export function SearchPage() {
           onPickAuthor={pickAuthor}
           onClearRecent={clearRecent}
         />
-      ) : loading ? (
+      ) : books.length === 0 && loading ? (
         <div className="mt-3">
           <LoadingState label="Buscando…" />
         </div>
@@ -94,6 +116,8 @@ export function SearchPage() {
           {offline && <OfflineNotice onRetry={retry} />}
           <SearchResults
             results={results}
+            loading={loading}
+            booksHeading={booksHeading}
             onPickAuthor={pickAuthor}
             onOpenBook={() => remember(text)}
           />

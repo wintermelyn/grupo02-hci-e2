@@ -2,14 +2,16 @@ import { Heart } from 'lucide-react'
 import { cx } from '../../components/cx'
 import { useChanged } from '../../components/useChanged'
 import { useStore } from '../../store'
+import { activitySentence, type FeedItem } from './feed'
 
 export interface LikeButtonProps {
-  activityId: string
+  item: FeedItem
   className?: string
 }
 
 /** A gesture towards a friend, so it has no counter. The toast says who it reaches. */
-export function LikeButton({ activityId, className }: LikeButtonProps) {
+export function LikeButton({ item, className }: LikeButtonProps) {
+  const activityId = item.activity.id
   const likedIds = useStore((state) => state.likedActivityIds)
   const toggleLike = useStore((state) => state.toggleLike)
   const liked = likedIds.includes(activityId)
@@ -18,6 +20,8 @@ export function LikeButton({ activityId, className }: LikeButtonProps) {
   return (
     <button
       type="button"
+      // A fixed name that says which activity it is: the state is only in aria-pressed.
+      aria-label={`Me gusta: ${activitySentence(item)}`}
       aria-pressed={liked}
       onClick={() => toggleLike(activityId)}
       // The same states as a quiet button, in the size of the text next to it. The minimum width

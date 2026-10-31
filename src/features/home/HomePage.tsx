@@ -2,7 +2,7 @@ import { PageHeader } from '../../components'
 import { ActivityPreview } from './ActivityPreview'
 import { ActivityView } from './ActivityView'
 import { ReadingNow } from './ReadingNow'
-import { useActivityView, useActivityViewScroll } from './useActivityView'
+import { useActivityView, useActivityViewFocus, useActivityViewScroll } from './useActivityView'
 import { useFeed, useReadingNow } from './useHome'
 
 export function HomePage() {
@@ -10,9 +10,10 @@ export function HomePage() {
   const feed = useFeed()
   const { batches, showMore } = useActivityView()
   useActivityViewScroll(batches !== undefined)
+  const { viewTitle, viewLink } = useActivityViewFocus(batches !== undefined)
 
   if (batches !== undefined) {
-    return <ActivityView feed={feed} batches={batches} onShowMore={showMore} />
+    return <ActivityView feed={feed} batches={batches} onShowMore={showMore} titleRef={viewTitle} />
   }
 
   return (
@@ -20,7 +21,7 @@ export function HomePage() {
       <PageHeader title="Inicio" />
       <div className="md:grid md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:gap-12">
         <ReadingNow reading={reading} />
-        <ActivityPreview feed={feed} />
+        <ActivityPreview feed={feed} viewLinkRef={viewLink} />
       </div>
     </section>
   )

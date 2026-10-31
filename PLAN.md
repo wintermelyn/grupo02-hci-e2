@@ -435,7 +435,7 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Salir de "Leído" | No aparece | No se distingue un error de una relectura, así que nada se borra: inicio y puntaje quedan, y volver a "Leyendo" solo quita el fin. Una relectura corrige el inicio en la ficha, en su fila |
 | Sección marcada en la ficha | No aparece | Ninguna, porque la ficha se abre desde cualquier sección |
 | Nombre del selector | Habla de "un lápiz" | "Cambiar" junto al lápiz, porque todo ícono lleva texto. El selector se titula "Estado de «título»" |
-| Libros sin descripción | No aparece | La ficha mantiene la misma forma en todos los anchos. "Sobre este libro" va siempre en el mismo lugar y, sin descripción, dice "Aún no tenemos descripción de este libro.". Hoy son 2 de 54 libros |
+| Libros sin descripción | No aparece | La ficha mantiene la misma forma en todos los anchos. "Sobre este libro" va siempre en el mismo lugar y, sin descripción, dice "Aún no tenemos descripción de este libro.". Hoy son 2 de 54 libros del catálogo. Un libro encontrado en vivo trae la suya al abrir la ficha, y mientras la busca dice "Buscando la descripción…" en ese mismo lugar |
 | Descripción traducida | No aparece | Bajo la descripción, "Traducción hecha con IA" como dato de procedencia, sin cinta ni color de acento, si el libro trae `descriptionTranslated` |
 | Estrellas | No aparece | De tinta. El naranja de Goodreads compite con las portadas y como ícono llega a 3,03:1 |
 | Color de la cinta | No aparece | Burdeo `#7a2334`. Se parece al ciruela de "Lo tengo", pero el estado nunca se apoya solo en el color |
@@ -463,5 +463,5 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Forma del aviso de D5 | Portada, título, pregunta y "Sí" y "No" | Una fila compacta sobre la lista, con portada chica, sin tarjeta, en "Todos" y "Lo quiero" |
 | "Leyendo ahora" en Inicio | "Tarjeta" que abre la ficha | Portadas grandes en dos columnas, o tres con tres libros, porque casi nadie lee más de dos o tres a la vez. Bajo cada una, "Llevas 12 días" |
 | Buscar antes de escribir | No aparece | Búsquedas recientes, cuando las hay, autores de tu biblioteca y "Lo que leen tus amigos", para reconocer en vez de recordar |
-| Resultados de Buscar | "Libros y autores" | Dicen cuántos hay y cuántos ya tienes. Van en "Autores" y "Libros", y tocar un autor filtra sus libros. Sin resultados, se ofrecen los autores como salida |
+| Resultados de Buscar | "Libros y autores" | Dicen cuántos hay y cuántos ya tienes. Si Open Library tiene más de los que muestra, dicen "Los 20 más relevantes" y los autores van sin cantidad. Van en "Autores" y "Libros", y tocar un autor filtra sus libros, con Atrás de vuelta a la búsqueda. Sin resultados, se ofrecen los autores como salida |
 | Buscador y "+ Nueva carpeta" en Mis libros | "Buscador" sin ubicación | El buscador va en la fila del título, como en una carpeta. "+ Nueva carpeta" es la última tarjeta del tablero y el nombre se escribe ahí mismo |

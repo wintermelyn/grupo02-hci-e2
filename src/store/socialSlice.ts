@@ -99,7 +99,7 @@ export const createSocialSlice: SliceCreator<SocialActions> = (set, get) => {
     },
 
     toggleLike: (activityId) => {
-      const { activities, likedActivityIds, users, showToast } = get()
+      const { activities, likedActivityIds, users, showToast, undoSnapshot } = get()
       if (likedActivityIds.includes(activityId)) {
         set({ likedActivityIds: likedActivityIds.filter((id) => id !== activityId) })
         return
@@ -107,7 +107,8 @@ export const createSocialSlice: SliceCreator<SocialActions> = (set, get) => {
       set({ likedActivityIds: [...likedActivityIds, activityId] })
       const activity = activities.find(({ id }) => id === activityId)
       const user = users.find(({ id }) => id === activity?.userId)
-      if (user) showToast(`${firstName(user.name)} verá que te gustó`)
+      // As in accept: a new toast would take Deshacer away, and the button already shows the like.
+      if (user && !undoSnapshot) showToast(`${firstName(user.name)} verá que te gustó`)
     },
   }
 }

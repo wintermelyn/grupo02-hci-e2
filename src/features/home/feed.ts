@@ -45,6 +45,11 @@ export function timeAgo(date: ISODate): string {
   return `Hace ${days} días`
 }
 
+/** The activity as one sentence, for a control that needs to say which one it acts on. */
+export function activitySentence({ activity, user, book }: FeedItem): string {
+  return `${firstName(user.name)} ${ACTIVITY_VERBS[activity.kind]} ${book.title}`
+}
+
 /** What goes under a book in "Leyendo ahora". */
 export function readingTime(startedAt: ISODate | undefined): string {
   if (!startedAt) return 'Sin fecha de inicio'

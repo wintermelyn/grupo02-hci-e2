@@ -1,4 +1,5 @@
 import { CircleAlert, RotateCcw, SearchX } from 'lucide-react'
+import type { Ref } from 'react'
 import { BookRow, Button, EmptyState } from '../../components'
 import { AuthorList } from './AuthorList'
 import type { ArrangedResults, AuthorGroup } from './results'
@@ -49,26 +50,44 @@ export function NoResults({ text, authors, onPickAuthor }: NoResultsProps) {
 
 export interface SearchResultsProps {
   results: ArrangedResults
+  /** Open Library has not answered yet, so the list can still grow. */
+  loading: boolean
+  /** Where the focus goes after picking an author, whose button is gone by then. */
+  booksHeading: Ref<HTMLHeadingElement>
   onPickAuthor: (name: string) => void
   /** A book of the list was opened, which makes this search worth remembering. */
   onOpenBook: () => void
 }
 
-export function SearchResults({ results, onPickAuthor, onOpenBook }: SearchResultsProps) {
+export function SearchResults({
+  results,
+  loading,
+  booksHeading,
+  onPickAuthor,
+  onOpenBook,
+}: SearchResultsProps) {
   const { authors, books, summary } = results
   return (
     <>
       <p role="status" className="mt-3 text-sm text-muted">
-        {summary}
+        {loading ? 'Buscando más…' : summary}
       </p>
-      {authors.length > 0 && <AuthorList title="Autores" authors={authors} onPick={onPickAuthor} />}
+      {authors.length > 0 && (
+        <AuthorList title="Autores" authors={authors} counted={false} onPick={onPickAuthor} />
+      )}
       <section
         className="mt-5"
         onClick={({ target }) => {
           if (target instanceof Element && target.closest('a')) onOpenBook()
         }}
       >
-        <h2 className="font-serif text-heading font-semibold">Libros</h2>
+        <h2
+          ref={booksHeading}
+          tabIndex={-1}
+          className="w-fit rounded-control font-serif text-heading font-semibold"
+        >
+          Libros
+        </h2>
         {/* Not BookList: its title is for screen readers, and here it is on the screen. */}
         <ul className="mt-0.5 md:grid md:grid-cols-2 md:gap-x-8">
           {books.map((book) => (

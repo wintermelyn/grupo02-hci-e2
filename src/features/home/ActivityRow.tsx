@@ -2,7 +2,7 @@ import { Link } from 'react-router'
 import { Avatar, bookPath } from '../../components'
 import { personPath } from '../friends/people'
 import { ActivityLine } from './ActivityLine'
-import type { FeedItem } from './feed'
+import { timeAgo, type FeedItem } from './feed'
 import { LikeButton } from './LikeButton'
 
 export interface ActivityRowProps {
@@ -30,10 +30,16 @@ export function ActivityRow({ item, from }: ActivityRowProps) {
           data-activity-link
           className="block min-w-0 flex-1 rounded-control py-2"
         >
-          <ActivityLine item={item} />
+          <ActivityLine item={item}>
+            <span className="max-[359px]:hidden"> · {timeAgo(activity.date)}</span>
+          </ActivityLine>
           <span className="line-clamp-2 font-serif text-base/5 font-semibold">{book.title}</span>
+          {/* At 320 the line has 131 px and "Valentina empezó · Hoy" takes 150, even in short form. */}
+          <span className="block text-sm text-muted min-[360px]:hidden">
+            {timeAgo(activity.date)}
+          </span>
         </Link>
-        <LikeButton activityId={activity.id} className="shrink-0" />
+        <LikeButton item={item} className="shrink-0" />
       </div>
     </li>
   )

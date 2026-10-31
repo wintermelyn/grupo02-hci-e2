@@ -2,10 +2,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useStore } from '../store'
 import type { Book } from '../types'
 import {
+  fetchDescription,
   fetchWork,
+  forgetSearches,
   matchesAuthor,
   mergeResults,
   REQUEST_TIMEOUT_MS,
+  savedSearch,
   searchBooks,
   SEARCH_DELAY_MS,
 } from './openlibrary'
@@ -41,6 +44,7 @@ async function search(query: string, signal = new AbortController().signal) {
 
 beforeEach(() => {
   vi.useFakeTimers()
+  forgetSearches()
   fetchMock.mockReset()
   vi.stubGlobal('fetch', fetchMock)
   return () => {
@@ -177,6 +181,83 @@ describe('searchBooks', () => {
   })
 })
 
+describe('searchBooks, how much there is', () => {
+  it('says when Open Library has more than it sent', async () => {
+    fetchMock.mockResolvedValue(json({ numFound: 295526, docs: [LIVE_DOC] }))
+    expect((await search('king')).more).toBe(true)
+  })
+
+  it('says nothing when that is all there is', async () => {
+    fetchMock.mockResolvedValue(json({ numFound: 1, docs: [LIVE_DOC] }))
+    expect((await search('apocalipsis')).more).toBe(false)
+  })
+
+  it('does not promise more when the service is down', async () => {
+    fetchMock.mockRejectedValue(new TypeError('Failed to fetch'))
+    expect((await search('carrie')).more).toBe(false)
+  })
+})
+
+describe('saved answers', () => {
+  it('keeps an answer, to give it back with no waiting', async () => {
+    fetchMock.mockResolvedValue(json({ docs: [LIVE_DOC] }))
+    const answer = await search('apocalipsis')
+    expect(savedSearch('apocalipsis')).toEqual(answer)
+    expect(savedSearch('otra')).toBeUndefined()
+  })
+
+  it('keeps an empty answer, which is an answer too', async () => {
+    fetchMock.mockResolvedValue(json({ docs: [] }))
+    await search('zzzz')
+    expect(savedSearch('zzzz')?.books).toEqual([])
+  })
+
+  it('does not keep a search that failed, so trying again really tries', async () => {
+    fetchMock.mockRejectedValue(new TypeError('Failed to fetch'))
+    await search('carrie')
+    expect(savedSearch('carrie')).toBeUndefined()
+  })
+
+  it('drops the oldest one when there are too many', async () => {
+    fetchMock.mockImplementation(async () => json({ docs: [] }))
+    for (let index = 0; index <= 30; index += 1) await search(`busqueda ${index}`)
+    expect(savedSearch('busqueda 0')).toBeUndefined()
+    expect(savedSearch('busqueda 1')).toBeDefined()
+    expect(savedSearch('busqueda 30')).toBeDefined()
+  })
+
+  it('forgets them all', async () => {
+    fetchMock.mockImplementation(async () => json({ docs: [] }))
+    await search('dune')
+    forgetSearches()
+    expect(savedSearch('dune')).toBeUndefined()
+  })
+})
+
+describe('fetchDescription', () => {
+  it('reads the text of the work, and asks for nothing else', async () => {
+    fetchMock.mockResolvedValue(json({ description: { value: 'Una gripe.' } }))
+    await expect(fetchDescription('OL9W')).resolves.toBe('Una gripe.')
+    expect(fetchMock).toHaveBeenCalledOnce()
+    expect(String(fetchMock.mock.calls[0][0])).toContain('/works/OL9W.json')
+  })
+
+  it('resolves to nothing when the work has none', async () => {
+    fetchMock.mockResolvedValue(json({ title: 'Sin texto' }))
+    await expect(fetchDescription('OL9W')).resolves.toBeUndefined()
+  })
+
+  it('resolves to nothing when the work does not exist', async () => {
+    fetchMock.mockResolvedValue(json({}, 404))
+    await expect(fetchDescription('OL9W')).resolves.toBeUndefined()
+  })
+
+  it('rejects when it cannot answer', async () => {
+    fetchMock.mockRejectedValue(new TypeError('Failed to fetch'))
+    await expect(fetchDescription('OL9W')).rejects.toThrow('Failed to fetch')
+  })
+})
+
 describe('fetchWork', () => {
   const WORK = {
     title: 'Apocalipsis',
@@ -212,6 +293,11 @@ describe('fetchWork', () => {
   it('reads a description that comes as plain text', async () => {
     answerWith({ '/works/OL9W.json': () => json({ title: 'A', description: 'Texto' }) })
     await expect(fetchWork('OL9W')).resolves.toMatchObject({ description: 'Texto', authors: [] })
+  })
+
+  it('marks a work with no description as already asked', async () => {
+    answerWith({ '/works/OL9W.json': () => json({ title: 'A' }) })
+    await expect(fetchWork('OL9W')).resolves.toMatchObject({ description: '' })
   })
 
   it('keeps the book when an author does not load', async () => {

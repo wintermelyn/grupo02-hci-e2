@@ -1,6 +1,10 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { MemoryRouter, Routes, useNavigate } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { forgetSearches } from '../../lib/openlibrary'
+import { appRoutes } from '../../routes'
 import { useStore } from '../../store'
+import { CurrentLocation } from '../../test/CurrentLocation'
 import { currentLocation, renderApp } from '../../test/router'
 import { readRecentSearches } from './recentSearchStore'
 
@@ -11,9 +15,43 @@ function answerWith(...docs: object[]) {
   fetchMock.mockImplementation(async () => new Response(JSON.stringify({ docs })))
 }
 
+/** Open Library says it has `numFound` books and sends these documents. */
+function answerPage(numFound: number, ...docs: object[]) {
+  fetchMock.mockImplementation(async () => new Response(JSON.stringify({ numFound, docs })))
+}
+
+/** Leaves the answers pending, and hands back how to deliver them. */
+function holdAnswers() {
+  const pending: ((response: Response) => void)[] = []
+  fetchMock.mockImplementation(() => new Promise((resolve) => pending.push(resolve)))
+  return (...docs: object[]) => {
+    pending.forEach((resolve) => resolve(new Response(JSON.stringify({ docs }))))
+  }
+}
+
+function GoBack() {
+  const navigate = useNavigate()
+  return <button onClick={() => navigate(-1)}>Atrás</button>
+}
+
+/** The whole app with Más before the search in the history, and a button for the browser's Back. */
+function renderAfterMas(path: string) {
+  render(
+    <MemoryRouter initialEntries={['/mas', path]} initialIndex={1}>
+      <GoBack />
+      <Routes>{appRoutes}</Routes>
+      <CurrentLocation />
+    </MemoryRouter>,
+  )
+}
+
 function failNetwork() {
   fetchMock.mockRejectedValue(new TypeError('Failed to fetch'))
 }
+
+/** How many times it asked for a search, apart from what a book page asks for. */
+const searches = () =>
+  fetchMock.mock.calls.filter(([url]) => String(url).includes('/search.json')).length
 
 const search = () => screen.getByRole('searchbox', { name: 'Buscar libros y autores' })
 const type = (text: string) => fireEvent.change(search(), { target: { value: text } })
@@ -27,6 +65,7 @@ const APOCALYPSE = {
 
 beforeEach(() => {
   localStorage.clear()
+  forgetSearches()
   fetchMock.mockReset()
   answerWith()
   vi.stubGlobal('fetch', fetchMock)
@@ -81,22 +120,109 @@ describe('before typing', () => {
 })
 
 describe('with results', () => {
-  it('shows loading, then how many there are and how many the person has', async () => {
+  it('shows what the app has at once, then how many there are and how many the person has', async () => {
     answerWith(APOCALYPSE)
     renderApp('/buscar')
     type('carrie')
-    expect(screen.getByText('Buscando…')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Carrie/ })).toBeInTheDocument()
+    expect(screen.getByText('Buscando más…')).toBeInTheDocument()
     expect(await screen.findByText('2 libros · 1 en tu biblioteca')).toBeInTheDocument()
+    expect(screen.queryByText('Buscando más…')).not.toBeInTheDocument()
     expect(currentLocation()).toBe('/buscar?q=carrie')
+  })
+
+  it('shows a loading list only when the app has nothing to show yet', async () => {
+    answerWith(APOCALYPSE)
+    renderApp('/buscar')
+    type('apocalipsis')
+    expect(screen.getByText('Buscando…')).toBeInTheDocument()
+    expect(await screen.findByText('Apocalipsis')).toBeInTheDocument()
+    expect(screen.queryByText('Buscando…')).not.toBeInTheDocument()
+  })
+
+  it('adds what arrives after what is on the screen, without moving it', async () => {
+    const deliver = holdAnswers()
+    renderApp('/buscar?q=carrie')
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce())
+    deliver(APOCALYPSE)
+    await screen.findByText('Apocalipsis')
+    const titles = within(section('Libros')).getAllByRole('link')
+    expect(titles.map(({ textContent }) => textContent)).toEqual([
+      expect.stringContaining('Carrie'),
+      expect.stringContaining('Apocalipsis'),
+    ])
+  })
+
+  it('keeps the list in view while the next search is on its way', async () => {
+    answerWith(APOCALYPSE)
+    renderApp('/buscar?q=apocalipsis')
+    await screen.findByText('Apocalipsis')
+
+    const deliver = holdAnswers()
+    type('apocalipsiss')
+    expect(screen.getByText('Apocalipsis')).toBeInTheDocument()
+    expect(screen.getByText('Buscando más…')).toBeInTheDocument()
+    expect(screen.queryByText('Buscando…')).not.toBeInTheDocument()
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2))
+    deliver()
+    expect(await screen.findByText('No encontramos «apocalipsiss»')).toBeInTheDocument()
+    expect(screen.queryByText('Apocalipsis')).not.toBeInTheDocument()
+  })
+
+  it('does not carry a search that was cleared into the next one', async () => {
+    answerWith(APOCALYPSE)
+    renderApp('/buscar?q=apocalipsis')
+    await screen.findByText('Apocalipsis')
+    type('')
+    holdAnswers()
+    type('dune')
+    expect(screen.queryByText('Apocalipsis')).not.toBeInTheDocument()
+  })
+
+  it('comes back from a book with its list, in its place and without asking again', async () => {
+    answerWith(APOCALYPSE)
+    renderApp('/buscar?q=apocalipsis')
+    fireEvent.click(await screen.findByRole('link', { name: /Apocalipsis/ }))
+    document.documentElement.scrollTop = 0
+
+    fireEvent.click(screen.getByRole('link', { name: 'Volver' }))
+    expect(screen.getByRole('link', { name: /Apocalipsis/ })).toBeInTheDocument()
+    expect(screen.queryByText('Buscando más…')).not.toBeInTheDocument()
+    expect(searches()).toBe(1)
+  })
+
+  it('does not lose on the way back what the book page found', async () => {
+    answerWith(APOCALYPSE)
+    renderApp('/buscar?q=apocalipsis')
+    fireEvent.click(await screen.findByRole('link', { name: /Apocalipsis/ }))
+    await waitFor(() => expect(useStore.getState().extraBooks.OL123W.description).toBe(''))
+
+    fireEvent.click(screen.getByRole('link', { name: 'Volver' }))
+    fireEvent.click(screen.getByRole('link', { name: /Apocalipsis/ }))
+    expect(useStore.getState().extraBooks.OL123W.description).toBe('')
+  })
+
+  it('says when the list is only the most relevant of many', async () => {
+    answerPage(295526, APOCALYPSE)
+    renderApp('/buscar?q=apocalipsis')
+    expect(await screen.findByText('El más relevante')).toBeInTheDocument()
+  })
+
+  it('leaves out of the authors an amount that would only be the one of this page', async () => {
+    answerPage(295526, APOCALYPSE)
+    renderApp('/buscar?q=king')
+    await screen.findByText('Los 5 más relevantes · 4 en tu biblioteca')
+    const authors = within(section('Autores'))
+    expect(authors.getByRole('button', { name: /Stephen King/ })).toBeInTheDocument()
+    expect(authors.queryByText(/\d libros?/)).not.toBeInTheDocument()
   })
 
   it('separates authors and books, and tapping an author filters their books', async () => {
     answerWith(APOCALYPSE, { key: '/works/OL5W', title: 'King Lear', author_name: ['Shakespeare'] })
     renderApp('/buscar?q=king')
-    const authors = await screen.findByRole('heading', { name: 'Autores' })
-    const list = within(authors.closest('section')!)
-    expect(list.getByText('5 libros')).toBeInTheDocument()
-    expect(within(section('Libros')).getByText('King Lear')).toBeInTheDocument()
+    expect(await within(section('Libros')).findByText('King Lear')).toBeInTheDocument()
+    const list = within(section('Autores'))
 
     fireEvent.click(list.getByRole('button', { name: /Stephen King/ }))
     expect(currentLocation()).toBe('/buscar?q=Stephen+King')
@@ -104,6 +230,36 @@ describe('with results', () => {
     expect(screen.queryByText('King Lear')).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Autores' })).not.toBeInTheDocument()
     expect(readRecentSearches()).toEqual(['Stephen King'])
+  })
+
+  it('filters at once and moves the focus to the books, as the button is gone', async () => {
+    answerWith(APOCALYPSE)
+    renderApp('/buscar?q=king')
+    await screen.findByText('Apocalipsis')
+    fireEvent.click(screen.getByRole('button', { name: /Stephen King/ }))
+    expect(screen.getByRole('heading', { name: 'Libros' })).toHaveFocus()
+    expect(screen.getByText('Apocalipsis')).toBeInTheDocument()
+    expect(await screen.findByText(/en tu biblioteca/)).toBeInTheDocument()
+  })
+
+  it('takes Back from an author to the search it was found in, not out of Buscar', async () => {
+    answerWith(APOCALYPSE)
+    renderAfterMas('/buscar?q=king')
+    await screen.findByText('Apocalipsis')
+    fireEvent.click(screen.getByRole('button', { name: /Stephen King/ }))
+    expect(currentLocation()).toBe('/buscar?q=Stephen+King')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Atrás' }))
+    expect(currentLocation()).toBe('/buscar?q=king')
+    expect(await screen.findByRole('heading', { name: 'Autores' })).toBeInTheDocument()
+  })
+
+  it('does not fill the history while typing', async () => {
+    renderAfterMas('/buscar')
+    type('k')
+    type('ki')
+    fireEvent.click(screen.getByRole('button', { name: 'Atrás' }))
+    expect(currentLocation()).toBe('/mas')
   })
 
   it('does not take Hawking for King', async () => {

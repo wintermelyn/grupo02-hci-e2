@@ -6,6 +6,7 @@ import { BookFolders } from './BookFolders'
 import { LedgerRow } from './LedgerRow'
 import { MissingBook } from './MissingBook'
 import { ReadingDetails } from './ReadingDetails'
+import { useBookDescription } from './useBookDescription'
 
 const LIBRARY_PATH = '/biblioteca'
 const FOLDER_PATTERN = `${LIBRARY_PATH}/carpeta/:folderId`
@@ -36,7 +37,9 @@ function BookDetails({ authors, year, pages }: Book) {
 }
 
 /** Always there, in the same place: most books have no description, and the page keeps its shape. */
-function AboutBook({ description, descriptionTranslated }: Book) {
+function AboutBook({ book }: { book: Book }) {
+  const { description, descriptionTranslated } = book
+  const loading = useBookDescription(book)
   return (
     <section className="col-span-2 mt-5 min-w-0 md:col-span-1 md:col-start-2 lg:col-start-3 lg:border-t lg:border-line lg:pt-2.5">
       <h2 className="font-serif text-lg font-semibold">Sobre este libro</h2>
@@ -49,7 +52,9 @@ function AboutBook({ description, descriptionTranslated }: Book) {
           )}
         </>
       ) : (
-        <p className="mt-1 text-muted">Aún no tenemos descripción de este libro.</p>
+        <p className="mt-1 text-muted">
+          {loading ? 'Buscando la descripción…' : 'Aún no tenemos descripción de este libro.'}
+        </p>
       )}
     </section>
   )
@@ -100,7 +105,7 @@ export function BookPage() {
           {entry && <BookFolders book={book} entry={entry} />}
         </dl>
 
-        <AboutBook {...book} />
+        <AboutBook book={book} />
       </div>
     </article>
   )

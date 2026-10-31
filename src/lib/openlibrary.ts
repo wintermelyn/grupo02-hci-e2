@@ -11,6 +11,7 @@ export const REQUEST_TIMEOUT_MS = 5000
 
 const SEARCH_LIMIT = 20
 const MAX_AUTHORS_OF_A_WORK = 3
+const MAX_SAVED_ANSWERS = 30
 const SEARCH_FIELDS = [
   'key',
   'title',
@@ -25,10 +26,14 @@ const SEARCH_FIELDS = [
 
 const WORK_ID = /^OL\d+W$/
 
+export const isWorkId = (id: BookId) => WORK_ID.test(id)
+
 export interface BookSearchResult {
   books: Book[]
   /** Open Library did not answer, so the books come only from what the app already has. */
   offline: boolean
+  /** Open Library has more books than the ones it sent. */
+  more: boolean
 }
 
 interface SearchDoc {
@@ -69,7 +74,8 @@ function matchesBook({ title, authors }: Book, query: string): boolean {
   )
 }
 
-function localMatches(query: string): Book[] {
+/** What the app already has, which needs no waiting. */
+export function localMatches(query: string): Book[] {
   const { seedBooks, extraBooks } = useStore.getState()
   return Object.values({ ...seedBooks, ...extraBooks }).filter((book) => matchesBook(book, query))
 }
@@ -104,6 +110,21 @@ export function mergeResults(local: Book[], live: Book[]): Book[] {
     return true
   })
 }
+
+// Outside the components: opening a book unmounts the search, and it has to come back at once, with
+// the height of its list, for the page to return to where it was. A failed search is not kept.
+const savedAnswers = new Map<string, BookSearchResult>()
+
+function saveAnswer(query: string, answer: BookSearchResult) {
+  savedAnswers.delete(query)
+  savedAnswers.set(query, answer)
+  const [oldest] = savedAnswers.keys()
+  if (savedAnswers.size > MAX_SAVED_ANSWERS) savedAnswers.delete(oldest)
+}
+
+export const savedSearch = (query: string) => savedAnswers.get(query)
+
+export const forgetSearches = () => savedAnswers.clear()
 
 /** Resolves to null on a 404. Throws on any other answer, on a network failure and at the timeout. */
 async function getJson<T>(url: string, signal?: AbortSignal): Promise<T | null> {
@@ -156,12 +177,20 @@ export async function searchBooks(query: string, signal: AbortSignal): Promise<B
     fields: SEARCH_FIELDS,
   })
   try {
-    const answer = await getJson<{ docs?: SearchDoc[] }>(`${API_URL}/search.json?${params}`, signal)
-    const live = (answer?.docs ?? []).flatMap((doc) => bookFromDoc(doc) ?? [])
-    return { books: mergeResults(local, live), offline: false }
+    const url = `${API_URL}/search.json?${params}`
+    const answer = await getJson<{ docs?: SearchDoc[]; numFound?: number }>(url, signal)
+    const docs = answer?.docs ?? []
+    const live = docs.flatMap((doc) => bookFromDoc(doc) ?? [])
+    const result = {
+      books: mergeResults(local, live),
+      offline: false,
+      more: (answer?.numFound ?? 0) > docs.length,
+    }
+    saveAnswer(query, result)
+    return result
   } catch (error) {
     if (signal.aborted) throw error
-    return { books: local, offline: true }
+    return { books: local, offline: true, more: false }
   }
 }
 
@@ -185,7 +214,7 @@ async function authorNames({ authors = [] }: WorkDoc): Promise<string[]> {
  * rejects when it cannot answer, so the page can tell "not found" from "try again".
  */
 export async function fetchWork(id: BookId): Promise<Book | null> {
-  if (!WORK_ID.test(id)) return null
+  if (!isWorkId(id)) return null
   const work = await getJson<WorkDoc>(`${API_URL}/works/${id}.json`)
   if (!work?.title) return null
   // Open Library marks a missing cover with -1.
@@ -196,7 +225,14 @@ export async function fetchWork(id: BookId): Promise<Book | null> {
     title: work.title,
     authors: await authorNames(work),
     coverUrl: cover ? coverUrl(cover) : undefined,
-    description: descriptionOf(work),
+    // Empty: already asked, so the book page does not ask again.
+    description: descriptionOf(work) ?? '',
     year: year ? Number(year) : undefined,
   }
+}
+
+/** Only the text, for a book that already came from a search. Rejects when it cannot answer. */
+export async function fetchDescription(id: BookId): Promise<string | undefined> {
+  const work = await getJson<WorkDoc>(`${API_URL}/works/${id}.json`)
+  return work ? descriptionOf(work) : undefined
 }

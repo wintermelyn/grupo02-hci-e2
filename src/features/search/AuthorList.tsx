@@ -4,7 +4,13 @@ import type { AuthorGroup } from './results'
 
 const MAX_COVERS = 2
 
-function AuthorTile({ author, onPick }: { author: AuthorGroup; onPick: (name: string) => void }) {
+interface AuthorTileProps {
+  author: AuthorGroup
+  counted: boolean
+  onPick: (name: string) => void
+}
+
+function AuthorTile({ author, counted, onPick }: AuthorTileProps) {
   return (
     <button
       type="button"
@@ -20,7 +26,9 @@ function AuthorTile({ author, onPick }: { author: AuthorGroup; onPick: (name: st
       </span>
       <span className="min-w-0">
         <span className="block truncate font-serif text-lg/6 font-semibold">{author.name}</span>
-        <span className="block text-sm text-muted">{booksLabel(author.books.length)}</span>
+        {counted && (
+          <span className="block text-sm text-muted">{booksLabel(author.books.length)}</span>
+        )}
       </span>
     </button>
   )
@@ -29,11 +37,13 @@ function AuthorTile({ author, onPick }: { author: AuthorGroup; onPick: (name: st
 export interface AuthorListProps {
   title: string
   authors: AuthorGroup[]
+  /** False when `books` is only a page of a search, where the amount would not be the author's. */
+  counted?: boolean
   onPick: (name: string) => void
 }
 
 /** Four on a phone, so the books that follow stay near. */
-export function AuthorList({ title, authors, onPick }: AuthorListProps) {
+export function AuthorList({ title, authors, counted = true, onPick }: AuthorListProps) {
   return (
     <section className="mt-5">
       <h2 className="font-serif text-heading font-semibold">{title}</h2>
@@ -43,7 +53,7 @@ export function AuthorList({ title, authors, onPick }: AuthorListProps) {
             key={author.name}
             className="border-b border-line last:border-b-0 max-md:nth-4:border-b-0 md:border-b-0"
           >
-            <AuthorTile author={author} onPick={onPick} />
+            <AuthorTile author={author} counted={counted} onPick={onPick} />
           </li>
         ))}
       </ul>
