@@ -27,6 +27,22 @@ describe('Toast', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Cambio deshecho')
   })
 
+  it('returns focus to where it was before Deshacer, which disappears with the toast', () => {
+    render(
+      <>
+        <button>Tag</button>
+        <Toast />
+      </>,
+    )
+    act(() => state().commit('Libros quitados', () => ({ library: {} })))
+    const trigger = screen.getByRole('button', { name: 'Tag' })
+    const undoButton = screen.getByRole('button', { name: 'Deshacer' })
+    trigger.focus()
+    act(() => undoButton.focus())
+    fireEvent.click(undoButton)
+    expect(trigger).toHaveFocus()
+  })
+
   it('waits while the toast is hovered, then gives the full time again', () => {
     render(<Toast />)
     act(() => state().commit('Libros quitados', () => ({ library: {} })))

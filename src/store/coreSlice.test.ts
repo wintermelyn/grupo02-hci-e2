@@ -306,8 +306,8 @@ describe('toast', () => {
 
   it('a plain toast replaces an undoable one and drops its undo copy', () => {
     state().setStatus(unknownBook.id, 'want')
-    state().showToast('Código copiado')
-    expect(state().toast).toMatchObject({ message: 'Código copiado', undoable: false })
+    state().showToast('Sigue en tu lista')
+    expect(state().toast).toMatchObject({ message: 'Sigue en tu lista', undoable: false })
     expect(state().undoSnapshot).toBeNull()
   })
 

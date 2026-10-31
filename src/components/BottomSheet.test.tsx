@@ -53,4 +53,40 @@ describe('BottomSheet', () => {
     expect(screen.queryByText('Carpetas')).not.toBeInTheDocument()
     expect(onClose).not.toHaveBeenCalled()
   })
+
+  it('closes on a click on the backdrop, but not on the second click of a double tap', () => {
+    const { onClose } = renderSheet(true)
+    const dialog = screen.getByRole('dialog', { name: 'Mover a…' })
+    fireEvent.click(dialog, { detail: 2 })
+    expect(onClose).not.toHaveBeenCalled()
+    fireEvent.click(dialog, { detail: 1 })
+    expect(onClose).toHaveBeenCalledOnce()
+  })
+
+  it('drops the second click of the double tap that closed it, and nothing after that', () => {
+    const onClick = vi.fn()
+    const { rerender } = renderSheet(true)
+    render(<button onClick={onClick}>Detrás</button>)
+    const behind = screen.getByRole('button', { name: 'Detrás', hidden: true })
+    // A panel closed by an earlier test is still waiting for its next click.
+    fireEvent.click(document.body)
+    rerender(false)
+
+    fireEvent.click(behind, { detail: 2 })
+    expect(onClick).not.toHaveBeenCalled()
+    fireEvent.click(behind, { detail: 2 })
+    expect(onClick).toHaveBeenCalledOnce()
+  })
+
+  it('lets a normal click through after closing', () => {
+    const onClick = vi.fn()
+    const { rerender } = renderSheet(true)
+    render(<button onClick={onClick}>Detrás</button>)
+    const behind = screen.getByRole('button', { name: 'Detrás', hidden: true })
+    fireEvent.click(document.body)
+    rerender(false)
+
+    fireEvent.click(behind, { detail: 1 })
+    expect(onClick).toHaveBeenCalledOnce()
+  })
 })

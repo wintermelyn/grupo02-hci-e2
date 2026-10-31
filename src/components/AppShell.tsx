@@ -23,7 +23,7 @@ function isSectionActive({ to, alsoActiveOn = [] }: Section, pathname: string): 
   return [to, ...alsoActiveOn].some((path) => matchPath({ path, end: to === '/' }, pathname))
 }
 
-// Active is shown by weight, a filled pill and aria-current="page", not by colour alone.
+// Active is shown by weight, a filled pill and aria-current, not by colour alone.
 function navItemClass(isActive: boolean, layout: string): string {
   return cx(
     'flex items-center rounded-lg',
@@ -39,10 +39,10 @@ function NavItems({ layout, iconSize }: { layout: string; iconSize: number }) {
     const isActive = isSectionActive(section, pathname)
     return (
       <li key={to} className="flex-1 md:flex-none">
-        {/* NavLink only knows its own URL, and Más also has to stay marked on other routes. */}
+        {/* NavLink only knows its own URL. "true" says the page belongs to the section without being it. */}
         <Link
           to={to}
-          aria-current={isActive ? 'page' : undefined}
+          aria-current={isActive ? (matchPath(to, pathname) ? 'page' : 'true') : undefined}
           className={navItemClass(isActive, layout)}
         >
           <Icon aria-hidden size={iconSize} />

@@ -12,7 +12,7 @@ function navigationBars() {
 function activeSections(nav: HTMLElement) {
   return within(nav)
     .getAllByRole('link')
-    .filter((link) => link.getAttribute('aria-current') === 'page')
+    .filter((link) => link.hasAttribute('aria-current'))
     .map((link) => link.textContent)
 }
 
@@ -43,6 +43,21 @@ describe('AppShell', () => {
   ])('%s marks only %s', (path, section) => {
     renderApp(path)
     for (const nav of navigationBars()) expect(activeSections(nav)).toEqual([section])
+  })
+
+  it.each([
+    ['/mas', 'page'],
+    ['/amigos', 'true'],
+    ['/perfil', 'true'],
+    ['/biblioteca', 'page'],
+    ['/biblioteca/carpeta/terror', 'true'],
+  ])('%s is announced as aria-current=%s', (path, value) => {
+    renderApp(path)
+    const [nav] = navigationBars()
+    const active = within(nav)
+      .getAllByRole('link')
+      .find((link) => link.hasAttribute('aria-current'))
+    expect(active).toHaveAttribute('aria-current', value)
   })
 
   it('marks no section on a book page', () => {

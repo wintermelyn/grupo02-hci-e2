@@ -1,4 +1,5 @@
 import { fireEvent, screen, within } from '@testing-library/react'
+import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import { daysAgo, today } from '../lib/dates'
 import { renderWithRouter } from '../test/router'
@@ -120,9 +121,30 @@ describe('StatusControl', () => {
   })
 })
 
+describe('StatusControl when the book changes', () => {
+  function BookSwitcher() {
+    const [bookId, setBookId] = useState(CARRIE)
+    return (
+      <>
+        <button onClick={() => setBookId(IT)}>Otro libro</button>
+        <StatusControl bookId={bookId} />
+      </>
+    )
+  }
+
+  it('closes the panel instead of showing it for the other book', () => {
+    renderWithRouter(<BookSwitcher />)
+    openPanel()
+    expect(screen.getByRole('dialog', { name: 'Estado de «Carrie»' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Otro libro' }))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+})
+
 describe('StatusControl with a book outside the library', () => {
   it('offers to add it, with nothing marked, and adds it with the chosen tag', () => {
     renderControl(apiBook.id, apiBook)
+    const trigger = screen.getByRole('button', { name: 'Agregar a Mis libros' })
     openPanel('Agregar a Mis libros')
     expect(screen.getByRole('dialog', { name: 'Agregar a Mis libros' })).toBeInTheDocument()
     for (const name of ['Lo quiero', 'Lo tengo', 'Leyendo', 'Leído']) {
@@ -131,7 +153,8 @@ describe('StatusControl with a book outside the library', () => {
     fireEvent.click(option('Lo tengo'))
     expect(state().getBook(apiBook.id)).toEqual(apiBook)
     expect(state().library[apiBook.id].status).toBe('owned')
-    expect(screen.getByRole('button', { name: /^Lo tengo\./ })).toBeInTheDocument()
+    // The same element, so the dialog can give it back the focus.
+    expect(screen.getByRole('button', { name: /^Lo tengo\./ })).toBe(trigger)
   })
 
   it('adds the book before finishing it, starting today', () => {

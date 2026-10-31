@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { currentLocation, renderWithRouter } from '../test/router'
 import { state } from '../test/store'
@@ -41,8 +41,9 @@ describe('BookRow', () => {
   it('follows the tag when it changes', () => {
     renderRow(libraryBook('OL81613W'))
     expect(screen.getByText('Lo quiero')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('link', { name: /It/ }))
-    expect(currentLocation()).toBe('/libro/OL81613W')
+    act(() => state().setStatus('OL81613W', 'owned'))
+    expect(screen.getByText('Lo tengo')).toBeInTheDocument()
+    expect(screen.queryByText('Lo quiero')).not.toBeInTheDocument()
   })
 
   it('shows the rating of a rated book', () => {

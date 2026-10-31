@@ -11,6 +11,20 @@ export interface BottomSheetProps {
 }
 
 /**
+ * The second click of a double tap would land on whatever was behind the panel, such as the
+ * navigation bar under the last option. event.detail counts the clicks of a double tap, so the
+ * next click is the only one that can be that second click.
+ */
+function ignoreSecondClick() {
+  const ignore = (event: MouseEvent) => {
+    if (event.detail < 2) return
+    event.preventDefault()
+    event.stopPropagation()
+  }
+  window.addEventListener('click', ignore, { capture: true, once: true })
+}
+
+/**
  * Bottom sheet on mobile, centred modal from md:. Built on the native modal <dialog>, which
  * traps focus, makes the page behind it inert and returns focus to the trigger when closed.
  *
@@ -25,7 +39,10 @@ export function BottomSheet({ open, onClose, title, children, footer }: BottomSh
     const dialog = dialogRef.current
     if (!dialog) return
     if (open && !dialog.open) dialog.showModal()
-    if (!open && dialog.open) dialog.close()
+    if (!open && dialog.open) {
+      dialog.close()
+      ignoreSecondClick()
+    }
   }, [open])
 
   return (
@@ -43,8 +60,9 @@ export function BottomSheet({ open, onClose, title, children, footer }: BottomSh
         if (open) onClose()
       }}
       // The panel covers the whole dialog box, so a click on the dialog itself is the backdrop.
+      // Double tapping the button that opens the panel must not close it right away.
       onClick={(event) => {
-        if (event.target === event.currentTarget) onClose()
+        if (event.target === event.currentTarget && event.detail < 2) onClose()
       }}
       className="m-0 mt-auto max-h-[85dvh] w-full max-w-none rounded-t-2xl bg-white p-0 text-gray-900 shadow-xl backdrop:bg-black/50 md:m-auto md:max-w-lg md:rounded-2xl"
     >

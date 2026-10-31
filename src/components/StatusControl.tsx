@@ -23,7 +23,9 @@ const OPTIONS: readonly ReadingStatus[] = ['want', 'owned', 'reading', 'read']
 
 /** The tag with its pencil (D2). Opens a panel with the four tags; a chosen tag applies at once. */
 export function StatusControl({ bookId, book, className }: StatusControlProps) {
-  const [open, setOpen] = useState(false)
+  // Tied to the book, so going to another book with the browser's back button closes the panel.
+  const [openFor, setOpenFor] = useState<BookId>()
+  const open = openFor === bookId
   const entry = useStore(selectEntry(bookId))
   const title = useStore(selectBook(bookId))?.title ?? book?.title
   const setStatus = useStore((state) => state.setStatus)
@@ -33,7 +35,7 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
 
   function choose(status: ReadingStatus) {
     // Closed first, so the toast's Deshacer is not left behind the modal.
-    setOpen(false)
+    setOpenFor(undefined)
     // Finishing again would replace finishedAt and drop the rating of a book already in Leído.
     if (status === current) return
     if (book) upsertBook(book)
@@ -49,29 +51,27 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
 
   return (
     <>
-      {current ? (
-        <button
-          type="button"
-          aria-label={`${STATUS_LABELS[current]}. Cambiar estado de ${bookName}`}
-          onClick={() => setOpen(true)}
-          className={cx(
-            'inline-flex min-h-11 items-center gap-2 rounded-lg pr-2 font-medium text-gray-800',
-            className,
-          )}
-        >
-          <StatusTag status={current} />
-          <Pencil aria-hidden size={16} />
-          Cambiar
-        </button>
-      ) : (
-        <Button icon={Plus} onClick={() => setOpen(true)} className={className}>
-          Agregar a Mis libros
-        </Button>
-      )}
+      {/* One button for both states: the dialog gives focus back to it after adding the book. */}
+      <Button
+        icon={current ? undefined : Plus}
+        aria-label={current && `${STATUS_LABELS[current]}. Cambiar estado de ${bookName}`}
+        onClick={() => setOpenFor(bookId)}
+        className={className}
+      >
+        {current ? (
+          <>
+            <StatusTag status={current} />
+            <Pencil aria-hidden size={16} />
+            Cambiar
+          </>
+        ) : (
+          'Agregar a Mis libros'
+        )}
+      </Button>
 
       <BottomSheet
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={() => setOpenFor(undefined)}
         title={current ? `Estado de ${bookName}` : 'Agregar a Mis libros'}
       >
         <ul className="flex flex-col gap-1">

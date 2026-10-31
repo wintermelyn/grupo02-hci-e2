@@ -27,6 +27,11 @@ describe('books.json', () => {
     expect(isUnique(catalog.map((book) => book.id))).toBe(true)
   })
 
+  it('keeps accents composed, so a plain text search finds them', () => {
+    const texts = catalog.flatMap((book) => [book.title, ...book.authors, book.description ?? ''])
+    expect(texts.filter((text) => text !== text.normalize('NFC'))).toEqual([])
+  })
+
   it('points every cover to public/covers', () => {
     const covers = catalog.flatMap((book) => (book.coverUrl ? [book.coverUrl] : []))
     expect(covers.length).toBeGreaterThanOrEqual(45)
