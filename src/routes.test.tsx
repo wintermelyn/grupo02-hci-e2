@@ -9,6 +9,7 @@ import { currentLocation, renderApp } from './test/router'
 const SCREENS: Record<string, string> = {
   '/': '/',
   '/biblioteca': '/biblioteca',
+  '/biblioteca/sin-carpeta': '/biblioteca/sin-carpeta',
   '/biblioteca/carpeta/:folderId': '/biblioteca/carpeta/proximos',
   '/libro/:bookId': '/libro/OL81626W',
   '/descubrir': '/descubrir',
