@@ -414,3 +414,6 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Código de amigo | No aparece | Queda fuera. Compartir un código exige coordinarse por otro medio, lo contrario de N2 |
 | Seguidores | El journey 2.1.2 menciona "amigos y seguidores" | Amigos muestra solo amigos y solicitudes |
 | Barra de navegación | Nombra "Mis libros", "Más", "Descubrir" y el buscador principal, sin dar el orden | *Inicio · Mis libros · Descubrir · Buscar · Más* |
+| Relectura pasando por otro tag | No aparece | Pasar de "Leído" directo a "Leyendo" pone inicio = hoy. Si antes pasa por otro tag, se conserva la fecha vieja, como dice el contrato de `setStatus`, y se corrige con "Editar lectura" |
+| Sección marcada en la ficha | No aparece | Ninguna, porque la ficha se abre desde cualquier sección |
+| Nombre del selector | Habla de "un lápiz" | "Cambiar" junto al lápiz, porque todo ícono lleva texto. El selector se titula "Estado de «título»" |

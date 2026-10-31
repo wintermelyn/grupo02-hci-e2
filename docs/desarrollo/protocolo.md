@@ -12,7 +12,7 @@ Todo cambio queda en un PR. No se hace merge local hacia esta rama ni push direc
 - **PR de la fase:** va de la rama de la fase hacia esta rama. Se abre al cerrar la fase y queda abierto hasta que Matías apruebe el CP.
 - **PR de publicación:** va de esta rama hacia `main`. Se abre y se integra con `Aprobé el CP<n>`.
 
-Los PR se integran en GitHub con `gh pr merge --merge`, nunca antes de `Aprobé el CP<n>` y primero el de la fase. Si este PR depende de otro que sigue abierto, la descripción enlaza ese PR.
+La sesión integra los PR en GitHub con `gh pr merge --merge`, nunca antes de `Aprobé el CP<n>` y primero el de la fase. Si un PR está en borrador, antes lo saca de borrador. Si este PR depende de otro que sigue abierto, la descripción enlaza ese PR.
 
 ## Reglas de toda fase
 
