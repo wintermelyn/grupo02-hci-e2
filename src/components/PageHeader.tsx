@@ -12,7 +12,7 @@ export function BackLink({ to, label = 'Volver' }: BackLinkProps) {
   return (
     <Link
       to={to}
-      className="-ml-2 inline-flex min-h-11 items-center gap-0.5 rounded-control pr-2 pl-1 font-medium text-muted hover:text-ink active:bg-sand"
+      className="-ml-2 inline-flex min-h-11 shrink-0 items-center gap-0.5 rounded-control pr-2 pl-1 font-medium whitespace-nowrap text-ink transition-colors duration-100 hover:bg-sand active:bg-sand-deep"
     >
       <ChevronLeft aria-hidden size={20} />
       {label}
@@ -31,7 +31,8 @@ export function Wordmark() {
 }
 
 export interface PageHeaderProps {
-  title: string
+  /** Text, or the field that replaces it while the name is being edited. */
+  title: ReactNode
   /** One line of context under the title. */
   subtitle?: string
   /** Sits before the title, e.g. the <Avatar/> of a person. */
@@ -39,7 +40,10 @@ export interface PageHeaderProps {
   /** Where "Volver" goes. A fixed path, not history.back(), so it also works on a shared link. */
   backTo?: string
   backLabel?: string
-  /** A single action next to the title, e.g. a <Button/>. The product name moves above it. */
+  /**
+   * What acts on the page, next to the title, e.g. a <Button/>. The product name moves above it. It
+   * can cover the row with `absolute inset-0`, as the search of a folder does on a phone.
+   */
   action?: ReactNode
   /** Sits on the band's bottom edge, e.g. a <TagFilter/>. */
   children?: ReactNode
@@ -59,25 +63,28 @@ export function PageHeader({
   const wordmarkAbove = Boolean(backTo || action)
 
   return (
-    <header className={cx('full-bleed bg-shell pt-4 md:pt-8', !children && 'pb-5')}>
+    // flow-root: a margin at the foot of a child stays in the band instead of collapsing out of it.
+    <header className={cx('full-bleed flow-root bg-shell pt-2 md:pt-4', !children && 'pb-4')}>
       {wordmarkAbove && (
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex min-h-11 items-center justify-between gap-3">
           {backTo && <BackLink to={backTo} label={backLabel} />}
           <Wordmark />
         </div>
       )}
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
+      <div className="relative flex min-h-11 items-center justify-between gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           {media}
-          <div className="min-w-0">
-            <h1 className="font-serif text-display font-semibold tracking-tight">{title}</h1>
+          <div className="min-w-0 flex-1">
+            <h1 className="font-serif text-title font-semibold tracking-tight md:text-display">
+              {title}
+            </h1>
             {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
           </div>
         </div>
         {action && <div className="shrink-0">{action}</div>}
         {!wordmarkAbove && <Wordmark />}
       </div>
-      {children && <div className="mt-3">{children}</div>}
+      {children && <div className="mt-2">{children}</div>}
     </header>
   )
 }

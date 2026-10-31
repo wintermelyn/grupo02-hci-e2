@@ -225,3 +225,25 @@ describe('every change', () => {
     }
   })
 })
+
+describe('setStartDate', () => {
+  const CARRIE = 'OL81626W' // Leyendo
+  const IT = 'OL81613W' // Lo quiero
+
+  it('corrects the start of a book in Leyendo, with Deshacer', () => {
+    const before = state().library[CARRIE]
+    state().setStartDate(CARRIE, daysAgo(40))
+    expect(state().library[CARRIE]).toEqual({ ...before, startedAt: daysAgo(40) })
+    expect(state().toast).toMatchObject({ message: 'Lectura actualizada', undoable: true })
+    state().undo()
+    expect(state().library[CARRIE]).toBe(before)
+  })
+
+  it('does nothing with the same date or a book that is not in Leyendo', () => {
+    const { startedAt = '' } = state().library[CARRIE]
+    state().setStartDate(CARRIE, startedAt)
+    state().setStartDate(IT, daysAgo(40))
+    expect(state().toast).toBeNull()
+    expect(state().library[IT].startedAt).toBeUndefined()
+  })
+})

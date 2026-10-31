@@ -17,6 +17,8 @@ export interface LibraryActions {
    * addedAt: today()) first. Ignores ids that getBook does not know. An undefined rating clears it.
    */
   finishBook: (bookId: BookId, details: FinishDetails) => void
+  /** Corrects when a book in Leyendo was started, which finishBook cannot do: it ends the reading. */
+  setStartDate: (bookId: BookId, startedAt: ISODate) => void
   removeFromLibrary: (bookIds: BookId[]) => void
   /** Returns the new folder id. */
   createFolder: (name: string) => string
@@ -92,6 +94,14 @@ export const createLibrarySlice: SliceCreator<LibraryActions> = (_set, get) => {
       if (current) label = `Estado cambiado a «${STATUS_LABELS.read}»`
       if (current?.status === 'read') label = 'Lectura actualizada'
       get().commit(label, ({ library }) => ({ library: { ...library, [bookId]: entry } }))
+    },
+
+    setStartDate: (bookId, startedAt) => {
+      const current = selectEntry(bookId)(get())
+      if (current?.status !== 'reading' || current.startedAt === startedAt) return
+      get().commit('Lectura actualizada', ({ library }) => ({
+        library: { ...library, [bookId]: { ...current, startedAt } },
+      }))
     },
 
     removeFromLibrary: (bookIds) => {

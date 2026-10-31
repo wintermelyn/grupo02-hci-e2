@@ -2,7 +2,7 @@ import { Pencil, Plus } from 'lucide-react'
 import { today } from '../lib/dates'
 import { STATUS_LABELS, STATUS_ORDER } from '../lib/status'
 import { selectBook, selectEntry, useStore } from '../store'
-import type { Book, BookId, ReadingStatus } from '../types'
+import type { Book, BookId, LibraryEntry, ReadingStatus } from '../types'
 import { AnchoredMenu } from './AnchoredMenu'
 import { cx } from './cx'
 import { StatusTag } from './StatusTag'
@@ -18,13 +18,31 @@ export interface StatusControlProps {
   className?: string
 }
 
-/** The tag with its pencil (D2). Opens a menu next to it; a chosen tag applies at once. */
+const LIST = new Intl.ListFormat('es-CL', { style: 'long', type: 'conjunction' })
+
+/** Says what leaving costs for this book, so it is read before and not in the toast after. */
+function whatIsLost(entry: LibraryEntry): string | undefined {
+  const { folderIds, startedAt, finishedAt, rating } = entry
+  const folders = folderIds.length
+  const lost = [
+    folders > 0 && (folders === 1 ? '1 carpeta' : `${folders} carpetas`),
+    (startedAt || finishedAt) && 'las fechas',
+    rating !== undefined && 'el puntaje',
+  ].filter((item): item is string => Boolean(item))
+  return lost.length > 0 ? `Pierdes ${LIST.format(lost)}` : undefined
+}
+
+/**
+ * The tag with its pencil (D2). Opens a menu next to it; a chosen tag applies at once. Taking the
+ * book out of the library lives here too: it takes the same two taps as adding it.
+ */
 export function StatusControl({ bookId, book, className }: StatusControlProps) {
   const entry = useStore(selectEntry(bookId))
   const title = useStore(selectBook(bookId))?.title ?? book?.title
   const setStatus = useStore((state) => state.setStatus)
   const finishBook = useStore((state) => state.finishBook)
   const upsertBook = useStore((state) => state.upsertBook)
+  const removeFromLibrary = useStore((state) => state.removeFromLibrary)
   const current = entry?.status
   const statusChanged = useChanged(current)
 
@@ -34,7 +52,9 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
     if (book) upsertBook(book)
     if (status === 'read') {
       const startedAt = entry?.startedAt ?? entry?.addedAt ?? today()
-      finishBook(bookId, { startedAt, finishedAt: today() })
+      // Only Leyendo drops finishedAt, so a book that comes back keeps the day it was finished.
+      const finishedAt = entry?.finishedAt ?? today()
+      finishBook(bookId, { startedAt, finishedAt, rating: entry?.rating })
     } else {
       setStatus(bookId, status)
     }
@@ -53,6 +73,16 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
         checked: current === status,
         onSelect: () => choose(status),
       }))}
+      actions={
+        entry && [
+          {
+            id: 'remove',
+            label: 'Quitar de mi biblioteca',
+            detail: whatIsLost(entry),
+            onSelect: () => removeFromLibrary([bookId]),
+          },
+        ]
+      }
       trigger={(triggerProps) => (
         // One button for both states, so the focus can come back to it after adding the book.
         <button
@@ -60,11 +90,13 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
           type="button"
           aria-label={current && `${STATUS_LABELS[current]}. Cambiar estado de ${bookName}`}
           className={cx(
-            'flex min-h-13 w-full items-center gap-3 rounded-card px-3.5 font-semibold shadow-card',
-            'transition-[background-color,box-shadow,translate] duration-100 active:translate-y-px active:shadow-none',
+            'flex min-h-11 items-center gap-3 rounded-control font-semibold',
+            'transition-[background-color,translate] duration-100',
+            // The whole row opens the menu, so the row answers the cursor, like a date row, and
+            // Cambiar only reacts when the cursor is really on it.
             current
-              ? 'justify-between bg-white hover:bg-shell active:bg-sand'
-              : 'justify-center bg-ink text-white hover:bg-ink/90 active:bg-ink/80',
+              ? 'group -mx-2 w-[calc(100%+1rem)] justify-between pl-2 hover:bg-ink/5 active:bg-ink/10'
+              : 'w-full justify-center bg-ink px-4 text-white hover:bg-ink/90 active:translate-y-px active:bg-ink/80',
           )}
         >
           {current ? (
@@ -75,7 +107,8 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
                 status={current}
                 className={statusChanged ? 'animate-tag-in' : undefined}
               />
-              <span className="inline-flex items-center gap-1.5">
+              {/* An action in a row, so it is drawn as a quiet compact Button. */}
+              <span className="inline-flex min-h-11 items-center gap-1.5 rounded-control px-2 transition-[background-color,translate] duration-100 group-aria-expanded:bg-ink/5 hover:bg-ink/5 active:translate-y-px active:bg-ink/10">
                 <Pencil aria-hidden size={16} />
                 Cambiar
               </span>

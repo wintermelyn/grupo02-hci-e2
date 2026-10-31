@@ -16,8 +16,8 @@ import { ignoreSecondClick } from './ignoreSecondClick'
 /** `radio`: one option is the current one. `checkbox`: several can be on. `action`: commands. */
 export type AnchoredMenuKind = 'radio' | 'checkbox' | 'action'
 
-/** `fill` takes the width of the control. The others are for a control narrower than the menu. */
-export type AnchoredMenuAlign = 'fill' | 'start' | 'end'
+/** `fill` takes the width of the control. `end` is for a control narrower than the menu. */
+export type AnchoredMenuAlign = 'fill' | 'end'
 
 export interface AnchoredMenuOption {
   id: string
@@ -25,6 +25,15 @@ export interface AnchoredMenuOption {
   label: ReactNode
   /** Only for `radio` and `checkbox`. */
   checked?: boolean
+  onSelect: () => void
+}
+
+/** A command below the options, set apart from them because it does something else. */
+export interface AnchoredMenuAction {
+  id: string
+  label: string
+  /** What the command will cost, read before choosing it. */
+  detail?: string
   onSelect: () => void
 }
 
@@ -42,6 +51,8 @@ export interface AnchoredMenuProps {
   /** Names the menu for screen readers. */
   label: string
   options: AnchoredMenuOption[]
+  /** Commands after a line, e.g. leaving the list the options belong to. */
+  actions?: AnchoredMenuAction[]
   kind?: AnchoredMenuKind
   /** Says in words that an option is on, since the check alone would rely on an icon. */
   checkedLabel?: string
@@ -66,7 +77,6 @@ const ITEM_ROLES: Record<AnchoredMenuKind, string> = {
 
 const ALIGN_CLASSES: Record<AnchoredMenuAlign, string> = {
   fill: 'inset-x-0',
-  start: 'left-0 w-64',
   end: 'right-0 w-64',
 }
 
@@ -98,6 +108,7 @@ function placeMenu(trigger: HTMLElement, menu: HTMLElement): Placement {
 export function AnchoredMenu({
   label,
   options,
+  actions = [],
   kind = 'radio',
   checkedLabel = 'Actual',
   align = 'fill',
@@ -109,6 +120,7 @@ export function AnchoredMenu({
   const [openFor, setOpenFor] = useState<string>()
   const open = openFor === resetKey
   const [placement, setPlacement] = useState<Placement>('below')
+  const [maxHeight, setMaxHeight] = useState<number>()
   const rootRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -119,10 +131,16 @@ export function AnchoredMenu({
     const control = triggerRef.current
     const menu = menuRef.current
     if (!open || !control || !menu) return
-    setPlacement(placeMenu(control, menu))
+    const place = placeMenu(control, menu)
+    setPlacement(place)
+    // The page may have run out of scroll: what does not fit stays reachable inside the menu.
+    const room = window.innerHeight - control.getBoundingClientRect().bottom - MENU_GAP * 2
+    setMaxHeight(place === 'below' && room < menu.offsetHeight ? room : undefined)
     const items = [...menu.querySelectorAll<HTMLElement>(ITEM_SELECTOR)]
     const selected = items.find((item) => item.getAttribute('aria-checked') === 'true')
-    const target = focusOnOpen.current === 'last' ? items.at(-1) : (selected ?? items[0])
+    // Opening with ArrowUp must not land on a command such as leaving the library, one Enter away.
+    const last = items.filter((item) => !item.hasAttribute('data-command')).at(-1)
+    const target = focusOnOpen.current === 'last' ? last : (selected ?? items[0])
     target?.focus()
   }, [open])
 
@@ -183,7 +201,7 @@ export function AnchoredMenu({
     items[targets[event.key]].focus()
   }
 
-  function choose(option: AnchoredMenuOption) {
+  function choose(option: Pick<AnchoredMenuOption, 'onSelect'>) {
     closeAndReturn()
     // The menu may be over the navigation bar, so a double tap must not reach it.
     ignoreSecondClick()
@@ -208,8 +226,10 @@ export function AnchoredMenu({
         aria-label={label}
         hidden={!open}
         onKeyDown={onMenuKeyDown}
+        style={{ maxHeight }}
         className={cx(
-          'absolute z-30 max-h-[60dvh] overflow-y-auto rounded-float bg-white p-1.5 shadow-float',
+          // Over the bottom bar: in a page too short to scroll, that is the only room left below.
+          'absolute z-45 max-h-[60dvh] overflow-y-auto rounded-float bg-white p-1.5 shadow-float',
           'transition-[opacity,translate,display] transition-discrete duration-150 ease-quick',
           'starting:-translate-y-1 starting:opacity-0 [&[hidden]]:opacity-0',
           ALIGN_CLASSES[align],
@@ -225,9 +245,8 @@ export function AnchoredMenu({
             tabIndex={-1}
             onClick={() => choose(option)}
             className={cx(
-              'flex min-h-12 w-full items-center justify-between gap-3 rounded-control px-2.5 text-left',
-              'transition-colors duration-100 -outline-offset-2 hover:bg-shell active:bg-sand',
-              option.checked && 'bg-shell',
+              'flex min-h-11 w-full items-center justify-between gap-3 rounded-control px-2.5 text-left',
+              'transition-colors duration-100 -outline-offset-2 hover:bg-shell active:bg-sand-deep',
             )}
           >
             {option.label}
@@ -235,10 +254,31 @@ export function AnchoredMenu({
             {option.checked && (
               <span
                 aria-hidden
-                className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-muted"
+                className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-ink"
               >
                 <Check size={16} strokeWidth={3} />
                 {checkedLabel}
+              </span>
+            )}
+          </button>
+        ))}
+
+        {actions.length > 0 && <div role="separator" className="my-1.5 border-t border-line" />}
+        {actions.map((action) => (
+          <button
+            key={action.id}
+            type="button"
+            role="menuitem"
+            data-command
+            tabIndex={-1}
+            aria-description={action.detail}
+            onClick={() => choose(action)}
+            className="block min-h-11 w-full rounded-control px-2.5 py-1.5 text-left font-semibold transition-colors duration-100 -outline-offset-2 hover:bg-shell active:bg-sand-deep"
+          >
+            {action.label}
+            {action.detail && (
+              <span aria-hidden className="block text-sm font-normal text-muted">
+                {action.detail}
               </span>
             )}
           </button>

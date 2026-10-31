@@ -29,7 +29,7 @@ function navItemClass(isActive: boolean, layout: string): string {
   return cx(
     'relative flex items-center transition-colors duration-100',
     layout,
-    isActive ? 'font-bold text-ink' : 'font-medium text-muted hover:text-ink active:bg-shell',
+    isActive ? 'font-bold text-ink' : 'font-semibold text-muted hover:text-ink',
   )
 }
 
@@ -68,18 +68,22 @@ function NavItems({
 export function AppShell() {
   return (
     <div className="min-h-dvh">
-      <header className="sticky top-0 z-40 hidden bg-white shadow-[0_1px_0_var(--color-line)] md:block">
-        <div className="mx-auto flex max-w-app items-center justify-between gap-6 px-4">
+      {/* On the ground of the page, so the bar and the column read as one: 48 px, one line, no card. */}
+      <header className="sticky top-0 z-40 hidden border-b border-edge bg-paper md:block">
+        <div className="mx-auto flex h-12 max-w-app items-center justify-between gap-6 px-4">
           <p className="flex items-baseline gap-2">
-            <span className="font-serif text-xl font-semibold">Goodreads</span>
-            <span className="text-xs text-muted">Prototipo de rediseño</span>
+            <span className="font-serif text-lg font-semibold">Goodreads</span>
+            <span className="text-xs whitespace-nowrap text-muted">
+              Prototipo<span className="hidden lg:inline"> de rediseño</span>
+            </span>
           </p>
           <nav aria-label="Principal">
-            <ul className="flex lg:gap-1">
+            <ul className="flex items-center gap-0.5 text-sm lg:gap-1">
+              {/* 44 px to touch and a 36 px fill: the bar keeps a margin around the active section. */}
               <NavItems
-                layout="min-h-16 gap-2 px-2 lg:px-3"
-                ribbon="top-0 h-2.5 w-2.25"
-                iconSize={20}
+                layout="isolate min-h-11 gap-1.5 px-2.5 before:absolute before:inset-x-0 before:inset-y-1 before:-z-10 before:rounded-control before:transition-colors before:duration-100 hover:before:bg-sand active:before:bg-sand-deep aria-[current]:before:bg-sand-deep lg:px-3"
+                ribbon="-top-0.5 h-3 w-2.25"
+                iconSize={18}
               />
             </ul>
           </nav>
@@ -93,11 +97,11 @@ export function AppShell() {
       <nav
         aria-label="Principal"
         data-bottom-bar
-        className="fixed inset-x-0 bottom-0 z-40 bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-1px_0_var(--color-line)] md:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-edge bg-paper pb-[env(safe-area-inset-bottom)] md:hidden"
       >
         <ul className="flex px-1">
           <NavItems
-            layout="min-h-16 flex-col justify-center gap-0.5 text-xs"
+            layout="min-h-16 flex-col justify-center gap-0.5 text-xs active:bg-sand"
             ribbon="top-0 h-2.5 w-2.25"
             iconSize={22}
           />

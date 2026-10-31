@@ -17,7 +17,8 @@ export interface SocialActions {
 /** How long a simulated person takes to accept a request. */
 export const ACCEPT_AFTER_MS = 4000
 
-// None of these actions touch library or folders, so they skip commit and their toasts have no undo.
+// None of these actions touch library or folders, so they skip commit. Only removing a friend keeps
+// an undo copy: the others are undone with one tap on the button that replaces them.
 export const createSocialSlice: SliceCreator<SocialActions> = (set, get) => {
   /** A homonym goes with the username, or the toast would not say who it was. */
   function nameOf(userId: string) {
@@ -33,14 +34,15 @@ export const createSocialSlice: SliceCreator<SocialActions> = (set, get) => {
     const isCurrent = (friendship: Friendship) =>
       friendship.userId === userId && friendship.status === 'pending' && friendship.since === since
 
-    const { friendships, showToast } = get()
+    const { friendships, showToast, undoSnapshot } = get()
     if (!friendships.some(isCurrent)) return
     set({
       friendships: friendships.map((friendship) =>
         isCurrent(friendship) ? { ...friendship, status: 'friends' } : friendship,
       ),
     })
-    showToast(`${nameOf(userId)} aceptó tu solicitud`)
+    // A new toast would take Deshacer away, and the screen already shows the accepted request.
+    if (!undoSnapshot) showToast(`${nameOf(userId)} aceptó tu solicitud`)
   }
 
   function scheduleAcceptance(request: Friendship) {
@@ -49,14 +51,22 @@ export const createSocialSlice: SliceCreator<SocialActions> = (set, get) => {
     else setTimeout(() => accept(request), remaining)
   }
 
-  function drop(userId: string, status: Friendship['status'], message: (name?: string) => string) {
-    const { friendships, showToast } = get()
+  function drop(
+    userId: string,
+    status: Friendship['status'],
+    message: (name?: string) => string,
+    undoable = false,
+  ) {
+    const { friendships, library, folders, showToast } = get()
     const found = friendships.some(
       (friendship) => friendship.userId === userId && friendship.status === status,
     )
     if (!found) return
-    set({ friendships: friendships.filter((friendship) => friendship.userId !== userId) })
-    showToast(message(nameOf(userId)))
+    set({
+      friendships: friendships.filter((friendship) => friendship.userId !== userId),
+      undoSnapshot: undoable ? { library, folders, friendships } : null,
+    })
+    showToast(message(nameOf(userId)), { undoable })
   }
 
   return {
@@ -76,7 +86,7 @@ export const createSocialSlice: SliceCreator<SocialActions> = (set, get) => {
     },
 
     removeFriend: (userId) => {
-      drop(userId, 'friends', (name) => `${name} ya no está en tus amigos`)
+      drop(userId, 'friends', (name) => `${name} ya no está en tus amigos`, true)
     },
 
     processPendingRequests: () => {

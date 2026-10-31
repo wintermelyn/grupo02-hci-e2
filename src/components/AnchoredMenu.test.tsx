@@ -33,6 +33,20 @@ afterEach(() => {
 })
 
 describe('AnchoredMenu', () => {
+  it('sets commands apart from the options, in the same keyboard order', () => {
+    const onRemove = vi.fn()
+    render(
+      <Menu actions={[{ id: 'x', label: 'Quitar', detail: 'Pierdes algo', onSelect: onRemove }]} />,
+    )
+    open()
+    key('End')
+    const action = screen.getByRole('menuitem', { name: /^Quitar/ })
+    expect(action).toHaveFocus()
+    fireEvent.click(action)
+    expect(onRemove).toHaveBeenCalledOnce()
+    expect(onSelect).not.toHaveBeenCalled()
+  })
+
   it('stays closed until the control opens it, and tells the control what it opens', () => {
     render(<Menu />)
     expect(menu()).not.toBeInTheDocument()

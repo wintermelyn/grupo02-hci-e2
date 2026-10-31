@@ -34,6 +34,17 @@ describe('status styles', () => {
     }
   })
 
+  it('keeps the text of a secondary button at 4.5:1 or more on its fill', () => {
+    expect(contrast(token('ink'), token('sand-deep'))).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST)
+    expect(contrast(token('ink'), token('sand-dark'))).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST)
+  })
+
+  it('keeps the edge of a secondary button at 3:1 or more on every ground', () => {
+    for (const surface of ['white', 'paper', 'shell']) {
+      expect(contrast(token('edge'), token(surface))).toBeGreaterThanOrEqual(3)
+    }
+  })
+
   it('gives each tag its own colour and icon, so colour is never the only difference', () => {
     expect(new Set(STATUSES.map(token)).size).toBe(STATUSES.length)
     expect(new Set(STATUSES.map((status) => STATUS_ICONS[status])).size).toBe(STATUSES.length)

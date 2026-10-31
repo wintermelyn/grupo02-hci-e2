@@ -10,6 +10,8 @@ export interface Book {
   authors: string[]
   coverUrl?: string
   description?: string
+  /** The description was machine-translated into Spanish, so the page says so. */
+  descriptionTranslated?: boolean
   year?: number
   pages?: number
 }
@@ -83,5 +85,10 @@ export interface AppState {
   /** Last day the D5 prompt was answered, persisted. Undo does not bring it back. */
   lastWantPromptOn?: ISODate
   toast: Toast | null
-  undoSnapshot: { library: AppState['library']; folders: Folder[] } | null
+  /** `friendships` only after removing a friend: a library change must not bring old ones back. */
+  undoSnapshot: {
+    library: AppState['library']
+    folders: Folder[]
+    friendships?: Friendship[]
+  } | null
 }

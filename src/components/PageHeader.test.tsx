@@ -21,6 +21,23 @@ describe('PageHeader', () => {
     expect(media.compareDocumentPosition(title)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
   })
 
+  // jsdom has no layout. Without this class, the margin of a child ends up outside the band.
+  it('holds the margin of what it carries inside the band', () => {
+    renderWithRouter(
+      <PageHeader title="Amigos">
+        <div className="mb-4">Campo</div>
+      </PageHeader>,
+    )
+    expect(header()).toHaveClass('flow-root')
+  })
+
+  it('lets an action cover the row of the title', () => {
+    renderWithRouter(<PageHeader title="Terror" action={<Button>Buscar</Button>} />)
+    const row = screen.getByRole('button', { name: 'Buscar' }).parentElement?.parentElement
+    expect(row).toContainElement(screen.getByRole('heading', { level: 1 }))
+    expect(row).toHaveClass('relative')
+  })
+
   it('keeps the product name when there is an action, which goes with the title', () => {
     renderWithRouter(<PageHeader title="Terror" action={<Button>Opciones</Button>} />)
     expect(wordmark()).toBeInTheDocument()

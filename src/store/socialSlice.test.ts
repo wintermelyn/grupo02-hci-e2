@@ -137,13 +137,33 @@ describe('cancelFriendRequest', () => {
 })
 
 describe('removeFriend', () => {
-  it('removes the friend and tells so, without undo', () => {
+  it('removes the friend and tells so, and undo brings the friendship back', () => {
+    const before = friendshipOf('diego')
     state().removeFriend('diego')
     expect(friendshipOf('diego')).toBeUndefined()
     expect(state().toast).toMatchObject({
       message: 'Diego Fuentes ya no está en tus amigos',
-      undoable: false,
+      undoable: true,
     })
+    state().undo()
+    expect(friendshipOf('diego')).toEqual(before)
+  })
+
+  it('does not leave a request stuck when undo brings back the one accepted meanwhile', () => {
+    state().sendFriendRequest('camila')
+    state().removeFriend('diego')
+    vi.advanceTimersByTime(ACCEPT_AFTER_MS)
+    expect(friendshipOf('camila')?.status).toBe('friends')
+    state().undo()
+    expect(friendshipOf('camila')?.status).toBe('friends')
+  })
+
+  it('does not take Deshacer away when a request is accepted', () => {
+    state().sendFriendRequest('camila')
+    state().removeFromLibrary(['OL81626W'])
+    vi.advanceTimersByTime(ACCEPT_AFTER_MS)
+    expect(friendshipOf('camila')?.status).toBe('friends')
+    expect(state().toast).toMatchObject({ undoable: true, message: 'Quitado de tu biblioteca' })
   })
 
   it('leaves a pending request alone', () => {
