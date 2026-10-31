@@ -63,6 +63,20 @@ describe('NewFolderCard', () => {
     expect(cancel().parentElement).toBe(create().parentElement)
   })
 
+  it.each([
+    ['a tablet', 8, ':nth-child(4n)', 'md:max-lg:[&:nth-child(4n)]:col-start-3'],
+    ['a computer', 10, ':nth-child(5n)', 'lg:[&:nth-child(5n)]:col-start-4'],
+  ])('stays on its side in the last column of %s', (_name, place, column, keepsSide) => {
+    act(() => {
+      for (let extra = 7; extra < place; extra++) state().createFolder(`Carpeta ${extra}`)
+    })
+    renderApp(LIBRARY)
+    fireEvent.click(card())
+    const item = field().closest('li') as HTMLElement
+    expect(item.matches(column)).toBe(true)
+    expect(item).toHaveClass(keepsSide)
+  })
+
   it('has room for the reason before it appears, so it moves nothing', () => {
     renderApp(LIBRARY)
     fireEvent.click(card())

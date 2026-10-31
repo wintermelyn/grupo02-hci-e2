@@ -98,7 +98,8 @@ export function NewFolderCard() {
   }
 
   return (
-    <li className="col-span-2">
+    // Two cells do not fit in the last column, so the row below takes them on that same side.
+    <li className="col-span-2 md:max-lg:[&:nth-child(4n)]:col-start-3 lg:[&:nth-child(5n)]:col-start-4">
       <div
         ref={formRef}
         className="grid h-full scroll-mb-20 rounded-card border border-edge bg-white p-3 md:scroll-mb-4"
