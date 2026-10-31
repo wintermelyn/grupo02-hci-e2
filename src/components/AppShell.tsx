@@ -16,7 +16,7 @@ interface Section {
 }
 
 const SECTIONS: readonly Section[] = [
-  { to: '/', label: 'Inicio', icon: House, alsoActiveOn: ['/actividad'] },
+  { to: '/', label: 'Inicio', icon: House },
   { to: '/biblioteca', label: 'Mis libros', icon: LibraryBig },
   { to: '/descubrir', label: 'Descubrir', icon: Compass },
   { to: '/buscar', label: 'Buscar', icon: Search },
@@ -24,15 +24,15 @@ const SECTIONS: readonly Section[] = [
 ]
 
 /** Screens made of rails and big cards take all the width. The rest keep a column they can read. */
-const WIDE_PATHS: readonly string[] = ['/', '/descubrir', '/buscar', '/actividad']
+const WIDE_PATHS: readonly string[] = ['/', '/descubrir', '/buscar']
 
 function isSectionActive({ to, alsoActiveOn = [] }: Section, pathname: string): boolean {
   return [to, ...alsoActiveOn].some((path) => matchPath({ path, end: to === '/' }, pathname))
 }
 
 /** La actividad lives inside Inicio, so touching Inicio from there is also going back. */
-function linkState(to: string, pathname: string) {
-  return to === '/' && pathname === '/actividad' ? { restoreScroll: true } : undefined
+function linkState(to: string, pathname: string, search: string) {
+  return to === '/' && pathname === '/' && search ? { restoreScroll: true } : undefined
 }
 
 interface NavItemsProps {
@@ -47,7 +47,7 @@ interface NavItemsProps {
 }
 
 function NavItems({ item, link, active, idle, iconSize, activeMark }: NavItemsProps) {
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
   return SECTIONS.map((section) => {
     const { to, label, icon: Icon } = section
     const isActive = isSectionActive(section, pathname)
@@ -56,7 +56,7 @@ function NavItems({ item, link, active, idle, iconSize, activeMark }: NavItemsPr
         {/* NavLink only knows its own URL. "true" says the page belongs to the section without being it. */}
         <Link
           to={to}
-          state={linkState(to, pathname)}
+          state={linkState(to, pathname, search)}
           aria-current={isActive ? (matchPath(to, pathname) ? 'page' : 'true') : undefined}
           className={cx(
             'relative flex transition-colors duration-100',

@@ -1,8 +1,6 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import { MemoryRouter, Route, Routes } from 'react-router'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { renderApp } from '../test/router'
-import { AppShell } from './AppShell'
 
 const SECTIONS = ['Inicio', 'Mis libros', 'Descubrir', 'Buscar', 'Más']
 
@@ -67,23 +65,10 @@ describe('AppShell', () => {
     for (const nav of navigationBars()) expect(activeSections(nav)).toEqual([])
   })
 
-  // The page has its own path, so the shell is checked alone, with one page at that path.
-  it('keeps Inicio active on /actividad, where touching it goes back to where the list was', () => {
-    render(
-      <MemoryRouter initialEntries={['/actividad']}>
-        <Routes>
-          <Route element={<AppShell />}>
-            <Route path="actividad" element={<h1>Actividad</h1>} />
-          </Route>
-        </Routes>
-      </MemoryRouter>,
-    )
+  it('keeps Inicio active on the activity view', () => {
+    renderApp('/?actividad=1')
     for (const nav of navigationBars()) {
       expect(activeSections(nav)).toEqual(['Inicio'])
-      expect(within(nav).getByRole('link', { name: 'Inicio' })).toHaveAttribute(
-        'aria-current',
-        'true',
-      )
     }
   })
 

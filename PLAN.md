@@ -44,8 +44,7 @@ Es una página web responsiva. En el celular y la tablet tiene una barra de nave
 ### Pantallas y rutas
 | Ruta | Pantalla | Dueño |
 |---|---|---|
-| `/` | **Inicio:** tarjeta "Leyendo ahora", que abre la ficha, + actividad de amigos | B |
-| `/actividad` | **Toda la actividad:** vista aparte dentro de Inicio, por Hoy, Esta semana y Antes | B |
+| `/` | **Inicio:** tarjeta "Leyendo ahora", que abre la ficha, + actividad de amigos. Con `?actividad=` muestra toda la actividad, por Hoy, Esta semana y Antes | B |
 | `/biblioteca` | **Mis libros:** aviso periódico, botones de tag, tablero "Mis carpetas" (2 portadas, nombre, cantidad), "+ Nueva carpeta". Con un tag activo, la lista de libros con ese tag | A |
 | `/biblioteca/carpeta/:folderId` | **Carpeta:** botones de tag, lista de libros con su tag, buscador interno | A |
 | `/biblioteca/sin-carpeta` | **Sin carpeta:** la misma pantalla de una carpeta, con los libros que no están en ninguna, sin renombrar ni eliminar | A |
@@ -57,7 +56,7 @@ Es una página web responsiva. En el celular y la tablet tiene una barra de nave
 | `/amigos/:userId` | **Persona:** qué lee, libros en común, botón agregar o estado de la solicitud | B |
 | `/perfil` | **Mi perfil:** nombre, @usuario, **Reiniciar demo** | B |
 
-Barra de navegación, en este orden: **Inicio · Mis libros · Descubrir · Buscar · Más**. Cada ícono va con su etiqueta de texto. "Más" queda activa también en `/amigos` y `/perfil`, e "Inicio" en `/actividad`.
+Barra de navegación, en este orden: **Inicio · Mis libros · Descubrir · Buscar · Más**. Cada ícono va con su etiqueta de texto. "Más" queda activa también en `/amigos` y `/perfil`.
 
 ### Decisiones de diseño que el prototipo debe mostrar
 D1 a D6 son las decisiones 1 a 6 del informe, con la misma numeración. La columna "Pantalla" sirve para llenar "Dónde se ve en el prototipo" (sección 5 del informe).
