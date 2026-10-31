@@ -55,6 +55,11 @@ function uniqueFolderId(name: string, taken: Set<string>): string {
   return id
 }
 
+function without(library: Library, bookIds: Iterable<BookId>): Library {
+  const removed = new Set(bookIds)
+  return Object.fromEntries(Object.entries(library).filter(([bookId]) => !removed.has(bookId)))
+}
+
 function withFolderIds(
   library: Library,
   bookIds: BookId[],
@@ -67,7 +72,7 @@ function withFolderIds(
   return { ...library, ...Object.fromEntries(changed) }
 }
 
-export const createLibrarySlice: SliceCreator<LibraryActions> = (_set, get) => {
+export const createLibrarySlice: SliceCreator<LibraryActions> = (set, get) => {
   function findFolder(id: string) {
     return get().folders.find((folder) => folder.id === id)
   }
@@ -105,12 +110,10 @@ export const createLibrarySlice: SliceCreator<LibraryActions> = (_set, get) => {
     },
 
     removeFromLibrary: (bookIds) => {
-      const removed = new Set(entriesOf(bookIds).map(({ bookId }) => bookId))
-      if (removed.size === 0) return
+      const removed = entriesOf(bookIds).map(({ bookId }) => bookId)
+      if (removed.length === 0) return
       get().commit('Quitado de tu biblioteca', ({ library }) => ({
-        library: Object.fromEntries(
-          Object.entries(library).filter(([bookId]) => !removed.has(bookId)),
-        ),
+        library: without(library, removed),
       }))
     },
 
@@ -172,7 +175,20 @@ export const createLibrarySlice: SliceCreator<LibraryActions> = (_set, get) => {
       }))
     },
 
-    // Stub from the base block: out of this phase. It goes through get().commit(label, mutator).
-    answerWantPrompt: () => {},
+    answerWantPrompt: (bookId, keep) => {
+      const current = selectEntry(bookId)(get())
+      if (current?.status !== 'want') return
+      // Apart from commit, so Deshacer brings the book back without asking about another one today.
+      set({ lastWantPromptOn: today() })
+      if (keep) {
+        get().commit('Sigue en tu lista', ({ library }) => ({
+          library: { ...library, [bookId]: { ...current, wantCheckedAt: today() } },
+        }))
+      } else {
+        get().commit('Quitado de tu lista', ({ library }) => ({
+          library: without(library, [bookId]),
+        }))
+      }
+    },
   }
 }
