@@ -1,21 +1,21 @@
 import { Bookmark } from 'lucide-react'
 import { useMemo } from 'react'
 import { useSearchParams } from 'react-router'
-import { BookRow, EmptyState, PageHeader, TagFilter, type TagFilterValue } from '../../components'
-import { STATUS_LABELS, STATUS_ORDER } from '../../lib/status'
+import { EmptyState, PageHeader, TagFilter, type TagFilterValue } from '../../components'
+import { STATUS_LABELS } from '../../lib/status'
 import { useStore } from '../../store'
 import type { Book, ReadingStatus } from '../../types'
+import { BookList } from './BookList'
+import {
+  booksLabel,
+  compareTitles,
+  countByTag,
+  parseTag,
+  pinnedFirst,
+  TAG_PARAM,
+  useBookLookup,
+} from './filters'
 import { FolderCard } from './FolderCard'
-
-const TAG_PARAM = 'tag'
-
-function parseTag(value: string | null): TagFilterValue {
-  return STATUS_ORDER.find((status) => status === value) ?? 'all'
-}
-
-function compareTitles(a: Book, b: Book): number {
-  return a.title.localeCompare(b.title, 'es-CL')
-}
 
 function TagList({ status, books }: { status: ReadingStatus; books: Book[] }) {
   const label = STATUS_LABELS[status]
@@ -28,18 +28,7 @@ function TagList({ status, books }: { status: ReadingStatus; books: Book[] }) {
       />
     )
   }
-  return (
-    <section className="mt-2">
-      <h2 className="sr-only">{label}</h2>
-      <ul className="md:grid md:grid-cols-2 md:gap-x-8">
-        {books.map((book) => (
-          <li key={book.id} className="border-b border-line last:border-b-0">
-            <BookRow book={book} />
-          </li>
-        ))}
-      </ul>
-    </section>
-  )
+  return <BookList title={label} books={books} />
 }
 
 export function LibraryPage() {
@@ -47,26 +36,10 @@ export function LibraryPage() {
   const tag = parseTag(searchParams.get(TAG_PARAM))
   const library = useStore((state) => state.library)
   const folders = useStore((state) => state.folders)
-  const seedBooks = useStore((state) => state.seedBooks)
-  const extraBooks = useStore((state) => state.extraBooks)
+  const bookOf = useBookLookup()
 
   const entries = useMemo(() => Object.values(library), [library])
-  const counts = useMemo(() => {
-    const byTag: Record<TagFilterValue, number> = {
-      all: entries.length,
-      want: 0,
-      owned: 0,
-      reading: 0,
-      read: 0,
-    }
-    for (const { status } of entries) byTag[status] += 1
-    return byTag
-  }, [entries])
-
-  const bookOf = useMemo(() => {
-    const books = { ...seedBooks, ...extraBooks }
-    return (bookId: string): Book | undefined => books[bookId]
-  }, [seedBooks, extraBooks])
+  const counts = useMemo(() => countByTag(entries), [entries])
 
   const taggedBooks = useMemo(() => {
     if (tag === 'all') return []
@@ -79,19 +52,17 @@ export function LibraryPage() {
   const board = useMemo(() => {
     // A book can be in several folders, but each card should show covers of its own.
     const shown = new Set<string>()
-    return [...folders]
-      .sort((a, b) => Number(b.pinned ?? false) - Number(a.pinned ?? false))
-      .map((folder) => {
-        const books = entries
-          .filter(({ folderIds }) => folderIds.includes(folder.id))
-          .flatMap(({ bookId }) => bookOf(bookId) ?? [])
-        const covers = [
-          ...books.filter(({ id }) => !shown.has(id)),
-          ...books.filter(({ id }) => shown.has(id)),
-        ].slice(0, 2)
-        for (const { id } of covers) shown.add(id)
-        return { folder, count: books.length, covers }
-      })
+    return pinnedFirst(folders).map((folder) => {
+      const books = entries
+        .filter(({ folderIds }) => folderIds.includes(folder.id))
+        .flatMap(({ bookId }) => bookOf(bookId) ?? [])
+      const covers = [
+        ...books.filter(({ id }) => !shown.has(id)),
+        ...books.filter(({ id }) => shown.has(id)),
+      ].slice(0, 2)
+      for (const { id } of covers) shown.add(id)
+      return { folder, count: books.length, covers }
+    })
   }, [folders, entries, bookOf])
 
   // Replaces the entry, so Back leaves Mis libros instead of undoing each filter.
@@ -101,12 +72,7 @@ export function LibraryPage() {
 
   return (
     <section>
-      <PageHeader
-        title="Mis libros"
-        subtitle={
-          counts.all === 1 ? '1 libro en tu biblioteca' : `${counts.all} libros en tu biblioteca`
-        }
-      >
+      <PageHeader title="Mis libros" subtitle={`${booksLabel(counts.all)} en tu biblioteca`}>
         <TagFilter value={tag} counts={counts} onChange={chooseTag} />
       </PageHeader>
 

@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import { BookCover, folderPath, Ribbon } from '../../components'
 import type { Book, Folder } from '../../types'
+import { booksLabel } from './filters'
 
 export interface FolderCardProps {
   folder: Folder
@@ -11,10 +12,6 @@ export interface FolderCardProps {
 }
 
 const COVER_SLOTS = [0, 1]
-
-function booksLabel(count: number): string {
-  return count === 1 ? '1 libro' : `${count} libros`
-}
 
 export function FolderCard({ folder, count, covers }: FolderCardProps) {
   return (
