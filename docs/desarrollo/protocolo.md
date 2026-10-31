@@ -165,7 +165,7 @@ Trae cuatro cosas, en este orden:
 ## 6. Cerrar
 
 1. Se marca en la sección 4 de `PLAN.md` lo que quedó hecho.
-2. Se agrega a `docs/registro-ia.md` una fila con el prompt en español formal y con ortografía correcta, con todo su contenido y cada pedido. Va en una sola línea, con `<br>` entre párrafos y con `|` y `<` escapados con `\`. Lo que la persona ajustó sobre el resultado va en "Qué cambiamos" como los cambios hechos, sin hablar de iteraciones ni de prompts; la sesión deja un borrador y la persona lo revisa y completa. Un encargo extenso hecho sobre ese resultado puede ir como fila propia, justo después.
+2. Se agrega a `docs/registro-ia.md` una fila con el prompt en español correcto, con ortografía y el mismo trato de tú que usa Matías, con todo su contenido y cada pedido. Va en una sola línea, con `<br>` entre párrafos y con `|` y `<` escapados con `\`. Lo que la persona ajustó sobre el resultado va en "Qué cambiamos" como los cambios hechos, sin hablar de iteraciones ni de prompts; la sesión deja un borrador y la persona lo revisa y completa. Un encargo extenso hecho sobre ese resultado puede ir como fila propia, justo después.
 3. Se hace commit en la rama de la fase y se hace push.
 4. Se abre el PR de la fase, o se actualiza si ya existe. No se integra.
 5. Se abre la página con `open docs/desarrollo/checkpoints/cp<n>/index.html`.
