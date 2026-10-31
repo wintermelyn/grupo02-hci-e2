@@ -1,4 +1,4 @@
-import { Construction } from 'lucide-react'
+import { Ellipsis } from 'lucide-react'
 import { EmptyState, PageHeader } from '../../components'
 
 export function MorePage() {
@@ -6,9 +6,9 @@ export function MorePage() {
     <section>
       <PageHeader title="Más" />
       <EmptyState
-        icon={Construction}
-        title="Pantalla pendiente"
-        description="Aquí irán los enlaces a Amigos y Mi perfil. La construye el rol B (Social y búsqueda)."
+        icon={Ellipsis}
+        title="Disponible pronto"
+        description="Aquí vas a encontrar a tus amigos y tu perfil. Este Goodreads es un prototipo de rediseño para un curso universitario."
       />
     </section>
   )

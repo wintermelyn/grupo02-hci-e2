@@ -1,29 +1,163 @@
 @import 'tailwindcss';
 
-/* Each colour keeps white text at 4.5:1 or more (WCAG 1.4.3), and also works as text on white. */
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 900;
+  src: url('./assets/fonts/source-serif-4-latin-opsz-normal.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Source Serif 4';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 900;
+  src: url('./assets/fonts/source-serif-4-latin-ext-opsz-normal.woff2') format('woff2');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+@font-face {
+  font-family: Figtree;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 900;
+  src: url('./assets/fonts/figtree-latin-wght-normal.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: Figtree;
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300 900;
+  src: url('./assets/fonts/figtree-latin-ext-wght-normal.woff2') format('woff2');
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F,
+    U+A720-A7FF;
+}
+
+/* The default palette is cleared, so only these colours exist. Text colours keep 4.5:1 or more on
+   white, paper, shell and sand (WCAG 1.4.3). */
 @theme {
-  --color-brand: #7c4a2d;
-  --color-want: #1d4ed8;
-  --color-owned: #6d28d9;
-  --color-reading: #b45309;
-  --color-read: #166534;
-  --color-danger: #b91c1c;
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-paper: #faf8f6;
+  --color-shell: #f4f1ea;
+  --color-sand: #ebe2d7;
+  --color-sand-deep: #dfd3c4;
+  --color-line: #e9e2d8;
+  --color-ink: #1e1915;
+  --color-muted: #5f564d;
+  --color-ribbon: #7a2334;
+  --color-want: #2f4a78;
+  --color-owned: #6b3a63;
+  --color-reading: #85490f;
+  --color-read: #2a6249;
+  --color-danger: #a3341c;
+
+  --font-sans: Figtree, ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Source Serif 4', Georgia, serif;
+
+  --text-display: 2.125rem;
+  --text-display--line-height: 2.5rem;
+  --text-title: 1.75rem;
+  --text-title--line-height: 2.125rem;
+  --text-heading: 1.375rem;
+  --text-heading--line-height: 1.75rem;
+
+  --radius-control: 6px;
+  --radius-card: 8px;
+  --radius-float: 10px;
+
+  --shadow-card: 0 1px 2px rgb(30 25 21 / 7%), 0 3px 10px -5px rgb(30 25 21 / 14%);
+  --shadow-float: 0 2px 4px rgb(30 25 21 / 14%), 0 18px 34px -8px rgb(30 25 21 / 40%);
+  --shadow-book: 0 1px 1px rgb(30 25 21 / 20%), 0 6px 12px -5px rgb(30 25 21 / 35%);
+  --shadow-book-lg: 0 2px 3px rgb(30 25 21 / 22%), 0 16px 26px -10px rgb(30 25 21 / 50%);
+
+  --ease-quick: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-tag-in: tag-in 180ms var(--ease-quick);
+  --animate-ribbon-in: ribbon-in 220ms var(--ease-quick);
+
   --container-app: 65rem;
+
+  @keyframes tag-in {
+    from {
+      opacity: 0;
+      translate: 0 6px;
+    }
+  }
+
+  @keyframes ribbon-in {
+    from {
+      translate: 0 -100%;
+    }
+  }
+}
+
+/* Phones held so the screen is short, where the book page moves its cover next to the title. */
+@custom-variant short (@media (max-height: 640px) and (width < 48rem));
+
+/* Reaches the edges of the screen from inside the app's centred column, keeping its text aligned. */
+@utility full-bleed {
+  margin-inline: calc(50% - 50vw);
+  padding-inline: calc(50vw - 50%);
+}
+
+/* The notched end of the ribbon, the one mark of what is active. */
+@utility ribbon {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
 }
 
 @layer base {
+  html {
+    overflow-x: clip;
+    scrollbar-color: var(--color-sand) transparent;
+  }
+
   body {
-    @apply bg-stone-50 text-gray-900 antialiased;
+    @apply bg-paper font-sans text-ink antialiased;
+    caret-color: var(--color-ribbon);
+    accent-color: var(--color-ink);
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background: var(--color-sand);
   }
 
   /* One visible focus style for every control, so keyboard users always know where they are. */
   :focus-visible {
-    outline: 3px solid var(--color-brand);
+    outline: 2px solid var(--color-ink);
     outline-offset: 2px;
   }
 
   /* A modal <dialog> makes the page inert but still lets it scroll behind the sheet. */
   body:has(dialog[open]) {
     overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 1ms !important;
+    }
   }
 }

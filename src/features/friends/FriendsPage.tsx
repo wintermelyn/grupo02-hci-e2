@@ -1,4 +1,4 @@
-import { Construction } from 'lucide-react'
+import { Users } from 'lucide-react'
 import { EmptyState, PageHeader } from '../../components'
 
 export function FriendsPage() {
@@ -6,9 +6,9 @@ export function FriendsPage() {
     <section>
       <PageHeader title="Amigos" />
       <EmptyState
-        icon={Construction}
-        title="Pantalla pendiente"
-        description="Aquí irán tus amigos y las solicitudes pendientes. La construye el rol B (Social y búsqueda)."
+        icon={Users}
+        title="Disponible pronto"
+        description="Aquí vas a ver a tus amigos, tus solicitudes y a cualquier persona que busques."
       />
     </section>
   )

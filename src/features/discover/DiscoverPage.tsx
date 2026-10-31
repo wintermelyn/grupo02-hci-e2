@@ -1,4 +1,4 @@
-import { Construction } from 'lucide-react'
+import { Compass } from 'lucide-react'
 import { EmptyState, PageHeader } from '../../components'
 
 export function DiscoverPage() {
@@ -6,9 +6,9 @@ export function DiscoverPage() {
     <section>
       <PageHeader title="Descubrir" />
       <EmptyState
-        icon={Construction}
-        title="Pantalla pendiente"
-        description="Aquí irán «Seleccionados para ti» y las listas prehechas. La construye el rol B (Social y búsqueda)."
+        icon={Compass}
+        title="Disponible pronto"
+        description="Aquí vas a encontrar libros seleccionados para ti y listas para explorar."
       />
     </section>
   )
