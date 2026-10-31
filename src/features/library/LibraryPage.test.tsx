@@ -1,6 +1,7 @@
 import { act, fireEvent, screen, within } from '@testing-library/react'
 import { describe, expect, it, onTestFinished, vi } from 'vitest'
 import { daysAgo, today } from '../../lib/dates'
+import { useStore } from '../../store'
 import { currentLocation, renderApp } from '../../test/router'
 import { state, stubAction } from '../../test/store'
 
@@ -9,6 +10,7 @@ const FUNDACION = 'OL46125W'
 const main = () => within(screen.getByRole('main'))
 const tagButton = (name: RegExp) => main().getByRole('button', { name })
 const board = () => main().queryByRole('heading', { name: 'Mis carpetas' })
+const boardSection = () => board()?.closest('section') as HTMLElement
 const prompt = () => main().queryByRole('region', { name: '¿Sigues queriendo leer este libro?' })
 const question = () => main().getByRole('heading', { name: '¿Sigues queriendo leer este libro?' })
 const searchBox = () => main().getByRole('searchbox', { name: 'Buscar en Mis libros' })
@@ -38,7 +40,7 @@ describe('LibraryPage', () => {
   it('shows the folder board with Próximos first and a link to each folder', () => {
     renderApp('/biblioteca')
     expect(board()).toBeInTheDocument()
-    const links = main().getAllByRole('link')
+    const links = within(boardSection()).getAllByRole('link')
     expect(links[0]).toHaveTextContent('Próximos')
     expect(links[0]).toHaveTextContent('2 libros · fija')
     expect(links[0]).toHaveAttribute('href', '/biblioteca/carpeta/proximos')
@@ -60,10 +62,28 @@ describe('LibraryPage', () => {
 
   it('shows different covers on each card, even for a book in two folders', () => {
     renderApp('/biblioteca')
-    const covers = [...screen.getByRole('main').querySelectorAll('img')].map((img) => img.src)
-    // Plus the cover of the prompt, which repeats the one on Terror.
-    expect(covers).toHaveLength(13)
+    const covers = [...boardSection().querySelectorAll('img')].map((img) => img.src)
+    expect(covers).toHaveLength(12)
     expect(new Set(covers).size).toBe(12)
+  })
+
+  it('lists the 34 books under the board in Todos, in title order and with their tag', () => {
+    renderApp('/biblioteca')
+    const list = main().getByRole('heading', { name: 'Todos los libros' }).closest('section')
+    const rows = within(list as HTMLElement).getAllByRole('listitem')
+    expect(rows).toHaveLength(34)
+    expect(rows[0]).toHaveTextContent(/^1984/)
+    expect(within(list as HTMLElement).getByRole('link', { name: /^Fundación/ })).toHaveTextContent(
+      'Lo quiero',
+    )
+    expect(rows.at(-1)).toHaveTextContent(/^Un mundo feliz/)
+  })
+
+  it('has no list in Todos without books, only the board', () => {
+    useStore.setState({ library: {} })
+    renderApp('/biblioteca')
+    expect(board()).toBeInTheDocument()
+    expect(main().queryByRole('heading', { name: 'Todos los libros' })).not.toBeInTheDocument()
   })
 
   it('replaces the board with the books of the chosen tag, in title order', () => {

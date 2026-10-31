@@ -46,7 +46,7 @@ Es una página web responsiva. En el celular y la tablet tiene una barra de nave
 |---|---|---|
 | `/` | **Inicio:** tarjeta "Leyendo ahora", que abre la ficha, + actividad de amigos | B |
 | `/actividad` | **Toda la actividad:** vista aparte dentro de Inicio, por Hoy, Esta semana y Antes | B |
-| `/biblioteca` | **Mis libros:** aviso periódico, botones de tag, tablero "Mis carpetas" (2 portadas, nombre, cantidad), "+ Nueva carpeta". Con un tag activo, la lista de libros con ese tag | A |
+| `/biblioteca` | **Mis libros:** aviso periódico, botones de tag, tablero "Mis carpetas" (2 portadas, nombre, cantidad), "+ Nueva carpeta" y, en "Todos", la lista de todos los libros debajo. Con un tag activo, la lista de libros con ese tag en vez del tablero | A |
 | `/biblioteca/carpeta/:folderId` | **Carpeta:** botones de tag, lista de libros con su tag, buscador interno | A |
 | `/libro/:bookId` | **Ficha:** portada, datos, tag con lápiz, carpetas del libro, fechas y puntaje | A |
 | `/descubrir` | **Descubrir:** carrusel con "Seleccionados para ti" y las listas prehechas, al mismo nivel y siempre a la vista | B |
@@ -434,6 +434,7 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Barra de navegación | Nombra "Mis libros", "Más", "Descubrir" y el buscador principal, sin dar el orden | *Inicio · Mis libros · Descubrir · Buscar · Más* |
 | Selector de tags | Pide una "vista de selección de opciones de tags", sin decir cuál | Un menú anclado junto al tag, porque cambiarlo es rápido y reversible |
 | Tag en las listas | "Junto al título" | Bajo el título, junto al autor y con la cinta de su color bajo la portada, porque un título largo no deja lugar a su lado en un celular |
+| "Todos" en Mis libros | La decisión 3 pide el botón, sin decir qué muestra en el tablero | La misma palabra dice lo mismo que en una carpeta: "Todos" lista los 34 libros. El tablero queda arriba, porque Mis libros es el camino a las carpetas (D1), y la lista va debajo, con el título "Todos los libros" y el tag de cada uno |
 | Cantidad en los botones de tag | No aparece | Cada botón muestra cuántos libros tiene, porque T2 parte de saber que son 17 |
 | Orden de la lista por tag | No aparece | Por título, para encontrar un libro conocido en una lista larga |
 | Salir de "Leído" | No aparece | No se distingue un error de una relectura, así que nada se borra: inicio y puntaje quedan, y volver a "Leyendo" solo quita el fin. Una relectura corrige el inicio en la ficha, en su fila |

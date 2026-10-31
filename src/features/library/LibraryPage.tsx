@@ -103,11 +103,15 @@ export function LibraryPage() {
     }
     if (tag === 'all') {
       return (
-        <FolderBoard
-          entries={entries}
-          unfiledBooks={unfiledBooks}
-          unfiledTo={`?${VIEW_PARAM}=${NO_FOLDER}`}
-        />
+        <>
+          <FolderBoard
+            entries={entries}
+            unfiledBooks={unfiledBooks}
+            unfiledTo={`?${VIEW_PARAM}=${NO_FOLDER}`}
+          />
+          {/* Todos says it has them all, here as much as inside a folder. */}
+          {books.length > 0 && <BookList title="Todos los libros" showTitle books={books} />}
+        </>
       )
     }
     if (books.length === 0) return <NoTaggedBooks status={tag} />
