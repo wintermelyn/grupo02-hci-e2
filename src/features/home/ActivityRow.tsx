@@ -37,16 +37,22 @@ export function ActivityRow({ item, from }: ActivityRowProps) {
           className="block outline-none after:absolute after:inset-0 after:rounded-row focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-ink"
         >
           <ActivityLine item={item}>
-            <span className="whitespace-pre max-[420px]:hidden"> · {timeAgo(activity.date)}</span>
+            <span className="whitespace-pre max-[420px]:hidden md:max-xl:hidden">
+              {' '}
+              · {timeAgo(activity.date)}
+            </span>
           </ActivityLine>
-          <span className="line-clamp-2 font-serif text-[1.0625rem]/snug font-semibold lg:line-clamp-1">
+          <span className="line-clamp-2 font-serif text-[1.0625rem]/snug font-semibold xl:line-clamp-1">
             {book.title}
           </span>
-          {/* The line has the width minus 156 px, and "Valentina quiere leer · Hace 13 días" takes 218. */}
-          <span className="block text-sm text-muted min-[420px]:hidden">
+          {/*
+            "Valentina quiere leer · Hace 13 días" takes 218 px. The line has the width minus 156 on a
+            phone, and two columns with "Me gusta" in words leave it less until xl.
+          */}
+          <span className="block text-sm text-muted min-[420px]:hidden md:max-xl:block">
             {timeAgo(activity.date)}
           </span>
-          <span className="block truncate text-sm text-muted max-lg:hidden">{book.authors[0]}</span>
+          <span className="block truncate text-sm text-muted max-xl:hidden">{book.authors[0]}</span>
         </Link>
       </div>
       <LikeButton item={item} className="relative z-10 mr-1 shrink-0" />

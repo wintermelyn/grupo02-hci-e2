@@ -150,7 +150,7 @@ export function SearchResults({
       <p role="status" className="mt-3 text-sm text-muted">
         {loading ? status : summary}
       </p>
-      <div className="lg:mt-7 lg:grid lg:grid-cols-12 lg:gap-x-4">
+      <div className="lg:mt-7 lg:grid lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-x-4">
         {authors.length > 0 && (
           <AuthorList
             title="Autores"

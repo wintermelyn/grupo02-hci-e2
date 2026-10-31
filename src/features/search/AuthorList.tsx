@@ -11,9 +11,9 @@ const FEATURED_COVERS = 3
 // the card is 139 px wide and the amount of books goes at its feet. Alone in a row on a phone, the
 // card has room to spare, and they grow to fill it.
 const FIRST_COVER =
-  'z-10 right-7 -bottom-12 w-17 -rotate-[7deg] max-[399px]:right-4 max-[399px]:-bottom-6 max-[399px]:w-13 group-only/tile:max-md:right-20 group-only/tile:max-md:-bottom-14 group-only/tile:max-md:w-28'
+  'z-10 right-7 -bottom-12 w-17 -rotate-[7deg] max-[399px]:right-4 max-[399px]:-bottom-6 max-[399px]:w-13 group-only/tile:max-md:right-18 group-only/tile:max-md:-bottom-16 group-only/tile:max-md:w-24'
 const SECOND_COVER =
-  '-right-3 -bottom-14 w-17 rotate-[9deg] max-[399px]:-right-5 max-[399px]:-bottom-8 max-[399px]:w-13 group-only/tile:max-md:right-2 group-only/tile:max-md:-bottom-16 group-only/tile:max-md:w-26'
+  '-right-3 -bottom-14 w-17 rotate-[9deg] max-[399px]:-right-5 max-[399px]:-bottom-8 max-[399px]:w-13 group-only/tile:max-md:right-1 group-only/tile:max-md:-bottom-18 group-only/tile:max-md:w-24'
 
 const COVER_PLACES = [
   `${FIRST_COVER} lg:right-8 lg:-bottom-14 lg:w-20`,
