@@ -258,6 +258,56 @@ describe('fetchDescription', () => {
   })
 })
 
+describe('the text of a description', () => {
+  const cleaned = (description: string) => {
+    fetchMock.mockResolvedValue(json({ description }))
+    return fetchDescription('OL9W')
+  }
+
+  it('leaves only the synopsis of Misery, as Open Library sends it', async () => {
+    const synopsis = 'Annie keeps Sheldon prisoner while forcing him to write a book.'
+    await expect(
+      cleaned(
+        `${synopsis}\r\n\r\n[Source][1]\r\n\r\n\r\n  [1]: https://stephenking.com/library/novel/misery.html`,
+      ),
+    ).resolves.toBe(synopsis)
+  })
+
+  it('reads a list of links as a list of names', async () => {
+    await expect(
+      cleaned(
+        'Contains:\n\n- [Selected from Carrie](https://openlibrary.org/works/OL11018609W/Selected)\n - [Insomnia][1]\n\n  [1]: https://openlibrary.org/works/OL81603W',
+      ),
+    ).resolves.toBe('Contains:\n\n- Selected from Carrie\n- Insomnia')
+  })
+
+  it('stops at the rule, after which come the other editions', async () => {
+    await expect(
+      cleaned('La historia.\r\n\r\n----------\r\nAlso contained in:\r\n\r\n- [Works](/works/1)'),
+    ).resolves.toBe('La historia.')
+  })
+
+  it('takes out the source in any of its forms, and what wrapped it', async () => {
+    await expect(cleaned('Una.\n([source](https://a.cl/b.html))')).resolves.toBe('Una.')
+    await expect(cleaned('Dos.\n([source][2])\n\n[2]: https://a.cl')).resolves.toBe('Dos.')
+    await expect(cleaned('Tres. (https://stories.audible.com)')).resolves.toBe('Tres.')
+  })
+
+  it('takes out emphasis, tags and loose links', async () => {
+    await expect(
+      cleaned('<p>**Fuerte** y *suave*, de <a href="https://a.cl/b">Haggard</a> www.a.cl</p>'),
+    ).resolves.toBe('Fuerte y suave, de Haggard')
+  })
+
+  it('reads an escaped bracket as a bracket', async () => {
+    await expect(cleaned('- [El Señor \\[1/2\\]](https://a.cl)')).resolves.toBe('- El Señor [1/2]')
+  })
+
+  it('keeps nothing when only marks were there, so the book page does not ask again', async () => {
+    await expect(cleaned('[1]: https://a.cl\n\n----------\n- [Works](/works/1)')).resolves.toBe('')
+  })
+})
+
 describe('fetchWork', () => {
   const WORK = {
     title: 'Apocalipsis',

@@ -47,8 +47,9 @@ export function SearchPage() {
         text,
         library,
         more,
+        loading,
       ),
-    [books, bookOf, text, library, more],
+    [books, bookOf, text, library, more, loading],
   )
 
   useEffect(() => {

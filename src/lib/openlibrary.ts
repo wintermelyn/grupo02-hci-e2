@@ -26,6 +26,16 @@ const SEARCH_FIELDS = [
 
 const WORK_ID = /^OL\d+W$/
 
+// Open Library keeps its descriptions in Markdown, and a few in HTML.
+const OTHER_EDITIONS_RULE = /^\s*-{3,}\s*$/m
+const LINK_DEFINITION = /^\s*\[[^\]]+\]:.*$/gm
+const LINK_TO_THE_SOURCE = /\(?\[source\](?:\[[^\]]*\]|\([^)]*\))\)?/gi
+const LINK = /\[((?:[^[\]]|\[[^\]]*\])*)\](?:\[[^\]]*\]|\([^)]*\))/g
+const BARE_LINK = /\(?(?:https?:\/\/|www\.)[^\s)]*\)?/gi
+const HTML_TAG = /<\/?[a-z][^>]*>/gi
+const EMPHASIS = /\*+/g
+const ESCAPED = /\\([\\[\]()*_-])/g
+
 export const isWorkId = (id: BookId) => WORK_ID.test(id)
 
 export interface BookSearchResult {
@@ -67,7 +77,10 @@ export function matchesAuthor(name: string, query: string): boolean {
   return wanted !== '' && ` ${words(name)}`.includes(` ${wanted}`)
 }
 
-function matchesBook({ title, authors }: Book, query: string): boolean {
+/** "king" goes on in "kingd" and in the author "Stephen King", but "dune" is another search. */
+export const narrowsSearch = (query: string, before: string) => matchesAuthor(query, before)
+
+export function matchesBook({ title, authors }: Book, query: string): boolean {
   return (
     normalizeText(title).includes(normalizeText(query)) ||
     authors.some((name) => matchesAuthor(name, query))
@@ -194,8 +207,26 @@ export async function searchBooks(query: string, signal: AbortSignal): Promise<B
   }
 }
 
+/** Only the synopsis: what follows the rule lists other editions, and the source is not part of it. */
+function cleanDescription(text: string): string {
+  return text
+    .replace(/\r\n?/g, '\n')
+    .split(OTHER_EDITIONS_RULE)[0]
+    .replace(HTML_TAG, '')
+    .replace(LINK_DEFINITION, '')
+    .replace(LINK_TO_THE_SOURCE, '')
+    .replace(LINK, '$1')
+    .replace(BARE_LINK, '')
+    .replace(EMPHASIS, '')
+    .replace(ESCAPED, '$1')
+    .replace(/^[ \t]+|[ \t]+$/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
 function descriptionOf({ description }: WorkDoc): string | undefined {
-  return typeof description === 'string' ? description : description?.value
+  const text = typeof description === 'string' ? description : description?.value
+  return text === undefined ? undefined : cleanDescription(text)
 }
 
 /** A name that does not load leaves the book without it, which is better than losing the book. */

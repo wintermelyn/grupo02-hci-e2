@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   localMatches,
   mergeResults,
+  narrowsSearch,
   savedSearch,
   searchBooks,
   type BookSearchResult,
@@ -22,8 +23,9 @@ export interface BookSearch extends BookSearchResult {
 
 /**
  * Searches for `query` and cancels the search before, so a late answer never replaces a newer one.
- * The books the app has are there from the first render, on top of the list the person was looking
- * at, which stays until the answer arrives. A search already answered needs no waiting at all.
+ * The books the app has are there from the first render. The list the person was looking at stays
+ * under them until the answer arrives, but only if this search narrows that one: under another
+ * search, those books would pass for its results. A search already answered needs no waiting.
  */
 export function useBookSearch(query: string): BookSearch {
   const text = query.trim()
@@ -50,11 +52,11 @@ export function useBookSearch(query: string): BookSearch {
   }, [text, attempt])
 
   const current = answer?.text === text && answer.attempt === attempt ? answer : saved
-  const shown = answer?.books
+  const kept = answer && narrowsSearch(text, answer.text) ? answer.books : undefined
   const books = useMemo(() => {
     if (current) return current.books
-    return text ? mergeResults(localMatches(text), shown ?? []) : []
-  }, [text, current, shown])
+    return text ? mergeResults(localMatches(text), kept ?? []) : []
+  }, [text, current, kept])
 
   return {
     text,

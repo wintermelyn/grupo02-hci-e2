@@ -1,4 +1,4 @@
-import { matchesAuthor } from '../../lib/openlibrary'
+import { matchesAuthor, matchesBook } from '../../lib/openlibrary'
 import type { Book, BookId, LibraryEntry } from '../../types'
 import { booksLabel, normalizeText } from '../library/filters'
 
@@ -12,6 +12,8 @@ export interface ArrangedResults {
   authors: AuthorGroup[]
   /** The books of the library first, as the person is most likely looking for one of those. */
   books: Book[]
+  /** Kept from the search before while this one has no answer, and they do not match it. */
+  earlier: Book[]
   summary: string
 }
 
@@ -48,6 +50,7 @@ export function arrangeResults(
   query: string,
   library: Record<BookId, LibraryEntry>,
   more = false,
+  loading = false,
 ): ArrangedResults {
   const authors = groupByAuthor(results).filter(({ name }) => matchesAuthor(name, query))
   const wanted = normalizeText(query)
@@ -55,9 +58,12 @@ export function arrangeResults(
   const books = exact?.books ?? results
   const mine = books.filter(({ id }) => Object.hasOwn(library, id))
   const others = books.filter(({ id }) => !Object.hasOwn(library, id))
+  const arranged = [...mine, ...others]
   return {
     authors: exact ? [] : authors.slice(0, MAX_AUTHORS),
-    books: [...mine, ...others],
+    // Once answered, the service decides what matches: it also searches what the app cannot see.
+    books: loading ? arranged.filter((book) => matchesBook(book, query)) : arranged,
+    earlier: loading ? arranged.filter((book) => !matchesBook(book, query)) : [],
     summary: resultsSummary(books.length, mine.length, more),
   }
 }

@@ -31,11 +31,11 @@ export function ActivityRow({ item, from }: ActivityRowProps) {
           className="block min-w-0 flex-1 rounded-control py-2"
         >
           <ActivityLine item={item}>
-            <span className="max-[359px]:hidden"> · {timeAgo(activity.date)}</span>
+            <span className="max-[420px]:hidden"> · {timeAgo(activity.date)}</span>
           </ActivityLine>
           <span className="line-clamp-2 font-serif text-base/5 font-semibold">{book.title}</span>
-          {/* At 320 the line has 131 px and "Valentina empezó · Hoy" takes 150, even in short form. */}
-          <span className="block text-sm text-muted min-[360px]:hidden">
+          {/* The line has the width minus 189 px, and "Valentina quiere leer · Hace 13 días" takes 218. */}
+          <span className="block text-sm text-muted min-[420px]:hidden">
             {timeAgo(activity.date)}
           </span>
         </Link>

@@ -1,6 +1,7 @@
 import { CircleAlert, RotateCcw, SearchX } from 'lucide-react'
-import type { Ref } from 'react'
+import type { MouseEventHandler, Ref } from 'react'
 import { BookRow, Button, EmptyState } from '../../components'
+import type { Book } from '../../types'
 import { AuthorList } from './AuthorList'
 import type { ArrangedResults, AuthorGroup } from './results'
 
@@ -48,6 +49,27 @@ export function NoResults({ text, authors, onPickAuthor }: NoResultsProps) {
   )
 }
 
+interface BookGridProps {
+  books: Book[]
+  onClick?: MouseEventHandler
+}
+
+/** Not BookList: its title is for screen readers, and here it is on the screen. */
+function BookGrid({ books, onClick }: BookGridProps) {
+  return (
+    <ul onClick={onClick} className="mt-0.5 md:grid md:grid-cols-2 md:gap-x-8">
+      {books.map((book) => (
+        <li
+          key={book.id}
+          className="border-b border-line last:border-b-0 md:nth-last-2:odd:border-b-0"
+        >
+          <BookRow book={book} />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 export interface SearchResultsProps {
   results: ArrangedResults
   /** Open Library has not answered yet, so the list can still grow. */
@@ -55,7 +77,7 @@ export interface SearchResultsProps {
   /** Where the focus goes after picking an author, whose button is gone by then. */
   booksHeading: Ref<HTMLHeadingElement>
   onPickAuthor: (name: string) => void
-  /** A book of the list was opened, which makes this search worth remembering. */
+  /** A book found by this search was opened, which makes the search worth remembering. */
   onOpenBook: () => void
 }
 
@@ -66,21 +88,23 @@ export function SearchResults({
   onPickAuthor,
   onOpenBook,
 }: SearchResultsProps) {
-  const { authors, books, summary } = results
+  const { authors, books, earlier, summary } = results
+  const status = books.length > 0 ? 'Buscando más…' : 'Buscando…'
   return (
     <>
       <p role="status" className="mt-3 text-sm text-muted">
-        {loading ? 'Buscando más…' : summary}
+        {loading ? status : summary}
       </p>
       {authors.length > 0 && (
-        <AuthorList title="Autores" authors={authors} counted={false} onPick={onPickAuthor} />
+        <AuthorList
+          title="Autores"
+          authors={authors}
+          counted={false}
+          reserving={loading}
+          onPick={onPickAuthor}
+        />
       )}
-      <section
-        className="mt-5"
-        onClick={({ target }) => {
-          if (target instanceof Element && target.closest('a')) onOpenBook()
-        }}
-      >
+      <section className="mt-5">
         <h2
           ref={booksHeading}
           tabIndex={-1}
@@ -88,17 +112,22 @@ export function SearchResults({
         >
           Libros
         </h2>
-        {/* Not BookList: its title is for screen readers, and here it is on the screen. */}
-        <ul className="mt-0.5 md:grid md:grid-cols-2 md:gap-x-8">
-          {books.map((book) => (
-            <li
-              key={book.id}
-              className="border-b border-line last:border-b-0 md:nth-last-2:odd:border-b-0"
-            >
-              <BookRow book={book} />
-            </li>
-          ))}
-        </ul>
+        {books.length > 0 && (
+          <BookGrid
+            books={books}
+            onClick={({ target }) => {
+              if (target instanceof Element && target.closest('a')) onOpenBook()
+            }}
+          />
+        )}
+        {earlier.length > 0 && (
+          <div aria-busy="true" className={books.length > 0 ? 'mt-4' : 'mt-1'}>
+            <h3 className="text-sm text-muted">De tu búsqueda anterior</h3>
+            <div className="opacity-70">
+              <BookGrid books={earlier} />
+            </div>
+          </div>
+        )}
       </section>
     </>
   )

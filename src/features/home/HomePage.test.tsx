@@ -103,12 +103,17 @@ describe('Inicio', () => {
     )
   })
 
-  it('moves the date under the title on the narrowest screen, where the line has no room', () => {
+  it('moves the date under the title where the longest line has no room, at one exact width', () => {
+    const [activity] = state().activities
+    useStore.setState({
+      activities: [{ ...activity, kind: 'want', userId: 'valentina', date: daysAgo(13) }],
+    })
     renderApp('/')
-    const rows = activityRows()
-    const dated = rows[rows.length - 1]
-    expect(within(dated).getByText(/^· Hace \d+ días$/)).toHaveClass('max-[359px]:hidden')
-    expect(within(dated).getByText(/^Hace \d+ días$/)).toHaveClass('min-[360px]:hidden')
+    const [longest] = activityRows()
+    expect(longest).toHaveTextContent('Valentina quiere leer · Hace 13 días')
+    // The same number in both: max- leaves that width out, and min- takes it in.
+    expect(within(longest).getByText('· Hace 13 días')).toHaveClass('max-[420px]:hidden')
+    expect(within(longest).getByText('Hace 13 días')).toHaveClass('min-[420px]:hidden')
   })
 
   it('offers a way out when nothing is being read', () => {

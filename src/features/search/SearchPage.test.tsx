@@ -56,12 +56,24 @@ const searches = () =>
 const search = () => screen.getByRole('searchbox', { name: 'Buscar libros y autores' })
 const type = (text: string) => fireEvent.change(search(), { target: { value: text } })
 const section = (name: string) => screen.getByRole('heading', { name }).closest('section')!
+const earlierBooks = () => screen.queryByRole('heading', { name: 'De tu búsqueda anterior' })
+
+/** What takes height over the books on a phone, where the list shows four. jsdom has no layout. */
+const authorRowsOnAPhone = () =>
+  Math.min(within(section('Autores')).getAllByRole('listitem', { hidden: true }).length, 4)
 
 const APOCALYPSE = {
   key: '/works/OL123W',
   title: 'Apocalipsis',
   author_name: ['Stephen King'],
 }
+
+/** A work by someone else whose name also matches "king". */
+const byOtherKing = (id: number, name: string) => ({
+  key: `/works/OL${id}W`,
+  title: `Obra ${id}`,
+  author_name: [name],
+})
 
 beforeEach(() => {
   localStorage.clear()
@@ -153,21 +165,97 @@ describe('with results', () => {
     ])
   })
 
-  it('keeps the list in view while the next search is on its way', async () => {
+  it('keeps the place of the authors that can still arrive, so the books do not move', async () => {
+    const deliver = holdAnswers()
+    renderApp('/buscar?q=king')
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce())
+    const firstBook = within(section('Libros')).getAllByRole('link')[0]
+    expect(within(section('Autores')).getAllByRole('button')).toHaveLength(1)
+    expect(authorRowsOnAPhone()).toBe(4)
+
+    deliver(
+      byOtherKing(1, 'Martin Luther King'),
+      byOtherKing(2, 'Billie Jean King'),
+      byOtherKing(3, 'Coretta Scott King'),
+    )
+    await screen.findByText(/en tu biblioteca/)
+    expect(within(section('Autores')).getAllByRole('button')).toHaveLength(4)
+    expect(authorRowsOnAPhone()).toBe(4)
+    expect(within(section('Libros')).getAllByRole('link')[0]).toBe(firstBook)
+  })
+
+  it('frees the place that no author took', async () => {
+    const deliver = holdAnswers()
+    renderApp('/buscar?q=king')
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce())
+    deliver()
+    await screen.findByText(/en tu biblioteca/)
+    expect(authorRowsOnAPhone()).toBe(1)
+  })
+
+  it('reserves nothing for authors when none matched yet', async () => {
+    const deliver = holdAnswers()
+    renderApp('/buscar?q=carrie')
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce())
+    expect(screen.queryByRole('heading', { name: 'Autores' })).not.toBeInTheDocument()
+    deliver()
+  })
+
+  it('keeps the list of a search that goes on, dimmed and apart from what matches', async () => {
     answerWith(APOCALYPSE)
     renderApp('/buscar?q=apocalipsis')
     await screen.findByText('Apocalipsis')
 
     const deliver = holdAnswers()
     type('apocalipsiss')
-    expect(screen.getByText('Apocalipsis')).toBeInTheDocument()
-    expect(screen.getByText('Buscando más…')).toBeInTheDocument()
-    expect(screen.queryByText('Buscando…')).not.toBeInTheDocument()
+    expect(earlierBooks()?.parentElement).toHaveAttribute('aria-busy', 'true')
+    expect(screen.getByText('Apocalipsis').closest('.opacity-70')).toBeInTheDocument()
+    expect(screen.getByText('Buscando…', { selector: 'p' })).toBeInTheDocument()
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2))
     deliver()
     expect(await screen.findByText('No encontramos «apocalipsiss»')).toBeInTheDocument()
     expect(screen.queryByText('Apocalipsis')).not.toBeInTheDocument()
+  })
+
+  it('does not take a book kept from the search before for one of this search', async () => {
+    answerWith(APOCALYPSE)
+    renderApp('/buscar?q=apocalipsis')
+    await screen.findByText('Apocalipsis')
+
+    holdAnswers()
+    type('apocalipsiss')
+    fireEvent.click(screen.getByRole('link', { name: /Apocalipsis/ }))
+    expect(currentLocation()).toBe('/libro/OL123W')
+    expect(readRecentSearches()).toEqual([])
+  })
+
+  it.each([
+    ['dune', /Dune/],
+    ['qqqzzz', undefined],
+  ])('drops the list when "%s" is another search, not more of it', async (next, local) => {
+    answerWith(APOCALYPSE)
+    renderApp('/buscar?q=king')
+    await screen.findByText('Apocalipsis')
+
+    holdAnswers()
+    type(next)
+    expect(screen.queryByText('Apocalipsis')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /Carrie/ })).not.toBeInTheDocument()
+    expect(earlierBooks()).not.toBeInTheDocument()
+    if (local) expect(screen.getByRole('link', { name: local })).toBeInTheDocument()
+    else expect(screen.getByText('Buscando…')).toBeInTheDocument()
+  })
+
+  it('does not dim what still matches, like the books of the author just tapped', async () => {
+    answerWith(APOCALYPSE)
+    renderApp('/buscar?q=king')
+    await screen.findByText('Apocalipsis')
+
+    holdAnswers()
+    fireEvent.click(screen.getByRole('button', { name: /Stephen King/ }))
+    expect(screen.getByText('Apocalipsis')).toBeInTheDocument()
+    expect(earlierBooks()).not.toBeInTheDocument()
   })
 
   it('does not carry a search that was cleared into the next one', async () => {

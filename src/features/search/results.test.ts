@@ -36,6 +36,20 @@ describe('arrangeResults', () => {
     expect(authors.map(({ name }) => name)).toEqual(['Stephen King'])
   })
 
+  it('sets apart what does not match while the answer is on its way, and only then', () => {
+    const results = [
+      { ...book('1'), title: 'Kingdom' },
+      { ...book('2'), title: 'Carrie' },
+    ]
+    const waiting = arrangeResults(results, 'kingd', NOTHING, false, true)
+    expect(waiting.books.map(({ title }) => title)).toEqual(['Kingdom'])
+    expect(waiting.earlier.map(({ title }) => title)).toEqual(['Carrie'])
+
+    const answered = arrangeResults(results, 'kingd', NOTHING)
+    expect(answered.books).toHaveLength(2)
+    expect(answered.earlier).toEqual([])
+  })
+
   it('leaves the list as it is when no author matches', () => {
     const { authors, books } = arrangeResults([stephen, hawking], 'libro', NOTHING)
     expect(authors).toEqual([])
