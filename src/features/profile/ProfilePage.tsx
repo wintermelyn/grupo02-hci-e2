@@ -1,4 +1,4 @@
-import { Construction } from 'lucide-react'
+import { CircleUser } from 'lucide-react'
 import { EmptyState, PageHeader } from '../../components'
 
 export function ProfilePage() {
@@ -6,9 +6,9 @@ export function ProfilePage() {
     <section>
       <PageHeader title="Mi perfil" />
       <EmptyState
-        icon={Construction}
-        title="Pantalla pendiente"
-        description="Aquí irán tu nombre, tu @usuario y «Reiniciar demo». La construye el rol B (Social y búsqueda)."
+        icon={CircleUser}
+        title="Disponible pronto"
+        description="Aquí vas a ver tu nombre, tu @usuario y la opción de reiniciar la demo."
       />
     </section>
   )

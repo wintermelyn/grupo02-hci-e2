@@ -7,3 +7,6 @@ export const STATUS_LABELS: Record<ReadingStatus, string> = {
   reading: 'Leyendo',
   read: 'Leído',
 }
+
+/** The order of the tags everywhere they are listed. */
+export const STATUS_ORDER: readonly ReadingStatus[] = ['want', 'owned', 'reading', 'read']

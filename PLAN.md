@@ -228,19 +228,21 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 
 ### Componentes compartidos (`src/components/`, del bloque base)
 - **`AppShell`:** navegación inferior en celular y superior en computador, contenedor centrado y `<Toast/>`.
-- **`PageHeader`:** título, botón de volver y una acción a la derecha.
-- **`BookCover`:** portada, con un placeholder de color e iniciales si no hay imagen.
-- **`BookRow`:** portada, título, autor, `StatusTag` junto al título (si el libro está en la biblioteca) y estrellas. Acepta la prop `trailing`.
-- **`StatusControl`:** el tag de la ficha con su lápiz (D2). Al tocarlo abre un `BottomSheet` con las cuatro opciones. Si el libro no está en la biblioteca, muestra "Agregar a Mis libros" y abre el mismo selector. Recibe `bookId` y `book`.
-- **`StatusTag`:** el tag en solo lectura, con ícono, texto y color.
+- **`PageHeader`:** banda de la página con título, subtítulo, botón de volver y una acción a la derecha. Lo que recibe como hijo, como `TagFilter`, queda en el borde inferior.
+- **`BookCover`:** portada, con un placeholder de color e iniciales si no hay imagen. Con la prop `status`, muestra la cinta del tag bajo la portada.
+- **`BookRow`:** portada con su cinta, título, `StatusTag` junto al autor, bajo el título (si el libro está en la biblioteca), y estrellas. Acepta la prop `trailing`. Al abrir la ficha le pasa de dónde viene, para que vuelva a esa misma lista.
+- **`StatusControl`:** el tag de la ficha con su lápiz (D2). Al tocarlo abre un menú anclado junto al control, con las cuatro opciones de 48 px de alto. El menú no oscurece la pantalla y deja ver el libro. Funciona con foco, flechas, Inicio, Fin, Escape y clic afuera. El informe solo pide una "vista de selección de opciones de tags". Si el libro no está en la biblioteca, muestra "Agregar a Mis libros" y abre el mismo menú. Recibe `bookId` y `book`.
+- **`StatusTag`:** el tag en solo lectura, con ícono, texto y color, sin relleno. Tamaño `sm` para las listas.
+- **`TagFilter`:** los botones de tag (D3), con la cantidad de libros de cada uno. El activo se marca con la cinta. Lo usan Mis libros y la carpeta.
+- **`Ribbon`:** la cinta, la marca de lo activo.
 - **`Stars`:** muestra el puntaje, o permite elegirlo si recibe `onChange`.
-- **`BottomSheet`:** panel inferior en celular y modal centrado en computador.
+- **`BottomSheet`:** panel inferior en celular y modal centrado en computador. Es para contenido largo, como "Editar lectura"; un cambio rápido y reversible no lo usa.
 - **`Button`:** variantes `primary`, `secondary` y `danger`.
 - **`EmptyState`, `LoadingState`, `ErrorState`.**
 
 También son compartidos y del bloque base:
 - **`src/routes.tsx`:** fija los nombres de las páginas, así que nadie tiene que editarlo después.
-- **`src/index.css`:** con `@theme`, que define `--color-want`, `--color-owned`, `--color-reading`, `--color-read` y el color de marca.
+- **`src/index.css`:** con `@theme`, que define los colores, las fuentes, la escala tipográfica, las sombras y las animaciones. La paleta por defecto de Tailwind no existe: solo hay estos tokens.
 - **`src/lib/dates.ts`.**
 - **`DESIGN.md`:** el aspecto de la app. Se escribe en "Dirección visual".
 
@@ -296,7 +298,7 @@ Cambian tipos usados en todo el proyecto, así que van en un solo commit para qu
   - `persist` guarda `lastWantPromptOn`, y se sube `BASE_VERSION`;
   - `buildInitialState` incluye `lastWantPromptOn: undefined`, porque `resetDemo` usa `set`, que combina claves, y sin ella el valor anterior sobrevive a "Reiniciar demo";
   - en `librarySlice`, quitar los stubs `toggleOwned` y `moveToFolder`, y agregar `answerWantPrompt`.
-- [x] **Etiquetas y estilos:** cuatro tags en `STATUS_LABELS` (*Lo quiero, Lo tengo, Leyendo, Leído*), `STATUS_FILL`, `STATUS_ICONS` y `--color-owned`, con contraste de 4.5:1.
+- [x] **Etiquetas y estilos:** cuatro tags en `STATUS_LABELS` (*Lo quiero, Lo tengo, Leyendo, Leído*), sus estilos, `STATUS_ICONS` y `--color-owned`, con contraste de 4.5:1.
 - [x] **Componentes:**
   - `StatusControl` nuevo, según "Componentes compartidos";
   - `BookRow` con `StatusTag`, sin `selectable`, `onLongPress` ni `onRequestFinish`;

@@ -15,11 +15,7 @@ const RATINGS = Array.from({ length: MAX_RATING }, (_, index) => index + 1)
 
 function StarIcon({ filled, size }: { filled: boolean; size: number }) {
   return (
-    <Star
-      aria-hidden
-      size={size}
-      className={filled ? 'fill-amber-400 text-amber-700' : 'text-gray-500'}
-    />
+    <Star aria-hidden size={size} className={filled ? 'fill-star text-star-edge' : 'text-muted'} />
   )
 }
 
@@ -48,7 +44,7 @@ export function Stars({ value, onChange, label = 'Puntaje' }: StarsProps) {
         {RATINGS.map((rating) => (
           <label
             key={rating}
-            className="inline-flex size-11 cursor-pointer items-center justify-center rounded-lg has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-brand"
+            className="inline-flex size-11 cursor-pointer items-center justify-center rounded-control active:bg-shell has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ink"
           >
             <input
               type="radio"
@@ -62,14 +58,14 @@ export function Stars({ value, onChange, label = 'Puntaje' }: StarsProps) {
             <span className="sr-only">{rating === 1 ? '1 estrella' : `${rating} estrellas`}</span>
           </label>
         ))}
-        <span className="ml-2 text-gray-700" aria-hidden>
+        <span className="ml-2 text-muted" aria-hidden>
           {value ? `${value} de ${MAX_RATING}` : 'Sin puntaje'}
         </span>
         {value !== undefined && (
           <button
             type="button"
             onClick={() => onChange(undefined)}
-            className="ml-1 min-h-11 rounded-lg px-2 font-medium text-brand underline"
+            className="ml-1 min-h-11 rounded-control px-2 font-medium underline underline-offset-2 active:bg-shell"
           >
             Quitar puntaje
           </button>

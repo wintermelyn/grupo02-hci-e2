@@ -1,12 +1,20 @@
 import { Book, BookOpen, Bookmark, CircleCheck, type LucideIcon } from 'lucide-react'
 import type { ReadingStatus } from '../types'
 
-/** Filled style for a status; always paired with its text label, never used alone. */
-export const STATUS_FILL: Record<ReadingStatus, string> = {
-  want: 'border-want bg-want text-white',
-  owned: 'border-owned bg-owned text-white',
-  reading: 'border-reading bg-reading text-white',
-  read: 'border-read bg-read text-white',
+/** Text colour of a status; always paired with its icon and label, never used alone. */
+export const STATUS_TEXT: Record<ReadingStatus, string> = {
+  want: 'text-want',
+  owned: 'text-owned',
+  reading: 'text-reading',
+  read: 'text-read',
+}
+
+/** The ribbon under a cover, in the colour of the book's status. */
+export const STATUS_RIBBON: Record<ReadingStatus, string> = {
+  want: 'bg-want',
+  owned: 'bg-owned',
+  reading: 'bg-reading',
+  read: 'bg-read',
 }
 
 export const STATUS_ICONS: Record<ReadingStatus, LucideIcon> = {

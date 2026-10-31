@@ -1,14 +1,21 @@
-import { Construction } from 'lucide-react'
+import { CircleUser } from 'lucide-react'
+import { useMemo } from 'react'
+import { useParams } from 'react-router'
 import { EmptyState, PageHeader } from '../../components'
+import { useStore } from '../../store'
 
 export function PersonPage() {
+  const { userId } = useParams()
+  const users = useStore((state) => state.users)
+  const user = useMemo(() => users.find(({ id }) => id === userId), [users, userId])
+
   return (
     <section>
-      <PageHeader title="Persona" backTo="/amigos" backLabel="Amigos" />
+      <PageHeader title={user?.name ?? 'Persona'} backTo="/amigos" backLabel="Amigos" />
       <EmptyState
-        icon={Construction}
-        title="Pantalla pendiente"
-        description="Aquí irá qué lee esta persona y los libros que tienen en común. La construye el rol B (Social y búsqueda)."
+        icon={CircleUser}
+        title="Disponible pronto"
+        description="Aquí vas a ver qué lee esta persona y los libros que tienen en común."
       />
     </section>
   )

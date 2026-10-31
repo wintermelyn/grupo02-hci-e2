@@ -13,56 +13,59 @@ const CARRIE = 'OL81626W' // Leyendo
 const IT = 'OL81613W' // Lo quiero
 const CIEN_ANOS = 'OL274505W' // Leído
 
-const option = (name: string) => within(screen.getByRole('dialog')).getByRole('button', { name })
+const option = (name: string) => screen.getByRole('menuitemradio', { name })
 
 function renderControl(bookId: string, book?: Book) {
   renderWithRouter(<StatusControl bookId={bookId} book={book} />)
 }
 
-function openPanel(name: RegExp | string = /Cambiar estado/) {
-  fireEvent.click(screen.getByRole('button', { name }))
+const trigger = (name: RegExp | string = /Cambiar estado/) => screen.getByRole('button', { name })
+
+function openMenu(name?: RegExp | string) {
+  fireEvent.click(trigger(name))
 }
+
+const key = (name: string) => fireEvent.keyDown(document.activeElement as Element, { key: name })
 
 describe('StatusControl', () => {
   it('shows the current tag with a labelled pencil, naming the book for screen readers', () => {
     renderControl(CARRIE)
-    const trigger = screen.getByRole('button', { name: 'Leyendo. Cambiar estado de «Carrie»' })
-    expect(trigger).toHaveTextContent('Leyendo')
-    expect(trigger).toHaveTextContent('Cambiar')
+    const button = trigger('Leyendo. Cambiar estado de «Carrie»')
+    expect(button).toHaveTextContent('Leyendo')
+    expect(button).toHaveTextContent('Cambiar')
   })
 
   it('offers the four tags in order and marks the current one', () => {
     renderControl(CARRIE)
-    openPanel()
-    const dialog = screen.getByRole('dialog', { name: 'Estado de «Carrie»' })
+    openMenu()
+    const menu = screen.getByRole('menu', { name: 'Estado de «Carrie»' })
     expect(
-      within(dialog)
-        .getAllByRole('button')
-        .filter((button) => button.hasAttribute('aria-pressed'))
-        .map((button) => button.textContent?.replace('Actual', '')),
+      within(menu)
+        .getAllByRole('menuitemradio')
+        .map((item) => item.textContent?.replace('Actual', '')),
     ).toEqual(['Lo quiero', 'Lo tengo', 'Leyendo', 'Leído'])
-    expect(option('Leyendo')).toHaveAttribute('aria-pressed', 'true')
+    expect(option('Leyendo')).toBeChecked()
     expect(option('Leyendo')).toHaveTextContent('Actual')
-    expect(option('Lo tengo')).toHaveAttribute('aria-pressed', 'false')
+    expect(option('Lo tengo')).not.toBeChecked()
     expect(option('Lo tengo')).not.toHaveTextContent('Actual')
   })
 
   it.each([
     ['Lo quiero', 'want'],
     ['Lo tengo', 'owned'],
-  ])('sets %s directly, closes the panel and shows the toast', (name, status) => {
+  ])('sets %s directly, closes the menu and shows the toast', (name, status) => {
     renderControl(CARRIE)
-    openPanel()
+    openMenu()
     fireEvent.click(option(name))
     expect(state().library[CARRIE].status).toBe(status)
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
     expect(state().toast).toMatchObject({ undoable: true })
-    expect(screen.getByRole('button', { name: new RegExp(`^${name}\\.`) })).toBeInTheDocument()
+    expect(trigger(new RegExp(`^${name}\\.`))).toHaveFocus()
   })
 
   it('sets Leyendo directly', () => {
     renderControl(IT)
-    openPanel()
+    openMenu()
     fireEvent.click(option('Leyendo'))
     expect(state().library[IT].status).toBe('reading')
   })
@@ -71,20 +74,20 @@ describe('StatusControl', () => {
     const setStatus = stubAction('setStatus')
     const finishBook = stubAction('finishBook')
     renderControl(CARRIE)
-    openPanel()
+    openMenu()
     fireEvent.click(option('Leído'))
     expect(finishBook).toHaveBeenCalledExactlyOnceWith(CARRIE, {
       startedAt: daysAgo(12),
       finishedAt: today(),
     })
     expect(setStatus).not.toHaveBeenCalled()
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
   })
 
   it('uses addedAt as the start date of a book that was never started', () => {
     const finishBook = stubAction('finishBook')
     renderControl(IT)
-    openPanel()
+    openMenu()
     fireEvent.click(option('Leído'))
     expect(finishBook).toHaveBeenCalledExactlyOnceWith(IT, {
       startedAt: daysAgo(210),
@@ -95,29 +98,100 @@ describe('StatusControl', () => {
   it('does not finish a Leído book again, which would lose its dates and rating', () => {
     const finishBook = stubAction('finishBook')
     renderControl(CIEN_ANOS)
-    openPanel()
+    openMenu()
     fireEvent.click(option('Leído'))
     expect(finishBook).not.toHaveBeenCalled()
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
   })
 
   it('does nothing when the current tag is chosen', () => {
     const library = state().library
     renderControl(CARRIE)
-    openPanel()
+    openMenu()
     fireEvent.click(option('Leyendo'))
     expect(state().library).toBe(library)
     expect(state().toast).toBeNull()
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
   })
 
-  it('keeps everything as it was when the panel closes without choosing', () => {
+  it('leaves the rest of the page usable: the menu is not a modal', () => {
+    renderControl(CARRIE)
+    openMenu()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(trigger()).toHaveAttribute('aria-expanded', 'true')
+    expect(trigger()).toHaveAttribute('aria-haspopup', 'menu')
+  })
+
+  it('keeps everything as it was when a click outside closes the menu', () => {
     const library = state().library
     renderControl(CARRIE)
-    openPanel()
-    fireEvent.click(screen.getByRole('button', { name: 'Cerrar' }))
+    openMenu()
+    fireEvent.pointerDown(document.body)
     expect(state().library).toBe(library)
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+  })
+
+  it('closes with a second click on the control, but not with a double tap', () => {
+    renderControl(CARRIE)
+    openMenu()
+    fireEvent.click(trigger(), { detail: 2 })
+    expect(screen.getByRole('menu')).toBeInTheDocument()
+    fireEvent.click(trigger(), { detail: 1 })
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+  })
+})
+
+describe('StatusControl with the keyboard', () => {
+  it('starts on the current tag and moves with the arrows, wrapping around', () => {
+    renderControl(CARRIE)
+    openMenu()
+    expect(option('Leyendo')).toHaveFocus()
+    key('ArrowDown')
+    expect(option('Leído')).toHaveFocus()
+    key('ArrowDown')
+    expect(option('Lo quiero')).toHaveFocus()
+    key('ArrowUp')
+    expect(option('Leído')).toHaveFocus()
+  })
+
+  it('jumps to the ends with Home and End', () => {
+    renderControl(CARRIE)
+    openMenu()
+    key('Home')
+    expect(option('Lo quiero')).toHaveFocus()
+    key('End')
+    expect(option('Leído')).toHaveFocus()
+  })
+
+  it('opens from the control with the arrow keys', () => {
+    renderControl(IT)
+    trigger().focus()
+    key('ArrowUp')
+    expect(option('Leído')).toHaveFocus()
+  })
+
+  it('closes with Escape, gives the focus back and changes nothing', () => {
+    const library = state().library
+    renderControl(CARRIE)
+    openMenu()
+    key('Escape')
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    expect(trigger()).toHaveFocus()
+    expect(state().library).toBe(library)
+  })
+
+  it('closes with Tab, letting the focus move on', () => {
+    renderControl(CARRIE)
+    openMenu()
+    key('Tab')
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+  })
+
+  it('gives the focus back after choosing', () => {
+    renderControl(CARRIE)
+    openMenu()
+    fireEvent.click(option('Lo tengo'))
+    expect(trigger(/^Lo tengo\./)).toHaveFocus()
   })
 })
 
@@ -132,35 +206,35 @@ describe('StatusControl when the book changes', () => {
     )
   }
 
-  it('closes the panel instead of showing it for the other book', () => {
+  it('closes the menu instead of showing it for the other book', () => {
     renderWithRouter(<BookSwitcher />)
-    openPanel()
-    expect(screen.getByRole('dialog', { name: 'Estado de «Carrie»' })).toBeInTheDocument()
+    openMenu()
+    expect(screen.getByRole('menu', { name: 'Estado de «Carrie»' })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Otro libro' }))
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
   })
 })
 
 describe('StatusControl with a book outside the library', () => {
   it('offers to add it, with nothing marked, and adds it with the chosen tag', () => {
     renderControl(apiBook.id, apiBook)
-    const trigger = screen.getByRole('button', { name: 'Agregar a Mis libros' })
-    openPanel('Agregar a Mis libros')
-    expect(screen.getByRole('dialog', { name: 'Agregar a Mis libros' })).toBeInTheDocument()
+    const button = trigger('Agregar a Mis libros')
+    openMenu('Agregar a Mis libros')
+    expect(screen.getByRole('menu', { name: 'Agregar a Mis libros' })).toBeInTheDocument()
     for (const name of ['Lo quiero', 'Lo tengo', 'Leyendo', 'Leído']) {
-      expect(option(name)).toHaveAttribute('aria-pressed', 'false')
+      expect(option(name)).not.toBeChecked()
     }
     fireEvent.click(option('Lo tengo'))
     expect(state().getBook(apiBook.id)).toEqual(apiBook)
     expect(state().library[apiBook.id].status).toBe('owned')
-    // The same element, so the dialog can give it back the focus.
-    expect(screen.getByRole('button', { name: /^Lo tengo\./ })).toBe(trigger)
+    // The same element, so the focus can come back to it.
+    expect(trigger(/^Lo tengo\./)).toBe(button)
   })
 
   it('adds the book before finishing it, starting today', () => {
     const finishBook = stubAction('finishBook')
     renderControl(apiBook.id, apiBook)
-    openPanel('Agregar a Mis libros')
+    openMenu('Agregar a Mis libros')
     fireEvent.click(option('Leído'))
     expect(state().getBook(apiBook.id)).toEqual(apiBook)
     expect(finishBook).toHaveBeenCalledExactlyOnceWith(apiBook.id, {
