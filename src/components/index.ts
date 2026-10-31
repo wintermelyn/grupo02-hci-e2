@@ -25,6 +25,7 @@ export {
   type WordmarkProps,
 } from './PageHeader'
 export { bookPath, folderPath } from './paths'
+export { RailArrow, type RailArrowProps } from './RailArrow'
 export { Ribbon } from './Ribbon'
 export { SearchField, type SearchFieldProps } from './SearchField'
 export { Stars, type StarsProps } from './Stars'
@@ -33,3 +34,4 @@ export { StatusTag, type StatusTagProps } from './StatusTag'
 export { TagFilter, type TagFilterProps, type TagFilterValue } from './TagFilter'
 export { TextField, type TextFieldProps } from './TextField'
 export { Toast } from './Toast'
+export { useRail } from './useRail'
