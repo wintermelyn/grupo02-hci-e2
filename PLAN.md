@@ -164,7 +164,7 @@ interface Folder { id: string; name: string; pinned?: boolean; createdAt: ISODat
 interface User { id: string; name: string; username: string; avatarColor: string; mutualFriends: number; readingIds: BookId[]; readIds: BookId[] }
 interface Friendship { userId: string; status: 'pending' | 'friends'; since: string } // fecha y hora ISO
 interface Activity { id: string; userId: string; bookId: BookId; kind: 'started' | 'finished' | 'want'; date: ISODate; rating?: number }
-interface Toast { id: number; message: string; undoable: boolean }
+interface Toast { id: number; message: string; undoable: boolean; takesFocus?: boolean }
 
 interface AppState {
   me: User;                                   // del seed, no se persiste
@@ -187,7 +187,7 @@ interface AppState {
 | Archivo | Dueño | Contenido |
 |---|---|---|
 | `src/store/index.ts` | Base, **no se toca después** | Une los tres slices, `persist` y `resetDemo` |
-| `src/store/coreSlice.ts` | Base | `commit`, `undo`, `showToast`, `dismissToast`, `upsertBook`, `setStatus`, `getBook` |
+| `src/store/coreSlice.ts` | Base | `commit`, `undo`, `showToast`, `dismissToast`, `focusToast`, `upsertBook`, `setStatus`, `getBook` |
 | `src/store/librarySlice.ts` | A | Acciones de biblioteca (stubs del bloque base) |
 | `src/store/socialSlice.ts` | B | Acciones sociales (stubs del bloque base) |
 | `src/data/seedLibrary.ts` | A, después del bloque base | Biblioteca y carpetas iniciales |
@@ -464,5 +464,5 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | "Leyendo ahora" en Inicio | "Tarjeta" que abre la ficha | Portadas grandes en dos columnas, o tres con tres libros, porque casi nadie lee más de dos o tres a la vez. Bajo cada una, "Llevas 12 días" |
 | Buscar antes de escribir | No aparece | Búsquedas recientes, cuando las hay, autores de tu biblioteca y "Lo que leen tus amigos", para reconocer en vez de recordar |
 | Resultados de Buscar | "Libros y autores" | Dicen cuántos hay y cuántos ya tienes. Van en "Autores" y "Libros", y tocar un autor filtra sus libros. Sin resultados, se ofrecen los autores como salida |
-| Buscador y "+ Nueva carpeta" en Mis libros | "Buscador" sin ubicación | El buscador va en la fila del título, como en una carpeta. "+ Nueva carpeta" es la última tarjeta del tablero y el nombre se escribe ahí mismo. En celular toma la fila entera, para que se lea el nombre que se escribe |
+| Buscador y "+ Nueva carpeta" en Mis libros | "Buscador" sin ubicación | El buscador va en la fila del título, como en una carpeta. "+ Nueva carpeta" es la última tarjeta del tablero y el nombre se escribe ahí mismo. Mientras se escribe toma dos celdas, para que se lea el nombre y Crear y Cancelar quepan en una fila |
 | Mis libros sin subtítulo | No aparece | "34 libros en tu biblioteca" se quita, como en el modelo aprobado: "Todos" ya dice el total y la fila del título queda libre para Buscar |

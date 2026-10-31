@@ -65,6 +65,8 @@ export interface Toast {
   id: number
   message: string
   undoable: boolean
+  /** Deshacer takes the focus when it appears. See focusToast. */
+  takesFocus?: boolean
 }
 
 export interface AppState {
