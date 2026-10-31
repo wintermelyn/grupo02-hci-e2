@@ -35,7 +35,11 @@ export function TextField({
   }, [])
 
   function onKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Enter') onSubmit()
+    if (event.key === 'Enter') {
+      // Saving can give the focus back to a button, which would take this same key as a click.
+      event.preventDefault()
+      onSubmit()
+    }
     if (event.key === 'Escape') onCancel()
   }
 

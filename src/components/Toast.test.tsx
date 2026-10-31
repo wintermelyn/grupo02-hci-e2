@@ -18,6 +18,12 @@ describe('Toast', () => {
     expect(screen.getByRole('status')).toBeEmptyDOMElement()
   })
 
+  it('keeps Deshacer on screen with a long name without spaces', () => {
+    render(<Toast />)
+    act(() => state().commit('M'.repeat(60), () => ({})))
+    expect(screen.getByText('M'.repeat(60))).toHaveClass('min-w-0', 'wrap-anywhere')
+  })
+
   it('undoes the last library change', () => {
     const before = state().library
     render(<Toast />)

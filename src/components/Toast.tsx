@@ -74,7 +74,8 @@ function ToastCard({ toast }: { toast: ToastData }) {
       onBlur={onBlur}
       className="pointer-events-auto flex w-full max-w-md items-center justify-between gap-3 rounded-float bg-ink py-1 pr-1 pl-4 text-white shadow-float transition duration-200 ease-quick starting:translate-y-2 starting:opacity-0"
     >
-      <p>{toast.message}</p>
+      {/* A long folder name without spaces must not push Deshacer out of the screen. */}
+      <p className="min-w-0 wrap-anywhere">{toast.message}</p>
       {toast.undoable && (
         <button
           type="button"

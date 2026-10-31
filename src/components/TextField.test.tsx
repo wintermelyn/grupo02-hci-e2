@@ -30,6 +30,12 @@ describe('TextField', () => {
     expect(onCancel).toHaveBeenCalledOnce()
   })
 
+  it('keeps Enter from clicking the button that takes the focus after saving', () => {
+    const { field } = setup()
+    // fireEvent returns false when the default action was prevented.
+    expect(fireEvent.keyDown(field, { key: 'Enter' })).toBe(false)
+  })
+
   it('says why the value cannot be saved', () => {
     const { field } = setup('Ya tienes una carpeta con ese nombre.')
     expect(field).toBeInvalid()
