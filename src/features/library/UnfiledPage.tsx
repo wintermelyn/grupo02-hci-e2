@@ -39,7 +39,7 @@ export function UnfiledPage() {
     <section>
       <PageHeader
         title={UNFILED_NAME}
-        subtitle="Libros que no están en ninguna carpeta"
+        subtitle="Libros fuera de tus carpetas"
         backTo={LIBRARY_PATH}
         backLabel="Mis libros"
         action={

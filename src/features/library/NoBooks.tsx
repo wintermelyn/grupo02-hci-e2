@@ -9,11 +9,20 @@ export interface NoBooksProps {
   query: string
   /** How many books the folder has, whatever their tag. */
   total: number
+  /** Where those books are, when the list is not the folder itself. */
+  place?: string
   onShowAll: () => void
 }
 
 /** A folder with books, none of which pass the filters. */
-export function NoBooks({ name, label, query, total, onShowAll }: NoBooksProps) {
+export function NoBooks({
+  name,
+  label,
+  query,
+  total,
+  place = 'esta carpeta',
+  onShowAll,
+}: NoBooksProps) {
   // A book that changes its tag leaves this list but stays in the folder, so the way back is here.
   const showAll = label && <Button onClick={onShowAll}>Ver todos los libros</Button>
 
@@ -37,8 +46,8 @@ export function NoBooks({ name, label, query, total, onShowAll }: NoBooksProps) 
       title={`Ningún libro en «${label}»`}
       description={
         total === 1
-          ? 'El libro de esta carpeta tiene otro estado.'
-          : `Los ${total} libros de esta carpeta tienen otro estado.`
+          ? `El libro de ${place} tiene otro estado.`
+          : `Los ${total} libros de ${place} tienen otro estado.`
       }
       action={showAll}
     />

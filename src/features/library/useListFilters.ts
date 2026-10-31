@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router'
 import { parseTag, TAG_PARAM } from './filters'
 
-const QUERY_PARAM = 'q'
+export const QUERY_PARAM = 'q'
 
 /** The tag and the search of a list of books. They live in the URL, so the book page returns to them. */
 export function useListFilters() {
