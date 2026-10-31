@@ -45,6 +45,12 @@ export function timeAgo(date: ISODate): string {
   return `Hace ${days} días`
 }
 
+/** The date of a row with little room, on the line of the person: "Hoy", "Ayer" or "3 d". */
+export function shortTimeAgo(date: ISODate): string {
+  const days = daysSince(date)
+  return days > 1 ? `${days} d` : timeAgo(date)
+}
+
 /** The activity as one sentence, for a control that needs to say which one it acts on. */
 export function activitySentence({ activity, user, book }: FeedItem): string {
   return `${firstName(user.name)} ${ACTIVITY_VERBS[activity.kind]} ${book.title}`

@@ -75,7 +75,7 @@ export function ActivityView({ feed, batches, onShowMore, titleRef }: ActivityVi
             <PeriodGroup key={group.period} group={group} from={activityPath(batches)} />
           ))}
           {left > 0 ? (
-            <Button onClick={showMore} className="mt-5 w-full">
+            <Button onClick={showMore} className="mt-5 max-md:w-full">
               Ver más ({left})
             </Button>
           ) : (

@@ -1,4 +1,4 @@
-import { fireEvent, screen, within } from '@testing-library/react'
+import { cleanup, fireEvent, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { daysAgo, today } from '../../lib/dates'
 import { useStore } from '../../store'
@@ -93,10 +93,12 @@ describe('Inicio', () => {
     expect(within(section).getByRole('link', { name: /Dune/ })).toHaveTextContent('Diego empezó')
   })
 
-  it('tells the rows apart with the colour of each book', () => {
+  it('puts the rows on shell, with the cover loose and no tone of its book', () => {
     renderApp('/')
-    const tones = activityRows().map((row) => row.querySelector('[style]')?.getAttribute('style'))
-    expect(new Set(tones).size).toBe(PREVIEW_LENGTH)
+    const [row] = activityRows()
+    expect(row).toHaveClass('bg-shell', 'hover:bg-sand')
+    expect(row).not.toHaveClass('bg-white', 'border')
+    expect(row.firstElementChild).not.toHaveAttribute('style')
   })
 
   it('opens the book from the whole row, with the avatar and the heart over it', () => {
@@ -136,17 +138,29 @@ describe('Inicio', () => {
     )
   })
 
-  it('moves the date under the title where the longest line has no room, at one exact width', () => {
+  it('keeps a short date on the line of the person, and the title in one line', () => {
     const [activity] = state().activities
     useStore.setState({
       activities: [{ ...activity, kind: 'want', userId: 'valentina', date: daysAgo(13) }],
     })
     renderApp('/')
     const [longest] = activityRows()
-    expect(longest).toHaveTextContent('Valentina quiere leer · Hace 13 días')
-    // The same number in both: max- leaves that width out, and min- takes it in.
-    expect(within(longest).getByText('· Hace 13 días')).toHaveClass('max-[420px]:hidden')
-    expect(within(longest).getByText('Hace 13 días')).toHaveClass('min-[420px]:hidden')
+    expect(longest).toHaveTextContent('Valentina quiere leer · 13 d')
+    expect(longest).not.toHaveTextContent('Hace 13 días')
+    // What gives way on a narrow row is the sentence, never the date.
+    expect(within(longest).getByText('· 13 d')).toHaveClass('shrink-0')
+    expect(within(longest).getByText(state().getBook(activity.bookId)!.title)).toHaveClass(
+      'line-clamp-1',
+    )
+  })
+
+  it('leaves the author for a computer', () => {
+    renderApp('/')
+    const [activity] = state().activities
+    const [row] = activityRows()
+    expect(within(row).getByText(state().getBook(activity.bookId)!.authors[0])).toHaveClass(
+      'max-lg:hidden',
+    )
   })
 
   it('offers a way out when nothing is being read', () => {
@@ -180,10 +194,16 @@ describe('like', () => {
     expect(button.textContent).not.toMatch(/\d/)
   })
 
-  it('is only the heart on a phone, with the word from a wider screen', () => {
+  it('is only the heart in a row of Inicio until a computer, and on a phone in the view', () => {
     renderApp('/')
     const [button] = likeButtons()
-    expect(within(button).getByText('Me gusta')).toHaveClass('max-md:hidden')
+    expect(within(button).getByText('Me gusta')).toHaveClass('max-lg:hidden')
+    expect(button).toHaveClass('lg:min-w-26')
+    cleanup()
+    renderApp('/?actividad=1')
+    const [inTheView] = likeButtons()
+    expect(within(inTheView).getByText('Me gusta')).toHaveClass('max-md:hidden')
+    expect(inTheView).toHaveClass('md:min-w-26')
   })
 
   it('shows the heart filled once it is given, in the shape and not only in the colour', () => {
@@ -296,6 +316,25 @@ describe('activity view', () => {
 
     fireEvent.click(screen.getByRole('link', { name: 'Inicio', current: false }))
     expect(link()).toHaveFocus()
+  })
+
+  it('takes its own width for Ver más from a tablet up', () => {
+    renderApp('/?actividad=1')
+    const showMore = screen.getByRole('button', { name: /Ver más/ })
+    expect(showMore).toHaveClass('max-md:w-full')
+    expect(showMore).not.toHaveClass('w-full')
+  })
+
+  it('keeps the dot with the date, in the space a wrapped date leaves out of the box', () => {
+    renderApp('/?actividad=2')
+    const dated = activityRows().at(-1) as HTMLElement
+    const date = within(dated)
+      .getAllByText(/Hace \d+ días/)
+      .at(-1) as HTMLElement
+    expect(date.querySelector('[aria-hidden]')).toHaveTextContent('·')
+    expect(date).toHaveClass('pl-3')
+    expect(date.parentElement).toHaveClass('-ml-3', 'flex-wrap')
+    expect(date.closest('p')).toHaveClass('overflow-hidden')
   })
 
   it('leaves the focus alone when the view is opened directly', () => {

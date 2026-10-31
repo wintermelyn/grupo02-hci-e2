@@ -36,25 +36,38 @@ export function ActivityEntry({ item, from, dated }: ActivityEntryProps) {
           >
             <ActivityLine item={item}>
               {dated && (
-                <span className="whitespace-pre max-md:hidden"> · {timeAgo(activity.date)}</span>
+                <span className="shrink-0 whitespace-pre max-md:hidden">
+                  {' '}
+                  · {timeAgo(activity.date)}
+                </span>
               )}
             </ActivityLine>
             <span className="mt-0.5 line-clamp-2 font-serif text-lg/snug font-semibold">
               {book.title}
             </span>
           </Link>
-          <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 text-sm text-muted">
-            {activity.rating !== undefined ? (
-              <Stars value={activity.rating} />
-            ) : (
-              <span>{book.authors[0]}</span>
-            )}
-            {dated && (
-              <span className="md:hidden">
-                <span aria-hidden>· </span>
-                {timeAgo(activity.date)}
+          {/*
+            The dot stands in the space before the date. A date that wraps starts its line, where
+            the negative margin leaves that space out of the box, and the dot goes with it.
+          */}
+          <p className="mt-0.5 overflow-hidden text-sm text-muted">
+            <span className="-ml-3 flex flex-wrap items-center">
+              <span className="pl-3">
+                {activity.rating !== undefined ? (
+                  <Stars value={activity.rating} />
+                ) : (
+                  book.authors[0]
+                )}
               </span>
-            )}
+              {dated && (
+                <span className="relative pl-3 md:hidden">
+                  <span aria-hidden className="absolute left-0 w-3 text-center">
+                    ·
+                  </span>
+                  {timeAgo(activity.date)}
+                </span>
+              )}
+            </span>
           </p>
         </div>
         <LikeButton item={item} className="relative z-10 shrink-0" />

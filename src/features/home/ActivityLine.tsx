@@ -30,15 +30,15 @@ export interface ActivityLineProps {
   className?: string
 }
 
-/** One line, always. It leaves room for ActivityAvatar. */
+/** One line, always. It leaves room for ActivityAvatar, and the sentence gives way before the date. */
 export function ActivityLine({ item: { activity, user }, children, className }: ActivityLineProps) {
   return (
     <span className={cx('flex min-h-7 items-center pl-7.5 text-sm text-muted', className)}>
       <span className="truncate">
         <span className="font-semibold text-ink">{firstName(user.name)}</span>{' '}
         {ACTIVITY_VERBS[activity.kind]}
-        {children}
       </span>
+      {children}
     </span>
   )
 }

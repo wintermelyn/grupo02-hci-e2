@@ -7,6 +7,7 @@ import {
   buildFeed,
   groupByPeriod,
   readingTime,
+  shortTimeAgo,
   timeAgo,
   type FeedItem,
 } from './feed'
@@ -22,6 +23,17 @@ function item(date: string): FeedItem {
   const [user] = state().users
   return { activity: activity(date, date), user, book }
 }
+
+describe('shortTimeAgo', () => {
+  it.each([
+    [0, 'Hoy'],
+    [1, 'Ayer'],
+    [2, '2 d'],
+    [30, '30 d'],
+  ])('%i days ago reads %s', (days, expected) => {
+    expect(shortTimeAgo(daysAgo(days))).toBe(expected)
+  })
+})
 
 describe('timeAgo', () => {
   it.each([
