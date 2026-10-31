@@ -49,6 +49,23 @@ describe('Toast', () => {
     expect(trigger).toHaveFocus()
   })
 
+  it('does not move the page to give the focus back', () => {
+    render(
+      <>
+        <button>Tag</button>
+        <Toast />
+      </>,
+    )
+    act(() => state().commit('Libros quitados', () => ({ library: {} })))
+    const trigger = screen.getByRole('button', { name: 'Tag' })
+    const undoButton = screen.getByRole('button', { name: 'Deshacer' })
+    trigger.focus()
+    act(() => undoButton.focus())
+    const focus = vi.spyOn(trigger, 'focus')
+    fireEvent.click(undoButton)
+    expect(focus).toHaveBeenCalledExactlyOnceWith({ preventScroll: true })
+  })
+
   describe('when an action asks it to take the focus', () => {
     function renderFocusedToast() {
       render(
