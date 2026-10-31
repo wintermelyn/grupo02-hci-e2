@@ -428,3 +428,8 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Relectura pasando por otro tag | No aparece | Pasar de "Leído" directo a "Leyendo" pone inicio = hoy. Si antes pasa por otro tag, se conserva la fecha vieja, como dice el contrato de `setStatus`, y se corrige con "Editar lectura" |
 | Sección marcada en la ficha | No aparece | Ninguna, porque la ficha se abre desde cualquier sección |
 | Nombre del selector | Habla de "un lápiz" | "Cambiar" junto al lápiz, porque todo ícono lleva texto. El selector se titula "Estado de «título»" |
+| Libros sin descripción | No aparece | La ficha muestra "Aún no tenemos descripción de este libro". 46 de 54 libros no la tienen en español |
+| Estrellas | No aparece | De tinta. El naranja de Goodreads compite con las portadas y como ícono llega a 3,03:1 |
+| Color de la cinta | No aparece | Burdeo `#7a2334`. Se parece al ciruela de "Lo tengo", pero el estado nunca se apoya solo en el color |
+| Nombre en el celular | No aparece | "Goodreads / prototipo" a la derecha del título en cada pantalla, porque el celular no tiene barra superior |
+| Confirmar Reiniciar demo y eliminar carpeta | No aparece. El plan pide confirmación sin decir con qué pieza | `BottomSheet`. Es una excepción a "el panel es para contenido largo", porque estas acciones no se pueden deshacer |
