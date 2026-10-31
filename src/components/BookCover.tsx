@@ -6,7 +6,7 @@ import { STATUS_RIBBON } from './statusStyles'
 import { useChanged } from './useChanged'
 
 /** `fill` takes the width of its container, for grids that change columns. */
-export type BookCoverSize = 'sm' | 'fill' | 'lg'
+export type BookCoverSize = 'xs' | 'sm' | 'fill' | 'lg'
 
 export interface BookCoverProps {
   book: Pick<Book, 'id' | 'title' | 'coverUrl'>
@@ -19,12 +19,14 @@ export interface BookCoverProps {
 }
 
 const SIZE_CLASSES: Record<BookCoverSize, string> = {
+  xs: 'w-11 text-xs',
   sm: 'w-14 text-sm md:w-16',
   fill: 'w-full text-xl',
   lg: 'w-28 text-2xl md:w-56 md:text-3xl',
 }
 
 const RIBBON_CLASSES: Record<BookCoverSize, string> = {
+  xs: '-bottom-1 right-1.5 h-3 w-1.5',
   sm: '-bottom-1.5 right-2 h-4 w-1.75',
   fill: '-bottom-2 right-3 h-6 w-2.5',
   lg: '-bottom-3 right-4 h-6 w-2.5 md:-bottom-5 md:right-6 md:h-9 md:w-3.25',
