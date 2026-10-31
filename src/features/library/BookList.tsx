@@ -7,8 +7,6 @@ import { pinnedFirst } from './filters'
 export interface BookListProps {
   /** Names the list for screen readers. */
   title: string
-  /** Shows the title too, as a section of its own on a page with something else. */
-  showTitle?: boolean
   books: Book[]
   /** The list is filtered by status, so its rows also say where each book is filed. */
   showFolders?: boolean
@@ -22,13 +20,7 @@ function FiledBookRow({ book, folders }: { book: Book; folders: Folder[] }) {
   return <BookRow book={book} folders={names} />
 }
 
-export function BookList({
-  title,
-  showTitle = false,
-  books,
-  showFolders = false,
-  openFolderId,
-}: BookListProps) {
+export function BookList({ title, books, showFolders = false, openFolderId }: BookListProps) {
   const folders = useStore((state) => state.folders)
   const otherFolders = useMemo(
     () => pinnedFirst(folders).filter(({ id }) => id !== openFolderId),
@@ -36,8 +28,8 @@ export function BookList({
   )
 
   return (
-    <section className={showTitle ? 'mt-7 lg:mt-10' : 'mt-2'}>
-      <h2 className={showTitle ? 'mb-1 section-title' : 'sr-only'}>{title}</h2>
+    <section className="mt-2">
+      <h2 className="sr-only">{title}</h2>
       <ul className="md:grid md:grid-cols-2 md:gap-x-8">
         {books.map((book) => (
           <li

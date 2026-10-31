@@ -82,13 +82,7 @@ export function LibraryPage() {
 
   function content() {
     if (tag === 'all') {
-      return (
-        <>
-          <FolderBoard entries={entries} unfiledBooks={unfiledBooks} />
-          {/* Todos says it has them all, here as much as inside a folder. */}
-          {books.length > 0 && <BookList title="Todos los libros" showTitle books={books} />}
-        </>
-      )
+      return <FolderBoard entries={entries} unfiledBooks={unfiledBooks} />
     }
     if (books.length === 0) return <NoTaggedBooks status={tag} />
     return <BookList title={STATUS_LABELS[tag]} books={books} showFolders />
