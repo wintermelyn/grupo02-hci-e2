@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { useSearchParams } from 'react-router'
-import { ErrorState, LoadingState, PageHeader, SearchField } from '../../components'
+import { ErrorState, LoadingState, SearchField, Wordmark } from '../../components'
 import { useStore } from '../../store'
 import { useBookLookup } from '../library/filters'
 import { addRecentSearch, clearRecentSearches, readRecentSearches } from './recentSearchStore'
@@ -76,12 +76,16 @@ export function SearchPage() {
 
   return (
     <section>
-      <PageHeader title="Buscar" />
+      {/* Not PageHeader: its row is as tall as a button, and that would move the field. */}
+      <header className="flex items-center justify-between gap-3 pt-3 lg:pt-8">
+        <h1 className="page-title">Buscar</h1>
+        <Wordmark />
+      </header>
       {/* Solid and to the edges of the column: what scrolls under it does not show through. */}
       <div
         ref={field}
         onKeyDown={onKeyDown}
-        className="full-bleed sticky top-0 z-30 -mt-2 bg-paper py-2"
+        className="full-bleed sticky top-0 z-30 mt-3 bg-paper py-2 lg:mt-4"
       >
         <SearchField
           size="lg"

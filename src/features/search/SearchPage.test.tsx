@@ -52,6 +52,15 @@ describe('before typing', () => {
     expect(screen.queryByText('Búsquedas recientes')).not.toBeInTheDocument()
   })
 
+  it('keeps the separation between its blocks at every width', () => {
+    localStorage.setItem('gr-e2-buscados', JSON.stringify(['king']))
+    renderApp('/buscar')
+    expect(search().parentElement?.parentElement).toHaveClass('mt-3', 'lg:mt-4')
+    expect(section('Búsquedas recientes')).toHaveClass('mt-4')
+    expect(section('Autores de Mis libros')).toHaveClass('mt-7', 'lg:mt-7')
+    expect(section('Lo que leen tus amigos')).toHaveClass('mt-8')
+  })
+
   it('downloads the catalog on arrival, with nothing on the screen waiting for it', () => {
     const files = catalog()
     renderApp('/buscar')

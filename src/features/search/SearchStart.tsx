@@ -28,7 +28,12 @@ export function SearchStart({
         <RecentSearches terms={recent} onPick={onSearch} onClear={onClearRecent} />
       )}
       {authors.length > 0 && (
-        <AuthorList title="Autores de Mis libros" authors={authors} onPick={onPickAuthor} />
+        <AuthorList
+          title="Autores de Mis libros"
+          authors={authors}
+          className="lg:mt-7"
+          onPick={onPickAuthor}
+        />
       )}
       <FriendsShelf books={friendsBooks} />
     </>
