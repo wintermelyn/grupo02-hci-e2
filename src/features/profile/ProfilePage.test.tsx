@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { forgetSearches, savedSearch, searchBooks } from '../../lib/openlibrary'
 import { renderApp } from '../../test/router'
@@ -18,6 +18,21 @@ describe('ProfilePage', () => {
       'href',
       '/mas',
     )
+  })
+
+  it('sums up my books and friends under the name, and follows them', () => {
+    renderApp('/perfil')
+    expect(screen.getByText('34 libros · 3 amigos')).toBeInTheDocument()
+    act(() => state().removeFromLibrary([CARRIE]))
+    expect(screen.getByText('33 libros · 3 amigos')).toBeInTheDocument()
+  })
+
+  it('asks in the same place, taking over the block that holds the button', () => {
+    renderApp('/perfil')
+    expect(screen.getByText(/Vuelve a los libros/)).toBeInTheDocument()
+    openConfirm()
+    expect(screen.queryByText(/Vuelve a los libros/)).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Reiniciar demo' })).toHaveLength(1)
   })
 
   it('asks in the page first, with the focus on Cancelar and what is lost in view', () => {
