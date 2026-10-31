@@ -15,10 +15,22 @@ export interface PersonActionProps {
   className?: string
 }
 
+interface StateLabelProps {
+  icon?: LucideIcon
+  /** In a row: under 360 px it steps down, so "Solicitud enviada" stays on one line above Cancelar. */
+  inRow: boolean
+  children: ReactNode
+}
+
 /** The state in words, so it never depends on colour or on the icon. */
-function StateLabel({ icon: Icon, children }: { icon?: LucideIcon; children: ReactNode }) {
+function StateLabel({ icon: Icon, inRow, children }: StateLabelProps) {
   return (
-    <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted">
+    <span
+      className={cx(
+        'inline-flex items-center gap-1.5 text-sm font-semibold whitespace-nowrap text-muted',
+        inRow && 'max-[359px]:text-xs',
+      )}
+    >
       {Icon && <Icon aria-hidden size={16} className="shrink-0" />}
       {children}
     </span>
@@ -30,7 +42,8 @@ function StateLabel({ icon: Icon, children }: { icon?: LucideIcon; children: Rea
  * the action a Button, the same one for adding, cancelling and removing, so they weigh the same and
  * each takes one tap. Removing offers Deshacer. A tap meant for Cancelar that lands on Quitar de
  * amigos, when the timer accepts the request, ends where the person wanted: not being friends.
- * On the header of a person it is an action of the page, so it has an edge. In a row it has none.
+ * On the header of a person it is an action of the page, so it has an edge. In a row it has none,
+ * and it stays inside the tinted row instead of reaching over the margin.
  */
 export function PersonAction({
   user,
@@ -44,9 +57,7 @@ export function PersonAction({
   const rootRef = useRef<HTMLDivElement>(null)
   const statusChanged = useChanged(status)
 
-  const weight = canRemove
-    ? ({ variant: 'secondary' } as const)
-    : ({ variant: 'quiet', className: '-mr-2.5' } as const)
+  const variant = canRemove ? 'secondary' : 'quiet'
 
   // The button that had the focus may be gone. Amigos handles this for its rows.
   useEffect(() => {
@@ -66,11 +77,15 @@ export function PersonAction({
     <div
       ref={rootRef}
       tabIndex={-1}
-      className={cx('flex min-h-11 flex-wrap items-center gap-x-3 gap-y-1 outline-none', className)}
+      className={cx(
+        'flex min-h-11 flex-wrap items-center gap-x-3 outline-none',
+        canRemove && 'gap-y-1',
+        className,
+      )}
     >
       {!status && (
         <Button
-          {...weight}
+          variant={variant}
           compact
           icon={Plus}
           aria-label={`Agregar a @${user.username}`}
@@ -82,10 +97,12 @@ export function PersonAction({
 
       {status === 'pending' && (
         <>
-          {/* The icon only where there is room: in a row, these words already take two lines. */}
-          <StateLabel icon={canRemove ? Clock : undefined}>Solicitud enviada</StateLabel>
+          {/* The icon only where there is room: in a row, the words alone fill the slot. */}
+          <StateLabel icon={canRemove ? Clock : undefined} inRow={!canRemove}>
+            Solicitud enviada
+          </StateLabel>
           <Button
-            {...weight}
+            variant={variant}
             compact
             aria-label={`Cancelar la solicitud a @${user.username}`}
             onClick={once(cancelFriendRequest)}
@@ -97,10 +114,12 @@ export function PersonAction({
 
       {status === 'friends' && (
         <>
-          <StateLabel icon={UserCheck}>Amigos</StateLabel>
+          <StateLabel icon={UserCheck} inRow={!canRemove}>
+            Amigos
+          </StateLabel>
           {canRemove && (
             <Button
-              {...weight}
+              variant={variant}
               compact
               aria-label={`Quitar a @${user.username} de amigos`}
               onClick={once(removeFriend)}

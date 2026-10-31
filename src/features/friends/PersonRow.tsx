@@ -12,8 +12,9 @@ export interface PersonRowProps {
   showFriendState?: boolean
 }
 
-// A fixed slot, so the name does not move when the action turns into the state of the request.
-const ACTION_SLOT = 'w-26 shrink-0 justify-end text-right lg:w-auto'
+// A fixed slot, so the name does not move when the action turns into the state of the request. The
+// state goes above Cancelar until both fit side by side without squeezing the name.
+const ACTION_SLOT = 'w-26 shrink-0 justify-end text-right min-[360px]:w-30 xl:w-auto xl:flex-nowrap'
 
 /** The link and the action are siblings: a button inside a link is not valid HTML. */
 export function PersonRow({ user, status, showFriendState = false }: PersonRowProps) {
@@ -21,22 +22,24 @@ export function PersonRow({ user, status, showFriendState = false }: PersonRowPr
   const { search } = useLocation()
 
   return (
-    <li
-      data-person={user.id}
-      className="border-b border-line last:border-b-0 md:nth-last-2:odd:border-b-0"
-    >
-      <div className="-mx-2 flex items-center gap-x-2 rounded-control px-2 transition-colors duration-100 has-[a:active]:bg-shell">
+    <li data-person={user.id} className="min-w-0">
+      {/* Only the link paints the row: the quiet action has to keep showing its own hover. */}
+      <div className="flex h-full items-center gap-x-0.5 rounded-row bg-shell pr-2 transition-colors duration-100 has-[a:hover]:bg-sand has-[a:active]:bg-sand-deep min-[360px]:gap-x-2">
         <Link
           to={{ pathname: personPath(user.id), search }}
-          className="flex min-w-0 flex-1 items-center gap-3 rounded-control py-2.5"
+          className="flex min-w-0 flex-1 items-center gap-1.5 rounded-row py-2.5 pl-2 min-[360px]:gap-3 min-[360px]:pl-3"
         >
-          <Avatar user={user} />
+          <Avatar user={user} className="max-[359px]:size-9" />
           <span className="min-w-0">
-            <span className="block font-serif text-lg/snug font-semibold">{user.name}</span>
+            <span className="block font-serif text-lg/snug font-semibold max-[359px]:text-base/snug">
+              {user.name}
+            </span>
             <span className="block text-sm text-muted">
               {/* Between homonyms, this is what tells them apart. */}
               <span className="block font-semibold text-ink">@{user.username}</span>
-              <span className="block">{mutualFriendsLabel(user.mutualFriends)}</span>
+              <span className="block max-[359px]:text-xs">
+                {mutualFriendsLabel(user.mutualFriends)}
+              </span>
             </span>
           </span>
         </Link>

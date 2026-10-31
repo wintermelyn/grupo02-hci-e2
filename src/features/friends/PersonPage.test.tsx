@@ -1,5 +1,6 @@
 import { act, fireEvent, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+import { coverTone } from '../../lib/coverTone'
 import { useStore } from '../../store'
 import { ACCEPT_AFTER_MS } from '../../store/socialSlice'
 import { currentLocation, renderApp } from '../../test/router'
@@ -176,6 +177,54 @@ describe('PersonPage books', () => {
     withoutBooks('diego', list)
     renderApp('/amigos/diego')
     expect(heading(title)).not.toBeInTheDocument()
+  })
+})
+
+describe('PersonPage reading card', () => {
+  const card = () => sectionOf('Está leyendo').getByRole('link')
+
+  it('takes the colour of its book, with the book as its only link', () => {
+    renderApp('/amigos/camila')
+    expect(card()).toHaveAttribute('href', '/libro/OL278437W')
+    expect(card()).toHaveStyle({ backgroundColor: coverTone('OL278437W') })
+    expect(card()).toHaveClass('text-white')
+  })
+
+  it('says what is in common inside the card, and nothing when it is not', () => {
+    keepInLibrary('OL278437W')
+    renderApp('/amigos/camila')
+    expect(within(card()).getByText('En común')).toBeInTheDocument()
+    act(() => keepInLibrary())
+    expect(within(card()).queryByText('En común')).not.toBeInTheDocument()
+  })
+
+  it('carries no ribbon of my status, which could pass for theirs', () => {
+    renderApp('/amigos/camila')
+    expect(card().querySelector('[class*="ribbon"]')).toBeNull()
+  })
+})
+
+describe('PersonPage shelf', () => {
+  const shelf = () => sectionOf('Últimos leídos').getByRole('list')
+
+  it('is a rail that keeps its edges on a phone and a row of covers on a computer', () => {
+    renderApp('/amigos/diego')
+    expect(shelf()).toHaveClass('rail', 'full-bleed', 'overflow-x-auto', 'lg:grid')
+  })
+
+  it('opens each book, and the book goes back to this person', () => {
+    renderApp('/amigos/ignacio')
+    const [first] = within(shelf()).getAllByRole('link')
+    fireEvent.click(first)
+    expect(currentLocation()).toMatch(/^\/libro\//)
+    fireEvent.click(main().getByRole('link', { name: 'Volver' }))
+    expect(currentLocation()).toBe('/amigos/ignacio')
+  })
+
+  it('marks only the books in common', () => {
+    keepInLibrary('OL1168083W')
+    renderApp('/amigos/diego')
+    expect(within(shelf()).getAllByText('En común')).toHaveLength(1)
   })
 })
 
