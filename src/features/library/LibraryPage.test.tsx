@@ -1,5 +1,5 @@
 import { act, fireEvent, screen, within } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, onTestFinished, vi } from 'vitest'
 import { daysAgo, today } from '../../lib/dates'
 import { currentLocation, renderApp } from '../../test/router'
 import { state, stubAction } from '../../test/store'
@@ -10,6 +10,7 @@ const main = () => within(screen.getByRole('main'))
 const tagButton = (name: RegExp) => main().getByRole('button', { name })
 const board = () => main().queryByRole('heading', { name: 'Mis carpetas' })
 const prompt = () => main().queryByRole('region', { name: '¿Sigues queriendo leer este libro?' })
+const question = () => main().getByRole('heading', { name: '¿Sigues queriendo leer este libro?' })
 const searchBox = () => main().getByRole('searchbox', { name: 'Buscar en Mis libros' })
 const band = () => screen.getByRole('heading', { level: 1 }).closest('header') as HTMLElement
 const toast = () => screen.getByText(/./, { selector: '[role="status"] p' })
@@ -199,6 +200,34 @@ describe('LibraryPage', () => {
       expect(prompt()).toHaveTextContent('It · 210 días en Lo quiero')
     })
 
+    describe('after Deshacer', () => {
+      it.each([
+        ['No', '/biblioteca'],
+        ['No', '/biblioteca?tag=want'],
+        ['Sí', '/biblioteca'],
+        ['Sí', '/biblioteca?tag=want'],
+      ])('takes the focus to the question and shows it whole: %s in %s', (answer, path) => {
+        const reveal = vi.fn()
+        Element.prototype.scrollIntoView = reveal
+        onTestFinished(() => {
+          Reflect.deleteProperty(Element.prototype, 'scrollIntoView')
+        })
+        renderApp(path)
+        fireEvent.click(main().getByRole('button', { name: answer }), { detail: 1 })
+        expect(reveal).not.toHaveBeenCalled()
+
+        fireEvent.click(screen.getByRole('button', { name: 'Deshacer' }))
+        expect(question()).toHaveFocus()
+        expect(reveal).toHaveBeenCalledExactlyOnceWith({ block: 'nearest' })
+        expect(reveal.mock.contexts[0]).toBe(prompt())
+      })
+
+      it('does not take the focus when the question is there from the start', () => {
+        renderApp('/biblioteca')
+        expect(question()).not.toHaveFocus()
+      })
+    })
+
     it('calls the action with the book it asks about', () => {
       const answer = stubAction('answerWantPrompt')
       renderApp('/biblioteca')
@@ -244,11 +273,11 @@ describe('LibraryPage', () => {
         expect(answerNo()).toHaveFocus()
       })
 
-      it('brings the book back and stays in the list with Enter on Deshacer', () => {
+      it('brings the book back and the focus to the question with Enter on Deshacer', () => {
         const undo = answerNo()
         fireEvent.click(undo, { detail: 0 })
         expect(state().library[IT].folderIds).toEqual(['terror'])
-        expect(document.activeElement).toContainElement(main().getAllByRole('link')[0])
+        expect(question()).toHaveFocus()
       })
 
       it('goes on through the list with Tab', () => {
