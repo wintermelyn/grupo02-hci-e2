@@ -2,19 +2,17 @@
 
 El prototipo se implementa por fases, cada una en una sesión nueva. El prompt de cada fase dice qué se construye. Este protocolo dice cómo parte, cómo se comprueba y cómo cierra, para que todas trabajen igual.
 
-**Esta rama** es `wintermelyn/desarrollo-proyecto`, y cada sesión abre en su carpeta, `desarrollo-proyecto`. El trabajo de cada fase llega aquí por un pull request (PR), y `main` avanza solo por otro PR. `z1diego` revisa e integra esos PR. Mientras duren las fases, esto reemplaza el merge diario a `main` de la sección 5 de `PLAN.md`.
+**Esta rama** es `wintermelyn/desarrollo-proyecto`, y cada sesión abre en su carpeta, `desarrollo-proyecto`. El trabajo de cada fase llega aquí por un pull request (PR), y `main` avanza solo por otro PR, cuando se aprueba un checkpoint (CP). Mientras duren las fases, esto reemplaza el merge diario a `main` de la sección 5 de `PLAN.md`.
 
 ## Ramas y pull requests
 
-Todo cambio queda en un PR. Las sesiones no integran PR, no hacen merge local hacia esta rama ni push directo a `main`: `z1diego` revisa cada PR y lo integra en GitHub.
+Todo cambio queda en un PR. No se hace merge local hacia esta rama ni push directo a `main`.
 
-- **Rama de la fase:** cada fase trabaja en su propia rama, `fase-<n>`, salvo que el prompt dé otro nombre. Nace de la rama de la fase anterior, o de esta rama si ese PR ya se integró. Ahí va todo lo de la fase, incluidos sus cierres.
-- **PR de la fase:** va hacia la rama de la que nació la fase. Se abre al cerrar la fase, listo para revisión y con `z1diego` como revisor. Si este PR depende de otro que sigue abierto, la descripción lo enlaza.
-- **PR de publicación:** va de esta rama hacia `main`. Se abre listo para revisión, con `z1diego` como revisor, cuando esta rama tiene commits que `main` no tiene.
+- **Rama de la fase:** cada fase trabaja en su propia rama, nacida del último commit de esta rama. Se llama `fase-<n>`, salvo que el prompt dé otro nombre. Ahí va todo lo de la fase, incluidos sus cierres.
+- **PR de la fase:** va de la rama de la fase hacia esta rama. Se abre al cerrar la fase y queda abierto hasta que Matías apruebe el CP.
+- **PR de publicación:** va de esta rama hacia `main`. Se abre y se integra con `Aprobé el CP<n>`.
 
-Los PR apilados se integran en orden, desde el más antiguo, con `--merge`. Cuando se integra uno, el PR siguiente se apunta a esta rama con `gh pr edit <n> --base wintermelyn/desarrollo-proyecto`, y se comprueba que su diff siga mostrando solo su fase.
-
-Si `z1diego` pide cambios, se corrigen en la rama de ese PR y se llevan a las ramas siguientes con `git merge`, sin rebase ni push forzado. Cada rama queda con format, lint, test y build en verde.
+La sesión integra los PR en GitHub con `gh pr merge --merge`, nunca antes de `Aprobé el CP<n>` y primero el de la fase. Si un PR está en borrador, antes lo saca de borrador. Si este PR depende de otro que sigue abierto, la descripción enlaza ese PR.
 
 ## Reglas de toda fase
 
@@ -34,15 +32,15 @@ Si `z1diego` pide cambios, se corrigen en la rama de ese PR y se llevan a las ra
 
 ## 1. Empezar
 
-Una fase parte cuando Matías escribe `Aprobé el CP<n>` con sus respuestas. Eso aprueba el resultado, no integra el PR: la fase siguiente no espera la revisión. La fase 1 no viene de un CP y parte directo con su prompt. `Aprobé el CP6` no abre otra fase, pero hace estos mismos pasos para dejar el cierre de la fase 6 en revisión.
+Una fase parte cuando Matías escribe `Aprobé el CP<n>` con sus respuestas. La fase 1 no viene de un CP y parte directo con su prompt. `Aprobé el CP6` no abre otra fase, pero hace estos mismos pasos para que el cierre de la fase 6 llegue a `main`.
 
-1. Se revisa con `gh pr view` si el PR de la fase aprobada ya se integró. Si se integró, se apunta el PR siguiente a esta rama cuando exista y se actualiza esta rama con `git pull --ff-only`.
-2. Se crea la rama de la fase nueva desde la rama de la fase aprobada, o desde esta rama si ese PR ya se integró.
-3. Se pasan las respuestas a `PLAN.md`, en la rama nueva. Las decisiones de implementación van a la sección 6, y si una respuesta cambia otra sección, esa también se edita.
-4. Se hace commit y push de la rama nueva, sin forzar.
-5. Si esta rama tiene commits que `main` no tiene, se abre el PR de publicación o se confirma que ya existe. Si `main` tiene commits que esta rama no tiene, primero se hace merge de `main` en esta rama. Vercel despliega desde `main`, así que publicar depende de que `z1diego` integre ese PR.
+1. Se integra el PR de la fase aprobada y se actualiza esta rama con `git pull --ff-only`.
+2. Se pasan las respuestas a `PLAN.md`. Las decisiones de implementación van a la sección 6, y si una respuesta cambia otra sección, esa también se edita.
+3. Se hace commit en esta rama y se hace push, sin forzar. Si `main` tiene commits que esta rama no tiene, primero se hace merge de `main` en esta rama.
+4. Se abre el PR de publicación y se integra. Vercel despliega desde `main`, así que este paso publica el prototipo.
+5. Se actualiza esta rama con `git pull --ff-only origin main`, se hace push y se crea la rama de la fase nueva.
 
-**Listo cuando** `git status` no muestra cambios y la rama nueva contiene el último commit de la fase aprobada.
+**Listo cuando** `git status` no muestra cambios y esta rama y `origin/main` apuntan al mismo commit.
 
 ## 2. Construir en paralelo
 
@@ -53,7 +51,7 @@ Aplica cuando un workflow construye en paralelo. Cada agente:
 - recibe las secciones de `PLAN.md` que le tocan y `DESIGN.md`;
 - hace commit en su rama.
 
-Después un agente integra las ramas de los agentes en la rama de la fase hasta que pasen format, lint, test y build. Ese resultado sale con el PR de la fase.
+Después un agente integra las ramas de los agentes en la rama de la fase hasta que pasen format, lint, test y build. Ese resultado llega a esta rama con el PR de la fase.
 
 **Listo cuando** todas las ramas están integradas y `npm run format:check`, `npm run lint`, `npm test` y `npm run build` pasan en la rama de la fase.
 
@@ -126,10 +124,10 @@ Trae cuatro cosas, en este orden:
 1. Se marca en la sección 4 de `PLAN.md` lo que quedó hecho.
 2. Se agrega a `docs/registro-ia.md` una fila con el prompt en español formal y con ortografía correcta, con todo su contenido y cada pedido. Va en una sola línea, con `<br>` entre párrafos y con `|` y `<` escapados con `\`.
 3. Se hace commit en la rama de la fase y se hace push.
-4. Se abre el PR de la fase, listo para revisión y con `z1diego` como revisor, o se actualiza si ya existe. Queda abierto para su revisión.
+4. Se abre el PR de la fase, o se actualiza si ya existe. No se integra.
 5. Se abre la página con `open docs/desarrollo/checkpoints/cp<n>/index.html`.
 6. Se resume el resultado en cinco líneas, con el enlace al PR.
 
 Ahí se termina y se espera la respuesta de Matías.
 
-Una sesión de correcciones sobre un CP trabaja en la misma rama de la fase, actualiza esa misma página y cierra con estos mismos pasos. Sus cambios quedan en el mismo PR. Si ya hay fases apiladas encima, se llevan a sus ramas con `git merge`.
+Una sesión de correcciones sobre un CP trabaja en la misma rama de la fase, actualiza esa misma página y cierra con estos mismos pasos. Sus cambios quedan en el mismo PR y llegan a `main` con el `Aprobé el CP<n>` siguiente.
