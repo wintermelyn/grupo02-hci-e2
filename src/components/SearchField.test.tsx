@@ -63,6 +63,25 @@ describe('SearchField', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
+  // Filled at 44 px, a button would cover the edge of a 44 px field, so only what shows gets smaller.
+  it('shows the button inside the edge of the field, with 44 px to touch', () => {
+    const { unmount } = render(<SearchField label="Buscar" value="king" onChange={() => {}} />)
+    const button = () => screen.getByRole('button', { name: 'Borrar búsqueda' })
+    expect(button()).toHaveClass('min-h-8.5', 'mr-1', 'after:absolute')
+    expect(button()).toHaveClass('after:-inset-y-[5px]', 'after:-right-1')
+    unmount()
+    render(<SearchField label="Buscar" value="king" onChange={() => {}} size="lg" />)
+    expect(button()).toHaveClass('min-h-11')
+    expect(button()).not.toHaveClass('after:absolute')
+  })
+
+  it('keeps the focus in the field while a button is pressed, so a long text stays put', () => {
+    render(<SearchField label="Buscar" value="king" onChange={() => {}} onClose={() => {}} />)
+    // fireEvent returns false when the default, here moving the focus, was prevented.
+    expect(fireEvent.mouseDown(screen.getByRole('button', { name: 'Borrar búsqueda' }))).toBe(false)
+    expect(fireEvent.mouseDown(screen.getByRole('button', { name: 'Cerrar búsqueda' }))).toBe(false)
+  })
+
   describe('with a way out', () => {
     const closeButton = () => screen.getByRole('button', { name: 'Cerrar búsqueda' })
 

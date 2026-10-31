@@ -1,5 +1,5 @@
 import { Search, X } from 'lucide-react'
-import { useRef, type KeyboardEvent } from 'react'
+import { useRef, type KeyboardEvent, type MouseEvent } from 'react'
 import { cx } from './cx'
 
 export interface SearchFieldProps {
@@ -20,9 +20,22 @@ export interface SearchFieldProps {
   className?: string
 }
 
-// -my-px: 44 px to touch, reaching over the border, so the field also measures 44 px.
 const TEXT_BUTTON =
-  '-my-px inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full px-3 font-semibold text-ink -outline-offset-2 transition-colors duration-100 hover:bg-sand active:bg-sand-deep'
+  'relative inline-flex shrink-0 items-center gap-1 rounded-full font-semibold text-ink -outline-offset-2 transition-colors duration-100 hover:bg-sand active:bg-sand-deep'
+
+// A filled pill of 44 px would press against the edge of a 44 px field and cover it. It shows at
+// 34 px, with 4 px to the edge on all three sides, and ::after keeps the 44 px to touch. It reaches
+// the edge, not the input, so nothing typed is covered.
+const TEXT_BUTTON_SIZE = {
+  md: 'mr-1 min-h-8.5 px-2.5 after:absolute after:-inset-y-[5px] after:left-0 after:-right-1 after:rounded-full',
+  lg: 'min-h-11 px-3',
+}
+
+// A press keeps the focus in the field, or its edge would drop back and a long text would jump to
+// its start. A click still does what it says, and Tab still reaches the button.
+function keepFocus(event: MouseEvent) {
+  event.preventDefault()
+}
 
 /** Filters as the person types, so it has no submit button. */
 export function SearchField({
@@ -76,8 +89,9 @@ export function SearchField({
         <button
           type="button"
           aria-label="Borrar búsqueda"
+          onMouseDown={keepFocus}
           onClick={clear}
-          className={cx(TEXT_BUTTON, onClose && 'max-md:hidden')}
+          className={cx(TEXT_BUTTON, TEXT_BUTTON_SIZE[size], onClose && 'max-md:hidden')}
         >
           <X aria-hidden size={18} />
           Borrar
@@ -87,8 +101,9 @@ export function SearchField({
         <button
           type="button"
           aria-label="Cerrar búsqueda"
+          onMouseDown={keepFocus}
           onClick={onClose}
-          className={cx(TEXT_BUTTON, 'md:hidden')}
+          className={cx(TEXT_BUTTON, TEXT_BUTTON_SIZE[size], 'md:hidden')}
         >
           <X aria-hidden size={18} />
           Cerrar

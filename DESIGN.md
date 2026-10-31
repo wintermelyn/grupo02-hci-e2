@@ -678,7 +678,7 @@ Una píldora blanca con borde de 1 px `edge` y la lupa a la izquierda. Filtra mi
 - **Tamaño:** `md` mide 44 px y es para filtrar una lista, como en Amigos. `lg` mide 56 px, con texto de 18 px, y es para una pantalla cuyo primer trabajo es buscar, como Buscar.
 - **Dónde va:** bajo el título, con 16 px abajo, si es lo primero de la página, como en Amigos, donde sigue a la vista porque es el camino de T3. Si `TagFilter` ya sigue al título, va en la fila del título, como en una carpeta. Nunca más abajo: el campo debe aparecer junto a lo que se tocó y no empujar la lista.
 - **Etiqueta:** `label` nombra el campo para lectores de pantalla. `placeholder` dice qué se puede buscar, como "Nombre o @usuario", o dónde, como "Buscar en Terror", en `muted`, y un texto que no cabe termina en puntos suspensivos.
-- **Borrar y Cerrar:** píldoras de texto en tinta, peso 600, con hover `sand` y presión `sand-deep`, como `quiet`.
+- **Borrar y Cerrar:** píldoras de texto en tinta, peso 600, sin relleno en reposo, con hover `sand` y presión `sand-deep`, como `quiet`. El relleno y el foco quedan dentro del campo y nunca tocan su borde: en `md` se ven de 34 px, a 4 px del borde por arriba, por abajo y a la derecha, y un pseudoelemento conserva los 44 px para tocar, sin llegar a lo escrito; en `lg` miden 44 px, porque el campo les da aire. Presionarlos no le quita el foco al campo, así que el borde sigue en tinta y un texto largo no salta a su inicio.
 - **`onClose`:** para un campo que el celular abre a pedido. Agrega "Cerrar", que en celular toma el lugar de "Borrar", porque con ambos quedan 56 px para escribir a 320 px. Desde `md` sigue "Borrar". Escape cierra en todos los anchos.
 - **Foco:** con el foco, el borde pasa a tinta y se dobla, alrededor de toda la píldora.
 
@@ -771,7 +771,7 @@ Una sola curva, `--ease-quick` (`cubic-bezier(0.16, 1, 0.3, 1)`). Respuestas al 
 
 ### Foco
 
-Un solo estilo: contorno de 2 px de tinta a 2 px de distancia, definido de forma global. No lo reemplaces ni lo quites. Solo el toast lo cambia a blanco, por su fondo oscuro, las opciones del menú lo dibujan hacia adentro y `SearchField` pasa su borde a tinta y lo dobla, alrededor de toda la píldora.
+Un solo estilo: contorno de 2 px de tinta a 2 px de distancia, definido de forma global. No lo reemplaces ni lo quites. Solo el toast lo cambia a blanco, por su fondo oscuro, las opciones del menú y Borrar y Cerrar lo dibujan hacia adentro, y `SearchField` pasa su borde a tinta y lo dobla, alrededor de toda la píldora.
 
 ## Cómo se aplica a una pantalla
 
