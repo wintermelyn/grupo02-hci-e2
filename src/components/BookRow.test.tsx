@@ -5,8 +5,8 @@ import { state } from '../test/store'
 import type { Book } from '../types'
 import { BookRow } from './BookRow'
 
-// Not in seedBooks or extraBooks, like a live search result.
-const apiBook: Book = { id: 'OL0000001W', title: 'Libro de la API', authors: ['Autora'] }
+// Not in seedBooks or extraBooks, like a result of Buscar.
+const catalogBook: Book = { id: 'OL0000001W', title: 'Libro del catálogo', authors: ['Autora'] }
 
 function libraryBook(bookId: string): Book {
   const book = state().getBook(bookId)
@@ -19,19 +19,19 @@ function renderRow(book: Book) {
 }
 
 describe('BookRow', () => {
-  it('adds the book before opening its page', () => {
-    renderRow(apiBook)
-    fireEvent.click(screen.getByRole('link', { name: /Libro de la API/ }))
-    expect(state().getBook(apiBook.id)).toEqual(apiBook)
-    expect(currentLocation()).toBe(`/libro/${apiBook.id}`)
+  it('opens the page of the book and stores nothing, as it only looked at it', () => {
+    renderRow(catalogBook)
+    fireEvent.click(screen.getByRole('link', { name: /Libro del catálogo/ }))
+    expect(state().extraBooks).toEqual({})
+    expect(currentLocation()).toBe(`/libro/${catalogBook.id}`)
   })
 
   it('lets the list mark what matched, in the title and in the authors', () => {
-    renderWithRouter(<BookRow book={apiBook} highlight={(text) => <mark>{text}</mark>} />, {
+    renderWithRouter(<BookRow book={catalogBook} highlight={(text) => <mark>{text}</mark>} />, {
       route: '/buscar',
     })
     const marked = [...document.querySelectorAll('mark')].map(({ textContent }) => textContent)
-    expect(marked).toEqual(['Libro de la API', 'Autora'])
+    expect(marked).toEqual(['Libro del catálogo', 'Autora'])
   })
 
   it('swaps my tag and stars for a note in a list about someone else', () => {
@@ -43,7 +43,7 @@ describe('BookRow', () => {
   })
 
   it('shows no tag for a book outside the library', () => {
-    renderRow(apiBook)
+    renderRow(catalogBook)
     expect(screen.queryByText(/Lo quiero|Lo tengo|Leyendo|Leído/)).not.toBeInTheDocument()
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
@@ -83,7 +83,7 @@ describe('BookRow', () => {
   })
 
   it('shows the trailing content', () => {
-    renderWithRouter(<BookRow book={apiBook} trailing={<button>Quitar</button>} />, {
+    renderWithRouter(<BookRow book={catalogBook} trailing={<button>Quitar</button>} />, {
       route: '/buscar',
     })
     expect(screen.getByRole('button', { name: 'Quitar' })).toBeInTheDocument()

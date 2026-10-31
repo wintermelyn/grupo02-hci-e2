@@ -12,8 +12,8 @@ import { useChanged } from './useChanged'
 export interface StatusControlProps {
   bookId: BookId
   /**
-   * The book's data, needed when it may not be in the store yet (e.g. a live search result):
-   * it is added with upsertBook before any change, so the library never points to an unknown book.
+   * The book's data, needed when it may not be in the store yet (a book of the catalog): it is
+   * added with upsertBook before any change, so Mis libros has it without downloading the catalog.
    */
   book?: Book
   className?: string

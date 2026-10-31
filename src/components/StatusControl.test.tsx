@@ -7,7 +7,7 @@ import { state, stubAction } from '../test/store'
 import type { Book } from '../types'
 import { StatusControl } from './StatusControl'
 
-// Not in seedBooks or extraBooks, like a live search result.
+// Not in seedBooks or extraBooks, like a book that is only in the catalog.
 const apiBook: Book = { id: 'OL0000001W', title: 'Libro de prueba', authors: ['Autora'] }
 const CARRIE = 'OL81626W' // Leyendo
 const IT = 'OL81613W' // Lo quiero

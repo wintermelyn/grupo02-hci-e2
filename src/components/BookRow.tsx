@@ -9,7 +9,6 @@ import { Stars } from './Stars'
 import { StatusTag } from './StatusTag'
 
 export interface BookRowProps {
-  /** May come from the API: the row adds it with upsertBook before opening it. */
   book: Book
   /** Extra content at the top right, e.g. a "Quitar" button. */
   trailing?: ReactNode
@@ -34,10 +33,8 @@ export function BookRow({
   compact = false,
   highlight = (text) => text,
 }: BookRowProps) {
-  const upsertBook = useStore((state) => state.upsertBook)
   const entry = useStore(selectEntry(book.id))
   const { pathname, search } = useLocation()
-  const open = () => upsertBook(book)
   // The book page goes back to this exact list, with its filter.
   const linkState = { from: pathname + search }
 
@@ -47,7 +44,6 @@ export function BookRow({
       <Link
         to={bookPath(book.id)}
         state={linkState}
-        onClick={open}
         tabIndex={-1}
         aria-hidden
         className={cx('shrink-0', compact ? 'py-2' : 'py-2.5')}
@@ -61,7 +57,6 @@ export function BookRow({
       <Link
         to={bookPath(book.id)}
         state={linkState}
-        onClick={open}
         className={cx('block min-w-0 flex-1 rounded-row', compact ? 'py-2' : 'py-2.5')}
       >
         <span
