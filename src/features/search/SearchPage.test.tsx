@@ -507,6 +507,17 @@ describe('while the catalog downloads', () => {
     expect(screen.queryByText('Buscando…')).not.toBeInTheDocument()
   })
 
+  it('holds the place of the amount, the authors and the books', async () => {
+    const deliver = holdCatalog()
+    renderApp('/buscar?q=apocalipsis')
+    expect(screen.getByText('Buscando…').parentElement).toHaveClass('h-5')
+    const shapes = main().getByText('Buscando…').parentElement?.nextElementSibling
+    expect(shapes).toHaveAttribute('aria-hidden', 'true')
+    expect(shapes?.querySelectorAll('ul')).toHaveLength(2)
+    await act(async () => deliver())
+    expect(screen.getByText('1 libro')).toHaveClass('text-sm')
+  })
+
   it('does not wait for it before typing', () => {
     holdCatalog()
     renderApp('/buscar')

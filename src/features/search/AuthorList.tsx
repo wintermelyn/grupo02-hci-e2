@@ -4,6 +4,9 @@ import { coverTone } from '../../lib/coverTone'
 import { booksLabel } from '../library/filters'
 import type { AuthorGroup } from './results'
 
+/** The cards in the rows that fit in each width. */
+export const AUTHOR_GRID = 'mt-3 grid grid-cols-2 gap-2.5 md:grid-cols-3 xl:grid-cols-4'
+
 const COVERS = 2
 const FEATURED_COVERS = 3
 
@@ -107,7 +110,8 @@ export function AuthorList({
       <h2 className={cx('section-title', lead && 'lg:col-span-5')}>{title}</h2>
       <ul
         className={cx(
-          'mt-3 grid grid-cols-2 gap-2.5 max-md:[&>li:nth-child(n+5)]:hidden md:grid-cols-3 md:max-xl:[&>li:nth-child(n+7)]:hidden xl:grid-cols-4',
+          AUTHOR_GRID,
+          'max-md:[&>li:nth-child(n+5)]:hidden md:max-xl:[&>li:nth-child(n+7)]:hidden',
           lead && 'lg:contents',
         )}
       >

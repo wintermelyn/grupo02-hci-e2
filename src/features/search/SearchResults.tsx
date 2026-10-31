@@ -45,6 +45,8 @@ export function NoResults({ text, authors, onPickAuthor }: NoResultsProps) {
   )
 }
 
+export const BOOK_GRID = 'mt-1.5 grid md:gap-x-8'
+
 interface BookGridProps {
   books: Book[]
   className?: string
@@ -55,7 +57,7 @@ interface BookGridProps {
 /** Not BookList: its title is for screen readers, and here it is on the screen. */
 function BookGrid({ books, className, highlight, onClick }: BookGridProps) {
   return (
-    <ul onClick={onClick} className={cx('mt-1.5 grid md:gap-x-8', className)}>
+    <ul onClick={onClick} className={cx(BOOK_GRID, className)}>
       {books.map((book) => (
         <li key={book.id} className="min-w-0">
           <BookRow book={book} compact highlight={highlight} />
@@ -65,8 +67,10 @@ function BookGrid({ books, className, highlight, onClick }: BookGridProps) {
   )
 }
 
+/** The grid of the results from lg, which the first time they load keeps their place. */
+export const RESULTS_GRID = 'lg:mt-7 lg:grid lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-x-4'
 const ROOMY_GRID = 'md:grid-cols-2 xl:grid-cols-3'
-const GRID_BESIDE_LEAD = 'md:grid-cols-2 lg:grid-cols-1'
+export const GRID_BESIDE_LEAD = 'md:grid-cols-2 lg:grid-cols-1'
 
 export interface SearchResultsProps {
   results: ArrangedResults
@@ -108,7 +112,7 @@ export function SearchResults({
       <p role="status" className="mt-3 text-sm text-muted">
         {summary}
       </p>
-      <div className="lg:mt-7 lg:grid lg:grid-cols-12 lg:grid-rows-[auto_1fr] lg:gap-x-4">
+      <div className={RESULTS_GRID}>
         {authors.length > 0 && (
           <AuthorList
             title="Autores"

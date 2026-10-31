@@ -8,12 +8,13 @@ import {
   type RefObject,
 } from 'react'
 import { useSearchParams } from 'react-router'
-import { ErrorState, LoadingState, SearchField, Wordmark } from '../../components'
+import { ErrorState, SearchField, Wordmark } from '../../components'
 import { useStore } from '../../store'
 import { useBookLookup } from '../library/filters'
 import { useListFilters } from '../library/useListFilters'
 import { addRecentSearch, clearRecentSearches, readRecentSearches } from './recentSearchStore'
 import { arrangeResults } from './results'
+import { SearchSkeleton } from './SearchSkeleton'
 import { SearchStart } from './SearchStart'
 import { NoResults, SearchResults } from './SearchResults'
 import { useBookSearch } from './useBookSearch'
@@ -136,9 +137,7 @@ export function SearchPage() {
           onClearRecent={clearRecent}
         />
       ) : loading ? (
-        <div className="mt-3">
-          <LoadingState label="Buscando…" />
-        </div>
+        <SearchSkeleton />
       ) : failed ? (
         <ErrorState
           title="No pudimos buscar"
