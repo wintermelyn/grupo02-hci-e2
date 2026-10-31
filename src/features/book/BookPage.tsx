@@ -20,6 +20,7 @@ import { ReadingDetails } from './ReadingDetails'
 import { useBookDescription } from './useBookDescription'
 
 const LIBRARY_PATH = '/biblioteca'
+const SEARCH_PATH = '/buscar'
 const FOLDER_PATTERN = `${LIBRARY_PATH}/carpeta/:folderId`
 
 /** The tags that have a reading to show. Lo quiero and Lo tengo keep theirs, out of sight. */
@@ -32,6 +33,7 @@ function backTarget(state: unknown, folders: Folder[]): { to: string; label: str
   const [pathname] = from.split('?')
   if (pathname === LIBRARY_PATH) return { to: from, label: 'Mis libros' }
   if (pathname === UNFILED_PATH) return { to: from, label: UNFILED_NAME }
+  if (pathname === SEARCH_PATH) return { to: from, label: 'Buscar' }
   const folderId = matchPath(FOLDER_PATTERN, pathname)?.params.folderId
   const folder = folders.find(({ id }) => id === folderId)
   return { to: from, label: folder?.name ?? 'Volver' }
@@ -122,7 +124,7 @@ export function BookPage() {
 
         <div className={BOOK_READING}>
           <header className="min-w-0">
-            <h1 className="font-serif text-heading font-semibold tracking-tight wrap-break-word hyphens-auto md:page-title">
+            <h1 className="font-serif text-heading font-semibold tracking-tight wrap-break-word md:page-title">
               {book.title}
             </h1>
             <BookDetails {...book} />

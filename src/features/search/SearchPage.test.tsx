@@ -137,6 +137,13 @@ describe('before typing', () => {
     expect(screen.queryByRole('link', { name: 'Amigos' })).not.toBeInTheDocument()
   })
 
+  it('names Buscar on the way back from a book of the shelf', () => {
+    renderApp('/buscar')
+    fireEvent.click(within(section('Lo que leen tus amigos')).getByRole('link', { name: /Dune/ }))
+    fireEvent.click(main().getByRole('link', { name: 'Buscar' }))
+    expect(currentLocation()).toBe('/buscar')
+  })
+
   it('says which friend read each book', () => {
     renderApp('/buscar')
     const shelf = within(section('Lo que leen tus amigos'))
@@ -196,7 +203,7 @@ describe('changing the search with the page scrolled', () => {
     await renderScrolledTo(900)
     fireEvent.click(screen.getByRole('link', { name: /Apocalipsis/ }))
     expect(page.scrollTop).toBe(0)
-    fireEvent.click(main().getByRole('link', { name: 'Volver' }))
+    fireEvent.click(main().getByRole('link', { name: 'Buscar' }))
     expect(page.scrollTop).toBe(900)
   })
 })
@@ -260,7 +267,7 @@ describe('with results', () => {
     fireEvent.click(await screen.findByRole('link', { name: /Apocalipsis/ }))
     document.documentElement.scrollTop = 0
 
-    fireEvent.click(screen.getByRole('link', { name: 'Volver' }))
+    fireEvent.click(main().getByRole('link', { name: 'Buscar' }))
     expect(screen.getByRole('link', { name: /Apocalipsis/ })).toBeInTheDocument()
     expect(files.mock.calls.filter(([url]) => url.endsWith('index.json'))).toHaveLength(1)
   })
