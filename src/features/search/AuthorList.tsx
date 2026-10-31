@@ -54,8 +54,9 @@ function AuthorTile({ author, featured, onPick }: AuthorTileProps) {
       >
         {author.name}
       </span>
-      <span className={cx('mt-auto block text-sm text-white/88', featured && 'lg:mt-1.5')}>
-        {booksLabel(author.books.length)}
+      {/* Its line stays while the catalog arrives, so the amount shows up without moving anything. */}
+      <span className={cx('mt-auto block min-h-5 text-sm text-white/88', featured && 'lg:mt-1.5')}>
+        {author.count !== undefined && booksLabel(author.count)}
       </span>
       {covers.map((book, index) => (
         <span key={book.id} className={cx('absolute', places[index])}>

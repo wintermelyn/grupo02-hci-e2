@@ -47,7 +47,6 @@ describe('before typing', () => {
   it('shows the authors of the library and what friends read, and no recent searches', () => {
     renderApp('/buscar')
     expect(within(section('Autores de Mis libros')).getByText('Stephen King')).toBeInTheDocument()
-    expect(within(section('Autores de Mis libros')).getByText('4 libros')).toBeInTheDocument()
     expect(within(section('Lo que leen tus amigos')).getByText('Dune')).toBeInTheDocument()
     expect(screen.queryByText('Búsquedas recientes')).not.toBeInTheDocument()
   })
@@ -75,6 +74,33 @@ describe('before typing', () => {
     expect(
       within(section('Lo que leen tus amigos')).queryByText('Las venas abiertas de América Latina'),
     ).not.toBeInTheDocument()
+  })
+
+  it('counts the books of each author in the catalog, the number that tapping them shows', async () => {
+    catalog()
+    renderApp('/buscar')
+    const authors = within(section('Autores de Mis libros'))
+    const king = await authors.findByRole('button', { name: /Stephen King.*5 libros/ })
+    fireEvent.click(king)
+    expect(screen.getByText('5 libros · 4 en Mis libros')).toBeInTheDocument()
+  })
+
+  it('says no amount until the catalog arrives, and keeps its line', async () => {
+    catalog()
+    renderApp('/buscar')
+    const authors = within(section('Autores de Mis libros'))
+    const king = authors.getByRole('button', { name: 'Stephen King' })
+    expect(king.querySelector('.min-h-5')).toBeEmptyDOMElement()
+    expect(await authors.findByText('5 libros')).toBeInTheDocument()
+  })
+
+  it('says no amount if the catalog fails', async () => {
+    stubCatalog({ failing: [/index/] })
+    renderApp('/buscar')
+    await act(async () => undefined)
+    const authors = within(section('Autores de Mis libros'))
+    expect(authors.getByRole('button', { name: 'Stephen King' })).toBeInTheDocument()
+    expect(authors.queryByText(/\d+ libros?$/)).not.toBeInTheDocument()
   })
 
   it('keeps the place of friends when there are none', () => {
