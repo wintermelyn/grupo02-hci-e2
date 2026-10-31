@@ -47,16 +47,16 @@ export function matchesQuery({ title, authors }: Book, query: string): boolean {
 
 export const MAX_FOLDER_NAME_LENGTH = 40
 
-/** Why a folder cannot take this name, in the person's words. */
+/** Why a folder, or a new one without `folderId`, cannot take this name, in the person's words. */
 export function folderNameProblem(
-  folder: Folder,
   name: string,
   folders: Folder[],
+  folderId?: string,
 ): string | undefined {
   const wanted = normalizeText(name)
   if (!wanted) return 'Escribe un nombre para la carpeta.'
   const repeated = folders.some(
-    ({ id, name: other }) => id !== folder.id && normalizeText(other) === wanted,
+    ({ id, name: other }) => id !== folderId && normalizeText(other) === wanted,
   )
   return repeated ? 'Ya tienes una carpeta con ese nombre.' : undefined
 }

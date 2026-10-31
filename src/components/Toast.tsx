@@ -1,5 +1,5 @@
 import { Undo2 } from 'lucide-react'
-import { useRef, type FocusEvent, type PointerEvent } from 'react'
+import { useEffect, useRef, type FocusEvent, type KeyboardEvent, type PointerEvent } from 'react'
 import { useStore } from '../store'
 import type { Toast as ToastData } from '../types'
 
@@ -36,6 +36,11 @@ function ToastCard({ toast }: { toast: ToastData }) {
   const resumeToast = useStore((state) => state.resumeToast)
   const holds = useRef(new Set<Hold>())
   const focusedBefore = useRef<HTMLElement | null>(null)
+  const undoRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (toast.takesFocus) undoRef.current?.focus()
+  }, [toast.takesFocus])
 
   function setHold(hold: Hold, active: boolean) {
     if (active) holds.current.add(hold)
@@ -62,6 +67,16 @@ function ToastCard({ toast }: { toast: ToastData }) {
     focusedBefore.current?.focus()
   }
 
+  function onUndoKeyDown(event: KeyboardEvent) {
+    // A held Enter repeats here, and would undo what that same key has just done.
+    if (event.repeat) event.preventDefault()
+    // Nothing follows the toast on the page, so Tab would lose the place the focus came from.
+    if (event.key === 'Tab' && toast.takesFocus && focusedBefore.current) {
+      event.preventDefault()
+      focusedBefore.current.focus()
+    }
+  }
+
   function onBlur(event: FocusEvent<HTMLDivElement>) {
     if (!event.currentTarget.contains(event.relatedTarget)) setHold('focus', false)
   }
@@ -74,11 +89,14 @@ function ToastCard({ toast }: { toast: ToastData }) {
       onBlur={onBlur}
       className="pointer-events-auto flex w-full max-w-md items-center justify-between gap-3 rounded-float bg-ink py-1 pr-1 pl-4 text-white shadow-float transition duration-200 ease-quick starting:translate-y-2 starting:opacity-0"
     >
-      <p>{toast.message}</p>
+      {/* A long folder name without spaces must not push Deshacer out of the screen. */}
+      <p className="min-w-0 wrap-anywhere">{toast.message}</p>
       {toast.undoable && (
         <button
+          ref={undoRef}
           type="button"
           onClick={undoAndRestoreFocus}
+          onKeyDown={onUndoKeyDown}
           className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-control px-3 font-semibold text-shell hover:bg-white/10 focus-visible:outline-white active:bg-white/20"
         >
           <Undo2 aria-hidden size={18} />

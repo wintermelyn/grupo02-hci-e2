@@ -194,6 +194,14 @@ components:
     typography: '{typography.book-title}'
     rounded: '{rounded.card}'
     padding: '12px'
+  new-folder-card:
+    backgroundColor: '{colors.sand}'
+    textColor: '{colors.ink}'
+    typography: '{typography.book-title}'
+    rounded: '{rounded.card}'
+    padding: '12px'
+  new-folder-card-hover:
+    backgroundColor: '{colors.sand-deep}'
   folder-link:
     textColor: '{colors.ink}'
     height: '44px'
@@ -329,11 +337,11 @@ Los cuatro colores de estado se usan en el texto y el ícono de `StatusTag`, y e
 - **Papel** (`paper`, #faf8f6): el fondo de la app. También rellena el botón activo de `TagFilter`, que así se abre hacia la página.
 - **Concha** (`shell`, #f4f1ea): la banda superior de cada sección, el hover de las opciones del menú y de las filas de enlace, y la presión de las filas de libro y de persona. También es el `theme-color` del navegador.
 - **Blanco** (`white`, #ffffff): tarjetas, campo de búsqueda, menú e `InlineConfirm`.
-- **Arena** (`sand`, #ebe2d7): hover de las secciones de la barra superior y de los botones de texto del buscador, presión de `quiet`, presión de las filas de enlace, botón deshabilitado, huecos de portada, esqueletos de carga y selección de texto.
-- **Arena profunda** (`sand-deep`, #dfd3c4): el relleno de `Button` `secondary` y de la sección activa de la barra superior, la presión de las opciones del menú. Solo da 1,47, 1,39 y 1,31:1 sobre blanco, papel y concha, así que `secondary` lleva además un borde `edge`.
+- **Arena** (`sand`, #ebe2d7): hover de las secciones de la barra superior y de los botones de texto del buscador, presión de `quiet`, presión de las filas de enlace, botón deshabilitado, huecos de portada, esqueletos de carga, selección de texto y el bloque de "+ Nueva carpeta".
+- **Arena profunda** (`sand-deep`, #dfd3c4): el relleno de `Button` `secondary` y de la sección activa de la barra superior, la presión de las opciones del menú y "+ Nueva carpeta" bajo el cursor. Solo da 1,47, 1,39 y 1,31:1 sobre blanco, papel y concha, así que `secondary` lleva además un borde `edge`.
 - **Arena oscura** (`sand-dark`, #d3c4b1): un paso más que arena profunda, para `secondary` bajo el cursor y al presionar
 - **Línea** (`line`, #e9e2d8): separadores de 1 px entre filas, borde de `FolderCard` y la raya del menú antes de sus comandos. Es decorativa (1,21:1 sobre papel), así que nunca es la única señal de un control o un estado.
-- **Borde** (`edge`, #857a6e): el borde de 1 px de `SearchField`, `InlineConfirm` y `Button` `secondary`, la raya de las dos barras y el hover de `FolderCard`. Llega a 3:1 para que un campo se vea sin depender de una sombra.
+- **Borde** (`edge`, #857a6e): el borde de 1 px de `SearchField`, `InlineConfirm`, `Button` `secondary` y "+ Nueva carpeta", la raya de las dos barras y el hover de `FolderCard`. Llega a 3:1 para que un campo se vea sin depender de una sombra.
 - **Neutro** (`muted`, #5f564d): texto secundario, secciones inactivas, íconos y estrellas vacías.
 
 ### Contrastes medidos
@@ -416,7 +424,7 @@ El diseño parte del celular. El contenido vive en una columna centrada de hasta
 - **Banda:** `PageHeader` llena todo el ancho de la pantalla con `shell`, gracias a `full-bleed`, y deja el texto alineado con la columna. Tiene 8 px arriba, 16 px desde `md`, y 16 px abajo si no lleva nada en su borde inferior. El margen inferior de lo que lleva adentro queda en la banda, gracias a `flow-root`. La acción de la página, si la hay, va en la misma fila del título. Cada sección parte con esta banda, salvo la ficha.
 - **Espacio bajo el contenido:** `main` deja 144 px abajo en celular, para la barra y el toast, y 48 px desde `md`.
 - **Ritmo vertical:** 20 px entre bloques, 12 px bajo un título de sección y 4 px entre un título de bloque de la ficha y su contenido.
-- **Tablero de tarjetas:** 2 columnas con 10 px de separación en celular, 4 columnas con 16 px desde `md` y 5 desde `lg`.
+- **Tablero de tarjetas:** 2 columnas con 10 px de separación en celular, 4 columnas con 16 px desde `md` y 5 desde `lg`. Las tarjetas de una fila miden lo mismo, y un nombre llega a dos líneas. "+ Nueva carpeta" cierra el tablero: en celular ocupa lo que la última fila deja libre, y mientras se escribe toma dos celdas.
 - **Listas de libros:** una columna de `BookRow` en celular y dos desde `md`, con 32 px entre columnas. Cada fila va en un `li` con `border-b border-line last:border-b-0`, como en `BookList`. Esa lista es `BookList`. Desde `md`, las dos últimas filas pierden su línea si quedan una al lado de la otra, con `md:nth-last-2:odd:border-b-0`.
 - **Ficha:** sin banda, sobre el papel, con `BackLink` y `Wordmark` en la primera fila. Tiene la misma forma para todo libro, con o sin descripción.
   - **Celular:** portada de 112 px a la izquierda, con el título y los datos a su lado. Debajo, a todo el ancho, el registro y "Sobre este libro".
@@ -478,7 +486,7 @@ Importa todo desde `src/components/`. Son del bloque base: si necesitas cambiar 
 | Editar un dato                                     | En su lugar, en la misma fila o título donde se lee                                                  |
 | Escribir un texto corto donde se lee               | `TextField`, con Guardar y Cancelar al lado                                                          |
 | Confirmar lo que no se puede deshacer              | `InlineConfirm`, solo para eliminar carpeta y Reiniciar demo                                         |
-| Buscar o filtrar mientras se escribe               | `SearchField`, en la banda                                                                           |
+| Buscar o filtrar mientras se escribe               | `SearchField`, en la banda; en una lista de libros, `BandSearch`                                     |
 | Mostrar a una persona                              | `Avatar`, siempre junto a su nombre                                                                  |
 | Confirmar después de un cambio y permitir deshacer | El toast del store, que `AppShell` ya muestra; no montes otro                                        |
 | Lista vacía o sin resultados                       | `EmptyState`, con ícono, título, descripción y acción opcional                                       |
@@ -499,13 +507,15 @@ Esto dice qué piezas existen para cada pantalla. Su contenido y sus textos sale
 
 `InlineConfirm` confirma eliminar carpeta, y confirmará Reiniciar demo cuando exista Mi perfil.
 
-Tampoco existe todavía el aviso de D5. **Lo que no está en `src/components/` no tiene aspecto definido.** Arma lo que falte solo con estos tokens, respeta las 14 reglas y anótalo como decisión para el CP. Una pieza que dos pantallas necesiten se propone como compartida, para que los dos roles no construyan versiones distintas. Los campos de texto ya heredan el foco global, el acento de tinta (`accent-color`) y el cursor burdeo. `FolderCard` es de `src/features/library/`: sirve de modelo para una tarjeta, pero no es un componente compartido.
+**Lo que no está en `src/components/` no tiene aspecto definido.** Arma lo que falte solo con estos tokens, respeta las 14 reglas y anótalo como decisión para el CP. Una pieza que dos pantallas necesiten se propone como compartida, para que los dos roles no construyan versiones distintas. Los campos de texto ya heredan el foco global, el acento de tinta (`accent-color`) y el cursor burdeo. `FolderCard` es de `src/features/library/`: sirve de modelo para una tarjeta, pero no es un componente compartido.
 
 ### Piezas locales
 
 Viven en la carpeta de su pantalla. Sirven de modelo, y se vuelven compartidas si otra pantalla las necesita.
 
 - **Lista de libros:** `BookList`, en `src/features/library/`, la usan Mis libros y la carpeta.
+- **Aviso de D5:** `WantPrompt`, en `src/features/library/`. Una fila sobre la lista, sin tarjeta, en "Todos" y "Lo quiero", y oculta mientras se busca. Lleva portada de 56 px, la pregunta en Book title y "It · 210 días en tu lista" en Small `muted`, hasta dos líneas. Separa de lo que sigue con una línea, a 16 px de la banda. "Sí" y "No" son el mismo `Button` `secondary` `compact`, en una grilla de hasta 208 px: desde `md` van en el borde derecho y en celular bajo el texto. Responder mueve la lista hacia arriba, así que el segundo toque de un doble toque se ignora y el foco sigue en el contenido.
+- **"+ Nueva carpeta":** `NewFolderCard`, la última tarjeta del tablero. En reposo es un bloque `sand` con borde `edge`, porque se presiona: "+ Nueva carpeta" en Book title y "Un libro puede estar en varias" en Small `muted`, abajo y a la izquierda. Bajo el cursor toma `sand-deep`. Cuánto pesa en reposo es una decisión abierta del CP4, en `docs/desarrollo/checkpoints/cp4/decisiones.md`. Desde `md` mide lo mismo que una `FolderCard`, también sola en su fila. En celular ocupa la media fila que deja libre una cantidad impar de tarjetas, o la fila entera si la empieza. Al presionarla se vuelve blanca con borde `edge`, porque ahora se escribe: "Nueva carpeta" en Small label, `TextField`, y Crear (`primary`) y Cancelar (`secondary`), los dos `compact` y del mismo tamaño. Mientras se escribe toma dos celdas en todo dispositivo, con la altura de una `FolderCard` desde `md`: en celular, media fila solo dejaría leer unas doce letras de un nombre de hasta 40, y en una celda de tablet Crear y Cancelar no caben en una fila. Si cae en la última columna, baja a la fila siguiente sin cambiar de lado, alineada a la derecha, para abrir bajo el dedo. En celular toma la fila entera. La línea del motivo queda reservada, así que aparecer no mueve nada. No lleva huecos de portada: esos dicen que una carpeta real no tiene libros. Crear queda deshabilitado sin nombre. El motivo aparece cuando la persona escribe algo que no sirve, o presiona Enter con el campo vacío. Sigue los límites de renombrar. Al crear, la carpeta aparece antes de esta tarjeta y el foco vuelve a ella.
 - **Fila de persona:** `PersonRow`, en `src/features/friends/`. `Avatar` `sm`, nombre en Book title, @usuario en Small label de tinta y amigos en común en Small. El @usuario va en tinta porque es lo que separa a dos homónimos. Esas dos líneas no se juntan nunca, para que la fila mida lo mismo en todos los estados. La acción va a la derecha, en un espacio fijo de 104 px, y desde `lg` toma su propio ancho, para que el nombre no se mueva cuando la acción pasa a ser el estado de la solicitud.
 - **Invitar contactos:** un `Button` `quiet` `compact`, a la derecha del título de Amigos, para que no salte con cada búsqueda. El texto queda sobre el margen, así que su relleno sobresale 10 px con el cursor.
 - **Estado de una persona:** "Solicitud enviada" y "Amigos" en Small label `muted`, sin color de estado ni cinta. Esos colores son solo de los libros. "Amigos" lleva ícono de 16 px, y "Solicitud enviada" solo en Persona, donde hay espacio. En la lista "Tus amigos" el estado se omite, porque el título ya lo dice.
@@ -515,7 +525,7 @@ Viven en la carpeta de su pantalla. Sirven de modelo, y se vuelven compartidas s
 - **Fecha en una fila:** sin borde ni fondo, con su ícono `CalendarDays` en `muted` y hover de tinta al 5 %. Abre el calendario al tocar cualquier parte, así que las partes de la fecha se editan con el teclado. Chrome ignora `:focus` sobre ellas, por lo que un filtro convierte su azul en un tono cercano a `sand` y deja marcada la parte que se edita. La fecha del calendario se guarda de inmediato, y la escrita al presionar Enter o al salir del campo.
 - **Carpetas de un libro:** enlaces de texto en la fila Carpetas, en peso 500, con subrayado `muted` al 50 % que pasa a tinta con el cursor, y 44 × 44 px como mínimo. Son un lugar, no un estado: no llevan cinta ni color de tag. Al final de la fila, un `Button` `quiet` `compact` abre el menú y se llama según lo que se puede hacer: "Agregar", con un más, si no hay ninguna, y "Agregar o quitar", sin ícono, si hay, porque el más diría solo la mitad. Su nombre accesible dice "Agregar a carpeta". Sin carpetas, a su izquierda dice "Sin carpetas" en `muted`. El botón no se mueve de la primera línea: lo que no cabe son los enlaces, que bajan.
 - **Nombre de una carpeta:** `TextField` toma el lugar del título con el mismo tipo, con Guardar y Cancelar en la banda.
-- **Búsqueda en una carpeta:** `SearchField` va en la fila del título, porque `TagFilter` ocupa el borde inferior de la banda. Desde `md` está siempre a la vista, con 288 px de ancho, junto a Opciones. En celular no cabe junto al título, así que el botón `compact` "Buscar", sin ícono para que el título quepa a 320 px, lo abre sobre esa misma fila, con el foco en el campo: aparece bajo el dedo y ningún libro se mueve. El título sigue en la página para los lectores de pantalla, y el `placeholder` dice en qué carpeta se busca. "Cerrar" vacía la búsqueda, cierra el campo y devuelve el foco a "Buscar". Una búsqueda que vuelve desde la URL abre el campo sola, sin tomar el foco.
+- **Búsqueda en una lista de libros:** `BandSearch`, en `src/features/library/`, la usan Mis libros y la carpeta. `SearchField` va en la fila del título, porque `TagFilter` ocupa el borde inferior de la banda. Respeta el botón de tag activo, y cambiarlo no borra lo escrito. En Mis libros reemplaza el tablero y el aviso por los resultados. Con otro tag activo, "Sin resultados" ofrece "Ver todos los libros"; en "Todos", dice que Buscar sirve para lo que está fuera de la biblioteca. Desde `md` está siempre a la vista, con 288 px de ancho, junto a Opciones. En celular no cabe junto al título, así que el botón `compact` "Buscar", sin ícono para que el título quepa a 320 px, lo abre sobre esa misma fila, con el foco en el campo: aparece bajo el dedo y ningún libro se mueve. El título sigue en la página para los lectores de pantalla, y el `placeholder` dice en qué carpeta se busca. "Cerrar" vacía la búsqueda, cierra el campo y devuelve el foco a "Buscar". Una búsqueda que vuelve desde la URL abre el campo sola, sin tomar el foco.
 - **Carpeta fija:** solo dice "Carpeta fija" de subtítulo.
 - **Título de una carpeta:** en celular llega a dos líneas, porque comparte la fila con dos botones y un nombre de 40 caracteres dejaría el primer libro a media pantalla. Desde `md` se muestra entero.
 - **Sobre este libro:** el bloque va siempre en el mismo lugar, con su título en Book title. La descripción va en Body, entera, sin cortar ni "Leer más". Sin descripción dice "Aún no tenemos descripción de este libro." en Body `muted`, sin ícono ni `EmptyState`, porque es el caso normal y no un problema.
@@ -548,7 +558,7 @@ La firma del sistema. `Ribbon` es decorativo y lleva `aria-hidden`: lo que marca
 
 - **Dónde abre el menú:** debajo del control siempre que pueda, porque arriba taparía el libro. Si no cabe, la página hace scroll primero. Solo abre hacia arriba cuando la página ya no puede moverse. Si tampoco cabe arriba, queda abajo, sobre la barra inferior (capa 45, entre las barras y el toast), y limita su alto al espacio que queda.
 - **Agregar o quitar carpetas de un libro:** es un cambio rápido y reversible, así que va en un menú anclado con todas las carpetas. Tocar una la agrega o la quita, y las dos cosas cuestan lo mismo, como pide la regla 11.
-- **Nombrar una carpeta:** el nombre se escribe en el título, con `TextField`.
+- **Nombrar una carpeta:** el nombre se escribe en el título, o en la última tarjeta del tablero si es nueva, con `TextField`.
 - **Fechas y puntaje:** se corrigen en su fila de la ficha, y cada cambio ofrece Deshacer.
 
 ### AnchoredMenu
@@ -575,7 +585,7 @@ Un campo blanco con borde de 1 px `edge`, 44 px de alto y radio de control, con 
 
 ### TextField
 
-Un texto corto que se escribe donde se lee, como el nombre de una carpeta. Hereda el tipo de lo que reemplaza y va sobre una línea de 1 px de tinta, que se aparta mientras el contorno de foco dibuja el campo. Parte con el foco y su texto seleccionado. Enter guarda y Escape cancela. Si el valor no se puede guardar, `problem` lo dice debajo, en Small con `CircleAlert`. Quien lo muestra pone Guardar y Cancelar a su lado.
+Un texto corto que se escribe donde se lee, como el nombre de una carpeta. Hereda el tipo de lo que reemplaza y va sobre una línea de 1 px de tinta, que se aparta mientras el contorno de foco dibuja el campo. Parte con el foco y su texto seleccionado. Enter guarda y Escape cancela, y Enter no llega a ser un clic en el botón que recibe el foco después de guardar. Si el valor no se puede guardar, `problem` lo dice debajo, en Small con `CircleAlert`. Quien lo muestra pone Guardar y Cancelar a su lado.
 
 ### Avatar
 
@@ -621,9 +631,9 @@ Estrellas de 14 px para mostrar un puntaje y de 26 px, en áreas de 44 px, cuand
 ### Cards / Containers
 
 - **Corner Style:** tarjeta (8 px).
-- **Background:** blanco.
+- **Background:** blanco. "+ Nueva carpeta" es la excepción en reposo: es un bloque que se presiona.
 - **Shadow Strategy:** ninguna. Nunca una tarjeta dentro de otra.
-- **Border:** 1 px `line` en `FolderCard`, que pasa a `edge` con el cursor, y 1 px `edge` en `InlineConfirm`.
+- **Border:** 1 px `line` en `FolderCard`, que pasa a `edge` con el cursor, y 1 px `edge` en `InlineConfirm` y "+ Nueva carpeta".
 - **Internal Padding:** 12 px.
 
 `FolderCard` es la tarjeta de referencia: dos portadas con 6 px de separación, nombre serif a 10 px y cantidad en Small. Si falta una portada, su hueco se rellena con `sand`.
@@ -646,11 +656,11 @@ Las portadas no se tiñen ni se recortan en la ficha. `lg` mide 112 px en celula
 
 ### Toast
 
-Una capa de tinta de hasta 448 px, centrada, con radio `float` y `shadow-float`. Queda sobre la barra inferior en celular y a 24 px del borde desde `md`. Entra en 200 ms. Deshacer va con ícono y texto en `shell`. Dura 5 s y se detiene mientras el cursor o el foco están encima.
+Una capa de tinta de hasta 448 px, centrada, con radio `float` y `shadow-float`. Queda sobre la barra inferior en celular y a 24 px del borde desde `md`. Entra en 200 ms. Deshacer va con ícono y texto en `shell`. Dura 5 s y se detiene mientras el cursor o el foco están encima. Si la acción se hizo con teclado y su control desapareció, como en el aviso de D5, el foco llega a Deshacer y Tab lo devuelve a donde estaba. El mensaje corta una palabra larga, para que Deshacer siga a la vista.
 
 ### Estados de pantalla
 
-`EmptyState` y `ErrorState` centran un ícono de 32 px con trazo 1,5, un título Subheading y una descripción `muted`. El ícono de error va en `danger`. `LoadingState` dibuja tres filas de esqueleto en `sand` con la forma de `BookRow`, para que la página no salte, y pulsa solo si la persona no pidió reducir movimiento.
+`EmptyState` y `ErrorState` centran un ícono de 32 px con trazo 1,5, un título Subheading y una descripción `muted`, que corta una palabra larga para no salirse del margen. El ícono de error va en `danger`. `LoadingState` dibuja tres filas de esqueleto en `sand` con la forma de `BookRow`, para que la página no salte, y pulsa solo si la persona no pidió reducir movimiento.
 
 ### Movimiento
 

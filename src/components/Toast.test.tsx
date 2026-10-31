@@ -18,6 +18,12 @@ describe('Toast', () => {
     expect(screen.getByRole('status')).toBeEmptyDOMElement()
   })
 
+  it('keeps Deshacer on screen with a long name without spaces', () => {
+    render(<Toast />)
+    act(() => state().commit('M'.repeat(60), () => ({})))
+    expect(screen.getByText('M'.repeat(60))).toHaveClass('min-w-0', 'wrap-anywhere')
+  })
+
   it('undoes the last library change', () => {
     const before = state().library
     render(<Toast />)
@@ -41,6 +47,67 @@ describe('Toast', () => {
     act(() => undoButton.focus())
     fireEvent.click(undoButton)
     expect(trigger).toHaveFocus()
+  })
+
+  describe('when an action asks it to take the focus', () => {
+    function renderFocusedToast() {
+      render(
+        <>
+          <button>Contenido</button>
+          <Toast />
+        </>,
+      )
+      const content = screen.getByRole('button', { name: 'Contenido' })
+      content.focus()
+      act(() => {
+        state().commit('Libros quitados', () => ({ library: {} }))
+        state().focusToast()
+      })
+      return { content, undoButton: screen.getByRole('button', { name: 'Deshacer' }) }
+    }
+
+    it('takes the focus to Deshacer, which stops the timer', () => {
+      const { undoButton } = renderFocusedToast()
+      expect(undoButton).toHaveFocus()
+      act(() => vi.advanceTimersByTime(TOAST_DURATION_MS * 2))
+      expect(undoButton).toBeInTheDocument()
+    })
+
+    it('goes back to the content with Deshacer', () => {
+      const { content, undoButton } = renderFocusedToast()
+      fireEvent.click(undoButton)
+      expect(content).toHaveFocus()
+    })
+
+    it('goes back to the content with Tab, and then leaves on its own', () => {
+      const { content, undoButton } = renderFocusedToast()
+      fireEvent.keyDown(undoButton, { key: 'Tab' })
+      expect(content).toHaveFocus()
+      act(() => vi.advanceTimersByTime(TOAST_DURATION_MS))
+      expect(screen.getByRole('status')).toBeEmptyDOMElement()
+    })
+
+    it('does not take a held Enter as a click', () => {
+      const { undoButton } = renderFocusedToast()
+      // fireEvent answers false when the default action of the key was prevented.
+      expect(fireEvent.keyDown(undoButton, { key: 'Enter', repeat: true })).toBe(false)
+      expect(fireEvent.keyDown(undoButton, { key: 'Enter' })).toBe(true)
+    })
+  })
+
+  it('does nothing when asked to take the focus without a toast', () => {
+    render(<Toast />)
+    act(() => state().focusToast())
+    expect(state().toast).toBeNull()
+  })
+
+  it('leaves Tab alone when the keyboard came on its own', () => {
+    render(<Toast />)
+    act(() => state().commit('Libros quitados', () => ({ library: {} })))
+    const undoButton = screen.getByRole('button', { name: 'Deshacer' })
+    expect(undoButton).not.toHaveFocus()
+    act(() => undoButton.focus())
+    expect(fireEvent.keyDown(undoButton, { key: 'Tab' })).toBe(true)
   })
 
   it('waits while the toast is hovered, then gives the full time again', () => {

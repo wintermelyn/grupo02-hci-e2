@@ -247,3 +247,40 @@ describe('setStartDate', () => {
     expect(state().library[IT].startedAt).toBeUndefined()
   })
 })
+
+describe('answerWantPrompt', () => {
+  const IT = 'OL81613W' // Lo quiero hace 210 días, en Terror
+
+  it('keeps the book with Sí and remembers that it asked', () => {
+    state().answerWantPrompt(IT, true)
+    expect(state().library[IT].wantCheckedAt).toBe(today())
+    expect(state().library[IT].status).toBe('want')
+    expect(state().lastWantPromptOn).toBe(today())
+    expect(state().toast?.message).toBe('Sigue en tu lista')
+  })
+
+  it('takes the book out of the library and its folders with No', () => {
+    state().answerWantPrompt(IT, false)
+    expect(state().library).not.toHaveProperty(IT)
+    expect(state().lastWantPromptOn).toBe(today())
+    expect(state().toast).toMatchObject({ message: 'Quitado de tu lista', undoable: true })
+  })
+
+  it('brings the book back with Deshacer, and the prompt stays answered', () => {
+    const before = state().library[IT]
+    state().answerWantPrompt(IT, false)
+    state().undo()
+    expect(state().library[IT]).toEqual(before)
+    expect(state().lastWantPromptOn).toBe(today())
+  })
+
+  it.each([
+    ['out of the library', 'OL698173W'],
+    ['with another tag', CARRIE],
+  ])('ignores a book %s', (_name, bookId) => {
+    const commit = stubAction('commit')
+    state().answerWantPrompt(bookId, false)
+    expect(commit).not.toHaveBeenCalled()
+    expect(state().lastWantPromptOn).toBeUndefined()
+  })
+})

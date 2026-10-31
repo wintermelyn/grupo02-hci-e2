@@ -16,6 +16,11 @@ export interface CoreActions {
   showToast: (message: string, options?: { undoable?: boolean }) => void
   /** Hides the toast and drops the undo copy. */
   dismissToast: () => void
+  /**
+   * Takes the focus to Deshacer, for an action run from the keyboard whose control leaves with it.
+   * Deshacer is the last stop of the page, too far to reach in 5 s from the middle of a list.
+   */
+  focusToast: () => void
   /** Stops the auto-dismiss timer while the toast is hovered or focused. */
   pauseToast: () => void
   /** Restarts the auto-dismiss timer with the full TOAST_DURATION_MS. */
@@ -95,6 +100,10 @@ export const createCoreSlice: SliceCreator<CoreActions> = (set, get) => ({
   dismissToast: () => {
     clearTimeout(toastTimer)
     set({ toast: null, undoSnapshot: null })
+  },
+
+  focusToast: () => {
+    set(({ toast }) => ({ toast: toast && { ...toast, takesFocus: true } }))
   },
 
   pauseToast: () => {

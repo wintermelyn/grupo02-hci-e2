@@ -133,7 +133,7 @@ N3 no se atiende en esta entrega. Si el equipo cambia alguna decisión, se actua
 ### Aviso periódico (D5)
 - **A qué libro pregunta:** al libro en `want` con la fecha `wantCheckedAt ?? addedAt` más antigua, si tiene más de 90 días (`WANT_PROMPT_AFTER_DAYS`). Con el seed, el primero es *It*.
 - **Cuándo aparece:** como tarjeta arriba de Mis libros, sin bloquear la pantalla, si hay un libro que cumpla y `lastWantPromptOn` no es hoy. Sigue ahí hasta que la persona responde, así que una tarea no lo pierde por entrar y salir de la sección.
-- **"Sí":** deja `wantCheckedAt = today()` y muestra el toast "Sigue en tu lista".
+- **"Sí":** deja `wantCheckedAt = today()` y muestra el toast "Sigue en tu lista", con Deshacer como todo cambio en la biblioteca.
 - **"No":** saca el libro de la biblioteca y de sus carpetas, y muestra el toast "Quitado de tu lista" con Deshacer.
 - **Después de responder:** `lastWantPromptOn = today()`, así que no aparece otro aviso ese día. Deshacer no cambia ese dato, porque `commit` solo guarda `library` y `folders`.
 
@@ -164,7 +164,7 @@ interface Folder { id: string; name: string; pinned?: boolean; createdAt: ISODat
 interface User { id: string; name: string; username: string; avatarColor: string; mutualFriends: number; readingIds: BookId[]; readIds: BookId[] }
 interface Friendship { userId: string; status: 'pending' | 'friends'; since: string } // fecha y hora ISO
 interface Activity { id: string; userId: string; bookId: BookId; kind: 'started' | 'finished' | 'want'; date: ISODate; rating?: number }
-interface Toast { id: number; message: string; undoable: boolean }
+interface Toast { id: number; message: string; undoable: boolean; takesFocus?: boolean }
 
 interface AppState {
   me: User;                                   // del seed, no se persiste
@@ -187,7 +187,7 @@ interface AppState {
 | Archivo | Dueño | Contenido |
 |---|---|---|
 | `src/store/index.ts` | Base, **no se toca después** | Une los tres slices, `persist` y `resetDemo` |
-| `src/store/coreSlice.ts` | Base | `commit`, `undo`, `showToast`, `dismissToast`, `upsertBook`, `setStatus`, `getBook` |
+| `src/store/coreSlice.ts` | Base | `commit`, `undo`, `showToast`, `dismissToast`, `focusToast`, `upsertBook`, `setStatus`, `getBook` |
 | `src/store/librarySlice.ts` | A | Acciones de biblioteca (stubs del bloque base) |
 | `src/store/socialSlice.ts` | B | Acciones sociales (stubs del bloque base) |
 | `src/data/seedLibrary.ts` | A, después del bloque base | Biblioteca y carpetas iniciales |
@@ -339,7 +339,7 @@ Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarr
 - **Listo cuando:** la revisión final de Impeccable termina con veredicto `ship` y `DESIGN.md` describe lo que se ve en Mis libros y en la ficha.
 
 ### Rol A · Biblioteca (T1 + T2) · `src/features/library/`, `src/features/book/`, `librarySlice.ts`
-- [ ] **Mis libros**, sobre lo que dejó "Dirección visual":
+- [x] **Mis libros**, sobre lo que dejó "Dirección visual":
   - aviso periódico (D5);
   - buscador sobre la biblioteca;
   - "+ Nueva carpeta".
@@ -352,7 +352,7 @@ Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarr
   - se muestran cuando el tag es "Leído";
   - se editan ahí mismo, con fechas y estrellas opcionales;
   - no permite fin anterior a inicio ni fechas futuras.
-- [ ] **Acciones de `librarySlice`.** Falta `answerWantPrompt`; las demás están hechas.
+- [x] **Acciones de `librarySlice`.**
 - [x] **Campo de formulario compartido** (bloque base, antes de "+ Nueva carpeta"): `TextField`, para renombrar carpeta y "+ Nueva carpeta".
 - **Listo cuando:** T1 y T2 se completan desde "Reiniciar demo", en celular y en computador, y cada cambio muestra el toast con Deshacer.
 
@@ -464,4 +464,5 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | "Leyendo ahora" en Inicio | "Tarjeta" que abre la ficha | Portadas grandes en dos columnas, o tres con tres libros, porque casi nadie lee más de dos o tres a la vez. Bajo cada una, "Llevas 12 días" |
 | Buscar antes de escribir | No aparece | Búsquedas recientes, cuando las hay, autores de tu biblioteca y "Lo que leen tus amigos", para reconocer en vez de recordar |
 | Resultados de Buscar | "Libros y autores" | Dicen cuántos hay y cuántos ya tienes. Van en "Autores" y "Libros", y tocar un autor filtra sus libros. Sin resultados, se ofrecen los autores como salida |
-| Buscador y "+ Nueva carpeta" en Mis libros | "Buscador" sin ubicación | El buscador va en la fila del título, como en una carpeta. "+ Nueva carpeta" es la última tarjeta del tablero y el nombre se escribe ahí mismo |
+| Buscador y "+ Nueva carpeta" en Mis libros | "Buscador" sin ubicación | El buscador va en la fila del título, como en una carpeta. "+ Nueva carpeta" es la última tarjeta del tablero y el nombre se escribe ahí mismo. Mientras se escribe toma dos celdas, para que se lea el nombre y Crear y Cancelar quepan en una fila |
+| Mis libros sin subtítulo | No aparece | "34 libros en tu biblioteca" se quita, como en el modelo aprobado: "Todos" ya dice el total y la fila del título queda libre para Buscar |
