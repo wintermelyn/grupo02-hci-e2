@@ -140,6 +140,11 @@ describe('PersonPage books', () => {
     expect(sectionOf('Últimos leídos').getAllByRole('listitem')).toHaveLength(2)
   })
 
+  it('gives a lone book the width of both columns', () => {
+    renderApp('/amigos/diego')
+    expect(sectionOf('Está leyendo').getByRole('listitem')).toHaveClass('md:only:col-span-2')
+  })
+
   it('shows each book once, marking on its row what is in common', () => {
     keepInLibrary('OL893414W', 'OL1168083W', 'OL81626W')
     renderApp('/amigos/diego')

@@ -141,7 +141,8 @@ export function FriendsPage() {
           placeholder="Nombre o @usuario"
           value={query}
           onChange={search}
-          className="mb-4 md:max-w-lg"
+          // The first column of the rows under it, with the gap of RowList.
+          className="mb-4 md:w-[calc((100%-0.625rem)/2)]"
         />
       </PageHeader>
 

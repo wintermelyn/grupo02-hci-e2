@@ -55,7 +55,7 @@ export function ReadingCards({ books, sharedIds }: { books: Book[]; sharedIds: S
   return (
     <ul className="grid gap-2.5 md:grid-cols-2 lg:gap-4">
       {books.map((book) => (
-        <li key={book.id} className="min-w-0">
+        <li key={book.id} className="min-w-0 md:only:col-span-2">
           <ReadingCard book={book} shared={sharedIds.has(book.id)} />
         </li>
       ))}

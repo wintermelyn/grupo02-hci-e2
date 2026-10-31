@@ -84,8 +84,9 @@ export function NewFolderCard() {
         >
           <CardShape covers="grid grid-cols-2 gap-1.5" />
           <span className="col-start-1 row-start-1 self-end">
-            <span className="block font-serif text-lg font-semibold">
-              <Plus aria-hidden size={18} className="mr-1 inline align-[-2px]" />
+            {/* Beside the words and not among them, so it never stays alone at the end of a line. */}
+            <span className="flex items-start gap-1 font-serif text-lg font-semibold">
+              <Plus aria-hidden size={18} className="mt-1.25 shrink-0" />
               Nueva carpeta
             </span>
             <span className="block text-sm text-balance text-muted">

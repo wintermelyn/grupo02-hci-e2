@@ -34,6 +34,11 @@ const cancelButton = (username: string) =>
   rowOf(username).getByRole('button', { name: /^Cancelar/ })
 
 describe('FriendsPage without text', () => {
+  it('gives the search the width of the first column', () => {
+    renderApp('/amigos')
+    expect(searchBox().closest('.rounded-full')).toHaveClass('md:w-[calc((100%-0.625rem)/2)]')
+  })
+
   it('has its header, search field and back link', () => {
     renderApp('/amigos')
     expect(screen.getByRole('heading', { level: 1, name: 'Amigos' })).toBeInTheDocument()

@@ -35,6 +35,13 @@ describe('NewFolderCard', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
+  it('keeps the plus out of the text that wraps', () => {
+    renderApp(LIBRARY)
+    const plus = card().querySelector('svg')
+    expect(plus).toHaveClass('shrink-0')
+    expect(plus?.parentElement).toHaveClass('flex')
+  })
+
   it('takes the whole row on a phone when it starts one', () => {
     renderApp(LIBRARY)
     const item = card().closest('li') as HTMLElement
