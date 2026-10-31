@@ -4,7 +4,7 @@ Este documento es lo único que hay que leer para empezar a programar. Todo lo q
 
 **Fuente de las decisiones de diseño:** `docs/e2/informe-e2.pdf`. Si este plan y el informe se contradicen, manda el informe y se corrige el plan. Lo que el informe no define está resuelto en la sección 6.
 
-**Estado del código:** el bloque base tiene los "Ajustes al bloque base" y la "Dirección visual" de la sección 4. Mis libros y la ficha ya están construidas, y `DESIGN.md` describe el aspecto de la app.
+**Estado del código:** el bloque base tiene los "Ajustes al bloque base" y la "Dirección visual" de la sección 4. Mis libros, la ficha, la carpeta, Más, Amigos y Persona ya están construidas, T1 y T3 se completan, y `DESIGN.md` describe el aspecto de la app.
 
 **URL:** tiene que seguir funcionando hasta fines de noviembre (E3, 25 de noviembre).
 
@@ -228,7 +228,7 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 
 ### Componentes compartidos (`src/components/`, del bloque base)
 - **`AppShell`:** navegación inferior en celular y superior en computador, contenedor centrado y `<Toast/>`.
-- **`PageHeader`:** banda de la página con título, subtítulo, botón de volver y una acción a la derecha. Lo que recibe como hijo, como `TagFilter`, queda en el borde inferior. "Goodreads / prototipo" sigue visible en el celular, también con acción.
+- **`PageHeader`:** banda de la página con título, subtítulo, botón de volver y una acción a la derecha. Lo que recibe como hijo, como `TagFilter`, queda en el borde inferior. "Goodreads / prototipo" sigue visible en el celular, también con acción. `media` pone algo antes del título, como un `Avatar`.
 - **`BookCover`:** portada, con un placeholder de color e iniciales si no hay imagen. Con la prop `status`, muestra la cinta del tag bajo la portada.
 - **`BookRow`:** portada con su cinta, título, `StatusTag` junto al autor, bajo el título (si el libro está en la biblioteca), y estrellas. Acepta la prop `trailing`. Al abrir la ficha le pasa de dónde viene, para que vuelva a esa misma lista.
 - **`AnchoredMenu`:** el menú anclado reutilizable. Sirve para un cambio rápido y reversible con pocas opciones, junto a su control: `radio` para una opción actual, `checkbox` para varias y `action` para comandos.
@@ -340,16 +340,16 @@ Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarr
   - aviso periódico (D5);
   - buscador sobre la biblioteca;
   - "+ Nueva carpeta".
-- [ ] **Carpeta:** `TagFilter`, lista de `BookRow`, buscador interno, renombrar y eliminar carpeta, y estado vacío. El título y la banda ya están.
-- [ ] **Ficha**, sobre lo que dejó "Dirección visual":
+- [x] **Carpeta:** `TagFilter`, lista de `BookRow`, buscador interno, renombrar y eliminar carpeta, y estado vacío. El título y la banda ya están.
+- [x] **Ficha**, sobre lo que dejó "Dirección visual":
   - agregar y quitar carpetas en los chips, que hoy solo enlazan a cada carpeta;
   - "Quitar de mi biblioteca";
   - estado de carga mientras se ejecuta `fetchWork`, antes de "Libro no encontrado".
-- [ ] **Fechas y puntaje en la ficha:**
+- [x] **Fechas y puntaje en la ficha:**
   - se muestran cuando el tag es "Leído";
   - "Editar lectura" abre un `BottomSheet` con fechas y estrellas opcionales;
   - no permite fin anterior a inicio ni fechas futuras.
-- [ ] **Acciones de `librarySlice`.**
+- [ ] **Acciones de `librarySlice`.** Falta `answerWantPrompt`; las demás están hechas.
 - **Listo cuando:** T1 y T2 se completan desde "Reiniciar demo", en celular y en computador, y cada cambio muestra el toast con Deshacer.
 
 ### Rol B · Social y búsqueda (T3 + búsqueda) · `src/features/home|search|discover|more|friends|profile/`, `src/lib/openlibrary.ts`, `socialSlice.ts`, `src/data/seedDiscover.ts`
@@ -364,21 +364,21 @@ Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarr
   - todas las secciones usan el mismo componente y tamaño;
   - "Seleccionados para ti" oculta los libros que ya están en la biblioteca;
   - al tocar un libro se abre la ficha.
-- [ ] **Más:** enlaces a Amigos y Mi perfil, con el botón "Amigos" a la vista.
-- [ ] **Amigos (D4):**
+- [x] **Más:** enlaces a Amigos y Mi perfil, con el botón "Amigos" a la vista.
+- [x] **Amigos (D4):**
   - sin texto en la barra, lista de amigos y solicitudes pendientes;
   - con texto, resultados de todo el directorio por nombre o @usuario;
   - cada resultado muestra avatar, @usuario, amigos en común y "+ Agregar";
   - *+ Agregar* → mensaje y estado "Solicitud enviada" (con la opción de cancelar) → "Amigos";
   - "Invitar contactos" es un enlace secundario que solo muestra un aviso;
   - estado sin resultados.
-- [ ] **Persona:** qué está leyendo, últimos leídos, libros en común y botón de agregar o estado de la solicitud.
+- [x] **Persona:** qué está leyendo, últimos leídos, libros en común y botón de agregar o estado de la solicitud.
 - [ ] **Inicio:**
   - "Leyendo ahora", que abre la ficha;
   - feed de actividad con like;
   - estado vacío.
 - [ ] **Mi perfil:** nombre, @usuario y "Reiniciar demo" con confirmación.
-- [ ] **Acciones de `socialSlice`.**
+- [x] **Acciones de `socialSlice`.**
 - **Listo cuando:** T3 se completa desde "Reiniciar demo", en celular y en computador; la búsqueda funciona aunque Open Library esté caído; y los estados de carga, sin resultados y error están implementados.
 
 ### Puntos de contacto entre A y B (ya resueltos)

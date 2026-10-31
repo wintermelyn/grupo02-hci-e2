@@ -470,10 +470,10 @@ Viven en la carpeta de su pantalla. Sirven de modelo, y se vuelven compartidas s
 - **Estado de una persona:** "Solicitud enviada" y "Amigos" en Small label `muted`, con ícono de 16 px, sin color de estado ni cinta. Esos colores son solo de los libros.
 - **Acción sobre una persona:** `PersonAction`. Agregar, Cancelar y Quitar de amigos son `secondary` en Amigos y en Persona, por la regla 11.
 - **Fila de enlace:** en `MorePage.tsx`, una tarjeta blanca de 56 px con ícono, texto y flecha.
-- **Campo de un formulario:** blanco, con borde de 1 px `muted`, radio de control, 44 px de alto y la etiqueta encima. El borde es necesario porque la sombra casi no se ve sobre el panel blanco. Lo usan `FolderOptions.tsx` y `ReadingDetails.tsx`. El campo de fecha pone su ícono `CalendarDays` en `muted`, y abre el calendario al tocar cualquier parte. Chrome ignora `:focus` sobre las partes de una fecha, así que un filtro convierte su azul en un tono cercano a `sand` y deja marcada la parte que se edita.
+- **Campo de un formulario:** blanco, con borde de 1 px `muted`, radio de control, 44 px de alto y la etiqueta encima. El borde es necesario porque la sombra casi no se ve sobre el panel blanco. Lo usan `FolderOptions.tsx` y `ReadingDetails.tsx`. El campo de fecha pone su ícono `CalendarDays` en `muted`, y abre el calendario al tocar cualquier parte, así que las partes de la fecha se editan con el teclado. Chrome ignora `:focus` sobre ellas, por lo que un filtro convierte su azul en un tono cercano a `sand` y deja marcada la parte que se edita.
 - **Motivo de un botón deshabilitado:** Small en tinta con `CircleAlert` en `muted`, dentro de una región `status`.
 - **"Tu lectura":** bloque de la ficha, bajo `StatusControl`, con inicio, fin y puntaje, y "Editar lectura" como `secondary`.
-- **Libros en común:** portadas `fill` de 80 px con su título en serif de 14 px, en todos los dispositivos. Son portadas chicas y no filas porque esos libros suelen aparecer justo arriba, en la misma página, y no deben pesar más que ellos.
+- **Libros en común:** portadas `fill` de 80 px con su título en serif de 14 px, en todos los dispositivos. Son portadas y no filas porque esos libros suelen aparecer justo arriba, en la misma página. En tablet y celular miden más que las de las filas, y eso quedó como hallazgo abierto del CP3.
 
 ### Cinta
 
