@@ -1,10 +1,12 @@
 import type { Book, BookId, LibraryEntry } from '../../types'
 import { booksLabel, normalizeText } from '../library/filters'
-import { matchesAuthor } from './searchCatalog'
+import { isAuthorName, matchesAuthor } from './searchCatalog'
 
 export interface AuthorGroup {
   name: string
   books: Book[]
+  /** How many books of theirs the card says. Unknown until the catalog arrives. */
+  count: number | undefined
 }
 
 export interface ArrangedResults {
@@ -34,7 +36,7 @@ export function groupByAuthor(books: Book[]): AuthorGroup[] {
     for (const name of book.authors) byName.set(name, [...(byName.get(name) ?? []), book])
   }
   return [...byName]
-    .map(([name, list]) => ({ name, books: list }))
+    .map(([name, list]) => ({ name, books: list, count: list.length }))
     .sort((a, b) => b.books.length - a.books.length || a.name.localeCompare(b.name, 'es-CL'))
 }
 
@@ -62,7 +64,7 @@ export function arrangeResults(
 ): ArrangedResults {
   const authors = groupByAuthor(results).filter(({ name }) => matchesAuthor(name, query))
   const wanted = normalizeText(query)
-  const exact = authors.find(({ name }) => normalizeText(name) === wanted)
+  const exact = authors.find(({ name }) => isAuthorName(name, query))
   const books = exact?.books ?? results
   const mine = books.filter(({ id }) => Object.hasOwn(library, id))
   const others = books.filter(({ id }) => !Object.hasOwn(library, id))

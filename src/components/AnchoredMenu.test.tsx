@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { useState } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { state } from '../test/store'
 import { AnchoredMenu, type AnchoredMenuProps } from './AnchoredMenu'
 
 const onSelect = vi.fn()
@@ -53,6 +54,23 @@ describe('AnchoredMenu', () => {
     )
     open()
     expect(screen.getByText('M'.repeat(40))).toHaveClass('wrap-anywhere')
+  })
+
+  it('goes over the toast, and tells it to wait while it is open', () => {
+    render(<Menu />)
+    expect(state().menuOpen).toBe(false)
+    open()
+    expect(menu()).toHaveClass('z-50')
+    expect(state().menuOpen).toBe(true)
+    key('Escape')
+    expect(state().menuOpen).toBe(false)
+  })
+
+  it('lets the toast go on if it leaves with the page, still open', () => {
+    const { unmount } = render(<Menu />)
+    open()
+    unmount()
+    expect(state().menuOpen).toBe(false)
   })
 
   it('stays closed until the control opens it, and tells the control what it opens', () => {

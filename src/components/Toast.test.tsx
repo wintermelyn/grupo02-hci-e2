@@ -24,6 +24,48 @@ describe('Toast', () => {
     expect(screen.getByText('M'.repeat(60))).toHaveClass('min-w-0', 'wrap-anywhere')
   })
 
+  describe('with a menu open', () => {
+    const undoButton = () => screen.queryByRole('button', { name: 'Deshacer' })
+
+    it('goes under the menu, which keeps its taps', () => {
+      render(<Toast />)
+      expect(screen.getByRole('status')).toHaveClass('z-45')
+    })
+
+    it('keeps Deshacer until the menu closes, and then gets its full time', () => {
+      render(<Toast />)
+      act(() => state().commit('Libro movido', () => ({})))
+      act(() => state().setMenuOpen(true))
+      act(() => vi.advanceTimersByTime(TOAST_DURATION_MS * 2))
+      expect(undoButton()).toBeInTheDocument()
+
+      act(() => state().setMenuOpen(false))
+      act(() => vi.advanceTimersByTime(TOAST_DURATION_MS - 1))
+      expect(undoButton()).toBeInTheDocument()
+      act(() => vi.advanceTimersByTime(1))
+      expect(undoButton()).not.toBeInTheDocument()
+    })
+
+    it('waits as well if it arrives with the menu already open', () => {
+      render(<Toast />)
+      act(() => state().setMenuOpen(true))
+      act(() => state().commit('Libro movido', () => ({})))
+      act(() => vi.advanceTimersByTime(TOAST_DURATION_MS * 2))
+      expect(undoButton()).toBeInTheDocument()
+      act(() => state().setMenuOpen(false))
+    })
+
+    it('does not let the menu end what the mouse is holding', () => {
+      render(<Toast />)
+      act(() => state().commit('Libro movido', () => ({})))
+      fireEvent.pointerEnter(undoButton()!.parentElement!, { pointerType: 'mouse' })
+      act(() => state().setMenuOpen(true))
+      act(() => state().setMenuOpen(false))
+      act(() => vi.advanceTimersByTime(TOAST_DURATION_MS * 2))
+      expect(undoButton()).toBeInTheDocument()
+    })
+  })
+
   it('undoes the last library change', () => {
     const before = state().library
     render(<Toast />)

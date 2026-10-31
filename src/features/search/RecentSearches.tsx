@@ -9,7 +9,7 @@ export interface RecentSearchesProps {
 
 export function RecentSearches({ terms, onPick, onClear }: RecentSearchesProps) {
   return (
-    <section className="mt-5">
+    <section className="mt-4">
       <div className="flex items-center justify-between gap-3">
         <h2 className="section-title">Búsquedas recientes</h2>
         <Button

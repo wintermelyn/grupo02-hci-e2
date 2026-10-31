@@ -140,7 +140,9 @@ describe('BookPage', () => {
 
   it('breaks a long word of the title or the author instead of leaving its column', () => {
     renderApp(CARRIE)
-    expect(main().getByRole('heading', { level: 1 })).toHaveClass('wrap-break-word', 'hyphens-auto')
+    const title = main().getByRole('heading', { level: 1 })
+    expect(title).toHaveClass('wrap-break-word')
+    expect(title).not.toHaveClass('hyphens-auto')
     expect(main().getByText('Stephen King').parentElement).toHaveClass('wrap-break-word')
   })
 

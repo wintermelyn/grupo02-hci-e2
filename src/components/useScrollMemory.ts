@@ -29,7 +29,7 @@ export function useScrollMemory() {
     const left = shown.current
     shown.current = { pathname, url }
     positions.current.set(left.url, lastTop.current)
-    // A filter or a search changes the URL inside the same page, which stays where it is.
+    // A filter or a search changes the URL inside the same page: moving is up to that page.
     if (left.pathname === pathname) return
     const goingBack =
       navigationType === 'POP' || (state as { restoreScroll?: boolean } | null)?.restoreScroll

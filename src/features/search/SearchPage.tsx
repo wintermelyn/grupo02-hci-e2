@@ -1,8 +1,17 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type RefObject,
+} from 'react'
 import { useSearchParams } from 'react-router'
-import { ErrorState, LoadingState, PageHeader, SearchField } from '../../components'
+import { ErrorState, LoadingState, SearchField, Wordmark } from '../../components'
 import { useStore } from '../../store'
 import { useBookLookup } from '../library/filters'
+import { useListFilters } from '../library/useListFilters'
 import { addRecentSearch, clearRecentSearches, readRecentSearches } from './recentSearchStore'
 import { arrangeResults } from './results'
 import { SearchStart } from './SearchStart'
@@ -25,15 +34,36 @@ function useFocusOnWideScreen(enabled: boolean) {
   return field
 }
 
+/**
+ * A new search starts at its first result, right under the field, which stays at the top of the
+ * screen. With the page above that point the results are already in view, so nothing moves.
+ */
+function useStartAtResults(text: string, field: RefObject<HTMLElement | null>) {
+  const start = useRef<HTMLDivElement>(null)
+  const shown = useRef(text)
+  useLayoutEffect(() => {
+    if (shown.current === text) return
+    shown.current = text
+    if (!start.current || !field.current) return
+    const page = document.documentElement
+    const { top } = start.current.getBoundingClientRect()
+    const resultsTop = page.scrollTop + top - field.current.offsetHeight
+    if (page.scrollTop > resultsTop) page.scrollTop = resultsTop
+  }, [text, field])
+  return start
+}
+
 export function SearchPage() {
-  const [params, setParams] = useSearchParams()
-  const query = params.get('q') ?? ''
-  const { text, loading, failed, books, retry } = useBookSearch(query)
+  // The field keeps its own value: if it waited for the URL, each letter would lose the caret.
+  const { typed, search } = useListFilters()
+  const [, setParams] = useSearchParams()
+  const { text, loading, failed, books, retry } = useBookSearch(typed)
   const library = useStore((state) => state.library)
   const authors = useLibraryAuthors()
   const friendsBooks = useFriendsBooks()
   const [recent, setRecent] = useState(readRecentSearches)
-  const field = useFocusOnWideScreen(query === '')
+  const field = useFocusOnWideScreen(typed === '')
+  const resultsStart = useStartAtResults(text, field)
   const bookOf = useBookLookup()
   const booksHeading = useRef<HTMLHeadingElement>(null)
   const focusOnBooks = useRef(false)
@@ -55,10 +85,9 @@ export function SearchPage() {
     booksHeading.current?.focus({ preventScroll: true })
   }, [text])
 
-  // Typing does not fill the history, but an author is a step: Back returns to the search before it.
-  const setQuery = (value: string) => setParams(value ? { q: value } : {}, { replace: true })
   const remember = (term: string) => setRecent((current) => addRecentSearch(term, current))
 
+  // Typing does not fill the history, but an author is a step: Back returns to the search before it.
   function pickAuthor(name: string) {
     remember(name)
     focusOnBooks.current = true
@@ -76,28 +105,33 @@ export function SearchPage() {
 
   return (
     <section>
-      <PageHeader title="Buscar" />
+      {/* Not PageHeader: its row is as tall as a button, and that would move the field. */}
+      <header className="flex items-center justify-between gap-3 pt-3 lg:pt-8">
+        <h1 className="page-title">Buscar</h1>
+        <Wordmark />
+      </header>
       {/* Solid and to the edges of the column: what scrolls under it does not show through. */}
       <div
         ref={field}
         onKeyDown={onKeyDown}
-        className="full-bleed sticky top-0 z-30 -mt-2 bg-paper py-2"
+        className="full-bleed sticky top-0 z-30 mt-3 bg-paper py-2 lg:mt-4"
       >
         <SearchField
           size="lg"
           label="Buscar libros y autores"
           placeholder="Título o autor"
-          value={query}
-          onChange={setQuery}
+          value={typed}
+          onChange={search}
         />
       </div>
+      <div ref={resultsStart} />
 
       {!text ? (
         <SearchStart
           recent={recent}
           authors={authors}
           friendsBooks={friendsBooks}
-          onSearch={setQuery}
+          onSearch={search}
           onPickAuthor={pickAuthor}
           onClearRecent={clearRecent}
         />

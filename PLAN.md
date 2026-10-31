@@ -121,7 +121,7 @@ Una app real tendría su propia base de datos indexada, con cada libro nuevo ya 
 - **ID de un libro:** la clave de la obra en Open Library, por ejemplo `OL45804W`. Se usa así tal cual en la URL.
 - **Búsqueda** (`src/features/search/searchCatalog.ts`, rol B):
   - Corre sobre el índice, en el render, así que cada letra tiene su lista sin esperar.
-  - Cada palabra escrita debe ser el inicio de una palabra del título o de los autores, en cualquier orden y sin distinguir tildes ni mayúsculas. "king" encuentra a Stephen King y no a Hawking, y "marquez cien" encuentra *Cien años de soledad*.
+  - Cada palabra escrita debe ser el inicio de una palabra del título o de los autores, en cualquier orden y sin distinguir tildes ni mayúsculas. "king" encuentra a Stephen King y no a Hawking, y "marquez cien" encuentra *Cien años de soledad*. Las iniciales de un autor valen pegadas, con puntos o con espacios: "jk rowling", "j k rowling" y "j.k. rowling" son la misma búsqueda. No hay tolerancia a errores de escritura.
   - Va primero el título exacto, luego el título que empieza así, una palabra del título, el autor y lo demás. Entre iguales, el más leído. Los libros de la biblioteca suben al principio de la lista.
   - La lista llega a 40 libros y dice de cuántos, salvo los libros de un autor, que van todos.
 - **Ficha de un libro que no está a mano** (por ejemplo, un enlace abierto en otro navegador): espera el índice con `BookSkeleton`. Si el libro no está en él, muestra "Libro no encontrado". Un id que no puede ser un libro lo dice sin bajar nada.
@@ -263,7 +263,7 @@ También son compartidos y del bloque base:
 Si alguien necesita cambiar algo compartido, le avisa al otro rol antes y lo sube en un commit separado.
 
 ### Reglas de interfaz (valen para ambos roles; el detalle está en `docs/conceptos-hci.md`)
-1. **Íconos siempre con etiqueta de texto**, incluida la barra de navegación. Excepciones aprobadas: las flechas de un riel, en computador, y el corazón de "Me gusta", en celular. Ambas llevan nombre accesible.
+1. **Íconos siempre con etiqueta de texto**, incluida la barra de navegación. Excepciones aprobadas: las flechas de un riel, en computador, y el corazón de "Me gusta", en celular y en las filas de Inicio en tablet. Ambas llevan nombre accesible.
 2. **Áreas táctiles de al menos 44×44 px**, y nada que dependa solo del hover.
 3. **El estado nunca se comunica solo con color:** siempre texto + color.
 4. **Contraste de texto mínimo 4.5:1.** Nada de gris claro sobre blanco para texto que importa.
@@ -469,7 +469,7 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | "Me gusta" | No aparece en el informe E2. P1 y P2 lo mencionan en las entrevistas del E1 | Es un gesto hacia un amigo, no una cifra: sin contador ni lista de nombres. Al tocarlo, el aviso dice a quién le llega, como "Valentina verá que te gustó" |
 | Forma del aviso de D5 | Portada, título, pregunta y "Sí" y "No" | Una fila compacta sobre la lista, con portada chica, sin tarjeta, en "Todos" y "Lo quiero" |
 | "Leyendo ahora" en Inicio | "Tarjeta" que abre la ficha | Portadas grandes en dos columnas, o tres con tres libros, porque casi nadie lee más de dos o tres a la vez. Bajo cada una, "Llevas 12 días" |
-| Buscar antes de escribir | No aparece | Búsquedas recientes, cuando las hay, autores de tu biblioteca y "Lo que leen tus amigos", para reconocer en vez de recordar |
+| Buscar antes de escribir | No aparece | Búsquedas recientes, cuando las hay, autores de tu biblioteca y "Lo que leen tus amigos", para reconocer en vez de recordar. Cada autor dice cuántos libros suyos hay en el catálogo, el mismo número que aparece al tocarlo. Sin el índice, esa línea queda vacía, sin mover nada |
 | Resultados de Buscar | "Libros y autores" | Dicen cuántos hay y cuántos ya tienes. Si son más de 40 muestran los más relevantes y dicen de cuántos, como "Los 40 más relevantes de 48". Los autores siempre dicen su cantidad. Van en "Autores" y "Libros", y tocar un autor lista todos sus libros, con Atrás de vuelta a la búsqueda. Sin resultados, se ofrecen los autores como salida |
 | Catálogo y búsqueda | No aparece | 1.046 libros en archivos estáticos, buscados en el navegador. Una app real tendría su base de datos indexada; aquí se evita un segundo servicio. Los libros son muchos para que buscar tenga sentido, sin pretender que estén todos: lo que no está, no se encuentra |
 | Buscador y "+ Nueva carpeta" en Mis libros | "Buscador" sin ubicación | El buscador va en la fila del título, como en una carpeta. "+ Nueva carpeta" es la última tarjeta del tablero y el nombre se escribe ahí mismo. Mientras se escribe toma dos celdas, para que se lea el nombre y Crear y Cancelar quepan en una fila |

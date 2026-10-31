@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter, Routes, useNavigate } from 'react-router'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { appRoutes } from '../../routes'
 import { useStore } from '../../store'
 import { stubCatalog } from '../../test/catalog'
@@ -28,6 +28,7 @@ function renderAfterMas(path: string) {
 
 const search = () => screen.getByRole('searchbox', { name: 'Buscar libros y autores' })
 const type = (text: string) => fireEvent.change(search(), { target: { value: text } })
+const main = () => within(screen.getByRole('main'))
 const section = (name: string) => screen.getByRole('heading', { name }).closest('section')!
 const waitForSection = async (name: string) =>
   (await screen.findByRole('heading', { name })).closest('section')!
@@ -47,9 +48,17 @@ describe('before typing', () => {
   it('shows the authors of the library and what friends read, and no recent searches', () => {
     renderApp('/buscar')
     expect(within(section('Autores de Mis libros')).getByText('Stephen King')).toBeInTheDocument()
-    expect(within(section('Autores de Mis libros')).getByText('4 libros')).toBeInTheDocument()
     expect(within(section('Lo que leen tus amigos')).getByText('Dune')).toBeInTheDocument()
     expect(screen.queryByText('Búsquedas recientes')).not.toBeInTheDocument()
+  })
+
+  it('keeps the separation between its blocks at every width', () => {
+    localStorage.setItem('gr-e2-buscados', JSON.stringify(['king']))
+    renderApp('/buscar')
+    expect(search().parentElement?.parentElement).toHaveClass('mt-3', 'lg:mt-4')
+    expect(section('Búsquedas recientes')).toHaveClass('mt-4')
+    expect(section('Autores de Mis libros')).toHaveClass('mt-7', 'lg:mt-7')
+    expect(section('Lo que leen tus amigos')).toHaveClass('mt-8')
   })
 
   it('downloads the catalog on arrival, with nothing on the screen waiting for it', () => {
@@ -66,6 +75,33 @@ describe('before typing', () => {
     expect(
       within(section('Lo que leen tus amigos')).queryByText('Las venas abiertas de América Latina'),
     ).not.toBeInTheDocument()
+  })
+
+  it('counts the books of each author in the catalog, the number that tapping them shows', async () => {
+    catalog()
+    renderApp('/buscar')
+    const authors = within(section('Autores de Mis libros'))
+    const king = await authors.findByRole('button', { name: /Stephen King.*5 libros/ })
+    fireEvent.click(king)
+    expect(screen.getByText('5 libros · 4 en Mis libros')).toBeInTheDocument()
+  })
+
+  it('says no amount until the catalog arrives, and keeps its line', async () => {
+    catalog()
+    renderApp('/buscar')
+    const authors = within(section('Autores de Mis libros'))
+    const king = authors.getByRole('button', { name: 'Stephen King' })
+    expect(king.querySelector('.min-h-5')).toBeEmptyDOMElement()
+    expect(await authors.findByText('5 libros')).toBeInTheDocument()
+  })
+
+  it('says no amount if the catalog fails', async () => {
+    stubCatalog({ failing: [/index/] })
+    renderApp('/buscar')
+    await act(async () => undefined)
+    const authors = within(section('Autores de Mis libros'))
+    expect(authors.getByRole('button', { name: 'Stephen King' })).toBeInTheDocument()
+    expect(authors.queryByText(/\d+ libros?$/)).not.toBeInTheDocument()
   })
 
   it('keeps the place of friends when there are none', () => {
@@ -88,10 +124,24 @@ describe('before typing', () => {
     expect(readRecentSearches()).toEqual([])
   })
 
+  it('shows in the field what a recent search puts in the URL', () => {
+    localStorage.setItem('gr-e2-buscados', JSON.stringify(['dune']))
+    renderApp('/buscar')
+    fireEvent.click(screen.getByRole('button', { name: 'dune' }))
+    expect(search()).toHaveValue('dune')
+  })
+
   it('does not hint that people are found elsewhere, which a question of the evaluation asks', () => {
     renderApp('/buscar')
     expect(screen.queryByText(/Buscas a una persona/)).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Amigos' })).not.toBeInTheDocument()
+  })
+
+  it('names Buscar on the way back from a book of the shelf', () => {
+    renderApp('/buscar')
+    fireEvent.click(within(section('Lo que leen tus amigos')).getByRole('link', { name: /Dune/ }))
+    fireEvent.click(main().getByRole('link', { name: 'Buscar' }))
+    expect(currentLocation()).toBe('/buscar')
   })
 
   it('says which friend read each book', () => {
@@ -99,6 +149,62 @@ describe('before typing', () => {
     const shelf = within(section('Lo que leen tus amigos'))
     const dune = shelf.getByRole('link', { name: /Dune/ })
     expect(dune).toHaveTextContent('Diego')
+  })
+})
+
+describe('changing the search with the page scrolled', () => {
+  const page = document.documentElement
+  /** Where the results start, measured from the top of the page. */
+  const RESULTS_TOP = 120
+
+  beforeEach(() => {
+    catalog()
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(
+      () => ({ top: RESULTS_TOP - page.scrollTop }) as DOMRect,
+    )
+  })
+
+  afterEach(() => {
+    page.scrollTop = 0
+  })
+
+  async function renderScrolledTo(top: number) {
+    renderApp('/buscar?q=apocalipsis')
+    await screen.findByRole('link', { name: /Apocalipsis/ })
+    page.scrollTop = top
+    fireEvent.scroll(window)
+  }
+
+  it('takes the page to the start of the new results', async () => {
+    await renderScrolledTo(900)
+    type('dune')
+    expect(page.scrollTop).toBe(RESULTS_TOP)
+  })
+
+  it('does the same on clearing the search', async () => {
+    await renderScrolledTo(900)
+    type('')
+    expect(page.scrollTop).toBe(RESULTS_TOP)
+  })
+
+  it('leaves the page alone when the results are already in view', async () => {
+    await renderScrolledTo(50)
+    type('dune')
+    expect(page.scrollTop).toBe(50)
+  })
+
+  it('leaves the page alone when the search stays the same', async () => {
+    await renderScrolledTo(900)
+    type('apocalipsis ')
+    expect(page.scrollTop).toBe(900)
+  })
+
+  it('still comes back from a book to where the list was', async () => {
+    await renderScrolledTo(900)
+    fireEvent.click(screen.getByRole('link', { name: /Apocalipsis/ }))
+    expect(page.scrollTop).toBe(0)
+    fireEvent.click(main().getByRole('link', { name: 'Buscar' }))
+    expect(page.scrollTop).toBe(900)
   })
 })
 
@@ -161,7 +267,7 @@ describe('with results', () => {
     fireEvent.click(await screen.findByRole('link', { name: /Apocalipsis/ }))
     document.documentElement.scrollTop = 0
 
-    fireEvent.click(screen.getByRole('link', { name: 'Volver' }))
+    fireEvent.click(main().getByRole('link', { name: 'Buscar' }))
     expect(screen.getByRole('link', { name: /Apocalipsis/ })).toBeInTheDocument()
     expect(files.mock.calls.filter(([url]) => url.endsWith('index.json'))).toHaveLength(1)
   })
