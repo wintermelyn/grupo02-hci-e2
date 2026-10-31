@@ -25,6 +25,7 @@ import {
   HISPANIC_AUTHORS,
   PASSED_OVER_WORKS,
   REJECTED_COVERS,
+  REMOVED_WORKS,
   UNTRANSLATED_TITLES,
 } from './catalog-lists.mjs'
 import {
@@ -351,11 +352,15 @@ async function selectBooks() {
     if (isPopular) popular += 1
     else hispanicCount.set(doc.author, (hispanicCount.get(doc.author) ?? 0) + 1)
   }
-  await writeJson(SELECTED_FILE, selected)
+  const kept = selected.filter(({ id }) => !REMOVED_WORKS[id])
+  for (const { id, originalTitle: title } of selected) {
+    if (REMOVED_WORKS[id]) dropped.push({ id, title, reason: REMOVED_WORKS[id] })
+  }
+  await writeJson(SELECTED_FILE, kept)
   await writeJson(DROPPED_FILE, dropped)
   console.log(
-    `${selected.length} selected (${popular} popular, ${selected.length - popular} hispanic), ` +
-      `${dropped.length} dropped`,
+    `${kept.length} selected (${popular} popular, ${selected.length - popular} hispanic, ` +
+      `${selected.length - kept.length} removed), ${dropped.length} dropped`,
   )
 }
 

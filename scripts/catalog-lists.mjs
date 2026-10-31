@@ -169,6 +169,147 @@ export const EXCLUDED_WORKS = {
   OL16538128W: 'es de Borges, Bioy Casares y Silvina Ocampo; llegó por el prólogo de Cortázar',
 }
 
+const NO_TEXT = 'sin descripción: la obra no trae'
+const TOO_SHORT = 'sin descripción: la que trae es demasiado corta'
+const OPINION = 'sin descripción: la que trae es la opinión de un lector'
+const UNKNOWN_LANGUAGE = 'sin descripción: no se reconoce el idioma de la que trae'
+const TEXT_NOT_ABOUT_IT =
+  'sin descripción: el texto habla de otro libro, o de la edición, y no de este'
+const ONLY_AUDIO_COVER =
+  'solo tiene la portada de un audiolibro: no hay otra edición en español con portada'
+const SMALL_COVER =
+  'portada de audiolibro: la otra edición en español tiene una de 128 px, y el mínimo es 150'
+
+// Taken out of the published catalog, with the reason: its owner decided that a new book needs a
+// description. They leave at the end of select, so each keeps its place on the lists and its twin
+// stays out, and no book comes in without its cover and translation. The 54 books are never here.
+export const REMOVED_WORKS = {
+  OL55806W: TOO_SHORT, // El poder de la mente subconsciente
+  OL5819962W: TEXT_NOT_ABOUT_IT, // El verano en que me enamoré
+  OL17732W: TEXT_NOT_ABOUT_IT, // Santa Biblia
+  OL15719630W: TEXT_NOT_ABOUT_IT, // Divergente
+  OL19665926W: NO_TEXT, // El club de las 5 de la mañana
+  OL45885W: OPINION, // El gran gigante bonachón
+  OL41495W: TEXT_NOT_ABOUT_IT, // Una arruga en el tiempo
+  OL14908941W: TEXT_NOT_ABOUT_IT, // Sinsajo
+  OL45809W: OPINION, // James y el melocotón gigante
+  OL307247W: NO_TEXT, // Tierra humana
+  OL265501W: OPINION, // En territorio salvaje
+  OL24456878W: NO_TEXT, // Psicología oscura
+  OL32466W: TOO_SHORT, // Una canción de Navidad
+  OL166952W: NO_TEXT, // Noches blancas
+  OL45499W: TEXT_NOT_ABOUT_IT, // Tao Te Ching
+  OL61981W: TEXT_NOT_ABOUT_IT, // La Ilíada
+  OL17076301W: NO_TEXT, // Hable como en TED
+  OL17618370W: NO_TEXT, // Código limpio
+  OL277730W: TEXT_NOT_ABOUT_IT, // El despertar
+  OL2897798W: TEXT_NOT_ABOUT_IT, // Watchmen
+  OL31111W: NO_TEXT, // Todo sobre el amor
+  OL487444W: NO_TEXT, // Cómo leer un libro
+  OL2772007W: TOO_SHORT, // El papel pintado amarillo
+  OL28800651W: NO_TEXT, // Las 8 reglas del amor
+  OL5731538W: TOO_SHORT, // La flor púrpura
+  OL362702W: TEXT_NOT_ABOUT_IT, // Julio César
+  OL24327739W: NO_TEXT, // Save Me
+  OL21208765W: NO_TEXT, // El niño, el topo, el zorro y el caballo
+  OL262463W: TEXT_NOT_ABOUT_IT, // Las memorias de Sherlock Holmes
+  OL27023502W: NO_TEXT, // La disciplina marcará tu destino
+  OL27696982W: TEXT_NOT_ABOUT_IT, // La profecía
+  OL17356842W: TEXT_NOT_ABOUT_IT, // La espada de cristal
+  OL151632W: TEXT_NOT_ABOUT_IT, // Física
+  OL1984422W: TEXT_NOT_ABOUT_IT, // Física para la ciencia y la tecnología
+  OL258850W: TEXT_NOT_ABOUT_IT, // Otelo
+  OL1826387W: NO_TEXT, // Matemáticas para administración y economía
+  OL7966118W: TOO_SHORT, // La perla
+  OL17319838W: TOO_SHORT, // Todos deberíamos ser feministas
+  OL34735956W: NO_TEXT, // ¿Quién eres tú y qué haces aquí? El libro de iO
+  OL17641518W: NO_TEXT, // Homo deus
+  OL453658W: TOO_SHORT, // Mort
+  OL2626638W: TEXT_NOT_ABOUT_IT, // Cántico por Leibowitz
+  OL71078W: TOO_SHORT, // La silla de plata
+  OL16247898W: TEXT_NOT_ABOUT_IT, // Política
+  OL20196354W: NO_TEXT, // Si lo crees, lo creas
+  OL17334243W: TOO_SHORT, // La vegetariana
+  OL20875537W: NO_TEXT, // Nosotros en la luna
+  OL262426W: TEXT_NOT_ABOUT_IT, // El archivo de Sherlock Holmes
+  OL34758325W: NO_TEXT, // Una vida sin salud mental
+  OL24354365W: NO_TEXT, // ¿Qué te pasó?
+  OL34744532W: NO_TEXT, // Fabricante de lágrimas
+  OL3951517W: TEXT_NOT_ABOUT_IT, // Las vírgenes suicidas
+  OL52456W: TEXT_NOT_ABOUT_IT, // Fausto
+  OL1901436W: NO_TEXT, // Tus zonas erróneas
+  OL15155002W: TOO_SHORT, // El patito feo
+  OL17795612W: NO_TEXT, // Los secretos de la mente millonaria
+  OL1929420W: TOO_SHORT, // Padres que odian
+  OL21214534W: NO_TEXT, // Solo una cosa
+  OL277761W: TOO_SHORT, // Conflicto
+  OL471940W: TEXT_NOT_ABOUT_IT, // Poirot investiga
+  OL5727666W: NO_TEXT, // Practicando el poder del ahora
+  OL362706W: TEXT_NOT_ABOUT_IT, // Los sonetos
+  OL22670634W: NO_TEXT, // Sin amor
+  OL497483W: NO_TEXT, // La guerra del arte
+  OL655908W: TOO_SHORT, // Era la víspera de Navidad
+  OL21676651W: NO_TEXT, // El reino de los malditos
+  OL2636675W: NO_TEXT, // El arco iris de gravedad
+  OL8369445W: TOO_SHORT, // Las mentiras de Locke Lamora
+  OL20142280W: NO_TEXT, // Cómo hacer que te pasen cosas buenas
+  OL25682966W: NO_TEXT, // Psicología oscura y manipulación
+  OL29317518W: NO_TEXT, // Indigno de ser humano
+  OL7497934W: NO_TEXT, // Cómo vivir 365 días al año
+  OL4797379W: NO_TEXT, // Física universitaria
+  OL7967812W: TEXT_NOT_ABOUT_IT, // Picnic extraterrestre
+  OL17423096W: TOO_SHORT, // Alas de fuego 2. La heredera perdida
+  OL51948W: TEXT_NOT_ABOUT_IT, // Apología de Sócrates
+  OL8215661W: NO_TEXT, // One Piece 1
+  OL453660W: UNKNOWN_LANGUAGE, // Brujerías
+  OL57249W: TOO_SHORT, // Química orgánica
+  OL28124W: NO_TEXT, // Las 21 leyes irrefutables del liderazgo
+  OL23731758W: NO_TEXT, // Todo lo que nunca fuimos
+  OL3259254W: TOO_SHORT, // La estructura de las revoluciones científicas
+  OL263676W: NO_TEXT, // Cuando todo se derrumba
+  OL1929398W: NO_TEXT, // Chantaje emocional
+  OL24822235W: NO_TEXT, // Desolación
+  OL8061453W: NO_TEXT, // El lugar sin límites
+  OL2863217W: NO_TEXT, // La última niebla
+  OL1730157W: NO_TEXT, // Chistes parra desorientar a la policía poesía
+  OL2084284W: NO_TEXT, // Altazor
+  OL11877394W: NO_TEXT, // Bonsái
+  OL9114268W: NO_TEXT, // Tengo miedo torero
+  OL9103353W: NO_TEXT, // Santa María de las flores negras
+  OL13387626W: NO_TEXT, // Subterra
+  OL276963W: TEXT_NOT_ABOUT_IT, // Final del juego
+  OL8971525W: NO_TEXT, // Bestiario
+  OL2056316W: NO_TEXT, // Plata quemada
+  OL2226600W: NO_TEXT, // Poesía completa
+  OL830718W: NO_TEXT, // Cuentos de amor, de locura y de muerte
+  OL8693149W: TOO_SHORT, // El amor, las mujeres y la vida
+  OL914913W: NO_TEXT, // Los ríos profundos
+  OL15855832W: NO_TEXT, // La palabra del mudo
+  OL990924W: TOO_SHORT, // Antología poética
+  OL953872W: NO_TEXT, // La última escala del tramp steamer
+  OL9199287W: NO_TEXT, // El olvido que seremos
+  OL2421156W: TEXT_NOT_ABOUT_IT, // La virgen de los sicarios
+  OL2854179W: TOO_SHORT, // María
+  OL1933249W: NO_TEXT, // La vorágine
+  OL1277046W: NO_TEXT, // Doña Bárbara
+  OL743255W: NO_TEXT, // El laberinto de la soledad
+  OL677320W: NO_TEXT, // Los recuerdos del porvenir
+  OL700567W: NO_TEXT, // Confabulario
+  OL938588W: TEXT_NOT_ABOUT_IT, // El Señor Presidente
+  OL8253141W: NO_TEXT, // Azul
+  OL17788687W: TOO_SHORT, // El hombre que amaba a los perros
+  OL34305156W: NO_TEXT, // Hijo de hombre
+  OL857568W: TEXT_NOT_ABOUT_IT, // El club Dumas
+  OL23311241W: NO_TEXT, // Luciérnagas
+  OL815454W: TEXT_NOT_ABOUT_IT, // Doña Perfecta
+  OL1344055W: NO_TEXT, // Poesías completas
+  OL629345W: NO_TEXT, // Rimas y leyendas
+  OL28774526W: NO_TEXT, // Esperando al diluvio
+  OL2223951W: NO_TEXT, // La catedral del mar
+  OL20168133W: ONLY_AUDIO_COVER, // Por qué dormimos
+  OL76836W: SMALL_COVER, // La fortaleza digital
+}
+
 // Passed over when picking a Hispanic author's books, so the quota goes to the book people look
 // for: anthologies with an English title, children's verses, books far from what made them known.
 export const PASSED_OVER_WORKS = new Set([
@@ -296,6 +437,10 @@ export const REJECTED_COVERS = new Set([
   8689451, // Los pilares de la tierra: una página de texto
   12639993, // La abadía de Northanger: inglés
   14637486, // Prometeo americano: inglés
+  11611972, // Prohibido nacer: marco de audiolibro
+  11372897, // Hijo dorado: marco de audiolibro
+  2129975, // Los 7 hábitos de la gente altamente efectiva: audiolibro de FonoLibro
+  3062539, // Blink: audiolibro de FonoLibro
 ])
 
 const ANCIENT = { year: null }
@@ -306,7 +451,7 @@ const ANCIENT = { year: null }
 // often a placeholder such as 1900 or 2000; the ones here are the real first editions.
 export const BOOK_FIXES = {
   OL18020194W: { year: 2016 },
-  OL20875338W: { title: 'Culpa tuya' },
+  OL20875338W: { title: 'Culpa tuya', year: 2017 },
   OL2010879W: { year: 1997 },
   OL17590212W: { title: 'El sutil arte de que (casi todo) te importe un carajo' },
   OL18108064W: { title: 'No me puedes lastimar' },
@@ -454,7 +599,7 @@ export const BOOK_FIXES = {
   OL151406W: { title: 'Alicia a través del espejo', year: 1871 },
   OL50283W: { title: 'La otra historia de los Estados Unidos' },
   OL115602W: { title: 'Me llamo Bud, no Buddy', year: 1999 },
-  OL476641W: { title: 'Winnie the Pooh' },
+  OL476641W: { title: 'Winnie the Pooh', year: 1926 },
   OL100672W: { title: 'Cándido, o el optimismo', year: 1759 },
   OL4794651W: { title: 'El juego de la vida y cómo jugarlo' },
   OL3243765W: { title: 'La casa en Mango Street' },
@@ -715,7 +860,7 @@ export const BOOK_FIXES = {
   OL16325201W: { year: 2012 },
   OL2827199W: { year: 2001 },
   OL1277046W: { year: 1929 },
-  OL17367560W: { title: 'Heredera de fuego' },
+  OL17367560W: { title: 'Heredera de fuego', coverId: 15102345 },
   OL745027W: {
     description:
       'Para Azorín esta novela resume mejor que ninguna el espíritu de Baroja. Y efectivamente: sus principios filosóficos y sociales, la reacción frente a la miseria y el dolor, y los elementos autobiográficos hacen de esta obra muestra privilegiada del mundo del autor. Médico, como Baroja, el protagonista de El árbol de la ciencia asiste impotente a los desafueros de una sociedad mezquina y envilecida. Entre el determinismo fisiológico y la rebelión moral hay la búsqueda de un camino propio.',
@@ -733,6 +878,7 @@ export const BOOK_FIXES = {
       'La ciudad y los perros no es solo un ataque contra la crueldad ejercida sobre un grupo de jóvenes alumnos del Colegio Militar Leoncio Prado, sino también una crítica frontal al concepto erróneo de la virilidad, de sus funciones y de las consecuencias de una educación castrense malentendida. Aunada a la brutalidad propia de la vida militar, a lo largo de las páginas de esta extraordinaria novela, la vehemencia y la pasión de la juventud se desbocan hasta llegar a una furia, una rabia y un fanatismo que anulan toda sensibilidad.',
   },
   OL886846W: {
+    year: 1967,
     description:
       'Tres tristes tigres, la historia de tres amigos en una juerga desenfrenada por los clubes nocturnos, salas de música, barrios marginales y demás submundo habanero en los años previos a Castro, es la mayor obra literaria de Cabrera Infante. Repleta de cambios de estilo, juegos de palabras y ritmos, a medio camino entre Borges y García Márquez, y Joyce y Kafka, su autor manifestó que «está escrita en cubano». Ganadora del Premio Biblioteca Breve, de la editorial Seix Barral, en 1964, fue publicada por primera vez en 1967, en una versión reescrita por motivos de censura. Vetada por Castro en Cuba, la novela apareció en el periodo de auge del boom latinoamericano y es considerada una de las más importantes de las letras hispanoamericanas.',
   },
@@ -757,7 +903,7 @@ export const BOOK_FIXES = {
   OL4797379W: { title: 'Física universitaria' },
   OL57249W: { title: 'Química orgánica' },
   OL1854815W: { title: 'Lecciones sobre la vida del monje que vendió su Ferrari' },
-  OL516728W: { title: 'La piedra de cristal' },
+  OL516728W: { title: 'La piedra de cristal', coverId: 14119100 },
   OL1099513W: { title: 'Viaje al centro de la Tierra' },
   OL1914022W: { title: 'Los pilares de la Tierra' },
   OL46302W: { title: 'Los límites de la Fundación' },
@@ -771,6 +917,27 @@ export const BOOK_FIXES = {
   OL15719630W: { noDescription: true },
   OL258850W: { noDescription: true },
   OL471940W: { noDescription: true },
+  // Years that contradict the work's own text in Open Library, or, for a book written in Spanish, its
+  // oldest Spanish edition: that edition is the first one.
+  OL53908W: { year: 1884 },
+  OL16239762W: { year: 2012 },
+  OL1973422W: { year: 1972 },
+  OL472250W: { year: 1976 },
+  OL273644W: { year: 1982 },
+  OL86707W: { year: 1993 },
+  OL13826369W: { year: 2010 },
+  OL262477W: { year: 1905 },
+  OL77813W: { year: 1985 },
+  OL262438W: { year: 1890 },
+  OL81624W: { year: 1999 },
+  OL17415W: { year: 1953 },
+  OL3454854W: { year: 1974 },
+  OL262454W: { year: 1902 },
+  OL97947W: { year: 2004 },
+  OL22705884W: { year: 2020 },
+  OL16805135W: { year: 2013 },
+  OL26387829W: { year: 2016 },
+  OL5969057W: { title: 'Guerra Mundial Z' },
 }
 
 // How an author is written in the catalog, by the name Open Library gives, folded: lowercase and

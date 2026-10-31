@@ -2,8 +2,9 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { gzipSync } from 'node:zlib'
 import { describe, expect, it } from 'vitest'
+import { DISCOVER_LISTS } from '../src/data/seedDiscover'
 import { DESCRIPTION_GROUPS as APP_GROUPS, descriptionGroup as appGroup } from '../src/lib/catalog'
-import { BOOK_FIXES } from './catalog-lists.mjs'
+import { BOOK_FIXES, REMOVED_WORKS } from './catalog-lists.mjs'
 import { DESCRIPTION_GROUPS, descriptionGroup, translationProblems } from './catalog-rules.mjs'
 
 const ROOT = join(import.meta.dirname, '..')
@@ -34,6 +35,32 @@ describe('the published catalog', () => {
       expect(title).not.toBe('')
       expect(authors.length).toBeGreaterThan(0)
       expect(existsSync(join(ROOT, `public/covers/${id}.jpg`))).toBe(true)
+    }
+  })
+
+  it('has a description for every book past the 54, and only for those books', () => {
+    const seedIds = new Set(seeds.map(({ id }) => id))
+    const newIds = rows.map(([id]) => id).filter((id) => !seedIds.has(id))
+    expect(Object.keys(texts).toSorted()).toEqual(newIds.toSorted())
+  })
+
+  it('leaves no cover, colour or row of a book that is not in the catalog', () => {
+    const ids = rows.map(([id]) => id).toSorted()
+    const covers = readdirSync(join(ROOT, 'public/covers')).map((file) => file.replace('.jpg', ''))
+    expect(covers.toSorted()).toEqual(ids)
+    expect(Object.keys(readJson('scripts/cover-colors.json')).toSorted()).toEqual(ids)
+  })
+
+  it('has taken out the removed books, none of them one of the 54', () => {
+    const ids = new Set(rows.map(([id]) => id))
+    for (const id of Object.keys(REMOVED_WORKS)) expect(ids.has(id), id).toBe(false)
+    for (const { id } of seeds) expect(REMOVED_WORKS[id], id).toBeUndefined()
+  })
+
+  it('keeps every book of Descubrir', () => {
+    const ids = new Set(rows.map(([id]) => id))
+    for (const { bookIds } of DISCOVER_LISTS) {
+      for (const id of bookIds) expect(ids.has(id), id).toBe(true)
     }
   })
 

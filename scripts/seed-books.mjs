@@ -106,7 +106,8 @@ const OVERRIDES = {
   OL274518W: { coverId: 1055706 },
   OL81631W: { title: 'Cementerio de animales' },
   OL450063W: { title: 'Frankenstein o el moderno Prometeo' },
-  OL274505W: { title: 'Cien años de soledad' },
+  // Open Library's cover is the English edition's, with the title in English.
+  OL274505W: { title: 'Cien años de soledad', coverId: 12376969 },
   OL110971W: { title: 'Ficciones' },
   OL503666W: { title: 'Don Quijote de la Mancha', year: 1605 },
   OL66554W: { title: 'Orgullo y prejuicio' },
