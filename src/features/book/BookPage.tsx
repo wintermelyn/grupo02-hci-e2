@@ -72,7 +72,7 @@ export function BookPage() {
 
   return (
     <article>
-      <div className="flex items-center justify-between pt-2 md:pt-4">
+      <div className="flex items-center justify-between pt-3 lg:pt-8">
         <BackLink to={back.to} label={back.label} />
         <Wordmark />
       </div>

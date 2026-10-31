@@ -125,7 +125,7 @@ describe('FolderPage', () => {
       renderApp(TERROR)
       fireEvent.click(openButton())
       expect(searchBox()).toHaveFocus()
-      expect(searchLayer()).toHaveClass('max-md:absolute', 'max-md:inset-0', 'max-md:bg-shell')
+      expect(searchLayer()).toHaveClass('max-md:absolute', 'max-md:inset-0', 'max-md:bg-paper')
       expect(searchLayer()).not.toHaveClass('max-md:hidden')
       expect(main().queryByRole('button', { name: 'Buscar en «Terror»' })).not.toBeInTheDocument()
     })

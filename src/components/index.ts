@@ -22,6 +22,7 @@ export {
   Wordmark,
   type BackLinkProps,
   type PageHeaderProps,
+  type WordmarkProps,
 } from './PageHeader'
 export { bookPath, folderPath } from './paths'
 export { Ribbon } from './Ribbon'

@@ -67,7 +67,7 @@ export function BandSearch({ label, placeholder, value, onChange, children }: Ba
         className={cx(
           'md:w-72',
           open
-            ? 'max-md:absolute max-md:inset-0 max-md:flex max-md:items-center max-md:bg-shell'
+            ? 'max-md:absolute max-md:inset-0 max-md:flex max-md:items-center max-md:bg-paper'
             : 'max-md:hidden',
         )}
       >

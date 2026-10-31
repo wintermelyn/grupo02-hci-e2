@@ -21,12 +21,31 @@ export function BackLink({ to, label = 'Volver' }: BackLinkProps) {
   )
 }
 
-/** On phones there is no top bar, so the band carries the name of the product. */
-export function Wordmark() {
+export interface WordmarkProps {
+  /** In two lines, for a row shared with a title and a button. */
+  stacked?: boolean
+  className?: string
+}
+
+/** The name of the product under lg. From lg, the sidebar says it. */
+export function Wordmark({ stacked = false, className }: WordmarkProps) {
   return (
-    <p className="ml-auto flex shrink-0 flex-col items-end md:hidden">
-      <span className="font-serif text-sm/tight font-semibold">Goodreads</span>
-      <span className="text-xs/tight text-muted">prototipo</span>
+    <p
+      className={cx(
+        'flex shrink-0 lg:hidden',
+        stacked ? 'flex-col items-end' : 'items-baseline gap-1.5',
+        className,
+      )}
+    >
+      <span
+        className={cx(
+          'font-serif font-semibold tracking-tight',
+          stacked ? 'text-sm/tight' : 'text-base',
+        )}
+      >
+        Goodreads
+      </span>
+      <span className={cx('text-xs text-muted', stacked && 'leading-tight')}>prototipo</span>
     </p>
   )
 }
@@ -46,13 +65,13 @@ export interface PageHeaderProps {
    * can cover the row with `absolute inset-0`, as the search of a folder does on a phone.
    */
   action?: ReactNode
-  /** Sits on the band's bottom edge, e.g. a <TagFilter/>. */
+  /** Sits under the title, e.g. a <TagFilter/>. */
   children?: ReactNode
   /** Keeps the product name next to the title, for a short title and a compact action. */
   wordmarkBeside?: boolean
 }
 
-/** The band every section starts with, so each page has one clear place to look first. */
+/** How every section starts: the title leads, with nothing behind it. */
 export function PageHeader({
   title,
   subtitle,
@@ -67,26 +86,24 @@ export function PageHeader({
   const wordmarkAbove = Boolean(backTo || action) && !wordmarkBeside
 
   return (
-    // flow-root: a margin at the foot of a child stays in the band instead of collapsing out of it.
-    <header className={cx('full-bleed flow-root bg-shell pt-2 md:pt-4', !children && 'pb-4')}>
+    // flow-root: a margin at the foot of a child stays in the header instead of collapsing out of it.
+    <header className={cx('flow-root pt-3 lg:pt-8', !children && 'pb-4')}>
       {wordmarkAbove && (
-        <div className="flex min-h-11 items-center justify-between gap-3">
+        <div className={cx('flex min-h-11 items-center gap-3', !backTo && 'lg:hidden')}>
           {backTo && <BackLink to={backTo} label={backLabel} />}
-          <Wordmark />
+          <Wordmark className="ml-auto" />
         </div>
       )}
       <div className="relative flex min-h-11 items-center justify-between gap-3">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           {media}
           <div className="min-w-0 flex-1">
-            <h1 className="font-serif text-title font-semibold tracking-tight md:text-display">
-              {title}
-            </h1>
+            <h1 className="page-title">{title}</h1>
             {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
           </div>
         </div>
         {action && <div className="shrink-0">{action}</div>}
-        {!wordmarkAbove && <Wordmark />}
+        {!wordmarkAbove && <Wordmark stacked={wordmarkBeside} className="ml-auto" />}
       </div>
       {children && <div className="mt-2">{children}</div>}
     </header>

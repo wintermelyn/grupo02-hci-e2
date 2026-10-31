@@ -13,9 +13,7 @@ export const BATCH_SIZE = 6
 function PeriodGroup({ group, from }: { group: FeedGroup; from: string }) {
   return (
     <section className="mt-5 md:grid md:grid-cols-[8rem_minmax(0,1fr)] md:gap-x-6 md:border-t md:border-line md:pt-3 lg:grid-cols-[10rem_minmax(0,1fr)]">
-      <h2 className="font-serif text-heading font-semibold md:sticky md:top-16 md:self-start">
-        {group.label}
-      </h2>
+      <h2 className="section-title md:sticky md:top-4 md:self-start">{group.label}</h2>
       <ul className="mt-1 md:mt-0">
         {group.items.map((item) => (
           <ActivityEntry
