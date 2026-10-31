@@ -1,12 +1,13 @@
 import { Sparkle } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { matchPath, useLocation, useParams } from 'react-router'
-import { BackLink, BookCover, StatusControl, Wordmark } from '../../components'
+import { BookCover, StatusControl } from '../../components'
 import { coverTone } from '../../lib/coverTone'
 import { selectBook, selectEntry, useStore } from '../../store'
 import type { Book, Folder, ReadingStatus } from '../../types'
 import { UNFILED_NAME, UNFILED_PATH } from '../library/filters'
 import { BookFolders } from './BookFolders'
+import { BOOK_COLUMNS, BOOK_SCENE, BookTopRow } from './BookSkeleton'
 import { LedgerRow } from './LedgerRow'
 import { MissingBook } from './MissingBook'
 import { ReadingDetails } from './ReadingDetails'
@@ -35,7 +36,7 @@ function BookDetails({ authors, year, pages }: Book) {
   const edition = [year, pages && `${pages} páginas`].filter(Boolean).join(' · ')
   return (
     <div className="mt-1.5 text-sm text-muted md:text-base">
-      <p>{authors.join(', ')}</p>
+      <p>{authors.join(', ') || 'Autor desconocido'}</p>
       {edition && <p>{edition}</p>}
     </div>
   )
@@ -89,20 +90,16 @@ export function BookPage() {
 
   return (
     <article>
-      <div className="flex items-center justify-between pt-3 lg:pt-8">
-        <BackLink to={back.to} label={back.label} />
-        <Wordmark />
-      </div>
+      <BookTopRow back={back} />
 
       {/*
         One shape for every book. The cover stands on the colour of its book, as in Descubrir, with
         everything that is read beside it, so a long description never leaves the page lopsided.
       */}
-      <div className="md:mt-3 md:grid md:grid-cols-[17.5rem_minmax(0,1fr)] md:items-start md:gap-x-8 lg:grid-cols-[minmax(16.5rem,4fr)_minmax(0,7fr)] lg:gap-x-12">
-        {/* The scene follows the reading on a long page. Its foot leaves room for the ribbon. */}
+      <div className={BOOK_COLUMNS}>
         <div
           style={{ '--tone': coverTone(book.id) } as CSSProperties}
-          className="tone-scene flex justify-center rounded-stage pt-4 pb-6 md:sticky md:top-4 md:px-6 md:pt-10 md:pb-14"
+          className={`tone-scene ${BOOK_SCENE}`}
         >
           <BookCover book={book} size="lg" status={entry?.status} raised />
         </div>

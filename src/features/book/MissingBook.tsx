@@ -1,10 +1,11 @@
 import { BookX } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { Button, EmptyState, ErrorState, LoadingState, PageHeader } from '../../components'
+import { Button, EmptyState, ErrorState, PageHeader } from '../../components'
 import { fetchWork } from '../../lib/openlibrary'
 import { useStore } from '../../store'
 import type { BookId } from '../../types'
+import { BookSkeleton } from './BookSkeleton'
 
 export interface MissingBookProps {
   bookId: BookId
@@ -44,14 +45,7 @@ export function MissingBook({ bookId, back }: MissingBookProps) {
     setAttempt((current) => current + 1)
   }
 
-  if (load === 'loading') {
-    return (
-      <section>
-        <PageHeader title="Cargando libro…" backTo={back.to} backLabel={back.label} />
-        <LoadingState label="Cargando libro…" />
-      </section>
-    )
-  }
+  if (load === 'loading') return <BookSkeleton back={back} />
 
   if (load === 'failed') {
     return (

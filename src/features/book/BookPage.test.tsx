@@ -736,10 +736,20 @@ describe('loading a book the store does not have', () => {
     expect(fetchWork).toHaveBeenCalledWith('OL999W')
     expect(main().getByRole('heading', { level: 1 })).toHaveTextContent('Cargando libro…')
     expect(main().getByText('Cargando libro…', { selector: '.sr-only' })).toBeInTheDocument()
+    expect(main().getByRole('status')).toBeInTheDocument()
+    expect(main().getByRole('link', { name: 'Mis libros' })).toBeInTheDocument()
+    expect(document.querySelector('article .rounded-stage')).not.toBeNull()
+    expect(document.querySelector('article dl')).not.toBeNull()
 
     await act(async () => work.resolve(REMOTE))
     expect(main().getByRole('heading', { level: 1 })).toHaveTextContent('Un libro remoto')
     expect(state().extraBooks.OL999W).toMatchObject(REMOTE)
+  })
+
+  it('says that the author is unknown, where the author would go', async () => {
+    vi.mocked(fetchWork).mockResolvedValue({ ...REMOTE, authors: [] })
+    renderApp('/libro/OL999W')
+    expect(await screen.findByText('Autor desconocido')).toBeInTheDocument()
   })
 
   it('does not look for a book the store has', () => {
