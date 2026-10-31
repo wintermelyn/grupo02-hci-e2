@@ -14,6 +14,16 @@ describe('PageHeader', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Mis libros' })).toBeInTheDocument()
   })
 
+  it('keeps the product name in the row of the title when asked to, even with an action', () => {
+    renderWithRouter(
+      <PageHeader title="Mis libros" action={<Button compact>Buscar</Button>} wordmarkBeside />,
+    )
+    const row = screen.getByRole('heading', { level: 1 }).parentElement?.parentElement
+      ?.parentElement
+    expect(row).toContainElement(wordmark())
+    expect(row).toContainElement(screen.getByRole('button', { name: 'Buscar' }))
+  })
+
   it('puts the media before the title', () => {
     renderWithRouter(<PageHeader title="Camila Torres" media={<span>CT</span>} />)
     const media = screen.getByText('CT')
@@ -21,14 +31,43 @@ describe('PageHeader', () => {
     expect(media.compareDocumentPosition(title)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
   })
 
-  // jsdom has no layout. Without this class, the margin of a child ends up outside the band.
-  it('holds the margin of what it carries inside the band', () => {
+  // jsdom has no layout. Without this class, the margin of a child ends up outside the header.
+  it('holds the margin of what it carries inside the header', () => {
     renderWithRouter(
       <PageHeader title="Amigos">
         <div className="mb-4">Campo</div>
       </PageHeader>,
     )
     expect(header()).toHaveClass('flow-root')
+  })
+
+  it('has nothing behind the title, which leads with its own size', () => {
+    renderWithRouter(<PageHeader title="Mis libros" />)
+    expect(header().className).not.toMatch(/bg-|full-bleed/)
+    expect(screen.getByRole('heading', { level: 1 })).toHaveClass('page-title')
+  })
+
+  it('shows the product name only under lg, where there is no sidebar', () => {
+    renderWithRouter(<PageHeader title="Mis libros" />)
+    expect(wordmark().parentElement).toHaveClass('lg:hidden')
+    expect(screen.getByText('prototipo')).toBeInTheDocument()
+  })
+
+  it('leaves no empty row from lg when only the product name goes above the title', () => {
+    renderWithRouter(<PageHeader title="Terror" action={<Button>Opciones</Button>} />)
+    expect(wordmark().parentElement?.parentElement).toHaveClass('lg:hidden')
+  })
+
+  it('keeps that row from lg when it also carries the way back', () => {
+    renderWithRouter(<PageHeader title="Terror" backTo="/biblioteca" backLabel="Mis libros" />)
+    expect(wordmark().parentElement?.parentElement).not.toHaveClass('lg:hidden')
+  })
+
+  it('stacks the product name when it shares the row with a title and an action', () => {
+    renderWithRouter(
+      <PageHeader title="Mis libros" action={<Button compact>Buscar</Button>} wordmarkBeside />,
+    )
+    expect(wordmark().parentElement).toHaveClass('flex-col')
   })
 
   it('lets an action cover the row of the title', () => {

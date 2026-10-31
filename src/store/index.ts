@@ -39,8 +39,10 @@ type PersistedState = Pick<
 // Stored data from an older version is replaced by the seed. Each owner bumps only their own part
 // (base: the shared types; A and B: the constant in their seed file), so the sum always goes up
 // and nobody has to edit this file.
-const BASE_VERSION = 2
+const BASE_VERSION = 3
 const STORAGE_VERSION = BASE_VERSION + LIBRARY_SEED_VERSION + SOCIAL_SEED_VERSION
+/** The last version with a live search: its books came from outside, but the data is still good. */
+const LIVE_SEARCH_VERSION = 8
 
 const seedBooks: Book[] = books
 
@@ -61,6 +63,25 @@ function buildInitialState(): AppState {
     toast: null,
     undoSnapshot: null,
   }
+}
+
+/**
+ * Keeps the person's data and only cleans the books the live search left. A book outside the library
+ * was only looked at, and goes. One in the library stays, without its text, which came in another
+ * language, and with the cover of the app: the initials stand in if the catalog does not have it.
+ */
+function dropLiveSearch(state: PersistedState): PersistedState {
+  const books = Object.values(state.extraBooks)
+    .filter(({ id }) => Object.hasOwn(state.library, id))
+    .map(({ id, title, authors, year, pages }) => ({
+      id,
+      title,
+      authors,
+      year,
+      pages,
+      coverUrl: `/covers/${id}.jpg`,
+    }))
+  return { ...state, extraBooks: Object.fromEntries(books.map((book) => [book.id, book])) }
 }
 
 function toPersisted(state: AppState): PersistedState {
@@ -84,7 +105,10 @@ export const useStore = create<StoreState>()(
       name: 'gr-e2',
       version: STORAGE_VERSION,
       partialize: toPersisted,
-      migrate: () => toPersisted(buildInitialState()),
+      migrate: (stored, version) =>
+        version === LIVE_SEARCH_VERSION
+          ? dropLiveSearch(stored as PersistedState)
+          : toPersisted(buildInitialState()),
     },
   ),
 )

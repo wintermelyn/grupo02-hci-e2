@@ -1,10 +1,9 @@
 import { BookX } from 'lucide-react'
-import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { Button, EmptyState, ErrorState, LoadingState, PageHeader } from '../../components'
-import { fetchWork } from '../../lib/openlibrary'
-import { useStore } from '../../store'
+import { Button, EmptyState, ErrorState, PageHeader } from '../../components'
+import { isWorkId, useCatalog } from '../../lib/catalog'
 import type { BookId } from '../../types'
+import { BookSkeleton } from './BookSkeleton'
 
 export interface MissingBookProps {
   bookId: BookId
@@ -12,48 +11,17 @@ export interface MissingBookProps {
 }
 
 /**
- * A book the store does not have, e.g. a link opened in another browser. Once found, upsertBook
- * makes the book page take over. Mount it with key={bookId}, so a new book starts over.
+ * A book that is not at hand, e.g. a link opened in another browser. Once the catalog arrives, the
+ * book page takes over if the book is in it. An id that cannot be a book does not need the catalog.
  */
 export function MissingBook({ bookId, back }: MissingBookProps) {
   const navigate = useNavigate()
-  const upsertBook = useStore((state) => state.upsertBook)
-  const [load, setLoad] = useState<'loading' | 'missing' | 'failed'>('loading')
-  const [attempt, setAttempt] = useState(0)
+  const canBeABook = isWorkId(bookId)
+  const { status, retry } = useCatalog({ off: !canBeABook })
 
-  useEffect(() => {
-    // After leaving this book, a late answer must not land on the next one.
-    let abandoned = false
-    fetchWork(bookId).then(
-      (book) => {
-        if (abandoned) return
-        if (book?.id === bookId) upsertBook(book)
-        else setLoad('missing')
-      },
-      () => {
-        if (!abandoned) setLoad('failed')
-      },
-    )
-    return () => {
-      abandoned = true
-    }
-  }, [bookId, attempt, upsertBook])
+  if (status === 'loading') return <BookSkeleton back={back} />
 
-  function retry() {
-    setLoad('loading')
-    setAttempt((current) => current + 1)
-  }
-
-  if (load === 'loading') {
-    return (
-      <section>
-        <PageHeader title="Cargando libro…" backTo={back.to} backLabel={back.label} />
-        <LoadingState label="Cargando libro…" />
-      </section>
-    )
-  }
-
-  if (load === 'failed') {
+  if (status === 'failed') {
     return (
       <section>
         <PageHeader title="No pudimos cargar el libro" backTo={back.to} backLabel={back.label} />

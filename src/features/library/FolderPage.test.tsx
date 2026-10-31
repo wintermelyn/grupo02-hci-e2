@@ -125,16 +125,17 @@ describe('FolderPage', () => {
       renderApp(TERROR)
       fireEvent.click(openButton())
       expect(searchBox()).toHaveFocus()
-      expect(searchLayer()).toHaveClass('max-md:absolute', 'max-md:inset-0', 'max-md:bg-shell')
+      expect(searchLayer()).toHaveClass('max-md:absolute', 'max-md:inset-0', 'max-md:bg-paper')
       expect(searchLayer()).not.toHaveClass('max-md:hidden')
       expect(main().queryByRole('button', { name: 'Buscar en «Terror»' })).not.toBeInTheDocument()
     })
 
     it('takes Opciones out of the way, so it cannot be reached under the field', () => {
       renderApp(TERROR)
-      expect(optionsButton().parentElement?.parentElement).not.toHaveClass('max-md:hidden')
+      const hiddenOnPhone = () => optionsButton().closest('.max-md\\:hidden')
+      expect(hiddenOnPhone()).toBeNull()
       fireEvent.click(openButton())
-      expect(optionsButton().parentElement?.parentElement).toHaveClass('max-md:hidden')
+      expect(hiddenOnPhone()).not.toBeNull()
     })
 
     it('keeps the title for screen readers while the field covers it', () => {
@@ -266,6 +267,15 @@ describe('FolderPage', () => {
       renderApp(TERROR)
       search('zzz')
       expect(main().getByText('Ningún libro de «Terror» coincide con «zzz».')).toBeInTheDocument()
+    })
+
+    it('says the tag and the other folders of each book in a list of a tag', () => {
+      renderApp(`${TERROR}?tag=owned`)
+      const row = (name: RegExp) => main().getByRole('link', { name })
+      expect(row(/^Nuestra parte de noche/)).toHaveTextContent('Próximos')
+      expect(row(/^Nuestra parte de noche/)).not.toHaveTextContent('Terror')
+      expect(row(/^Nuestra parte de noche/)).toHaveTextContent('Lo tengo')
+      expect(row(/^Drácula/)).not.toHaveTextContent('Terror')
     })
 
     it('says which tag held the search back', () => {
@@ -427,6 +437,16 @@ describe('FolderPage', () => {
       expect(nameField()).toHaveValue('Terror')
     })
 
+    it('keeps Guardar and Cancelar in the row of the field, up to 480 px, from a tablet up', () => {
+      renderApp(TERROR)
+      chooseOption('Renombrar carpeta')
+      const row = nameField().parentElement?.parentElement
+      expect(row).toContainElement(saveButton())
+      expect(row).toContainElement(cancelButton())
+      expect(row).toHaveClass('md:flex-row')
+      expect(nameField().parentElement).toHaveClass('md:max-w-120')
+    })
+
     it('has a single primary action', () => {
       renderApp(TERROR)
       chooseOption('Renombrar carpeta')
@@ -447,10 +467,22 @@ describe('FolderPage', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
       expect(bookTitles().length).toBeGreaterThan(0)
       expect(
-        strip().getByText('Esta carpeta tiene 10 libros. Los libros siguen en tu biblioteca.'),
+        strip().getByText('Esta carpeta tiene 10 libros. Siguen en Mis libros.'),
       ).toBeInTheDocument()
       expect(confirmButton().className).toContain('bg-danger')
       expect(state().folders.map(({ id }) => id)).toContain('terror')
+    })
+
+    it('takes the place of the tags from a tablet up, which keep their height', () => {
+      renderApp(TERROR)
+      chooseOption('Eliminar carpeta')
+      const question = main().getByRole('region', { name: 'Eliminar «Terror»' })
+      const tags = screen.getByRole('group', { name: 'Filtrar por estado' })
+      expect(question).toHaveClass('md:absolute', 'md:inset-0')
+      expect(tags.parentElement).toHaveClass('md:invisible')
+      expect(question.parentElement).toContainElement(tags)
+      fireEvent.keyDown(question, { key: 'Escape' })
+      expect(tags.parentElement).not.toHaveClass('md:invisible')
     })
 
     it('counts the books of the folder, not those of the filter', () => {
@@ -464,7 +496,7 @@ describe('FolderPage', () => {
       renderApp('/biblioteca/carpeta/regalos')
       chooseOption('Eliminar carpeta')
       expect(
-        main().getByText('Esta carpeta tiene 1 libro. El libro sigue en tu biblioteca.'),
+        main().getByText('Esta carpeta tiene 1 libro. Sigue en Mis libros.'),
       ).toBeInTheDocument()
     })
 

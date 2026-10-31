@@ -21,8 +21,8 @@ function booksLabel(count: number): string {
 }
 
 /**
- * The tag buttons (D3), which also say how many books each one has. The active one opens into the
- * page below it, so it reads as a tab, with the ribbon hanging over it.
+ * The tag buttons (D3), which also say how many books each one has. The active one is told by its
+ * weight, by the darker text and by the ribbon hanging over it, with no box around the group.
  */
 export function TagFilter({ value, counts, onChange }: TagFilterProps) {
   return (
@@ -41,11 +41,11 @@ export function TagFilter({ value, counts, onChange }: TagFilterProps) {
             aria-label={`${option.label}: ${booksLabel(counts[option.value])}`}
             onClick={() => onChange(option.value)}
             className={cx(
-              'relative flex min-h-14 flex-col items-center justify-end rounded-t-card pt-3 pb-1.5 text-xs whitespace-nowrap',
+              'relative flex min-h-14 flex-col items-center justify-end rounded-control pt-3 pb-1.5 text-xs whitespace-nowrap',
               'transition-colors duration-100',
               active
-                ? 'bg-paper font-bold text-ink'
-                : 'font-medium text-muted hover:text-ink active:bg-sand',
+                ? 'font-bold text-ink'
+                : 'font-medium text-muted hover:bg-shell hover:text-ink active:bg-sand',
             )}
           >
             {active && (

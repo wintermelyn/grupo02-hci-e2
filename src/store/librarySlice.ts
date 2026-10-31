@@ -1,4 +1,5 @@
 import { today } from '../lib/dates'
+import { placesLeft } from '../lib/leaveLibrary'
 import { STATUS_LABELS } from '../lib/status'
 import type { AppState, BookId, ISODate, LibraryEntry } from '../types'
 import type { SliceCreator } from '.'
@@ -55,6 +56,11 @@ function uniqueFolderId(name: string, taken: Set<string>): string {
   return id
 }
 
+function without(library: Library, bookIds: Iterable<BookId>): Library {
+  const removed = new Set(bookIds)
+  return Object.fromEntries(Object.entries(library).filter(([bookId]) => !removed.has(bookId)))
+}
+
 function withFolderIds(
   library: Library,
   bookIds: BookId[],
@@ -67,7 +73,7 @@ function withFolderIds(
   return { ...library, ...Object.fromEntries(changed) }
 }
 
-export const createLibrarySlice: SliceCreator<LibraryActions> = (_set, get) => {
+export const createLibrarySlice: SliceCreator<LibraryActions> = (set, get) => {
   function findFolder(id: string) {
     return get().folders.find((folder) => folder.id === id)
   }
@@ -75,6 +81,17 @@ export const createLibrarySlice: SliceCreator<LibraryActions> = (_set, get) => {
   /** The books a folder change can touch: in the library and not repeated. */
   function entriesOf(bookIds: BookId[]): LibraryEntry[] {
     return [...new Set(bookIds)].flatMap((bookId) => selectEntry(bookId)(get()) ?? [])
+  }
+
+  function bookName(bookId: BookId): string {
+    const title = get().getBook(bookId)?.title
+    return title ? `«${title}»` : 'El libro'
+  }
+
+  /** Names the book and every place it left, because the row it was in may not be on screen. */
+  function leftLabel([first, ...others]: LibraryEntry[]): string {
+    if (others.length > 0) return `${others.length + 1} libros salieron de Mis libros`
+    return `${bookName(first.bookId)} salió de ${placesLeft(first.folderIds, get().folders)}`
   }
 
   return {
@@ -105,11 +122,12 @@ export const createLibrarySlice: SliceCreator<LibraryActions> = (_set, get) => {
     },
 
     removeFromLibrary: (bookIds) => {
-      const removed = new Set(entriesOf(bookIds).map(({ bookId }) => bookId))
-      if (removed.size === 0) return
-      get().commit('Quitado de tu biblioteca', ({ library }) => ({
-        library: Object.fromEntries(
-          Object.entries(library).filter(([bookId]) => !removed.has(bookId)),
+      const removed = entriesOf(bookIds)
+      if (removed.length === 0) return
+      get().commit(leftLabel(removed), ({ library }) => ({
+        library: without(
+          library,
+          removed.map(({ bookId }) => bookId),
         ),
       }))
     },
@@ -172,7 +190,24 @@ export const createLibrarySlice: SliceCreator<LibraryActions> = (_set, get) => {
       }))
     },
 
-    // Stub from the base block: out of this phase. It goes through get().commit(label, mutator).
-    answerWantPrompt: () => {},
+    answerWantPrompt: (bookId, keep) => {
+      const current = selectEntry(bookId)(get())
+      if (current?.status !== 'want') return
+      const { lastWantPromptOn } = get()
+      if (keep) {
+        get().commit(`${bookName(bookId)} sigue en ${STATUS_LABELS.want}`, ({ library }) => ({
+          library: { ...library, [bookId]: { ...current, wantCheckedAt: today() } },
+        }))
+      } else {
+        get().commit(leftLabel([current]), ({ library }) => ({
+          library: without(library, [bookId]),
+        }))
+      }
+      // In the copy of commit, so Deshacer takes the answer back too and the prompt asks again.
+      set(({ undoSnapshot }) => ({
+        lastWantPromptOn: today(),
+        undoSnapshot: undoSnapshot && { ...undoSnapshot, lastWantPromptOn },
+      }))
+    },
   }
 }

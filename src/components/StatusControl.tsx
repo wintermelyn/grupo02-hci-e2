@@ -1,8 +1,9 @@
 import { Pencil, Plus } from 'lucide-react'
 import { today } from '../lib/dates'
+import { foldersLeft } from '../lib/leaveLibrary'
 import { STATUS_LABELS, STATUS_ORDER } from '../lib/status'
 import { selectBook, selectEntry, useStore } from '../store'
-import type { Book, BookId, LibraryEntry, ReadingStatus } from '../types'
+import type { Book, BookId, Folder, LibraryEntry, ReadingStatus } from '../types'
 import { AnchoredMenu } from './AnchoredMenu'
 import { cx } from './cx'
 import { StatusTag } from './StatusTag'
@@ -11,8 +12,8 @@ import { useChanged } from './useChanged'
 export interface StatusControlProps {
   bookId: BookId
   /**
-   * The book's data, needed when it may not be in the store yet (e.g. a live search result):
-   * it is added with upsertBook before any change, so the library never points to an unknown book.
+   * The book's data, needed when it may not be in the store yet (a book of the catalog): it is
+   * added with upsertBook before any change, so Mis libros has it without downloading the catalog.
    */
   book?: Book
   className?: string
@@ -20,16 +21,25 @@ export interface StatusControlProps {
 
 const LIST = new Intl.ListFormat('es-CL', { style: 'long', type: 'conjunction' })
 
-/** Says what leaving costs for this book, so it is read before and not in the toast after. */
-function whatIsLost(entry: LibraryEntry): string | undefined {
+/** Says both things the menu does, in step with "Agregar o quitar" on the row below. */
+const CHANGE_LABEL = 'Cambiar o quitar'
+
+/**
+ * Says what leaving costs for this book, so it is read before and not in the toast after. The book
+ * goes out of its folders and they stay, in the same words as the D5 prompt, and only what is really
+ * gone is called a loss.
+ */
+function whatIsLost(entry: LibraryEntry, allFolders: Folder[]): string | undefined {
   const { folderIds, startedAt, finishedAt, rating } = entry
-  const folders = folderIds.length
+  const folders = foldersLeft(folderIds, allFolders)
   const lost = [
-    folders > 0 && (folders === 1 ? '1 carpeta' : `${folders} carpetas`),
     (startedAt || finishedAt) && 'las fechas',
     rating !== undefined && 'el puntaje',
   ].filter((item): item is string => Boolean(item))
-  return lost.length > 0 ? `Pierdes ${LIST.format(lost)}` : undefined
+  const data = lost.length > 0 ? LIST.format(lost) : undefined
+  if (folders && data) return `También sale de ${folders} y pierdes ${data}`
+  if (folders) return `También sale de ${folders}`
+  return data && `Pierdes ${data}`
 }
 
 /**
@@ -43,6 +53,7 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
   const finishBook = useStore((state) => state.finishBook)
   const upsertBook = useStore((state) => state.upsertBook)
   const removeFromLibrary = useStore((state) => state.removeFromLibrary)
+  const folders = useStore((state) => state.folders)
   const current = entry?.status
   const statusChanged = useChanged(current)
 
@@ -77,8 +88,8 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
         entry && [
           {
             id: 'remove',
-            label: 'Quitar de mi biblioteca',
-            detail: whatIsLost(entry),
+            label: 'Quitar de Mis libros',
+            detail: whatIsLost(entry, folders),
             onSelect: () => removeFromLibrary([bookId]),
           },
         ]
@@ -88,15 +99,15 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
         <button
           {...triggerProps}
           type="button"
-          aria-label={current && `${STATUS_LABELS[current]}. Cambiar estado de ${bookName}`}
+          aria-label={current && `${STATUS_LABELS[current]}. ${CHANGE_LABEL}: ${bookName}`}
           className={cx(
-            'flex min-h-11 items-center gap-3 rounded-control font-semibold',
-            'transition-[background-color,translate] duration-100',
+            'flex min-h-11 items-center gap-3 font-semibold',
+            'transition-[background-color,scale] duration-150',
             // The whole row opens the menu, so the row answers the cursor, like a date row, and
-            // Cambiar only reacts when the cursor is really on it.
+            // Cambiar o quitar only reacts when the cursor is really on it.
             current
-              ? 'group -mx-2 w-[calc(100%+1rem)] justify-between pl-2 hover:bg-ink/5 active:bg-ink/10'
-              : 'w-full justify-center bg-ink px-4 text-white hover:bg-ink/90 active:translate-y-px active:bg-ink/80',
+              ? 'group -mx-2 w-[calc(100%+1rem)] justify-between rounded-control pl-2 hover:bg-ink/5 active:bg-ink/10'
+              : 'w-full justify-center rounded-full bg-ink px-4 text-white hover:bg-ink/90 active:scale-98 active:bg-ink/80',
           )}
         >
           {current ? (
@@ -107,10 +118,11 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
                 status={current}
                 className={statusChanged ? 'animate-tag-in' : undefined}
               />
-              {/* An action in a row, so it is drawn as a quiet compact Button. */}
-              <span className="inline-flex min-h-11 items-center gap-1.5 rounded-control px-2 transition-[background-color,translate] duration-100 group-aria-expanded:bg-ink/5 hover:bg-ink/5 active:translate-y-px active:bg-ink/10">
-                <Pencil aria-hidden size={16} />
-                Cambiar
+              {/* An action in a row, so it is drawn as a quiet compact Button. At 320 px it only
+                  fits next to "Lo quiero" smaller and without the pencil: the text says it all. */}
+              <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-2.5 whitespace-nowrap transition-[background-color,scale] duration-150 group-aria-expanded:bg-sand hover:bg-sand active:scale-98 active:bg-sand-deep max-[359px]:pl-0 max-[359px]:text-sm">
+                <Pencil aria-hidden size={16} className="max-[359px]:hidden" />
+                {CHANGE_LABEL}
               </span>
             </>
           ) : (

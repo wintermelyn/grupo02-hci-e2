@@ -1,34 +1,13 @@
 import { UserX } from 'lucide-react'
 import { useMemo } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router'
-import { Avatar, BookRow, Button, EmptyState, PageHeader } from '../../components'
+import { Avatar, Button, EmptyState, PageHeader } from '../../components'
 import { useStore } from '../../store'
-import type { Book, BookId, User } from '../../types'
+import type { BookId, User } from '../../types'
 import { FRIENDS_PATH, mutualFriendsLabel, sharedBooksLabel } from './people'
 import { PersonAction } from './PersonAction'
-import { RowList, Section } from './Section'
-
-function BookList({ books, sharedIds }: { books: Book[]; sharedIds: Set<BookId> }) {
-  return (
-    <RowList>
-      {books.map((book) => (
-        <li
-          key={book.id}
-          className="border-b border-line last:border-b-0 md:nth-last-2:odd:border-b-0"
-        >
-          <BookRow
-            book={book}
-            note={
-              sharedIds.has(book.id) ? (
-                <span className="block text-sm font-semibold">En común</span>
-              ) : null
-            }
-          />
-        </li>
-      ))}
-    </RowList>
-  )
-}
+import { ReadingCards, ReadShelf } from './PersonBooks'
+import { Section } from './Section'
 
 function PersonDetails({ user, backTo }: { user: User; backTo: string }) {
   const friendships = useStore((state) => state.friendships)
@@ -63,7 +42,7 @@ function PersonDetails({ user, backTo }: { user: User; backTo: string }) {
         backTo={backTo}
         backLabel="Amigos"
       >
-        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 pb-3">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
           <p className="text-sm text-muted">
             {mutualFriendsLabel(user.mutualFriends)} · {sharedBooksLabel(sharedIds.size)}
           </p>
@@ -73,12 +52,12 @@ function PersonDetails({ user, backTo }: { user: User; backTo: string }) {
 
       {reading.length > 0 && (
         <Section title="Está leyendo">
-          <BookList books={reading} sharedIds={sharedIds} />
+          <ReadingCards books={reading} sharedIds={sharedIds} />
         </Section>
       )}
       {read.length > 0 && (
         <Section title="Últimos leídos">
-          <BookList books={read} sharedIds={sharedIds} />
+          <ReadShelf books={read} sharedIds={sharedIds} />
         </Section>
       )}
     </section>

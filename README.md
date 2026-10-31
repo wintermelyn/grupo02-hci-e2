@@ -25,7 +25,7 @@ Antes de cada merge a `main` tienen que pasar `build`, `lint` y `test`.
 | [`PLAN.md`](PLAN.md)                                           | Qué se construye, decisiones técnicas y reparto entre los roles A y B. **Leer primero** |
 | [`docs/desarrollo/contratos.md`](docs/desarrollo/contratos.md) | Quién es dueño de cada archivo y cómo usar el store y los componentes compartidos       |
 | [`docs/desarrollo/tests.md`](docs/desarrollo/tests.md)         | Cómo están armados los tests y qué exigen a cada página                                 |
-| [`docs/desarrollo/catalogo.md`](docs/desarrollo/catalogo.md)   | Cómo se regenera el catálogo de libros desde Open Library                               |
+| [`docs/desarrollo/catalogo.md`](docs/desarrollo/catalogo.md)   | Cómo se prepara el catálogo de libros desde Open Library                                |
 | [`docs/desarrollo/tareas.md`](docs/desarrollo/tareas.md)       | Libros y personas concretos de T1, T2 y T3 (para las instrucciones de la E3)            |
 | [`docs/conceptos-hci.md`](docs/conceptos-hci.md)               | Conceptos del curso y reglas de interfaz                                                |
 | [`docs/registro-ia.md`](docs/registro-ia.md)                   | Registro de uso de IA (anotar cada sesión)                                              |

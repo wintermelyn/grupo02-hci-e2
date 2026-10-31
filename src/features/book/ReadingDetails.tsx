@@ -21,7 +21,7 @@ interface DateRowProps {
 // Chrome ignores :focus on the parts of a date, so nothing can replace the blue of the part being
 // edited. This filter turns it into a colour close to sand and keeps that part marked.
 const DATE_INPUT = cx(
-  'relative min-h-11 w-full min-w-0 rounded-control bg-transparent py-2 pr-9 pl-2 font-medium',
+  'relative min-h-11 w-full min-w-0 rounded-control bg-transparent py-2 pr-7 pl-2 font-medium',
   'transition-colors duration-100 hover:bg-ink/5',
   '[&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0',
   '[&::-webkit-calendar-picker-indicator]:m-0 [&::-webkit-calendar-picker-indicator]:size-full',
@@ -60,7 +60,8 @@ function DateRow({ label, value, min, max, onCommit }: DateRowProps) {
 
   return (
     <LedgerRow label={<label htmlFor={id}>{label}</label>}>
-      <span className="relative -mx-2 block">
+      {/* Over the left only: to the right, the 4 px of the focus outline stay inside the margin. */}
+      <span className="relative mr-1 -ml-2 block">
         <input
           id={id}
           type="date"
@@ -78,7 +79,7 @@ function DateRow({ label, value, min, max, onCommit }: DateRowProps) {
         <CalendarDays
           aria-hidden
           size={18}
-          className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-muted supports-[-moz-appearance:none]:hidden"
+          className="pointer-events-none absolute top-1/2 right-0 -translate-y-1/2 text-muted supports-[-moz-appearance:none]:hidden"
         />
       </span>
     </LedgerRow>
