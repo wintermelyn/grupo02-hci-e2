@@ -20,6 +20,16 @@ export function BackLink({ to, label = 'Volver' }: BackLinkProps) {
   )
 }
 
+/** On phones there is no top bar, so the band carries the name of the product. */
+export function Wordmark() {
+  return (
+    <p className="flex shrink-0 flex-col items-end md:hidden">
+      <span className="font-serif text-sm/tight font-semibold">Goodreads</span>
+      <span className="text-xs/tight text-muted">prototipo</span>
+    </p>
+  )
+}
+
 export interface PageHeaderProps {
   title: string
   /** One line of context under the title. */
@@ -50,7 +60,7 @@ export function PageHeader({
           <h1 className="font-serif text-display font-semibold tracking-tight">{title}</h1>
           {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
         </div>
-        {action && <div className="shrink-0">{action}</div>}
+        {action ? <div className="shrink-0">{action}</div> : <Wordmark />}
       </div>
       {children && <div className="mt-3">{children}</div>}
     </header>

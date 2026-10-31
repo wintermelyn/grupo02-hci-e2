@@ -76,18 +76,23 @@ export function LibraryPage() {
       .sort(compareTitles)
   }, [entries, tag, bookOf])
 
-  const board = useMemo(
-    () =>
-      [...folders]
-        .sort((a, b) => Number(b.pinned ?? false) - Number(a.pinned ?? false))
-        .map((folder) => ({
-          folder,
-          books: entries
-            .filter(({ folderIds }) => folderIds.includes(folder.id))
-            .flatMap(({ bookId }) => bookOf(bookId) ?? []),
-        })),
-    [folders, entries, bookOf],
-  )
+  const board = useMemo(() => {
+    // A book can be in several folders, but each card should show covers of its own.
+    const shown = new Set<string>()
+    return [...folders]
+      .sort((a, b) => Number(b.pinned ?? false) - Number(a.pinned ?? false))
+      .map((folder) => {
+        const books = entries
+          .filter(({ folderIds }) => folderIds.includes(folder.id))
+          .flatMap(({ bookId }) => bookOf(bookId) ?? [])
+        const covers = [
+          ...books.filter(({ id }) => !shown.has(id)),
+          ...books.filter(({ id }) => shown.has(id)),
+        ].slice(0, 2)
+        for (const { id } of covers) shown.add(id)
+        return { folder, count: books.length, covers }
+      })
+  }, [folders, entries, bookOf])
 
   // Replaces the entry, so Back leaves Mis libros instead of undoing each filter.
   function chooseTag(value: TagFilterValue) {
@@ -108,10 +113,10 @@ export function LibraryPage() {
       {tag === 'all' ? (
         <section className="mt-5">
           <h2 className="mb-3 font-serif text-heading font-semibold">Mis carpetas</h2>
-          <ul className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4">
-            {board.map(({ folder, books }) => (
+          <ul className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4 lg:grid-cols-5">
+            {board.map(({ folder, count, covers }) => (
               <li key={folder.id}>
-                <FolderCard folder={folder} books={books} />
+                <FolderCard folder={folder} count={count} covers={covers} />
               </li>
             ))}
           </ul>

@@ -22,9 +22,10 @@ describe('BookPage', () => {
     expect(main().getByText(/Un padre y un hijo atraviesan Argentina/)).toBeInTheDocument()
   })
 
-  it('leaves the section out when the book has no description', () => {
+  it('says so when the book has no description, without inventing one', () => {
     renderApp(CARRIE)
-    expect(main().queryByRole('heading', { name: 'Sobre este libro' })).not.toBeInTheDocument()
+    expect(main().getByRole('heading', { name: 'Sobre este libro' })).toBeInTheDocument()
+    expect(main().getByText('Aún no tenemos descripción de este libro.')).toBeInTheDocument()
   })
 
   it('shows every folder of the book, each one linking to it', () => {

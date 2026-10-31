@@ -14,9 +14,7 @@ const MAX_RATING = 5
 const RATINGS = Array.from({ length: MAX_RATING }, (_, index) => index + 1)
 
 function StarIcon({ filled, size }: { filled: boolean; size: number }) {
-  return (
-    <Star aria-hidden size={size} className={filled ? 'fill-star text-star-edge' : 'text-muted'} />
-  )
+  return <Star aria-hidden size={size} className={filled ? 'fill-ink text-ink' : 'text-muted'} />
 }
 
 function ratingLabel(value: number | undefined): string {
@@ -30,7 +28,7 @@ export function Stars({ value, onChange, label = 'Puntaje' }: StarsProps) {
     return (
       <span role="img" aria-label={ratingLabel(value)} className="inline-flex gap-0.5">
         {RATINGS.map((rating) => (
-          <StarIcon key={rating} filled={rating <= (value ?? 0)} size={16} />
+          <StarIcon key={rating} filled={rating <= (value ?? 0)} size={14} />
         ))}
       </span>
     )

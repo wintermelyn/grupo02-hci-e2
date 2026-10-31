@@ -78,7 +78,7 @@ export function AppShell() {
             <ul className="flex lg:gap-1">
               <NavItems
                 layout="min-h-16 gap-2 px-2 lg:px-3"
-                ribbon="top-0 h-3.5 w-2.5"
+                ribbon="top-0 h-2.5 w-2.25"
                 iconSize={20}
               />
             </ul>
@@ -98,7 +98,7 @@ export function AppShell() {
         <ul className="flex px-1">
           <NavItems
             layout="min-h-16 flex-col justify-center gap-0.5 text-xs"
-            ribbon="top-0 h-3.5 w-2.5"
+            ribbon="top-0 h-2.5 w-2.25"
             iconSize={22}
           />
         </ul>

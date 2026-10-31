@@ -54,6 +54,7 @@
   --color-paper: #faf8f6;
   --color-shell: #f4f1ea;
   --color-sand: #ebe2d7;
+  --color-sand-deep: #dfd3c4;
   --color-line: #e9e2d8;
   --color-ink: #1e1915;
   --color-muted: #5f564d;
@@ -62,8 +63,6 @@
   --color-owned: #6b3a63;
   --color-reading: #85490f;
   --color-read: #2a6249;
-  --color-star: #e87400;
-  --color-star-edge: #a85400;
   --color-danger: #a3341c;
 
   --font-sans: Figtree, ui-sans-serif, system-ui, sans-serif;
@@ -83,6 +82,7 @@
   --shadow-card: 0 1px 2px rgb(30 25 21 / 7%), 0 3px 10px -5px rgb(30 25 21 / 14%);
   --shadow-float: 0 2px 4px rgb(30 25 21 / 14%), 0 18px 34px -8px rgb(30 25 21 / 40%);
   --shadow-book: 0 1px 1px rgb(30 25 21 / 20%), 0 6px 12px -5px rgb(30 25 21 / 35%);
+  --shadow-book-lg: 0 2px 3px rgb(30 25 21 / 22%), 0 16px 26px -10px rgb(30 25 21 / 50%);
 
   --ease-quick: cubic-bezier(0.16, 1, 0.3, 1);
   --animate-tag-in: tag-in 180ms var(--ease-quick);
@@ -103,6 +103,9 @@
     }
   }
 }
+
+/* Phones held so the screen is short, where the book page moves its cover next to the title. */
+@custom-variant short (@media (max-height: 640px) and (width < 48rem));
 
 /* Reaches the edges of the screen from inside the app's centred column, keeping its text aligned. */
 @utility full-bleed {

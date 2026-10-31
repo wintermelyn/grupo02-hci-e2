@@ -46,6 +46,13 @@ describe('LibraryPage', () => {
     expect(main().getByRole('link', { name: /Novela/ })).toHaveTextContent('9 libros')
   })
 
+  it('shows different covers on each card, even for a book in two folders', () => {
+    renderApp('/biblioteca')
+    const covers = [...screen.getByRole('main').querySelectorAll('img')].map((img) => img.src)
+    expect(covers).toHaveLength(10)
+    expect(new Set(covers).size).toBe(10)
+  })
+
   it('replaces the board with the books of the chosen tag, in title order', () => {
     renderApp('/biblioteca')
     fireEvent.click(tagButton(/^Lo tengo/))

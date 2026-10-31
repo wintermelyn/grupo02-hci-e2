@@ -206,7 +206,7 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
         hidden={!open}
         onKeyDown={onMenuKeyDown}
         className={cx(
-          'absolute inset-x-0 z-30 rounded-float bg-white p-1.5 shadow-float md:right-auto md:w-72',
+          'absolute inset-x-0 z-30 rounded-float bg-white p-1.5 shadow-float',
           'transition-[opacity,translate,display] transition-discrete duration-150 ease-quick',
           'starting:-translate-y-1 starting:opacity-0 [&[hidden]]:opacity-0',
           placement === 'below' ? 'top-full mt-1.5' : 'bottom-full mb-1.5',

@@ -17,9 +17,9 @@ export interface BookCoverProps {
 }
 
 const SIZE_CLASSES: Record<BookCoverSize, string> = {
-  sm: 'w-11 text-sm',
+  sm: 'w-14 text-sm md:w-16',
   fill: 'w-full text-xl',
-  lg: 'w-41 text-3xl',
+  lg: 'w-41 text-3xl short:w-22 md:w-56',
 }
 
 const RIBBON_CLASSES: Record<BookCoverSize, string> = {
@@ -29,7 +29,7 @@ const RIBBON_CLASSES: Record<BookCoverSize, string> = {
 }
 
 // Dark enough for white initials at 4.5:1 or more.
-const PLACEHOLDER_COLOURS = ['#1e1915', '#2f4a78', '#6b3a63', '#85490f', '#2a6249', '#7a2334']
+const PLACEHOLDER_COLOURS = ['#1e1915', '#2f4a78', '#6b3a63', '#85490f', '#5f564d', '#7a2334']
 
 function placeholderColour(id: string): string {
   let hash = 0
@@ -47,6 +47,8 @@ function initials(title: string): string {
     .toLocaleUpperCase('es-CL')
 }
 
+const BOX_RATIO = 2 / 3
+
 // The hinge of a printed cover, which also separates pale covers from a pale background.
 const HINGE =
   'after:pointer-events-none after:absolute after:inset-y-0 after:left-0 after:w-2 after:bg-linear-to-r after:from-ink/15 after:to-transparent'
@@ -55,48 +57,56 @@ const HINGE =
  * Decorative: every screen shows the title next to the cover, so screen readers skip it.
  * Falls back to the placeholder when there is no image or it fails to load.
  *
- * `lg` keeps the whole cover: it fits inside a fixed 2:3 box, so nothing jumps when the image
- * loads, and sits on the box's bottom edge, where the ribbon comes out.
+ * `lg` keeps the whole cover: it takes its real shape inside a fixed 2:3 box, so nothing around it
+ * jumps when the image loads, and sits on the box's bottom edge, where the ribbon comes out.
  */
 export function BookCover({ book, size = 'fill', status, className }: BookCoverProps) {
   const [failedUrl, setFailedUrl] = useState<string>()
   const statusChanged = useChanged(status)
+  const [ratio, setRatio] = useState<number>()
   const showImage = book.coverUrl !== undefined && book.coverUrl !== failedUrl
-  const wholeCover = size === 'lg' && showImage
+  const wholeCover = size === 'lg' && showImage && ratio !== undefined
 
   return (
     <span
       className={cx('relative isolate block shrink-0', SIZE_CLASSES[size], className)}
       aria-hidden
     >
-      <span
-        className={cx(
-          'relative block aspect-2/3',
-          !wholeCover && cx('overflow-hidden rounded-[2px_3px_3px_2px] shadow-book', HINGE),
-        )}
-      >
-        {showImage ? (
-          <img
-            src={book.coverUrl}
-            alt=""
-            loading={size === 'lg' ? 'eager' : 'lazy'}
-            decoding="async"
-            onError={() => setFailedUrl(book.coverUrl)}
-            className={cx(
-              'block size-full',
-              wholeCover
-                ? 'object-contain object-bottom drop-shadow-[0_10px_14px_rgb(30_25_21/32%)]'
-                : 'bg-sand object-cover',
-            )}
-          />
-        ) : (
-          <span
-            className="flex size-full items-center justify-center font-serif font-semibold text-white"
-            style={{ backgroundColor: placeholderColour(book.id) }}
-          >
-            {initials(book.title)}
-          </span>
-        )}
+      <span className="flex aspect-2/3 items-end justify-center">
+        <span
+          className={cx(
+            'relative block aspect-2/3 w-full overflow-hidden rounded-[2px_3px_3px_2px]',
+            size === 'lg' ? 'shadow-book-lg' : 'shadow-book',
+            HINGE,
+          )}
+          style={
+            wholeCover
+              ? { aspectRatio: ratio, width: `${Math.min(ratio / BOX_RATIO, 1) * 100}%` }
+              : undefined
+          }
+        >
+          {showImage ? (
+            <img
+              src={book.coverUrl}
+              alt=""
+              loading={size === 'lg' ? 'eager' : 'lazy'}
+              decoding="async"
+              onLoad={({ currentTarget }) => {
+                if (size === 'lg')
+                  setRatio(currentTarget.naturalWidth / currentTarget.naturalHeight)
+              }}
+              onError={() => setFailedUrl(book.coverUrl)}
+              className="block size-full bg-sand object-cover"
+            />
+          ) : (
+            <span
+              className="flex size-full items-center justify-center font-serif font-semibold text-white"
+              style={{ backgroundColor: placeholderColour(book.id) }}
+            >
+              {initials(book.title)}
+            </span>
+          )}
+        </span>
       </span>
       {status && (
         <Ribbon

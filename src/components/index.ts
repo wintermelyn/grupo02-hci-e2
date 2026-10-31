@@ -6,7 +6,13 @@ export { Button, type ButtonProps, type ButtonVariant } from './Button'
 export { EmptyState, type EmptyStateProps } from './EmptyState'
 export { ErrorState, type ErrorStateProps } from './ErrorState'
 export { LoadingState, type LoadingStateProps } from './LoadingState'
-export { BackLink, PageHeader, type BackLinkProps, type PageHeaderProps } from './PageHeader'
+export {
+  BackLink,
+  PageHeader,
+  Wordmark,
+  type BackLinkProps,
+  type PageHeaderProps,
+} from './PageHeader'
 export { bookPath, folderPath } from './paths'
 export { Ribbon } from './Ribbon'
 export { Stars, type StarsProps } from './Stars'

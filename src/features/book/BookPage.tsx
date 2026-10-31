@@ -8,6 +8,7 @@ import {
   folderPath,
   PageHeader,
   StatusControl,
+  Wordmark,
 } from '../../components'
 import { selectBook, selectEntry, useStore } from '../../store'
 import type { Book, LibraryEntry } from '../../types'
@@ -42,7 +43,7 @@ function BookFolders({ entry }: { entry: LibraryEntry }) {
             <li key={id}>
               <Link
                 to={folderPath(id)}
-                className="inline-flex min-h-11 items-center rounded-control bg-sand px-3 font-medium transition-colors duration-100 hover:bg-line active:bg-shell"
+                className="inline-flex min-h-11 items-center rounded-control bg-sand px-3 font-medium transition-[background-color,translate] duration-100 hover:bg-sand-deep active:translate-y-px active:bg-sand-deep"
               >
                 {name}
               </Link>
@@ -77,41 +78,38 @@ export function BookPage() {
   }
 
   return (
-    // On short screens the page always has room to scroll, so the menu can open below the control.
-    <article className="[@media(max-height:640px)]:min-h-[calc(100dvh+2.5rem)]">
-      <div className="full-bleed bg-shell pt-2 md:mx-0 md:bg-transparent md:px-0 md:pt-6">
+    <article>
+      <div className="full-bleed flex items-center justify-between bg-shell pt-2 short:bg-transparent md:mx-0 md:bg-transparent md:px-0 md:pt-6">
         <BackLink to={back.to} label={back.label} />
+        <Wordmark />
       </div>
 
-      <div className="md:mt-2 md:grid md:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] md:items-start md:gap-10">
-        {/* The band keeps the cover in view: the menu always opens below it. */}
-        <div className="full-bleed flex justify-center bg-shell pt-1 pb-9 md:mx-0 md:rounded-card md:px-0 md:pt-9 md:pb-12">
-          <BookCover
-            book={book}
-            size="lg"
-            status={entry?.status}
-            className="[@media(max-height:640px)]:w-28"
-          />
+      {/* On a short phone the cover moves next to the title, so the menu fits without scrolling. */}
+      <div className="short:grid short:grid-cols-[5.5rem_minmax(0,1fr)] short:items-center short:gap-x-3.5 md:mt-2 md:grid md:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] md:grid-rows-[auto_1fr] md:items-start md:gap-x-10">
+        <div className="full-bleed flex justify-center bg-shell pt-1 pb-9 short:mx-0 short:bg-transparent short:p-0 short:pb-2 md:row-span-2 md:mx-0 md:rounded-card md:px-0 md:pt-6 md:pb-11">
+          <BookCover book={book} size="lg" status={entry?.status} />
         </div>
 
-        <div className="pt-6 md:pt-0">
-          <header className="text-center md:text-left">
-            <h1 className="font-serif text-title font-semibold tracking-tight md:text-display">
-              {book.title}
-            </h1>
-            <p className="mt-0.5 text-muted">{bookDetails(book)}</p>
-          </header>
+        <header className="pt-6 text-center short:pt-0 short:text-left md:pt-0 md:text-left">
+          <h1 className="font-serif text-title font-semibold tracking-tight short:text-heading md:text-display">
+            {book.title}
+          </h1>
+          <p className="mt-0.5 text-muted">{bookDetails(book)}</p>
+        </header>
 
+        <div className="short:col-span-2 md:col-start-2">
           <StatusControl bookId={book.id} book={book} className="mt-3.5 md:max-w-sm" />
 
           {entry && <BookFolders entry={entry} />}
 
-          {book.description && (
-            <section className="mt-5">
-              <h2 className="text-sm font-semibold text-muted">Sobre este libro</h2>
-              <p className="mt-1 max-w-prose whitespace-pre-line">{book.description}</p>
-            </section>
-          )}
+          <section className="mt-5">
+            <h2 className="text-sm font-semibold text-muted">Sobre este libro</h2>
+            {book.description ? (
+              <p className="mt-1 max-w-[34rem] whitespace-pre-line">{book.description}</p>
+            ) : (
+              <p className="mt-1 text-muted">Aún no tenemos descripción de este libro.</p>
+            )}
+          </section>
         </div>
       </div>
     </article>

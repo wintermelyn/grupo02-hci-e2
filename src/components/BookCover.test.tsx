@@ -13,6 +13,17 @@ describe('BookCover', () => {
     expect(container).toHaveTextContent('EL')
   })
 
+  it('takes the real shape of a large cover once it loads', () => {
+    const { container } = render(<BookCover book={book} size="lg" />)
+    const image = container.querySelector('img') as HTMLImageElement
+    Object.defineProperties(image, {
+      naturalWidth: { value: 200 },
+      naturalHeight: { value: 400 },
+    })
+    fireEvent.load(image)
+    expect(image.parentElement).toHaveStyle({ aspectRatio: '0.5', width: '75%' })
+  })
+
   it('shows no ribbon for a book without a status', () => {
     const { container } = render(<BookCover book={book} />)
     expect(ribbonOf(container)).not.toBeInTheDocument()
