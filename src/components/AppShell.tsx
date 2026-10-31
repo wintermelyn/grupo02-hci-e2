@@ -1,8 +1,10 @@
 import { Compass, Ellipsis, House, LibraryBig, Search, type LucideIcon } from 'lucide-react'
+import { useRef } from 'react'
 import { Link, matchPath, Outlet, useLocation } from 'react-router'
 import { cx } from './cx'
 import { Ribbon } from './Ribbon'
 import { Toast } from './Toast'
+import { usePageTitle } from './usePageTitle'
 import { useScrollMemory } from './useScrollMemory'
 
 interface Section {
@@ -67,7 +69,9 @@ function NavItems({
 }
 
 export function AppShell() {
+  const main = useRef<HTMLElement>(null)
   useScrollMemory()
+  usePageTitle(main)
 
   return (
     <div className="min-h-dvh">
@@ -93,7 +97,7 @@ export function AppShell() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-app px-4 pb-36 md:pb-12">
+      <main ref={main} className="mx-auto w-full max-w-app px-4 pb-36 md:pb-12">
         <Outlet />
       </main>
 
