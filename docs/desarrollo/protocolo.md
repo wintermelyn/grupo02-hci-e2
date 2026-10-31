@@ -26,14 +26,43 @@ La sesión integra los PR en GitHub con `gh pr merge --merge`, nunca antes de `A
 
 - **Qué manda:** el informe, después `PLAN.md` y después `DESIGN.md`. `DESIGN.md` fija tipografía, color, densidad, formas y un gesto propio. Las pantallas, los flujos, los textos y D1–D6 siguen saliendo del informe y del plan. Ante un choque con las 14 reglas de interfaz de `PLAN.md`, ganan las reglas.
 - **Modo:** todas las pantallas son de modo Operate. Cada una se reconoce primero como una app para ordenar libros, con controles estándar.
-- **Dónde corre Impeccable:** en la sesión principal, en esta carpeta, porque vive en `.claude/`. Se usa en la fase 2, para crear el mundo visual, en las fases 3 y 4, para revisar las pantallas nuevas, y en la fase 5, para el pulido con `/impeccable polish`.
+- **Dónde corren las skills:** Impeccable y design-taste-frontend viven en `.claude/`, que no llega a los worktrees. Un agente en worktree las usa por la ruta absoluta de esta carpeta. Impeccable crea el mundo visual en la fase 2 y pule en la fase 5, con `/impeccable polish`. Desde la fase 3 ambas se usan antes de construir y al revisar.
 - **Quién elige:** Impeccable propone las direcciones en su página y la sesión espera. Matías elige, y el CP registra la elegida y las descartadas.
-- **Agentes en paralelo:** construyen con `DESIGN.md`, los tokens de `src/index.css` y los componentes compartidos. Lo que el sistema no cubra se anota como decisión para el CP.
-- **Revisión de las fases 3 y 4:** va después de corregir los hallazgos del recorrido.
-  1. La sesión corre `.claude/skills/impeccable/scripts/impeccable detect --json src`.
-  2. Lanza el agente `impeccable-finish-reviewer` sobre las pantallas nuevas, con sus capturas en los cuatro dispositivos y `DESIGN.md` como vara.
-  3. Corrige sus arreglos, vuelve a capturar y le pide veredicto otra vez.
-  4. La revisión termina con veredicto `ship` o, tras dos rondas de arreglos, con lo abierto como hallazgo del CP. El veredicto va en la evidencia del CP.
+- **Agentes en paralelo:** construyen con `DESIGN.md`, los tokens de `src/index.css` y los componentes compartidos. Lo que el sistema no cubra sigue "Antes de construir" y se anota como decisión para el CP.
+
+### Antes de construir
+
+Aplica a cada pantalla nueva y a cada pieza que `DESIGN.md` no cubra. Leer una skill no cuenta como usarla.
+
+1. Quien construye corre `impeccable context --target <archivo>`.
+2. Corre `draw.mjs --app --kind <tipo> --brief "<producto>" --keep palette,type --options 3`, elige una dirección y saca su hoja completa. La paleta, la tipografía y la Cinta marcapáginas se mantienen.
+3. Construye tres propuestas de verdad distintas de esa pieza. Cambiar solo el radio o el color no cuenta. Las captura en celular y computador.
+4. Elige una, con una razón que venga de este producto, y sigue. El CP muestra las tres para que Matías pueda cambiarla.
+5. Su informe trae los comandos que corrió, sus resultados y las capturas de las tres. Si una herramienta no corre, informa el error exacto.
+
+### Fallas ya vistas
+
+Quien construye y quien revisa comprueban cada punto en el navegador, en los cuatro dispositivos. Las capturas, las medidas y los revisores corren una vez, cuando el trabajo está terminado, y no después de cada cambio.
+
+- **Lugar:** lo que se abre aparece donde se tocó. Un control no abre algo más abajo ni empuja la lista.
+- **Forma:** una pantalla mantiene su forma con el dato presente o ausente. Lo que falta se avisa en el mismo lugar donde estaría.
+- **Borde:** ningún campo ni bloque queda pegado a un cambio de color. La distancia se mide.
+- **Un sentido por botón:** un botón no cambia de significado según el estado. Quien pierde datos lee cuáles antes de confirmar.
+- **Sin modales:** ni diálogos ni paneles inferiores. Las alternativas están en `DESIGN.md`.
+- **Espacio:** el primer contenido útil se mide a 320 px y su alto va en el informe.
+- **Casos extremos:** título y nombre largos, dato ausente, listas vacías y control con su texto más largo. Nada salta de línea sin querer ni se sale del margen.
+- **Medidas:** contraste, áreas de 44 px y scroll horizontal se miden; no se estiman.
+
+### Revisión de las fases 3 y 4
+
+Va después de corregir los hallazgos del recorrido.
+
+1. La sesión corre `.claude/skills/impeccable/scripts/impeccable detect --json src`, y `lint.mjs --app src` e `inspect.mjs --app <url>` de design-taste-frontend.
+2. Lanza el agente `impeccable-finish-reviewer` sobre las pantallas nuevas, con sus capturas en los cuatro dispositivos, `DESIGN.md` como vara y "Fallas ya vistas" como lista. Le pasa las palabras de Matías y las capturas, sin el razonamiento de la sesión.
+3. Corrige sus arreglos, vuelve a capturar y le pide veredicto otra vez.
+4. La revisión termina con veredicto `ship` o, tras dos rondas de arreglos, con lo abierto como hallazgo del CP. El veredicto va en la evidencia del CP.
+
+Un comentario de Matías sobre el aspecto se encarga a un agente nuevo, con sus palabras textuales, para que no herede el razonamiento de la sesión.
 
 ## 1. Empezar
 
@@ -51,9 +80,9 @@ Una fase parte cuando Matías escribe `Aprobé el CP<n>` con sus respuestas. La 
 
 Aplica cuando un workflow construye en paralelo. Cada agente:
 
-- trabaja en su propio worktree, creado desde el último commit de la rama de la fase, y lo comprueba antes de escribir;
+- trabaja en su propio worktree, creado desde el último commit de la rama de la fase, y lo comprueba antes de escribir. Si nació de otro commit, lo avanza con `git merge --ff-only`;
 - parte con `npm ci`;
-- recibe las secciones de `PLAN.md` que le tocan y `DESIGN.md`;
+- recibe las secciones de `PLAN.md` que le tocan, `DESIGN.md` y "Diseño visual" de este protocolo;
 - hace commit en su rama.
 
 Después un agente integra las ramas de los agentes en la rama de la fase hasta que pasen format, lint, test y build. Ese resultado llega a esta rama con el PR de la fase.
@@ -127,7 +156,7 @@ Trae cuatro cosas, en este orden:
 ## 6. Cerrar
 
 1. Se marca en la sección 4 de `PLAN.md` lo que quedó hecho.
-2. Se agrega a `docs/registro-ia.md` una fila con el prompt en español formal y con ortografía correcta, con todo su contenido y cada pedido. Va en una sola línea, con `<br>` entre párrafos y con `|` y `<` escapados con `\`.
+2. Se agrega a `docs/registro-ia.md` una fila con el prompt en español formal y con ortografía correcta, con todo su contenido y cada pedido. Va en una sola línea, con `<br>` entre párrafos y con `|` y `<` escapados con `\`. Lo que la persona ajustó sobre el resultado va en "Qué cambiamos" como los cambios hechos, sin hablar de iteraciones ni de prompts; la sesión deja un borrador y la persona lo revisa y completa. Un encargo extenso hecho sobre ese resultado puede ir como fila propia, justo después.
 3. Se hace commit en la rama de la fase y se hace push.
 4. Se abre el PR de la fase, o se actualiza si ya existe. No se integra.
 5. Se abre la página con `open docs/desarrollo/checkpoints/cp<n>/index.html`.

@@ -17,5 +17,3 @@ Cada test va junto al código que prueba (`*.test.ts` o `*.test.tsx`). `src/test
 - no llame a `console.error`, lo que incluye las advertencias de `act()` de React.
 
 Si una página carga algo de forma asíncrona (por ejemplo `fetchWork` o la búsqueda con espera), se prueba en su propio test con `findBy*` o `waitFor`; no se relaja el test de rutas.
-
-`src/test/setup.ts` agrega a jsdom lo mínimo de `<dialog>` (`showModal` y `close`), así que un `BottomSheet` abierto funciona en los tests.
