@@ -1,4 +1,4 @@
-import { fireEvent, screen, within } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { renderApp } from '../test/router'
 
@@ -90,5 +90,26 @@ describe('AppShell', () => {
       fireEvent.click(screen.getByRole('button', { name: /Leído/ }))
       expect(scrolled()).toBe(400)
     })
+  })
+})
+
+describe('title of the tab', () => {
+  it.each([
+    ['/', 'Inicio · Goodreads'],
+    ['/biblioteca', 'Mis libros · Goodreads'],
+    ['/buscar', 'Buscar · Goodreads'],
+    ['/?actividad=1', 'Actividad de tus amigos · Goodreads'],
+    ['/libro/OL81626W', 'Carrie · Goodreads'],
+  ])('%s is named as its page', (path, title) => {
+    renderApp(path)
+    expect(document.title).toBe(title)
+  })
+
+  it('follows a change inside the page, which does not change the path', async () => {
+    renderApp('/')
+    fireEvent.click(screen.getByRole('link', { name: /Ver toda la actividad/ }))
+    await waitFor(() => expect(document.title).toBe('Actividad de tus amigos · Goodreads'))
+    fireEvent.click(screen.getByRole('link', { name: 'Inicio', current: false }))
+    await waitFor(() => expect(document.title).toBe('Inicio · Goodreads'))
   })
 })
