@@ -39,23 +39,24 @@ Son las tareas que el prototipo debe permitir completar de principio a fin. Las 
 
 ## 2. Qué se construye
 
-Es una página web responsiva. En el celular tiene una barra de navegación inferior y en el computador una barra superior con las mismas 5 secciones. El flujo principal es Inicio → Mis libros → carpeta → ficha del libro.
+Es una página web responsiva. En el celular y la tablet tiene una barra de navegación inferior, y en el computador una barra lateral con las mismas 5 secciones. El flujo principal es Inicio → Mis libros → carpeta → ficha del libro.
 
 ### Pantallas y rutas
 | Ruta | Pantalla | Dueño |
 |---|---|---|
 | `/` | **Inicio:** tarjeta "Leyendo ahora", que abre la ficha, + actividad de amigos | B |
+| `/actividad` | **Toda la actividad:** vista aparte dentro de Inicio, por Hoy, Esta semana y Antes | B |
 | `/biblioteca` | **Mis libros:** aviso periódico, botones de tag, tablero "Mis carpetas" (2 portadas, nombre, cantidad), "+ Nueva carpeta". Con un tag activo, la lista de libros con ese tag | A |
 | `/biblioteca/carpeta/:folderId` | **Carpeta:** botones de tag, lista de libros con su tag, buscador interno | A |
 | `/libro/:bookId` | **Ficha:** portada, datos, tag con lápiz, carpetas del libro, fechas y puntaje | A |
-| `/descubrir` | **Descubrir:** "Seleccionados para ti" y las listas prehechas, al mismo nivel | B |
+| `/descubrir` | **Descubrir:** carrusel con "Seleccionados para ti" y las listas prehechas, al mismo nivel y siempre a la vista | B |
 | `/buscar` | **Buscar:** libros y autores, sin personas ni pestañas | B |
 | `/mas` | **Más:** enlaces a Amigos y Mi perfil | B |
 | `/amigos` | **Amigos:** barra para buscar a cualquier usuario, amigos, solicitudes pendientes, "Invitar contactos" | B |
 | `/amigos/:userId` | **Persona:** qué lee, libros en común, botón agregar o estado de la solicitud | B |
 | `/perfil` | **Mi perfil:** nombre, @usuario, **Reiniciar demo** | B |
 
-Barra de navegación, en este orden: **Inicio · Mis libros · Descubrir · Buscar · Más**. Cada ícono va con su etiqueta de texto. "Más" queda activa también en `/amigos` y `/perfil`.
+Barra de navegación, en este orden: **Inicio · Mis libros · Descubrir · Buscar · Más**. Cada ícono va con su etiqueta de texto. "Más" queda activa también en `/amigos` y `/perfil`, e "Inicio" en `/actividad`.
 
 ### Decisiones de diseño que el prototipo debe mostrar
 D1 a D6 son las decisiones 1 a 6 del informe, con la misma numeración. La columna "Pantalla" sirve para llenar "Dónde se ve en el prototipo" (sección 5 del informe).
@@ -97,9 +98,9 @@ N3 no se atiende en esta entrega. Si el equipo cambia alguna decisión, se actua
 - **Después de entregar:** tag `e2-entrega`. En `main` solo se suben arreglos hasta la E3, y la URL se revisa antes del 25 de noviembre.
 
 ### Responsivo
-- Se diseña primero para el celular, con un punto de quiebre principal: `md` (≥ 768 px). `lg` solo afina el computador.
-  - **Celular:** barra de navegación inferior.
-  - **Computador:** barra superior y contenido centrado de hasta 1040 px.
+- Se diseña primero para el celular. `lg` (≥ 1024 px) cambia la navegación y `md` (≥ 768 px) cambia las grillas.
+  - **Celular y tablet:** barra de navegación inferior, de borde a borde.
+  - **Computador:** barra lateral y contenido a todo el ancho que queda.
   - **Modales:** no hay. Lo que se edita se edita en su lugar, y lo que pide confirmación la pide dentro de la página, con `InlineConfirm`.
 - **Lo resuelve el bloque base** en `AppShell`. Cada rol solo ajusta sus grillas con clases `md:`. Por ejemplo, carpetas en 2 columnas en celular, 4 en tablet y 5 en computador, y la ficha en dos columnas desde `md`.
 
@@ -255,7 +256,7 @@ También son compartidos y del bloque base:
 Si alguien necesita cambiar algo compartido, le avisa al otro rol antes y lo sube en un commit separado.
 
 ### Reglas de interfaz (valen para ambos roles; el detalle está en `docs/conceptos-hci.md`)
-1. **Íconos siempre con etiqueta de texto**, incluida la barra de navegación.
+1. **Íconos siempre con etiqueta de texto**, incluida la barra de navegación. Excepciones aprobadas: las flechas de un riel, en computador, y el corazón de "Me gusta", en celular. Ambas llevan nombre accesible.
 2. **Áreas táctiles de al menos 44×44 px**, y nada que dependa solo del hover.
 3. **El estado nunca se comunica solo con color:** siempre texto + color.
 4. **Contraste de texto mínimo 4.5:1.** Nada de gris claro sobre blanco para texto que importa.
@@ -294,7 +295,8 @@ Si alguien necesita cambiar algo compartido, le avisa al otro rol antes y lo sub
   - **A:** `features/library/LibraryPage.tsx`, `FolderPage.tsx` y `features/book/BookPage.tsx`;
   - **B:** `features/home/HomePage.tsx`, `features/search/SearchPage.tsx`, `features/friends/FriendsPage.tsx`, `PersonPage.tsx` y `features/profile/ProfilePage.tsx`.
 - [x] **`docs/registro-ia.md`** con su plantilla.
-- [ ] **Repo privado** en GitHub, con la profesora y la ayudante invitadas, y **primer deploy en Vercel**.
+- [x] **Repo privado** en GitHub y **primer deploy en Vercel**.
+- [ ] **Invitar** a la profesora y a la ayudante como colaboradoras.
 
 ### Ajustes al bloque base (primero; A y B dependen de ellos)
 Cambian tipos usados en todo el proyecto, así que van en un solo commit para que `npm run build` siga pasando.
@@ -466,3 +468,13 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Resultados de Buscar | "Libros y autores" | Dicen cuántos hay y cuántos ya tienes. Si Open Library tiene más de los que muestra, dicen "Los 20 más relevantes" y los autores van sin cantidad. Van en "Autores" y "Libros", y tocar un autor filtra sus libros, con Atrás de vuelta a la búsqueda. Sin resultados, se ofrecen los autores como salida |
 | Buscador y "+ Nueva carpeta" en Mis libros | "Buscador" sin ubicación | El buscador va en la fila del título, como en una carpeta. "+ Nueva carpeta" es la última tarjeta del tablero y el nombre se escribe ahí mismo. Mientras se escribe toma dos celdas, para que se lea el nombre y Crear y Cancelar quepan en una fila |
 | Mis libros sin subtítulo | No aparece | "34 libros en tu biblioteca" se quita, como en el modelo aprobado: "Todos" ya dice el total y la fila del título queda libre para Buscar |
+| Aspecto de toda la app | No aparece | El modelo G, aprobado en la etapa de modelación de la fase 4: paleta clara de pálidos del burdeo, títulos serif sin banda, formas redondeadas y barra lateral en computador |
+| Descubrir | "Seleccionados para ti" al mismo nivel que las listas | Carrusel infinito con un libro grande y sus vecinos a los lados, sin miniaturas. Las cuatro listas quedan siempre a la vista, "Seleccionados para ti" primero, y un contador dice "1 de 6". Con mouse, tocar una portada lateral avanza hasta ella |
+| Flechas de los rieles | Regla 1: todo ícono lleva texto | Sin texto y solo en computador, porque "Anterior" y "Siguiente" se veían anticuados y en un carrusel el sentido se entiende por la posición. En tacto manda el gesto. Con teclado se recorre con Tab |
+| Corazón de "Me gusta" | Regla 1: todo ícono lleva texto | Solo el corazón en celular, y "Me gusta" con texto en computador. Si hay un Deshacer activo, el aviso de a quién le llega no aparece, para no pisarlo |
+| Color de portada | "Portadas sin teñir" | Inicio y Buscar usan el color de la portada como fondo de sus tarjetas, oscurecido hasta dar 8,5:1 con texto blanco. Descubrir solo lo usa como tinte detrás de los libros, nunca bajo el texto |
+| Barra del celular | Barra inferior | Pegada al borde inferior, de lado a lado, sólida y sin desenfoque. El modelo la traía flotante, y en un celular real se movía mucho al hacer scroll. La causa probable es la barra del navegador, que no se pudo reproducir en emulación |
+| Fila de actividad | No aparece | Abre el libro |
+| Estante de Descubrir | No aparece | Si el libro ya está en mi biblioteca, muestra su tag |
+| Descripción de un libro en vivo | No aparece | Se pide siempre a Open Library al abrir la ficha y se muestra limpia, en su idioma, con la línea "Descripción de Open Library, sin traducir". No se traduce en vivo, porque N3 no se atiende en esta entrega |
+| Traducción hecha con IA | No aparece | Lleva un ícono de destellos junto al texto |

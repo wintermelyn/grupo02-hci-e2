@@ -24,11 +24,20 @@ La sesión integra los PR en GitHub con `gh pr merge --merge`, nunca antes de `A
 
 `DESIGN.md` describe el aspecto de la app. Nace en la fase 2, desde lo que ya quedó construido, y las fases siguientes lo siguen.
 
-- **Qué manda:** el informe, después `PLAN.md` y después `DESIGN.md`. `DESIGN.md` fija tipografía, color, densidad, formas y un gesto propio. Las pantallas, los flujos, los textos y D1–D6 siguen saliendo del informe y del plan. Ante un choque con las 14 reglas de interfaz de `PLAN.md`, ganan las reglas.
+- **Qué manda:** el informe, después `PLAN.md` y después `DESIGN.md`. `DESIGN.md` fija tipografía, color, densidad, formas y un gesto propio. Las pantallas, los flujos, los textos y D1–D6 siguen saliendo del informe y del plan. Ante un choque con las 14 reglas de interfaz de `PLAN.md`, ganan las reglas, salvo una excepción que Matías apruebe y que quede en la sección 6 de `PLAN.md`.
 - **Modo:** todas las pantallas son de modo Operate. Cada una se reconoce primero como una app para ordenar libros, con controles estándar.
 - **Dónde corren las skills:** Impeccable y design-taste-frontend viven en `.claude/`, que no llega a los worktrees. Un agente en worktree las usa por la ruta absoluta de esta carpeta. Impeccable crea el mundo visual en la fase 2 y pule en la fase 5, con `/impeccable polish`. Desde la fase 3 ambas se usan antes de construir y al revisar.
 - **Quién elige:** Impeccable propone las direcciones en su página y la sesión espera. Matías elige, y el CP registra la elegida y las descartadas.
 - **Agentes en paralelo:** construyen con `DESIGN.md`, los tokens de `src/index.css` y los componentes compartidos. Lo que el sistema no cubra sigue "Antes de construir" y se anota como decisión para el CP.
+
+### Modelación
+
+Va antes de construir, cuando una fase cambia cómo se ve la app o trae pantallas cuya forma no está clara.
+
+1. La sesión arma maquetas que corren de verdad, con los datos de la app, en una carpeta temporal. Cada modelo es una dirección distinta y se abre en su propia ruta.
+2. Matías las recorre en su celular y en el computador, y elige, mezcla o pide otra.
+3. Las maquetas no entran al repo. La aprobada se copia en `.claude/modelos-referencia/aprobado/`, con su código y sus capturas, y quien construye la trae a la app sin rehacerla.
+4. Lo aprobado queda en la sección 6 de `PLAN.md`, y el CP muestra los modelos descartados.
 
 ### Antes de construir
 
@@ -132,7 +141,7 @@ El build va primero porque `vite preview` sirve `dist/`. `--strictPort` evita ca
 | Tablet         | `iPad Mini`          | 768 px  |
 | Computador     | `Desktop Chrome`     | 1280 px |
 
-`iPad Mini` mide justo el punto de quiebre `md`, así que muestra la barra superior en su ancho mínimo.
+`iPad Mini` mide justo el punto de quiebre `md`, y `Desktop Chrome` es el único que muestra la barra lateral, que parte en `lg`.
 
 La lista de pantallas vive en el script de `.claude/capturas/`. Cada fase agrega las suyas y vuelve a capturar la lista completa.
 
