@@ -4,7 +4,7 @@ Este documento es lo único que hay que leer para empezar a programar. Todo lo q
 
 **Fuente de las decisiones de diseño:** `docs/e2/informe-e2.pdf`. Si este plan y el informe se contradicen, manda el informe y se corrige el plan. Lo que el informe no define está resuelto en la sección 6.
 
-**Estado del código:** el bloque base ya tiene los "Ajustes al bloque base" de la sección 4. Su aspecto sigue siendo provisional hasta "Dirección visual".
+**Estado del código:** el bloque base tiene los "Ajustes al bloque base" y la "Dirección visual" de la sección 4. Mis libros y la ficha ya están construidas, y `DESIGN.md` describe el aspecto de la app.
 
 **URL:** tiene que seguir funcionando hasta fines de noviembre (E3, 25 de noviembre).
 
@@ -97,10 +97,10 @@ N3 no se atiende en esta entrega. Si el equipo cambia alguna decisión, se actua
 - **Después de entregar:** tag `e2-entrega`. En `main` solo se suben arreglos hasta la E3, y la URL se revisa antes del 25 de noviembre.
 
 ### Responsivo
-- Se diseña primero para el celular, con un solo punto de quiebre: `md` (≥ 768 px).
+- Se diseña primero para el celular, con un punto de quiebre principal: `md` (≥ 768 px). `lg` solo afina el computador, y la variante `short` reordena la ficha en celulares de poca altura.
   - **Celular:** barra de navegación inferior y paneles que suben desde abajo.
   - **Computador:** barra superior, contenido centrado de hasta 1040 px y paneles como modal centrado.
-- **Lo resuelve el bloque base** en `AppShell` y `BottomSheet`. Cada rol solo ajusta sus grillas con clases `md:`. Por ejemplo, carpetas en 2 columnas en celular y 4 en computador, y la ficha en dos columnas en computador.
+- **Lo resuelve el bloque base** en `AppShell` y `BottomSheet`. Cada rol solo ajusta sus grillas con clases `md:`. Por ejemplo, carpetas en 2 columnas en celular, 4 en tablet y 5 en computador, y la ficha en dos columnas desde `md`.
 
 ### Fechas
 - Siempre se usa `src/lib/dates.ts`, que trae `today()`, `daysAgo(n)`, `parseDate()` y `formatDate()`, todas sobre date-fns.
@@ -316,27 +316,32 @@ Cambian tipos usados en todo el proyecto, así que van en un solo commit para qu
 - [x] **Tests:** actualizar `coreSlice.test.ts`, `seed.test.ts`, `routes.test.tsx`, `StatusControl.test.tsx`, `BookRow.test.tsx` y `src/test/helpers.test.tsx`.
 
 ### Dirección visual (después de los ajustes; A y B dependen de ella)
-Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarrollo/protocolo.md`. El aspecto del bloque base es provisional porque viene de antes del informe, así que se reemplaza. Mis libros se construye aquí por excepción para que los agentes tengan una pantalla real de referencia. `LibraryPage.tsx` sigue siendo del rol A.
-- [ ] **Mundo visual:** Impeccable propone las direcciones y Matías elige una.
-- [ ] **Sistema:** `src/index.css` y todos los componentes compartidos con el aspecto elegido, en un commit aparte.
-- [ ] **Mis libros como primera superficie:** solo lee el store.
+Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarrollo/protocolo.md`. Reemplaza el aspecto del bloque base. Mis libros y la ficha se construyen aquí por excepción, para que los agentes tengan dos pantallas reales de referencia. `LibraryPage.tsx` y `BookPage.tsx` siguen siendo del rol A.
+- [x] **Evaluación de Goodreads:** cada elemento contra las 14 reglas y los problemas de la interfaz anterior, con el contraste medido. Las direcciones parten de lo que sobrevive.
+- [x] **Mundo visual:** Impeccable propone las direcciones y Matías elige una.
+- [x] **Sistema:** `src/index.css` y todos los componentes compartidos con el aspecto elegido, en un commit aparte.
+  - fuentes libres alojadas en el proyecto;
+  - `StatusControl` como menú anclado;
+  - portadas regeneradas en mayor resolución.
+- [x] **Mis libros como primera superficie:** solo lee el store.
   - fila de botones de tag (D3), con "Todos" activo al entrar;
   - tablero "Mis carpetas" con "Próximos" primero y enlaces a cada carpeta (D1);
   - con un tag activo, la lista de esos libros en vez del tablero.
-- [ ] **`DESIGN.md` y `.impeccable/design.json`**, escritos desde lo construido.
-- **Listo cuando:** la revisión final de Impeccable termina con veredicto `ship` y `DESIGN.md` describe lo que se ve en Mis libros.
+- [x] **Ficha como segunda superficie:** portada, datos, descripción, carpetas y `StatusControl`. Solo lee el store, salvo el selector.
+- [x] **Pantallas pendientes** dentro del sistema, sin textos internos.
+- [x] **`DESIGN.md` y `.impeccable/design.json`**, escritos desde lo construido.
+- **Listo cuando:** la revisión final de Impeccable termina con veredicto `ship` y `DESIGN.md` describe lo que se ve en Mis libros y en la ficha.
 
 ### Rol A · Biblioteca (T1 + T2) · `src/features/library/`, `src/features/book/`, `librarySlice.ts`
 - [ ] **Mis libros**, sobre lo que dejó "Dirección visual":
   - aviso periódico (D5);
   - buscador sobre la biblioteca;
   - "+ Nueva carpeta".
-- [ ] **Carpeta:** fila de botones de tag, lista de `BookRow`, buscador interno, renombrar y eliminar carpeta, y estado vacío.
-- [ ] **Ficha:**
-  - portada, datos y descripción (si existe);
-  - `StatusControl` y chips de carpetas (agregar o quitar);
+- [ ] **Carpeta:** `TagFilter`, lista de `BookRow`, buscador interno, renombrar y eliminar carpeta, y estado vacío. El título y la banda ya están.
+- [ ] **Ficha**, sobre lo que dejó "Dirección visual":
+  - agregar y quitar carpetas en los chips, que hoy solo enlazan a cada carpeta;
   - "Quitar de mi biblioteca";
-  - estado "Libro no encontrado" y estado de carga mientras se ejecuta `fetchWork`.
+  - estado de carga mientras se ejecuta `fetchWork`, antes de "Libro no encontrado".
 - [ ] **Fechas y puntaje en la ficha:**
   - se muestran cuando el tag es "Leído";
   - "Editar lectura" abre un `BottomSheet` con fechas y estrellas opcionales;
@@ -389,7 +394,7 @@ Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarr
 | Orden | Qué |
 |---|---|
 | 1 | Ajustes al bloque base, publicados en `main` |
-| 2 | Dirección visual, con `DESIGN.md` y Mis libros como primera superficie |
+| 2 | Dirección visual, con `DESIGN.md`, y Mis libros y la ficha como primeras superficies |
 | 3 | A y B en paralelo, con merge a `main` cada vez que pase `npm run build` |
 | 4 | Integración: probar T1, T2 y T3 desde cero en celular y en computador |
 | 5 | Correcciones, capturas para el informe, entrega y tag `e2-entrega` |
@@ -416,6 +421,10 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Código de amigo | No aparece | Queda fuera. Compartir un código exige coordinarse por otro medio, lo contrario de N2 |
 | Seguidores | El journey 2.1.2 menciona "amigos y seguidores" | Amigos muestra solo amigos y solicitudes |
 | Barra de navegación | Nombra "Mis libros", "Más", "Descubrir" y el buscador principal, sin dar el orden | *Inicio · Mis libros · Descubrir · Buscar · Más* |
+| Selector de tags | Pide una "vista de selección de opciones de tags", sin decir cuál | Un menú anclado junto al tag, porque cambiarlo es rápido y reversible. El panel inferior queda para contenido largo |
+| Tag en las listas | "Junto al título" | Bajo el título, junto al autor y con la cinta de su color bajo la portada, porque un título largo no deja lugar a su lado en un celular |
+| Cantidad en los botones de tag | No aparece | Cada botón muestra cuántos libros tiene, porque T2 parte de saber que son 17 |
+| Orden de la lista por tag | No aparece | Por título, para encontrar un libro conocido en una lista larga |
 | Relectura pasando por otro tag | No aparece | Pasar de "Leído" directo a "Leyendo" pone inicio = hoy. Si antes pasa por otro tag, se conserva la fecha vieja, como dice el contrato de `setStatus`, y se corrige con "Editar lectura" |
 | Sección marcada en la ficha | No aparece | Ninguna, porque la ficha se abre desde cualquier sección |
 | Nombre del selector | Habla de "un lápiz" | "Cambiar" junto al lápiz, porque todo ícono lleva texto. El selector se titula "Estado de «título»" |
