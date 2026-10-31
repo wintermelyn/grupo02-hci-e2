@@ -10,6 +10,7 @@ import {
   type ReactNode,
   type RefObject,
 } from 'react'
+import { useStore } from '../store'
 import { cx } from './cx'
 import { ignoreSecondClick } from './ignoreSecondClick'
 
@@ -126,6 +127,7 @@ export function AnchoredMenu({
   const menuRef = useRef<HTMLDivElement>(null)
   const focusOnOpen = useRef<'selected' | 'last'>('selected')
   const menuId = useId()
+  const setMenuOpen = useStore((state) => state.setMenuOpen)
 
   useLayoutEffect(() => {
     const control = triggerRef.current
@@ -148,6 +150,12 @@ export function AnchoredMenu({
     const target = focusOnOpen.current === 'last' ? last : (selected ?? items[0])
     target?.focus()
   }, [open, kind])
+
+  useEffect(() => {
+    if (!open) return
+    setMenuOpen(true)
+    return () => setMenuOpen(false)
+  }, [open, setMenuOpen])
 
   useEffect(() => {
     if (!open) return
@@ -234,7 +242,8 @@ export function AnchoredMenu({
         style={{ maxHeight }}
         className={cx(
           // Over the bottom bar: in a page too short to scroll, that is the only room left below.
-          'absolute z-45 max-h-[60dvh] overflow-y-auto rounded-float bg-white p-1.5 shadow-float',
+          // Over the toast: under it, a tap on an option would land on Deshacer.
+          'absolute z-50 max-h-[60dvh] overflow-y-auto rounded-float bg-white p-1.5 shadow-float',
           'transition-[opacity,translate,display] transition-discrete duration-150 ease-quick',
           'starting:-translate-y-1 starting:opacity-0 [&[hidden]]:opacity-0',
           ALIGN_CLASSES[align],

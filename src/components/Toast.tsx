@@ -1,9 +1,16 @@
 import { Undo2 } from 'lucide-react'
-import { useEffect, useRef, type FocusEvent, type KeyboardEvent, type PointerEvent } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  type FocusEvent,
+  type KeyboardEvent,
+  type PointerEvent,
+} from 'react'
 import { useStore } from '../store'
 import type { Toast as ToastData } from '../types'
 
-type Hold = 'hover' | 'focus'
+type Hold = 'hover' | 'focus' | 'menu'
 
 /**
  * Renders the store's toast. The store hides it after 5 s (TOAST_DURATION_MS) and drops the
@@ -17,7 +24,7 @@ export function Toast() {
     <div
       role="status"
       aria-live="polite"
-      className="pointer-events-none fixed inset-x-0 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-50 flex justify-center px-4 lg:bottom-6 lg:pl-[calc(var(--sidebar)+1rem)]"
+      className="pointer-events-none fixed inset-x-0 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-45 flex justify-center px-4 lg:bottom-6 lg:pl-[calc(var(--sidebar)+1rem)]"
     >
       {toast && <ToastCard key={toast.id} toast={toast} />}
     </div>
@@ -28,26 +35,37 @@ export function Toast() {
  * The timer pauses while the card is hovered or focused, so someone reaching Deshacer with the
  * mouse or the keyboard does not lose it (WCAG 2.2.1). Only a mouse counts as hover: a tap fires
  * pointerenter without a matching pointerleave, which would keep the toast (and its undo copy) forever. Keyed by toast id, so holds start empty
- * for every new toast even if the focused button was removed without a blur event.
+ * for every new toast even if the focused button was removed without a blur event. An open menu
+ * also pauses it: the menu goes on top, and Deshacer must still be there when it closes.
  */
 function ToastCard({ toast }: { toast: ToastData }) {
   const undo = useStore((state) => state.undo)
   const pauseToast = useStore((state) => state.pauseToast)
   const resumeToast = useStore((state) => state.resumeToast)
+  const menuOpen = useStore((state) => state.menuOpen)
   const holds = useRef(new Set<Hold>())
   const focusedBefore = useRef<HTMLElement | null>(null)
   const undoRef = useRef<HTMLButtonElement>(null)
+
+  const setHold = useCallback(
+    (hold: Hold, active: boolean) => {
+      if (active) holds.current.add(hold)
+      else holds.current.delete(hold)
+      if (holds.current.size > 0) pauseToast()
+      else resumeToast()
+    },
+    [pauseToast, resumeToast],
+  )
 
   useEffect(() => {
     if (toast.takesFocus) undoRef.current?.focus()
   }, [toast.takesFocus])
 
-  function setHold(hold: Hold, active: boolean) {
-    if (active) holds.current.add(hold)
-    else holds.current.delete(hold)
-    if (holds.current.size > 0) pauseToast()
-    else resumeToast()
-  }
+  useEffect(() => {
+    if (!menuOpen) return
+    setHold('menu', true)
+    return () => setHold('menu', false)
+  }, [menuOpen, setHold])
 
   function setHover(event: PointerEvent<HTMLDivElement>, active: boolean) {
     if (event.pointerType === 'mouse') setHold('hover', active)

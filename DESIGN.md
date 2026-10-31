@@ -656,7 +656,7 @@ La firma del sistema. `Ribbon` es decorativo y lleva `aria-hidden`: lo que marca
 
 **La regla de confirmar en la página.** Solo eliminar carpeta y Reiniciar demo piden confirmación, con `InlineConfirm`. Lo demás se aplica de inmediato y ofrece Deshacer.
 
-- **Dónde abre el menú:** debajo del control siempre que pueda, porque arriba taparía el libro. Si no cabe, la página hace scroll primero. Solo abre hacia arriba cuando la página ya no puede moverse. Si tampoco cabe arriba, queda abajo, sobre la barra inferior (capa 45, entre las barras y el toast), y limita su alto al espacio que queda.
+- **Dónde abre el menú:** debajo del control siempre que pueda, porque arriba taparía el libro. Si no cabe, la página hace scroll primero. Solo abre hacia arriba cuando la página ya no puede moverse. Si tampoco cabe arriba, queda abajo, sobre la barra inferior, y limita su alto al espacio que queda. Va en la capa 50, sobre las barras y el toast, que va en la 45, para que un toque en una opción nunca caiga en Deshacer.
 - **Agregar o quitar carpetas de un libro:** es un cambio rápido y reversible, así que va en un menú anclado con todas las carpetas. Tocar una la agrega o la quita, y las dos cosas cuestan lo mismo, como pide la regla 11.
 - **Nombrar una carpeta:** el nombre se escribe en el título, o en la última tarjeta del tablero si es nueva, con `TextField`.
 - **Fechas y puntaje:** se corrigen en su fila de la ficha, y cada cambio ofrece Deshacer.
@@ -761,7 +761,7 @@ Las portadas no se tiñen ni se recortan en la ficha. `lg` mide 112 px en celula
 
 ### Toast
 
-Una capa de tinta de hasta 448 px, con radio `float` y `shadow-float`. Bajo `lg` queda centrada, a 15 px sobre la barra inferior, y desde `lg` a 24 px del borde, centrada en el contenido y sin pisar la barra lateral. Entra en 200 ms. Deshacer es una píldora con ícono y texto en `shell`. Dura 5 s y se detiene mientras el cursor o el foco están encima. Si la acción se hizo con teclado y su control desapareció, como en el aviso de D5, el foco llega a Deshacer y Tab lo devuelve a donde estaba. El mensaje corta una palabra larga, para que Deshacer siga a la vista.
+Una capa de tinta de hasta 448 px, con radio `float` y `shadow-float`. Bajo `lg` queda centrada, a 15 px sobre la barra inferior, y desde `lg` a 24 px del borde, centrada en el contenido y sin pisar la barra lateral. Entra en 200 ms. Deshacer es una píldora con ícono y texto en `shell`. Dura 5 s y se detiene mientras el cursor o el foco están encima, o mientras hay un menú abierto, que puede taparlo. Si la acción se hizo con teclado y su control desapareció, como en el aviso de D5, el foco llega a Deshacer y Tab lo devuelve a donde estaba. El mensaje corta una palabra larga, para que Deshacer siga a la vista.
 
 ### Estados de pantalla
 

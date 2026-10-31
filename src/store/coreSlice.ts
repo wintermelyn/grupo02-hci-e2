@@ -25,6 +25,9 @@ export interface CoreActions {
   pauseToast: () => void
   /** Restarts the auto-dismiss timer with the full TOAST_DURATION_MS. */
   resumeToast: () => void
+  /** An open menu can cover the toast, which waits for it so Deshacer outlasts what is on top. */
+  menuOpen: boolean
+  setMenuOpen: (open: boolean) => void
   /** Keeps a copy of a catalog book in extraBooks. Never overwrites a seed book. */
   upsertBook: (book: Book) => void
   /**
@@ -114,6 +117,10 @@ export const createCoreSlice: SliceCreator<CoreActions> = (set, get) => ({
     clearTimeout(toastTimer)
     if (get().toast) toastTimer = setTimeout(get().dismissToast, TOAST_DURATION_MS)
   },
+
+  menuOpen: false,
+
+  setMenuOpen: (menuOpen) => set({ menuOpen }),
 
   upsertBook: (book) => {
     if (lookup(get().seedBooks, book.id)) return
