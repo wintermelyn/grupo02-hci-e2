@@ -109,19 +109,23 @@ N3 no se atiende en esta entrega. Si el equipo cambia alguna decisión, se actua
 - **Nunca** usar `toISOString().slice(0,10)` ni `new Date('2026-10-27')`. Después de las 21:00 en Chile, el primero ya da la fecha de mañana, y el segundo muestra el día anterior.
 
 ### Libros
-- **Catálogo precargado (unos 50 libros reales).**
-  - El script `scripts/seed-books.mjs` los baja una vez de Open Library: `search.json` con `lang=es` y los campos `editions,editions.key,editions.title,editions.language,editions.cover_i`.
-  - Del resultado se usan el **título y la portada de la edición en español** (`editions.docs[0]`).
-  - Los autores se corrigen a mano en el JSON, porque a veces vienen en el idioma original.
-  - Las descripciones se traen de `/works/{key}.json`, donde vienen como string o como `{value}`. Las que no vienen en español se traducen en `scripts/translated-descriptions.json` y el libro queda marcado con `descriptionTranslated`. Pueden faltar.
-  - Las portadas se bajan con `-L.jpg?default=false` a `public/covers/`, para que se vean nítidas en pantallas 2x.
-  - El resultado se guarda en `src/data/books.json`, que se confirma en el repo, y la app no depende de Open Library para funcionar.
+Una app real tendría su propia base de datos indexada, con cada libro nuevo ya traducido al llegar. El prototipo muestra eso con archivos estáticos: sin base de datos, sin backend y sin depender de un servicio externo. Open Library solo se usa en los scripts que preparan el catálogo.
+
+- **Catálogo:** 1.170 libros reales con edición en español. Son los 54 de `src/data/books.json`, los más leídos de Open Library y un grupo de autores hispanos y latinoamericanos. Cómo se prepara está en `docs/desarrollo/catalogo.md`.
+- **Tres partes, según cuándo hacen falta:**
+  - **Los 54 de `books.json`** van en el bundle, con su descripción. Son los que usan los seeds, así que Inicio, Mis libros y Descubrir no esperan nada.
+  - **El índice,** `public/catalog/index.json`, trae de los 1.170 libros el id, el título, los autores, el año, las páginas y el color de la portada, con los más leídos primero. Se baja al entrar a Buscar o al abrir una ficha que no está a mano, y queda en memoria. Pesa 37 KB comprimido.
+  - **Las descripciones,** `public/catalog/descriptions/0.json` a `15.json`, se bajan al abrir una ficha, solo el archivo de ese libro. El archivo sale del id del libro, sin leer ninguna lista. Pesan de 16 a 23 KB comprimidos, y los 54 no están ahí.
+- **Portadas:** `public/covers/{id}.jpg`, de unos 15 KB, con un archivo por libro. Una portada que no carga deja las iniciales.
+- **Traducciones:** las descripciones que no venían en español están traducidas con IA en `scripts/translated-descriptions.json`, porque es lo que haría la app con cada libro nuevo. El libro lleva `descriptionTranslated` y la ficha dice "Traducción hecha con IA". Un texto que no describe su libro se deja fuera: la ficha dice lo mismo que para un libro sin descripción.
 - **ID de un libro:** la clave de la obra en Open Library, por ejemplo `OL45804W`. Se usa así tal cual en la URL.
-- **Búsqueda en vivo** (`src/lib/openlibrary.ts`, rol B):
-  - Usa `search.json` con un timeout de 5 s. Si falla, busca en el catálogo local y avisa.
-  - Los resultados en vivo se **deduplican** contra el catálogo local por título y autor normalizados, y los locales aparecen primero.
-  - `upsertBook` **nunca sobrescribe** un libro del catálogo precargado.
-- **Ficha de un libro que no está en el store** (por ejemplo, un enlace abierto en otro navegador): intenta cargarlo con `fetchWork(id)` de `openlibrary.ts`. Si no lo encuentra, muestra el estado "Libro no encontrado".
+- **Búsqueda** (`src/features/search/searchCatalog.ts`, rol B):
+  - Corre sobre el índice, en el render, así que cada letra tiene su lista sin esperar.
+  - Cada palabra escrita debe ser el inicio de una palabra del título o de los autores, en cualquier orden y sin distinguir tildes ni mayúsculas. "king" encuentra a Stephen King y no a Hawking, y "marquez cien" encuentra *Cien años de soledad*.
+  - Va primero el título exacto, luego el título que empieza así, una palabra del título, el autor y lo demás. Entre iguales, el más leído. Los libros de la biblioteca suben al principio de la lista.
+  - La lista llega a 40 libros y dice de cuántos, salvo los libros de un autor, que van todos.
+- **Ficha de un libro que no está a mano** (por ejemplo, un enlace abierto en otro navegador): espera el índice con `BookSkeleton`. Si el libro no está en él, muestra "Libro no encontrado". Un id que no puede ser un libro lo dice sin bajar nada.
+- **Carga y error:** solo mientras baja un archivo o si esa bajada falla, con Reintentar y en el lugar de lo que falta.
 
 ### Amigos (simulados)
 - El directorio fijo está en `src/data/users.json`.
@@ -159,7 +163,7 @@ type BookId = string;            // clave de obra de Open Library: "OL45804W"
 type ReadingStatus = 'want' | 'owned' | 'reading' | 'read';
 type ISODate = string;           // "2026-10-27"
 
-interface Book { id: BookId; title: string; authors: string[]; coverUrl?: string; description?: string; descriptionTranslated?: boolean; year?: number; pages?: number }
+interface Book { id: BookId; title: string; authors: string[]; coverUrl?: string; description?: string; descriptionTranslated?: boolean; year?: number; pages?: number; coverColor?: string }
 interface LibraryEntry { bookId: BookId; status: ReadingStatus; folderIds: string[]; addedAt: ISODate; wantCheckedAt?: ISODate; startedAt?: ISODate; finishedAt?: ISODate; rating?: number }
 interface Folder { id: string; name: string; pinned?: boolean; createdAt: ISODate }
 interface User { id: string; name: string; username: string; avatarColor: string; mutualFriends: number; readingIds: BookId[]; readIds: BookId[] }
@@ -170,7 +174,7 @@ interface Toast { id: number; message: string; undoable: boolean; takesFocus?: b
 interface AppState {
   me: User;                                   // del seed, no se persiste
   seedBooks: Record<BookId, Book>;            // books.json, no se persiste
-  extraBooks: Record<BookId, Book>;           // traídos de la API, se persisten
+  extraBooks: Record<BookId, Book>;           // copia de los libros del catálogo que la persona agregó, se persisten
   library: Record<BookId, LibraryEntry>;
   folders: Folder[];
   users: User[];                              // users.json, no se persiste
@@ -182,7 +186,7 @@ interface AppState {
   undoSnapshot: { library: AppState['library']; folders: Folder[] } | null;
 }
 ```
-**Para leer datos en un componente** se usa `useStore(selectBook(id))` y `useStore(selectEntry(id))`, que buscan en `seedBooks` y luego en `extraBooks`, o en `library`. `getBook(id)` solo se usa dentro de las acciones: si se llama durante el render, el componente no se actualiza cuando `upsertBook` agrega el libro.
+**Para leer datos en un componente** se usa `useStore(selectBook(id))` y `useStore(selectEntry(id))`, que buscan en `seedBooks` y luego en `extraBooks`, o en `library`. `getBook(id)` solo se usa dentro de las acciones: si se llama durante el render, el componente no se actualiza cuando `upsertBook` agrega el libro. El resto del catálogo no está en el store: vive en `src/lib/catalog.ts`, y lo lee la ficha con `useCatalogBook(id)`. Abrir un libro no guarda nada. Agregarlo guarda una copia sin descripción en `extraBooks`, para que Mis libros lo muestre sin bajar el catálogo y sin llenar el almacenamiento del navegador.
 
 ### Store: archivos y dueños
 | Archivo | Dueño | Contenido |
@@ -199,7 +203,8 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 
 **Persistencia.**
 - `persist` usa la clave `gr-e2` y `partialize` guarda solo `library`, `folders`, `friendships`, `likedActivityIds`, `extraBooks` y `lastWantPromptOn`.
-- Tiene `version` y `migrate: () => estado inicial`. La versión es la suma de `BASE_VERSION` (en `store/index.ts`), `LIBRARY_SEED_VERSION` (en `seedLibrary.ts`, de A) y `SOCIAL_SEED_VERSION` (en `seedSocial.ts`, de B). **Si un rol cambia su seed, sube su propia constante**, sin tocar `index.ts`.
+- Tiene `version` y `migrate`, que vuelve al estado inicial. La versión es la suma de `BASE_VERSION` (en `store/index.ts`), `LIBRARY_SEED_VERSION` (en `seedLibrary.ts`, de A) y `SOCIAL_SEED_VERSION` (en `seedSocial.ts`, de B). **Si un rol cambia su seed, sube su propia constante**, sin tocar `index.ts`.
+- La versión 8 es la excepción, porque es la última con búsqueda en vivo y sus datos siguen siendo buenos. Se conserva todo lo de la persona. De `extraBooks` se quitan los libros que no están en la biblioteca, y a los demás se les quita el texto, que venía en otro idioma, y se les deja la portada local. Un libro que ya no está en el catálogo sigue en Mis libros, con sus iniciales.
 
 **Deshacer y toast.**
 - Todo cambio en `library` o `folders` pasa por `commit(label, mutator)`. Este guarda en `undoSnapshot` solo `{ library, folders }` y llama a `showToast(label, { undoable: true })`.
@@ -211,7 +216,7 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 ### Contrato de acciones
 | Acción | Quién | Comportamiento |
 |---|---|---|
-| `upsertBook(book)` | Base | Agrega un libro a `extraBooks`. No hace nada si el id ya está en `seedBooks` |
+| `upsertBook(book)` | Base | Guarda en `extraBooks` la copia de un libro del catálogo. No hace nada si el id ya está en `seedBooks`. Lo usa `StatusControl` antes de agregar el libro |
 | `setStatus(bookId, 'want' \| 'owned' \| 'reading')` | Base | Si no está en la biblioteca, lo agrega. Al pasar a `reading`, completa `startedAt = today()` si no tiene y quita `finishedAt`, porque esa lectura no ha terminado. Al pasar a `want`, deja `wantCheckedAt = today()`. Salir de `read` no borra nada más: fechas y puntaje quedan guardados, para que corregir un error no pierda datos. **No acepta `read`** |
 | `undo()`, `resetDemo()` | Base | `resetDemo` limpia localStorage y vuelve al estado inicial |
 | `finishBook(bookId, { startedAt, finishedAt, rating? })` | A | **Es la única forma de dejar un libro en `read`.** También guarda las fechas y el puntaje que se editan en la ficha |
@@ -360,12 +365,10 @@ Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarr
 - [x] **Campo de formulario compartido** (bloque base, antes de "+ Nueva carpeta"): `TextField`, para renombrar carpeta y "+ Nueva carpeta".
 - **Listo cuando:** T1 y T2 se completan desde "Reiniciar demo", en celular y en computador, y cada cambio muestra el toast con Deshacer.
 
-### Rol B · Social y búsqueda (T3 + búsqueda) · `src/features/home|search|discover|more|friends|profile/`, `src/lib/openlibrary.ts`, `socialSlice.ts`, `src/data/seedDiscover.ts`
-- [ ] **`openlibrary.ts`:**
-  - `searchBooks(query, signal)` con espera de 350 ms mientras se escribe, `AbortController`, timeout de 5 s, búsqueda en el catálogo local si falla y deduplicación;
-  - `fetchWork(id)`, que usa la ficha de A.
+### Rol B · Social y búsqueda (T3 + búsqueda) · `src/features/home|search|discover|more|friends|profile/`, `src/lib/catalog.ts`, `socialSlice.ts`, `src/data/seedDiscover.ts`
+- [x] **`catalog.ts`:** baja el índice y las descripciones, los deja en memoria y dice si están cargando o fallaron. La ficha de A los usa con `useCatalogBook`, `useCatalog` y `useDescription`.
 - [ ] **Buscar:**
-  - resultados en `BookRow`; al tocar uno se hace `upsertBook` y se navega a `/libro/:id`;
+  - resultados en `BookRow`, que navega a `/libro/:id`;
   - estados de carga, sin resultados y error.
 - [ ] **Descubrir (D6):**
   - `seedDiscover.ts` con "Seleccionados para ti" (unos 6 libros según los gustos de Alex: terror y ciencia ficción) y 2 o 3 listas prehechas, usando los 20 libros del catálogo que no están en la biblioteca inicial;
@@ -387,12 +390,12 @@ Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarr
   - estado vacío.
 - [ ] **Mi perfil:** nombre, @usuario y "Reiniciar demo" con confirmación.
 - [x] **Acciones de `socialSlice`.**
-- **Listo cuando:** T3 se completa desde "Reiniciar demo", en celular y en computador; la búsqueda funciona aunque Open Library esté caído; y los estados de carga, sin resultados y error están implementados.
+- **Listo cuando:** T3 se completa desde "Reiniciar demo", en celular y en computador; la búsqueda funciona sin Open Library; y los estados de carga, sin resultados y error están implementados.
 
 ### Puntos de contacto entre A y B (ya resueltos)
 - B no cambia tags: enlaza a la ficha con `bookPath`, y ahí `StatusControl` hace el cambio.
-- B nunca toca la biblioteca: usa `upsertBook` y luego navega a la ficha de A.
-- A usa `fetchWork` de B. Mientras B no lo tenga listo, la ficha muestra "Libro no encontrado".
+- B nunca toca la biblioteca: navega a la ficha de A, y `StatusControl` guarda la copia del libro al agregarlo.
+- A usa `catalog.ts` de B para la ficha de un libro que no está a mano y para su descripción.
 - Cada uno escribe solo en sus carpetas y en su slice.
 
 ---
@@ -439,7 +442,7 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Salir de "Leído" | No aparece | No se distingue un error de una relectura, así que nada se borra: inicio y puntaje quedan, y volver a "Leyendo" solo quita el fin. Una relectura corrige el inicio en la ficha, en su fila |
 | Sección marcada en la ficha | No aparece | Ninguna, porque la ficha se abre desde cualquier sección |
 | Nombre del selector | Habla de "un lápiz" | "Cambiar o quitar" junto al lápiz, porque todo ícono lleva texto y el menú también saca el libro. Bajo 360 px va sin lápiz, para caber en una línea. El selector se titula "Estado de «título»" |
-| Libros sin descripción | No aparece | La ficha mantiene la misma forma en todos los anchos. "Sobre este libro" va siempre en el mismo lugar y, sin descripción, dice "Aún no tenemos descripción de este libro.". Hoy son 2 de 54 libros del catálogo. Un libro encontrado en vivo trae la suya al abrir la ficha, y mientras la busca dice "Buscando la descripción…" en ese mismo lugar |
+| Libros sin descripción | No aparece | La ficha mantiene la misma forma en todos los anchos. "Sobre este libro" va siempre en el mismo lugar y, sin descripción, dice "Aún no tenemos descripción de este libro.". Hoy son 124 de 1.170 libros. Mientras baja el archivo de las descripciones dice "Buscando la descripción…" en ese mismo lugar y, si falla, "No pudimos cargar la descripción." con Reintentar |
 | Descripción traducida | No aparece | Bajo la descripción, "Traducción hecha con IA" como dato de procedencia, sin cinta ni color de acento, si el libro trae `descriptionTranslated` |
 | Estrellas | No aparece | De tinta. El naranja de Goodreads compite con las portadas y como ícono llega a 3,03:1 |
 | Color de la cinta | No aparece | Burdeo `#7a2334`. Se parece al ciruela de "Lo tengo", pero el estado nunca se apoya solo en el color |
@@ -460,14 +463,15 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Nombres de carpeta | No aparece | Máximo 40 caracteres. Los repetidos se comparan sin mayúsculas, tildes ni espacios externos |
 | Carpeta vacía | No aparece | Se oculta el buscador y se explica cómo agregar libros desde la ficha |
 | Límites del calendario | Fechas futuras deshabilitadas | Inicio llega hasta hoy y fin va de inicio a hoy. Si inicio queda después de fin, un texto lo explica y no se guarda |
-| Falla de red en una ficha | No aparece | Error con Reintentar, separado de "Libro no encontrado" |
+| Falla de red en una ficha | No aparece | Sin el índice, error con Reintentar, separado de "Libro no encontrado". Sin la descripción, la ficha se muestra igual y Reintentar queda en "Sobre este libro" |
 | Orden en Amigos | No aparece | Amigos y solicitudes por nombre. Los resultados siguen el orden del directorio |
 | Largo de la actividad en Inicio | No aparece | Inicio muestra las 5 últimas. "Ver toda la actividad" abre una vista aparte, agrupada por Hoy, Esta semana y Antes, con "Ver más" por tandas y un final claro. Sin lista infinita ni caja con scroll propio |
 | "Me gusta" | No aparece en el informe E2. P1 y P2 lo mencionan en las entrevistas del E1 | Es un gesto hacia un amigo, no una cifra: sin contador ni lista de nombres. Al tocarlo, el aviso dice a quién le llega, como "Valentina verá que te gustó" |
 | Forma del aviso de D5 | Portada, título, pregunta y "Sí" y "No" | Una fila compacta sobre la lista, con portada chica, sin tarjeta, en "Todos" y "Lo quiero" |
 | "Leyendo ahora" en Inicio | "Tarjeta" que abre la ficha | Portadas grandes en dos columnas, o tres con tres libros, porque casi nadie lee más de dos o tres a la vez. Bajo cada una, "Llevas 12 días" |
 | Buscar antes de escribir | No aparece | Búsquedas recientes, cuando las hay, autores de tu biblioteca y "Lo que leen tus amigos", para reconocer en vez de recordar |
-| Resultados de Buscar | "Libros y autores" | Dicen cuántos hay y cuántos ya tienes. Si Open Library tiene más de los que muestra, dicen "Los 20 más relevantes" y los autores van sin cantidad. Van en "Autores" y "Libros", y tocar un autor filtra sus libros, con Atrás de vuelta a la búsqueda. Sin resultados, se ofrecen los autores como salida |
+| Resultados de Buscar | "Libros y autores" | Dicen cuántos hay y cuántos ya tienes. Si son más de 40 muestran los más relevantes y dicen de cuántos, como "Los 40 más relevantes de 48". Los autores siempre dicen su cantidad. Van en "Autores" y "Libros", y tocar un autor lista todos sus libros, con Atrás de vuelta a la búsqueda. Sin resultados, se ofrecen los autores como salida |
+| Catálogo y búsqueda | No aparece | 1.170 libros en archivos estáticos, buscados en el navegador. Una app real tendría su base de datos indexada; aquí se evita un segundo servicio. Los libros son muchos para que buscar tenga sentido, sin pretender que estén todos: lo que no está, no se encuentra |
 | Buscador y "+ Nueva carpeta" en Mis libros | "Buscador" sin ubicación | El buscador va en la fila del título, como en una carpeta. "+ Nueva carpeta" es la última tarjeta del tablero y el nombre se escribe ahí mismo. Mientras se escribe toma dos celdas, para que se lea el nombre y Crear y Cancelar quepan en una fila |
 | Mis libros sin subtítulo | No aparece | "34 libros en tu biblioteca" se quita, como en el modelo aprobado: "Todos" ya dice el total y la fila del título queda libre para Buscar |
 | Aspecto de toda la app | No aparece | El modelo G, aprobado en la etapa de modelación de la fase 4: paleta clara de pálidos del burdeo, títulos serif sin banda, formas redondeadas y barra lateral en computador |
@@ -478,6 +482,6 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Barra del celular | Barra inferior | Pegada al borde inferior, de lado a lado, sólida y sin desenfoque. El modelo la traía flotante, y en un celular real se movía mucho al hacer scroll. La causa probable es la barra del navegador, que no se pudo reproducir en emulación |
 | Fila de actividad | No aparece | Abre el libro |
 | Estante de Descubrir | No aparece | Si el libro ya está en mi biblioteca, muestra su tag |
-| Descripción de un libro en vivo | No aparece | Se pide siempre a Open Library al abrir la ficha y se muestra limpia, en su idioma, con la línea "Descripción de Open Library, sin traducir". No se traduce en vivo, porque N3 no se atiende en esta entrega |
+| Descripciones del catálogo | No aparece | Todas en español. Las que venían en otro idioma están traducidas con IA y lo dicen, porque en una app real cada libro nuevo llegaría con su traducción guardada. No se escribe una sinopsis nueva: un texto que no describe su libro se deja fuera |
 | Traducción hecha con IA | No aparece | Lleva un ícono de destellos junto al texto |
 | Aspecto de la ficha | No aparece. El modelo aprobado no la incluye | La portada va sola, sin bloque de color detrás. Bajo 768 px lleva al lado el título, el autor, el año y las páginas, como en el modelo. Dos columnas desde 768 px, con la portada acompañando la lectura y los títulos de las demás pantallas. Reemplaza a las tres columnas, que a 1024 px dejaban angostos el registro y la descripción |

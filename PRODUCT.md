@@ -55,7 +55,7 @@ El informe y el plan mandan sobre este archivo. Si se contradicen, el orden es `
 **Límites técnicos y de alcance:**
 
 - No hay backend. Los datos parten de un seed y se guardan en `localStorage`. Las amistades y las solicitudes son simuladas.
-- La búsqueda consulta Open Library y usa el catálogo local si el servicio falla.
+- La búsqueda corre en el navegador sobre el catálogo de la app, por inicio de palabra en título y autor.
 - La necesidad N3 (entender contenido en otro idioma o con varias ediciones) no se atiende en esta entrega.
 - No hay selección múltiple, código de amigo ni seguidores.
 
@@ -78,7 +78,7 @@ El informe y el plan mandan sobre este archivo. Si se contradicen, el orden es `
 
 - **Investigación:** entrevistas a P1, P2, P3 y P4, con códigos anónimos, en `docs/e1/informe-e1.pdf`. P5 fue un caso de contraste y quedó fuera del análisis.
 - **Decisiones de diseño:** las seis decisiones y las cinco necesidades, en `docs/e2/informe-e2.pdf`.
-- **Catálogo:** unos 50 libros reales de Open Library en `src/data/books.json`, con portadas en `public/covers/`.
+- **Catálogo:** 1.170 libros reales con edición en español, preparados desde Open Library en archivos estáticos, con portadas en `public/covers/`. Los 54 que usan los seeds van en `src/data/books.json`.
 - **Datos simulados:** Alex Muñoz, sus amigos, el directorio de usuarios y sus actividades son ficticios (`src/data/`).
 
 No hay métricas de uso, resultados de evaluación con usuarios ni testimonios para mostrar en la interfaz. La E3 todavía no se hace, así que ninguna pantalla o documento debe afirmar resultados de ella.
