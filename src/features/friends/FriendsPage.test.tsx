@@ -195,6 +195,18 @@ describe('person row', () => {
     expect(slot).toHaveClass('w-26')
   })
 
+  it('is a tinted row like those of Inicio, painted by its link and not by its action', () => {
+    renderApp('/amigos?q=camitorres')
+    const row = rowOf('camitorres').getByRole('link').parentElement
+    expect(row).toHaveClass('rounded-row', 'bg-shell', 'has-[a:hover]:bg-sand')
+    expect(row).not.toHaveClass('hover:bg-sand')
+  })
+
+  it('keeps the action inside the row, not over its edge', () => {
+    renderApp('/amigos?q=camitorres')
+    expect(addButton('camitorres')).not.toHaveClass('-mr-2.5')
+  })
+
   it('offers Agregar without a fill, since it is an action of a row', () => {
     renderApp('/amigos?q=camila')
     const buttons = main().getAllByRole('button', { name: /^Agregar/ })

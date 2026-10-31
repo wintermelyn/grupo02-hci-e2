@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router'
 import { Button, EmptyState, PageHeader, SearchField } from '../../components'
 import { useStore } from '../../store'
 import type { Friendship, User } from '../../types'
-import { matchesPerson, searchTerm } from './people'
+import { compareNames, matchesPerson, searchTerm } from './people'
 import { PersonRow } from './PersonRow'
 import { RowList, Section } from './Section'
 import { useKeepRowFocus } from './useKeepRowFocus'
@@ -12,10 +12,6 @@ import { useKeepRowFocus } from './useKeepRowFocus'
 const QUERY_PARAM = 'q'
 
 type StatusOf = (user: User) => Friendship['status'] | undefined
-
-function compareNames(a: User, b: User): number {
-  return a.name.localeCompare(b.name, 'es-CL')
-}
 
 interface PeopleListProps {
   people: User[]
@@ -57,7 +53,7 @@ function SearchResults({
     )
   }
   return (
-    <section className="mt-2">
+    <section>
       <h2 className="sr-only">Resultados</h2>
       <PeopleList people={people} statusOf={statusOf} showFriendState />
     </section>

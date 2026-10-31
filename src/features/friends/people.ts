@@ -6,6 +6,10 @@ export function personPath(userId: string): string {
   return `${FRIENDS_PATH}/${encodeURIComponent(userId)}`
 }
 
+export function compareNames(a: User, b: User): number {
+  return a.name.localeCompare(b.name, 'es-CL')
+}
+
 export function mutualFriendsLabel(count: number): string {
   if (count === 0) return 'Sin amigos en común'
   return count === 1 ? '1 amigo en común' : `${count} amigos en común`
@@ -14,6 +18,14 @@ export function mutualFriendsLabel(count: number): string {
 export function sharedBooksLabel(count: number): string {
   if (count === 0) return 'Sin libros en común'
   return count === 1 ? '1 libro en común' : `${count} libros en común`
+}
+
+export function friendsLabel(count: number): string {
+  return count === 1 ? '1 amigo' : `${count} amigos`
+}
+
+export function requestsLabel(count: number): string {
+  return count === 1 ? '1 solicitud enviada' : `${count} solicitudes enviadas`
 }
 
 /** Ignores case, accents and extra spaces, so "munoz" finds "Muñoz". */

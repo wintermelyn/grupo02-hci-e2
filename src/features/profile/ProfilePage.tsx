@@ -1,14 +1,25 @@
 import { RotateCcw } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Avatar, Button, InlineConfirm, PageHeader } from '../../components'
 import { forgetSearches } from '../../lib/openlibrary'
 import { useStore } from '../../store'
+import { friendsLabel } from '../friends/people'
 import { clearRecentSearches } from '../search/recentSearchStore'
+
+function booksLabel(count: number): string {
+  return count === 1 ? '1 libro' : `${count} libros`
+}
 
 export function ProfilePage() {
   const me = useStore((state) => state.me)
   const resetDemo = useStore((state) => state.resetDemo)
   const showToast = useStore((state) => state.showToast)
+  const library = useStore((state) => state.library)
+  const friendships = useStore((state) => state.friendships)
+  const summary = useMemo(() => {
+    const friends = friendships.filter(({ status }) => status === 'friends').length
+    return `${booksLabel(Object.keys(library).length)} · ${friendsLabel(friends)}`
+  }, [library, friendships])
   const [asking, setAsking] = useState(false)
   const resetButton = useRef<HTMLButtonElement>(null)
   const returnFocus = useRef(false)
@@ -41,12 +52,11 @@ export function ProfilePage() {
         media={<Avatar user={me} size="lg" />}
         backTo="/mas"
         backLabel="Más"
-      />
-      <section className="mt-5 md:max-w-lg">
+      >
+        <p className="text-sm text-muted">{summary}</p>
+      </PageHeader>
+      <section className="mt-7 lg:mt-10">
         <h2 className="section-title">Demo</h2>
-        <p className="mt-1 text-muted">
-          Vuelve a los libros, carpetas y amigos del comienzo, para repetir una tarea desde cero.
-        </p>
         {asking ? (
           <InlineConfirm
             title="¿Reiniciar la demo?"
@@ -58,14 +68,20 @@ export function ProfilePage() {
             Pierdes los cambios que hiciste en tus libros, carpetas y amigos.
           </InlineConfirm>
         ) : (
-          <Button
-            ref={resetButton}
-            icon={RotateCcw}
-            onClick={() => setAsking(true)}
-            className="mt-3"
-          >
-            Reiniciar demo
-          </Button>
+          <div className="mt-3 rounded-tile bg-shell p-5 md:flex md:items-center md:justify-between md:gap-6">
+            <p>
+              Vuelve a los libros, carpetas y amigos del comienzo, para repetir una tarea desde
+              cero.
+            </p>
+            <Button
+              ref={resetButton}
+              icon={RotateCcw}
+              onClick={() => setAsking(true)}
+              className="mt-3 shrink-0 md:mt-0"
+            >
+              Reiniciar demo
+            </Button>
+          </div>
         )}
       </section>
     </section>
