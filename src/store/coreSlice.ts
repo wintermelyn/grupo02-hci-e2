@@ -26,7 +26,8 @@ export interface CoreActions {
    * Adds the book to the library or changes its status. Ignores ids that getBook does not know,
    * so call upsertBook first for an API book. Leaving Leído drops finishedAt and rating, which
    * describe that finished reading; undo brings them back. Leído → Leyendo is a re-read, so
-   * startedAt becomes today.
+   * startedAt becomes today. Moving to Lo quiero sets wantCheckedAt to today, so the D5 prompt does
+   * not ask about a book the person just chose.
    */
   setStatus: (bookId: BookId, status: DirectStatus) => void
   /** Looks in seedBooks first, then in extraBooks. In a component, use `useStore(selectBook(id))`. */
@@ -35,7 +36,7 @@ export interface CoreActions {
 
 export const TOAST_DURATION_MS = 5000
 
-const DIRECT_STATUSES: readonly ReadingStatus[] = ['want', 'reading']
+const DIRECT_STATUSES: readonly ReadingStatus[] = ['want', 'owned', 'reading']
 
 let toastTimer: ReturnType<typeof setTimeout> | undefined
 let lastToastId = 0
@@ -125,12 +126,12 @@ export const createCoreSlice: SliceCreator<CoreActions> = (set, get) => ({
 
     const base: Omit<LibraryEntry, 'status'> = current ?? {
       bookId,
-      owned: false,
       folderIds: [],
       addedAt: today(),
     }
     const { finishedAt: _finishedAt, rating: _rating, ...kept } = base
     const entry: LibraryEntry = { ...kept, status, startedAt: startedAtFor(current, status) }
+    if (status === 'want') entry.wantCheckedAt = today()
     const label = current
       ? `Estado cambiado a «${STATUS_LABELS[status]}»`
       : `Agregado a Mis libros como «${STATUS_LABELS[status]}»`

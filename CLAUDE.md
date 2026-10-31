@@ -5,11 +5,14 @@ Prototipo web de un rediseño de Goodreads (curso IIC3182), sin backend: React 1
 ## Qué leer y cuándo
 
 - **`PLAN.md`**, al empezar cualquier tarea de implementación. Dice qué pantalla, ruta y acción del store es de cada rol, y trae los tipos, el **contrato** del store y las reglas de interfaz.
+- **`docs/e2/informe-e2.pdf`**, al dudar de una decisión de diseño: manda sobre `PLAN.md`.
+- **`docs/desarrollo/protocolo.md`**, al empezar o cerrar una fase. `Aprobé el CP<n>` empieza una.
 - **`docs/desarrollo/contratos.md`**, al usar el store o un componente compartido, al cambiar un seed, o al editar un archivo cuyo dueño no es tu rol.
 - **`docs/desarrollo/tests.md`**, al escribir tests o cuando falla `src/routes.test.tsx`.
 - **`docs/desarrollo/tareas.md`**, al tocar los libros o personas que usan las tareas T1–T3.
 - **`docs/desarrollo/catalogo.md`**, al agregar libros o regenerar `src/data/books.json`.
 - **`docs/conceptos-hci.md`**, al decidir cómo se ve o se comporta una pantalla.
+- **`DESIGN.md`** (desde la fase 2), al construir o cambiar el aspecto de una pantalla o un componente.
 
 ## Reglas que el código no muestra
 
@@ -20,7 +23,7 @@ Prototipo web de un rediseño de Goodreads (curso IIC3182), sin backend: React 1
 - **Idioma:** la interfaz va en español de Chile. Los identificadores van en inglés, según el glosario de `PLAN.md`.
 - **Fechas de calendario:** solo con `today()`, `daysAgo()`, `parseDate()` y `formatDate()` de `src/lib/dates.ts`. Después de las 21:00 en Chile, las conversiones vía UTC dan otro día.
 - **Leer el store:** en componentes, con `useStore(selectBook(id))` o `useStore(selectEntry(id))`. Cualquier otro selector debe devolver el dato tal cual; las listas derivadas se calculan con `useMemo` o `useShallow`.
-- **"Leído":** solo `finishBook` deja un libro en `read`. La interfaz llega ahí por `onRequestFinish` → `/libro/:id?accion=terminar`.
+- **"Leído":** solo `finishBook` deja un libro en `read`. La interfaz llega ahí por `StatusControl`, sin pasos intermedios.
 
 ## Cuándo una tarea está terminada
 

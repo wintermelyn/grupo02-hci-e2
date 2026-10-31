@@ -11,7 +11,7 @@ interface RouterOptions {
   path?: string
 }
 
-/** The URL the router is on, query string included, e.g. "/libro/OL1W?accion=terminar". */
+/** The URL the router is on, query string included, e.g. "/buscar?q=dune". */
 export function currentLocation(): string | null {
   return screen.getByTestId(CURRENT_LOCATION_TEST_ID).textContent
 }

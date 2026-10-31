@@ -35,6 +35,7 @@ function ToastCard({ toast }: { toast: ToastData }) {
   const pauseToast = useStore((state) => state.pauseToast)
   const resumeToast = useStore((state) => state.resumeToast)
   const holds = useRef(new Set<Hold>())
+  const focusedBefore = useRef<HTMLElement | null>(null)
 
   function setHold(hold: Hold, active: boolean) {
     if (active) holds.current.add(hold)
@@ -47,6 +48,20 @@ function ToastCard({ toast }: { toast: ToastData }) {
     if (event.pointerType === 'mouse') setHold('hover', active)
   }
 
+  function onFocus(event: FocusEvent<HTMLDivElement>) {
+    const from = event.relatedTarget
+    if (from instanceof HTMLElement && !event.currentTarget.contains(from)) {
+      focusedBefore.current = from
+    }
+    setHold('focus', true)
+  }
+
+  // Deshacer disappears with this toast, which would drop keyboard users back at the top of the page.
+  function undoAndRestoreFocus() {
+    undo()
+    focusedBefore.current?.focus()
+  }
+
   function onBlur(event: FocusEvent<HTMLDivElement>) {
     if (!event.currentTarget.contains(event.relatedTarget)) setHold('focus', false)
   }
@@ -55,7 +70,7 @@ function ToastCard({ toast }: { toast: ToastData }) {
     <div
       onPointerEnter={(event) => setHover(event, true)}
       onPointerLeave={(event) => setHover(event, false)}
-      onFocus={() => setHold('focus', true)}
+      onFocus={onFocus}
       onBlur={onBlur}
       className="pointer-events-auto flex w-full max-w-md items-center justify-between gap-3 rounded-xl bg-gray-900 py-2 pr-2 pl-4 text-white shadow-lg transition duration-200 starting:translate-y-2 starting:opacity-0 motion-reduce:transition-none"
     >
@@ -63,7 +78,7 @@ function ToastCard({ toast }: { toast: ToastData }) {
       {toast.undoable && (
         <button
           type="button"
-          onClick={undo}
+          onClick={undoAndRestoreFocus}
           className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-lg px-3 font-semibold text-amber-300 active:bg-white/10"
         >
           <Undo2 aria-hidden size={18} />

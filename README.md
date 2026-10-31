@@ -1,6 +1,6 @@
 # Prototipo E2 · Grupo 2 · Goodreads
 
-Prototipo web responsivo (celular y computador) para las 3 tareas de la E2: terminar un libro (T1), ordenar los pendientes (T2) y agregar un amigo (T3). Es una app solo de frontend: los datos parten de un seed y se guardan en `localStorage`. **Reiniciar demo**, en Perfil, vuelve al estado inicial.
+Prototipo web responsivo (celular y computador) para las 3 tareas de la E2: marcar un libro como leído (T1), ordenar los pendientes (T2) y agregar un amigo (T3). Es una app solo de frontend: los datos parten de un seed y se guardan en `localStorage`. **Reiniciar demo**, en Más → Mi perfil, vuelve al estado inicial.
 
 ## Para empezar
 

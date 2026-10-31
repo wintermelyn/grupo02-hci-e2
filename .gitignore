@@ -7,3 +7,8 @@ docs/clases/
 .claude/
 .agents/
 skills-lock.json
+.impeccable/build/
+.impeccable/critique/
+.impeccable/live/sessions/
+.impeccable/mocks/
+.impeccable/review/

@@ -9,7 +9,7 @@ Cada test va junto al código que prueba (`*.test.ts` o `*.test.tsx`). `src/test
 
 `src/routes.test.tsx` falla si se agrega una ruta sin agregarle una URL de ejemplo.
 
-**Tests que revisan tus páginas.** `src/routes.test.tsx` monta cada ruta (también `?accion=terminar` y las pestañas de Buscar) y exige que cada página:
+**Tests que revisan tus páginas.** `src/routes.test.tsx` monta cada ruta y exige que cada página:
 
 - tenga exactamente un `h1`;
 - se muestre dentro del `AppShell`, con la navegación "Principal";

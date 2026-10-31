@@ -8,7 +8,7 @@ export function FolderPage() {
       <EmptyState
         icon={Construction}
         title="Pantalla pendiente"
-        description="Aquí irán los libros de la carpeta, con buscador y selección múltiple. La construye el rol A (Biblioteca)."
+        description="Aquí irán los libros de la carpeta, con su buscador. La construye el rol A (Biblioteca)."
       />
     </section>
   )

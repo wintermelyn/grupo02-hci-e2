@@ -10,19 +10,14 @@ const SCREENS: Record<string, string> = {
   '/': '/',
   '/biblioteca': '/biblioteca',
   '/biblioteca/carpeta/:folderId': '/biblioteca/carpeta/proximos',
-  '/libro/:bookId': '/libro/OL1811898W',
+  '/libro/:bookId': '/libro/OL81626W',
+  '/descubrir': '/descubrir',
   '/buscar': '/buscar',
+  '/mas': '/mas',
   '/amigos': '/amigos',
   '/amigos/:userId': '/amigos/camila',
   '/perfil': '/perfil',
 }
-
-// URLs that reuse a route above with the query parameters from PLAN.md.
-const QUERY_VARIANTS: string[] = [
-  '/libro/OL1811898W?accion=terminar',
-  '/buscar?tab=libros',
-  '/buscar?tab=personas',
-]
 
 const CATCH_ALL = '/*'
 
@@ -53,8 +48,6 @@ describe('routes', () => {
   })
 
   it.each(Object.values(SCREENS))('%s renders one page inside the shell', expectScreen)
-
-  it.each(QUERY_VARIANTS)('%s renders one page inside the shell', expectScreen)
 
   it('sends unknown URLs to Inicio', () => {
     renderApp('/ruta-inexistente')
