@@ -1,4 +1,4 @@
-import { Construction } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { EmptyState, PageHeader } from '../../components'
 
 export function SearchPage() {
@@ -6,9 +6,9 @@ export function SearchPage() {
     <section>
       <PageHeader title="Buscar" />
       <EmptyState
-        icon={Construction}
-        title="Pantalla pendiente"
-        description="Aquí irá la búsqueda de libros y autores. La construye el rol B (Social y búsqueda)."
+        icon={Search}
+        title="Disponible pronto"
+        description="Aquí vas a poder buscar libros y autores."
       />
     </section>
   )

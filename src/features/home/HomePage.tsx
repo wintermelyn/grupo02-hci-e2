@@ -1,4 +1,4 @@
-import { Construction } from 'lucide-react'
+import { House } from 'lucide-react'
 import { EmptyState, PageHeader } from '../../components'
 
 export function HomePage() {
@@ -6,9 +6,9 @@ export function HomePage() {
     <section>
       <PageHeader title="Inicio" />
       <EmptyState
-        icon={Construction}
-        title="Pantalla pendiente"
-        description="Aquí irán «Leyendo ahora» y la actividad de tus amigos. La construye el rol B (Social y búsqueda)."
+        icon={House}
+        title="Disponible pronto"
+        description="Aquí vas a ver el libro que estás leyendo y lo que leen tus amigos."
       />
     </section>
   )

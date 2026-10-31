@@ -4,7 +4,7 @@ Este documento es lo único que hay que leer para empezar a programar. Todo lo q
 
 **Fuente de las decisiones de diseño:** `docs/e2/informe-e2.pdf`. Si este plan y el informe se contradicen, manda el informe y se corrige el plan. Lo que el informe no define está resuelto en la sección 6.
 
-**Estado del código:** el bloque base ya tiene los "Ajustes al bloque base" de la sección 4. Su aspecto sigue siendo provisional hasta "Dirección visual".
+**Estado del código:** el bloque base tiene los "Ajustes al bloque base" y la "Dirección visual" de la sección 4. Mis libros y la ficha ya están construidas, y `DESIGN.md` describe el aspecto de la app.
 
 **URL:** tiene que seguir funcionando hasta fines de noviembre (E3, 25 de noviembre).
 
@@ -97,10 +97,10 @@ N3 no se atiende en esta entrega. Si el equipo cambia alguna decisión, se actua
 - **Después de entregar:** tag `e2-entrega`. En `main` solo se suben arreglos hasta la E3, y la URL se revisa antes del 25 de noviembre.
 
 ### Responsivo
-- Se diseña primero para el celular, con un solo punto de quiebre: `md` (≥ 768 px).
+- Se diseña primero para el celular, con un punto de quiebre principal: `md` (≥ 768 px). `lg` solo afina el computador, y la variante `short` reordena la ficha en celulares de poca altura.
   - **Celular:** barra de navegación inferior y paneles que suben desde abajo.
   - **Computador:** barra superior, contenido centrado de hasta 1040 px y paneles como modal centrado.
-- **Lo resuelve el bloque base** en `AppShell` y `BottomSheet`. Cada rol solo ajusta sus grillas con clases `md:`. Por ejemplo, carpetas en 2 columnas en celular y 4 en computador, y la ficha en dos columnas en computador.
+- **Lo resuelve el bloque base** en `AppShell` y `BottomSheet`. Cada rol solo ajusta sus grillas con clases `md:`. Por ejemplo, carpetas en 2 columnas en celular, 4 en tablet y 5 en computador, y la ficha en dos columnas desde `md`.
 
 ### Fechas
 - Siempre se usa `src/lib/dates.ts`, que trae `today()`, `daysAgo(n)`, `parseDate()` y `formatDate()`, todas sobre date-fns.
@@ -112,7 +112,7 @@ N3 no se atiende en esta entrega. Si el equipo cambia alguna decisión, se actua
   - Del resultado se usan el **título y la portada de la edición en español** (`editions.docs[0]`).
   - Los autores se corrigen a mano en el JSON, porque a veces vienen en el idioma original.
   - Las descripciones se traen de `/works/{key}.json`, donde vienen como string o como `{value}`. Pueden faltar.
-  - Las portadas se bajan con `-M.jpg?default=false` a `public/covers/`.
+  - Las portadas se bajan con `-L.jpg?default=false` a `public/covers/`, para que se vean nítidas en pantallas 2x.
   - El resultado se guarda en `src/data/books.json`, que se confirma en el repo, y la app no depende de Open Library para funcionar.
 - **ID de un libro:** la clave de la obra en Open Library, por ejemplo `OL45804W`. Se usa así tal cual en la URL.
 - **Búsqueda en vivo** (`src/lib/openlibrary.ts`, rol B):
@@ -228,19 +228,21 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 
 ### Componentes compartidos (`src/components/`, del bloque base)
 - **`AppShell`:** navegación inferior en celular y superior en computador, contenedor centrado y `<Toast/>`.
-- **`PageHeader`:** título, botón de volver y una acción a la derecha.
-- **`BookCover`:** portada, con un placeholder de color e iniciales si no hay imagen.
-- **`BookRow`:** portada, título, autor, `StatusTag` junto al título (si el libro está en la biblioteca) y estrellas. Acepta la prop `trailing`.
-- **`StatusControl`:** el tag de la ficha con su lápiz (D2). Al tocarlo abre un `BottomSheet` con las cuatro opciones. Si el libro no está en la biblioteca, muestra "Agregar a Mis libros" y abre el mismo selector. Recibe `bookId` y `book`.
-- **`StatusTag`:** el tag en solo lectura, con ícono, texto y color.
+- **`PageHeader`:** banda de la página con título, subtítulo, botón de volver y una acción a la derecha. Lo que recibe como hijo, como `TagFilter`, queda en el borde inferior.
+- **`BookCover`:** portada, con un placeholder de color e iniciales si no hay imagen. Con la prop `status`, muestra la cinta del tag bajo la portada.
+- **`BookRow`:** portada con su cinta, título, `StatusTag` junto al autor, bajo el título (si el libro está en la biblioteca), y estrellas. Acepta la prop `trailing`. Al abrir la ficha le pasa de dónde viene, para que vuelva a esa misma lista.
+- **`StatusControl`:** el tag de la ficha con su lápiz (D2). Al tocarlo abre un menú anclado junto al control, con las cuatro opciones de 48 px de alto. El menú no oscurece la pantalla y deja ver el libro. Funciona con foco, flechas, Inicio, Fin, Escape y clic afuera. El informe solo pide una "vista de selección de opciones de tags". Si el libro no está en la biblioteca, muestra "Agregar a Mis libros" y abre el mismo menú. Recibe `bookId` y `book`.
+- **`StatusTag`:** el tag en solo lectura, con ícono, texto y color, sin relleno. Tamaño `sm` para las listas.
+- **`TagFilter`:** los botones de tag (D3), con la cantidad de libros de cada uno. El activo se marca con la cinta. Lo usan Mis libros y la carpeta.
+- **`Ribbon`:** la cinta, la marca de lo activo.
 - **`Stars`:** muestra el puntaje, o permite elegirlo si recibe `onChange`.
-- **`BottomSheet`:** panel inferior en celular y modal centrado en computador.
+- **`BottomSheet`:** panel inferior en celular y modal centrado en computador. Es para contenido largo, como "Editar lectura"; un cambio rápido y reversible no lo usa.
 - **`Button`:** variantes `primary`, `secondary` y `danger`.
 - **`EmptyState`, `LoadingState`, `ErrorState`.**
 
 También son compartidos y del bloque base:
 - **`src/routes.tsx`:** fija los nombres de las páginas, así que nadie tiene que editarlo después.
-- **`src/index.css`:** con `@theme`, que define `--color-want`, `--color-owned`, `--color-reading`, `--color-read` y el color de marca.
+- **`src/index.css`:** con `@theme`, que define los colores, las fuentes, la escala tipográfica, las sombras y las animaciones. La paleta por defecto de Tailwind no existe: solo hay estos tokens.
 - **`src/lib/dates.ts`.**
 - **`DESIGN.md`:** el aspecto de la app. Se escribe en "Dirección visual".
 
@@ -296,7 +298,7 @@ Cambian tipos usados en todo el proyecto, así que van en un solo commit para qu
   - `persist` guarda `lastWantPromptOn`, y se sube `BASE_VERSION`;
   - `buildInitialState` incluye `lastWantPromptOn: undefined`, porque `resetDemo` usa `set`, que combina claves, y sin ella el valor anterior sobrevive a "Reiniciar demo";
   - en `librarySlice`, quitar los stubs `toggleOwned` y `moveToFolder`, y agregar `answerWantPrompt`.
-- [x] **Etiquetas y estilos:** cuatro tags en `STATUS_LABELS` (*Lo quiero, Lo tengo, Leyendo, Leído*), `STATUS_FILL`, `STATUS_ICONS` y `--color-owned`, con contraste de 4.5:1.
+- [x] **Etiquetas y estilos:** cuatro tags en `STATUS_LABELS` (*Lo quiero, Lo tengo, Leyendo, Leído*), sus estilos, `STATUS_ICONS` y `--color-owned`, con contraste de 4.5:1.
 - [x] **Componentes:**
   - `StatusControl` nuevo, según "Componentes compartidos";
   - `BookRow` con `StatusTag`, sin `selectable`, `onLongPress` ni `onRequestFinish`;
@@ -314,27 +316,32 @@ Cambian tipos usados en todo el proyecto, así que van en un solo commit para qu
 - [x] **Tests:** actualizar `coreSlice.test.ts`, `seed.test.ts`, `routes.test.tsx`, `StatusControl.test.tsx`, `BookRow.test.tsx` y `src/test/helpers.test.tsx`.
 
 ### Dirección visual (después de los ajustes; A y B dependen de ella)
-Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarrollo/protocolo.md`. El aspecto del bloque base es provisional porque viene de antes del informe, así que se reemplaza. Mis libros se construye aquí por excepción para que los agentes tengan una pantalla real de referencia. `LibraryPage.tsx` sigue siendo del rol A.
-- [ ] **Mundo visual:** Impeccable propone las direcciones y Matías elige una.
-- [ ] **Sistema:** `src/index.css` y todos los componentes compartidos con el aspecto elegido, en un commit aparte.
-- [ ] **Mis libros como primera superficie:** solo lee el store.
+Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarrollo/protocolo.md`. Reemplaza el aspecto del bloque base. Mis libros y la ficha se construyen aquí por excepción, para que los agentes tengan dos pantallas reales de referencia. `LibraryPage.tsx` y `BookPage.tsx` siguen siendo del rol A.
+- [x] **Evaluación de Goodreads:** cada elemento contra las 14 reglas y los problemas de la interfaz anterior, con el contraste medido. Las direcciones parten de lo que sobrevive.
+- [x] **Mundo visual:** Impeccable propone las direcciones y Matías elige una.
+- [x] **Sistema:** `src/index.css` y todos los componentes compartidos con el aspecto elegido, en un commit aparte.
+  - fuentes libres alojadas en el proyecto;
+  - `StatusControl` como menú anclado;
+  - portadas regeneradas en mayor resolución.
+- [x] **Mis libros como primera superficie:** solo lee el store.
   - fila de botones de tag (D3), con "Todos" activo al entrar;
   - tablero "Mis carpetas" con "Próximos" primero y enlaces a cada carpeta (D1);
   - con un tag activo, la lista de esos libros en vez del tablero.
-- [ ] **`DESIGN.md` y `.impeccable/design.json`**, escritos desde lo construido.
-- **Listo cuando:** la revisión final de Impeccable termina con veredicto `ship` y `DESIGN.md` describe lo que se ve en Mis libros.
+- [x] **Ficha como segunda superficie:** portada, datos, descripción, carpetas y `StatusControl`. Solo lee el store, salvo el selector.
+- [x] **Pantallas pendientes** dentro del sistema, sin textos internos.
+- [x] **`DESIGN.md` y `.impeccable/design.json`**, escritos desde lo construido.
+- **Listo cuando:** la revisión final de Impeccable termina con veredicto `ship` y `DESIGN.md` describe lo que se ve en Mis libros y en la ficha.
 
 ### Rol A · Biblioteca (T1 + T2) · `src/features/library/`, `src/features/book/`, `librarySlice.ts`
 - [ ] **Mis libros**, sobre lo que dejó "Dirección visual":
   - aviso periódico (D5);
   - buscador sobre la biblioteca;
   - "+ Nueva carpeta".
-- [ ] **Carpeta:** fila de botones de tag, lista de `BookRow`, buscador interno, renombrar y eliminar carpeta, y estado vacío.
-- [ ] **Ficha:**
-  - portada, datos y descripción (si existe);
-  - `StatusControl` y chips de carpetas (agregar o quitar);
+- [ ] **Carpeta:** `TagFilter`, lista de `BookRow`, buscador interno, renombrar y eliminar carpeta, y estado vacío. El título y la banda ya están.
+- [ ] **Ficha**, sobre lo que dejó "Dirección visual":
+  - agregar y quitar carpetas en los chips, que hoy solo enlazan a cada carpeta;
   - "Quitar de mi biblioteca";
-  - estado "Libro no encontrado" y estado de carga mientras se ejecuta `fetchWork`.
+  - estado de carga mientras se ejecuta `fetchWork`, antes de "Libro no encontrado".
 - [ ] **Fechas y puntaje en la ficha:**
   - se muestran cuando el tag es "Leído";
   - "Editar lectura" abre un `BottomSheet` con fechas y estrellas opcionales;
@@ -387,7 +394,7 @@ Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarr
 | Orden | Qué |
 |---|---|
 | 1 | Ajustes al bloque base, publicados en `main` |
-| 2 | Dirección visual, con `DESIGN.md` y Mis libros como primera superficie |
+| 2 | Dirección visual, con `DESIGN.md`, y Mis libros y la ficha como primeras superficies |
 | 3 | A y B en paralelo, con merge a `main` cada vez que pase `npm run build` |
 | 4 | Integración: probar T1, T2 y T3 desde cero en celular y en computador |
 | 5 | Correcciones, capturas para el informe, entrega y tag `e2-entrega` |
@@ -414,6 +421,10 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Código de amigo | No aparece | Queda fuera. Compartir un código exige coordinarse por otro medio, lo contrario de N2 |
 | Seguidores | El journey 2.1.2 menciona "amigos y seguidores" | Amigos muestra solo amigos y solicitudes |
 | Barra de navegación | Nombra "Mis libros", "Más", "Descubrir" y el buscador principal, sin dar el orden | *Inicio · Mis libros · Descubrir · Buscar · Más* |
+| Selector de tags | Pide una "vista de selección de opciones de tags", sin decir cuál | Un menú anclado junto al tag, porque cambiarlo es rápido y reversible. El panel inferior queda para contenido largo |
+| Tag en las listas | "Junto al título" | Bajo el título, junto al autor y con la cinta de su color bajo la portada, porque un título largo no deja lugar a su lado en un celular |
+| Cantidad en los botones de tag | No aparece | Cada botón muestra cuántos libros tiene, porque T2 parte de saber que son 17 |
+| Orden de la lista por tag | No aparece | Por título, para encontrar un libro conocido en una lista larga |
 | Relectura pasando por otro tag | No aparece | Pasar de "Leído" directo a "Leyendo" pone inicio = hoy. Si antes pasa por otro tag, se conserva la fecha vieja, como dice el contrato de `setStatus`, y se corrige con "Editar lectura" |
 | Sección marcada en la ficha | No aparece | Ninguna, porque la ficha se abre desde cualquier sección |
 | Nombre del selector | Habla de "un lápiz" | "Cambiar" junto al lápiz, porque todo ícono lleva texto. El selector se titula "Estado de «título»" |

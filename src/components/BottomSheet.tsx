@@ -1,5 +1,6 @@
 import { X } from 'lucide-react'
 import { useEffect, useId, useRef, type ReactNode } from 'react'
+import { ignoreSecondClick } from './ignoreSecondClick'
 
 export interface BottomSheetProps {
   open: boolean
@@ -8,20 +9,6 @@ export interface BottomSheetProps {
   children: ReactNode
   /** Actions pinned to the bottom of the panel, e.g. Cancelar + one primary <Button/>. */
   footer?: ReactNode
-}
-
-/**
- * The second click of a double tap would land on whatever was behind the panel, such as the
- * navigation bar under the last option. event.detail counts the clicks of a double tap, so the
- * next click is the only one that can be that second click.
- */
-function ignoreSecondClick() {
-  const ignore = (event: MouseEvent) => {
-    if (event.detail < 2) return
-    event.preventDefault()
-    event.stopPropagation()
-  }
-  window.addEventListener('click', ignore, { capture: true, once: true })
 }
 
 /**
@@ -64,18 +51,18 @@ export function BottomSheet({ open, onClose, title, children, footer }: BottomSh
       onClick={(event) => {
         if (event.target === event.currentTarget && event.detail < 2) onClose()
       }}
-      className="m-0 mt-auto max-h-[85dvh] w-full max-w-none rounded-t-2xl bg-white p-0 text-gray-900 shadow-xl backdrop:bg-black/50 md:m-auto md:max-w-lg md:rounded-2xl"
+      className="m-0 mt-auto max-h-[85dvh] w-full max-w-none rounded-t-2xl bg-white p-0 text-ink shadow-float backdrop:bg-ink/40 md:m-auto md:max-w-lg md:rounded-float"
     >
       {open && (
         <div className="flex max-h-[85dvh] flex-col">
-          <div className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-2">
-            <h2 id={titleId} className="text-lg font-bold">
+          <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-2">
+            <h2 id={titleId} className="font-serif text-xl font-semibold">
               {title}
             </h2>
             <button
               type="button"
               onClick={onClose}
-              className="-mr-2 inline-flex min-h-11 items-center gap-1 rounded-lg px-2 font-medium text-gray-800"
+              className="-mr-2 inline-flex min-h-11 items-center gap-1 rounded-control px-2 font-medium text-muted hover:text-ink active:bg-shell"
             >
               <X aria-hidden size={20} />
               Cerrar
@@ -83,7 +70,7 @@ export function BottomSheet({ open, onClose, title, children, footer }: BottomSh
           </div>
           <div className="overflow-y-auto overscroll-contain px-4 py-4">{children}</div>
           {footer && (
-            <div className="flex flex-wrap justify-end gap-2 border-t border-gray-200 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+            <div className="flex flex-wrap justify-end gap-2 border-t border-line px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
               {footer}
             </div>
           )}

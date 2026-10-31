@@ -72,14 +72,14 @@ function ToastCard({ toast }: { toast: ToastData }) {
       onPointerLeave={(event) => setHover(event, false)}
       onFocus={onFocus}
       onBlur={onBlur}
-      className="pointer-events-auto flex w-full max-w-md items-center justify-between gap-3 rounded-xl bg-gray-900 py-2 pr-2 pl-4 text-white shadow-lg transition duration-200 starting:translate-y-2 starting:opacity-0 motion-reduce:transition-none"
+      className="pointer-events-auto flex w-full max-w-md items-center justify-between gap-3 rounded-float bg-ink py-1 pr-1 pl-4 text-white shadow-float transition duration-200 ease-quick starting:translate-y-2 starting:opacity-0"
     >
       <p>{toast.message}</p>
       {toast.undoable && (
         <button
           type="button"
           onClick={undoAndRestoreFocus}
-          className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-lg px-3 font-semibold text-amber-300 active:bg-white/10"
+          className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-control px-3 font-semibold text-shell hover:bg-white/10 focus-visible:outline-white active:bg-white/20"
         >
           <Undo2 aria-hidden size={18} />
           Deshacer

@@ -98,6 +98,8 @@ const CATALOG = [
 // Manual fixes by work key, for titles or authors that come back in the original language or
 // with edition noise ("Un mundo feliz / Brave New World").
 const OVERRIDES = {
+  // The cover of the first Spanish edition has a library barcode over the author's name.
+  OL81613W: { coverId: 8179786 },
   OL81631W: { title: 'Cementerio de animales' },
   OL450063W: { title: 'Frankenstein o el moderno Prometeo' },
   OL274505W: { title: 'Cien años de soledad' },
@@ -218,7 +220,7 @@ async function downloadCover(id, coverId) {
   const publicUrl = `/covers/${id}.jpg`
   if (await fileExists(file)) return publicUrl
   const response = await request(
-    `https://covers.openlibrary.org/b/id/${coverId}-M.jpg?default=false`,
+    `https://covers.openlibrary.org/b/id/${coverId}-L.jpg?default=false`,
   )
   if (!response.ok) return undefined
   await writeFile(file, Buffer.from(await response.arrayBuffer()))
@@ -230,17 +232,18 @@ async function buildBook(query) {
   if (!doc) return undefined
   const id = workId(doc)
   const edition = spanishEdition(doc)
+  const { coverId, ...fixes } = OVERRIDES[id] ?? {}
   const book = {
     id,
     title: edition?.title ?? doc.title,
     authors: doc.author_name ?? [query.author],
-    coverUrl: await downloadCover(id, edition?.cover_i ?? doc.cover_i),
+    coverUrl: await downloadCover(id, coverId ?? edition?.cover_i ?? doc.cover_i),
     description: await fetchDescription(id),
     // Open Library sometimes reports 0 for an unknown year.
     year: doc.first_publish_year || undefined,
     pages: doc.number_of_pages_median || undefined,
   }
-  return { book: { ...book, ...OVERRIDES[id] }, hasSpanishEdition: Boolean(edition) }
+  return { book: { ...book, ...fixes }, hasSpanishEdition: Boolean(edition) }
 }
 
 async function main() {
