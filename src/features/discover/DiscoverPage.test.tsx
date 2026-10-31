@@ -133,7 +133,7 @@ describe('what is already in the library', () => {
     state().setStatus(id, 'owned')
     renderApp(`/descubrir?lista=${classics.id}`)
     expect(count(`1 de ${classics.bookIds.length}`)).toBeInTheDocument()
-    expect(screen.getByText('Lo tengo')).toBeInTheDocument()
+    expect(screen.getByText('Lo tengo').closest('.shrink-0')).toBeInTheDocument()
     expect(rail().querySelector('.ribbon')).toBeInTheDocument()
   })
 
@@ -233,6 +233,30 @@ describe('the carousel', () => {
     expect(count('3 de 6')).toBeInTheDocument()
     expect(rail().scrollLeft).toBeGreaterThanOrEqual(6 * STEP)
     expect(rail().scrollLeft).toBeLessThan(12 * STEP)
+  })
+
+  it('gives the snap back after coming to rest, or the next drag would stop anywhere', () => {
+    giveLayout()
+    vi.stubGlobal('requestAnimationFrame', (run: FrameRequestCallback) => setTimeout(run))
+    renderApp('/descubrir')
+    for (let click = 0; click < 6; click += 1) fireEvent.click(backButton())
+    expect(rail().style.scrollSnapType).toBe('none')
+    act(() => {
+      vi.advanceTimersByTime(SETTLE)
+    })
+    expect(rail().style.scrollSnapType).toBe('')
+  })
+
+  it('comes to rest when the mouse lets go', () => {
+    giveLayout()
+    renderApp('/descubrir')
+    rail().scrollLeft = 13 * STEP
+    fireEvent.pointerUp(rail())
+    act(() => {
+      vi.advanceTimersByTime(SETTLE)
+    })
+    expect(rail().scrollLeft).toBe(7 * STEP)
+    expect(count('2 de 6')).toBeInTheDocument()
   })
 
   it('follows a finger: the count changes while the rail scrolls', () => {

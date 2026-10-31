@@ -48,12 +48,18 @@ export function BookDetail({ list, book, position, total, from }: BookDetailProp
           <Link
             {...toBook}
             tabIndex={-1}
-            className="mt-0.5 font-serif text-[1.375rem]/[1.15] font-semibold tracking-[-0.02em] text-balance sm:text-[1.75rem]/[1.12] lg:mt-2 lg:text-[2.75rem]/[1.06]"
+            // 44 px to touch on a title of one line, over the lines around it, which do nothing.
+            className="relative mt-0.5 font-serif text-[1.375rem]/[1.15] font-semibold tracking-[-0.02em] text-balance after:absolute after:inset-x-0 after:-inset-y-2.5 sm:text-[1.75rem]/[1.12] lg:mt-2 lg:text-[2.75rem]/[1.06]"
           >
             <span className="line-clamp-2 lg:line-clamp-3">{book.title}</span>
           </Link>
           <p className="mt-1 flex min-w-0 items-center gap-2 text-sm text-muted lg:mt-3 lg:text-base">
-            {entry && <StatusTag status={entry.status} size="sm" />}
+            {entry && (
+              // A long author gives way, and the tag stays in one line.
+              <span className="shrink-0 whitespace-nowrap">
+                <StatusTag status={entry.status} size="sm" />
+              </span>
+            )}
             <span className="min-w-0 truncate">{facts(book)}</span>
           </p>
           {reason && (

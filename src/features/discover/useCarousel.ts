@@ -70,6 +70,10 @@ export function useCarousel(total: number, startAt: number) {
     programmed.current = false
     if (endless) jumpLaps(resting >= 2 * total ? -1 : resting < total ? 1 : 0)
     setPlace(current.current)
+    // A move leaves the snap off on purpose, and only coming to rest turns it back on.
+    requestAnimationFrame(() => {
+      if (!programmed.current) rail.style.scrollSnapType = ''
+    })
   }
 
   function settleLater() {
@@ -113,6 +117,12 @@ export function useCarousel(total: number, startAt: number) {
 
   function onTouchEnd() {
     touching.current = false
+    settleLater()
+  }
+
+  /** The mouse lets go after the last scroll, so nothing else would bring the cover to the centre. */
+  function onPointerUp() {
+    railProps.onPointerUp()
     settleLater()
   }
 
@@ -168,6 +178,8 @@ export function useCarousel(total: number, startAt: number) {
       ...railProps,
       onScroll,
       onKeyDown,
+      onPointerUp,
+      onPointerCancel: onPointerUp,
       onTouchStart: () => {
         touching.current = true
       },
