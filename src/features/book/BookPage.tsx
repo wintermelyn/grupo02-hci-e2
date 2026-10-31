@@ -1,13 +1,18 @@
 import { Sparkle } from 'lucide-react'
-import type { CSSProperties } from 'react'
 import { matchPath, useLocation, useParams } from 'react-router'
 import { BookCover, StatusControl } from '../../components'
-import { coverTone } from '../../lib/coverTone'
 import { selectBook, selectEntry, useStore } from '../../store'
 import type { Book, Folder, ReadingStatus } from '../../types'
 import { UNFILED_NAME, UNFILED_PATH } from '../library/filters'
 import { BookFolders } from './BookFolders'
-import { BOOK_COLUMNS, BOOK_SCENE, BookTopRow } from './BookSkeleton'
+import {
+  BOOK_ABOUT,
+  BOOK_COLUMNS,
+  BOOK_COVER,
+  BOOK_READING,
+  BOOK_RECORD,
+  BookTopRow,
+} from './BookSkeleton'
 import { LedgerRow } from './LedgerRow'
 import { MissingBook } from './MissingBook'
 import { ReadingDetails } from './ReadingDetails'
@@ -35,7 +40,7 @@ function BookDetails({ authors, year, pages }: Book) {
   // The number and its unit stay together.
   const edition = [year, pages && `${pages} páginas`].filter(Boolean).join(' · ')
   return (
-    <div className="mt-1.5 text-sm text-muted md:text-base">
+    <div className="mt-1 text-sm wrap-break-word text-muted md:mt-1.5 md:text-base">
       <p>{authors.join(', ') || 'Autor desconocido'}</p>
       {edition && <p>{edition}</p>}
     </div>
@@ -62,7 +67,7 @@ function AboutBook({ book }: { book: Book }) {
   const { description, descriptionTranslated } = book
   const { searching, live } = useBookDescription(book)
   return (
-    <section className="mt-7 lg:mt-10">
+    <section className={BOOK_ABOUT}>
       <h2 className="section-title">Sobre este libro</h2>
       {description ? (
         <>
@@ -93,24 +98,23 @@ export function BookPage() {
       <BookTopRow back={back} />
 
       {/*
-        One shape for every book. The cover stands on the colour of its book, as in Descubrir, with
-        everything that is read beside it, so a long description never leaves the page lopsided.
+        One shape for every book. On a phone the title goes beside the cover, and from a tablet up
+        everything that is read does, so a long description never leaves the page lopsided.
       */}
       <div className={BOOK_COLUMNS}>
-        <div
-          style={{ '--tone': coverTone(book.id) } as CSSProperties}
-          className={`tone-scene ${BOOK_SCENE}`}
-        >
-          <BookCover book={book} size="lg" status={entry?.status} raised />
+        <div className={BOOK_COVER}>
+          <BookCover book={book} size="lg" status={entry?.status} />
         </div>
 
-        <div className="min-w-0">
-          <header className="mt-3 md:mt-0">
-            <h1 className="page-title wrap-break-word hyphens-auto">{book.title}</h1>
+        <div className={BOOK_READING}>
+          <header className="min-w-0">
+            <h1 className="font-serif text-heading font-semibold tracking-tight wrap-break-word hyphens-auto md:page-title">
+              {book.title}
+            </h1>
             <BookDetails {...book} />
           </header>
 
-          <dl className="mt-3 border-t border-line md:mt-5">
+          <dl className={BOOK_RECORD}>
             <LedgerRow label="Estado">
               {/* On a wide record, a full-width black pill would weigh more than the title. */}
               <StatusControl

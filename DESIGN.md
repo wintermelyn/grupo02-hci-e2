@@ -412,8 +412,7 @@ Los cuatro colores de estado se usan en el texto y el ícono de `StatusTag`, y e
 `coverTone(bookId)`, de `src/lib/coverTone.ts`, toma el color dominante de la portada, que viene de `src/data/coverColors.json`, y lo oscurece hasta dar 8,5:1 con texto blanco. El texto secundario va en blanco al 88 %. Un azul que deriva a índigo se queda en azul y un amarillo, que oscuro se vuelve oliva, pasa a ámbar. Una portada sin color propio, o un libro de una búsqueda en vivo, toma un tono de tinta (`rgb(50 43 38)`).
 
 - **Inicio, Buscar y Persona:** el tono es el fondo de la tarjeta que carga ese libro o autor. En Persona, solo la tarjeta de "Está leyendo".
-- **Descubrir:** solo es un tinte al 12 % sobre papel detrás de los libros (`tone-scene`, con `--tone`), y nunca queda bajo el texto, así que no cambia ningún contraste.
-- **Ficha:** el mismo tinte, en la escena donde se para la portada, sin texto encima.
+- **Descubrir:** solo es un tinte al 12 % sobre papel detrás de los libros (`tone-scene`, con `--tone`), y nunca queda bajo el texto, así que no cambia ningún contraste. La ficha no lleva tinte: su portada va sola, sobre `paper`.
 - **Ninguna otra superficie** se tiñe, y las portadas mismas nunca se tiñen.
 
 ### Contrastes medidos
@@ -478,7 +477,8 @@ Todos superan el 3:1 que pide el borde de un control. Sobre `sand-deep` da 2,88:
 - **Título de tarjeta** (600, 24 px y línea 1,12; 32 px desde 1024 px, tracking -0,02 em): el libro en una tarjeta de tono, con `font-serif text-[1.5rem]/[1.12] lg:text-[2rem]/[1.1]`.
 - **Nombre de autor** (600, 18 px y línea 1,15; 20 px desde 1024 px): el autor en su tarjeta de tono, con `font-serif text-lg/[1.15] lg:text-xl/[1.15]`. Desde 1024 px, la primera tarjeta de los resultados, que hace de mejor resultado, usa los 32 px de Título de tarjeta.
 - **Título del libro en Descubrir** (600, tracking -0,02 em): 22 px en celular, 28 px desde 640 px y 44 px desde 1024 px.
-- **Display** (600, 32 px, 38 px de línea, tracking -0,025 em) y **Heading** (600, 22 px, 28 px de línea): quedaron sin uso desde que la ficha pasó a `page-title`.
+- **Heading** (600, 22 px, 28 px de línea, tracking -0,025 em): el título de la ficha bajo 768 px, al lado de la portada. Desde 768 px usa `page-title`.
+- **Display** (600, 32 px, 38 px de línea, tracking -0,025 em): quedó sin uso desde que la ficha pasó a `page-title`.
 - **Subheading** (600, 20 px, 28 px de línea): las iniciales de `Avatar` `lg`.
 - **Book title** (600, 18 px): el nombre de un libro en `BookRow` (línea 1,375, máximo dos líneas), el de una persona en `PersonRow` (16 px bajo 360 px), el de una carpeta en `FolderCard` y el título de `EmptyState`, `ErrorState` e `InlineConfirm`.
 - **Fila compacta** (600, 17 px, línea 1,375): el libro en una fila de actividad, en `BookRow` con `compact` o en el estante de una persona, con `font-serif text-[1.0625rem]/snug`.
@@ -512,10 +512,10 @@ El diseño parte del celular. `AppShell` pone el marco y cada pantalla solo llen
 - **Tablero de tarjetas:** 2 columnas con 10 px de separación en celular, 4 columnas con 16 px desde `md` y 5 desde `lg`. Las tarjetas de una fila miden lo mismo, y un nombre llega a dos líneas. "+ Nueva carpeta" cierra el tablero: ocupa su celda, como una carpeta, y mientras se escribe toma dos.
 - **Listas de libros:** una columna de `BookRow` en celular y dos desde `md`, con 32 px entre columnas. Cada fila va en un `li` con `border-b border-line last:border-b-0`, como en `BookList`. Desde `md`, las dos últimas filas pierden su línea si quedan una al lado de la otra, con `md:nth-last-2:odd:border-b-0`.
 - **Ficha:** sin `PageHeader`, con `BackLink` y `Wordmark` en la primera fila. Tiene la misma forma para todo libro, con o sin descripción.
-  - **Celular:** una escena a todo el ancho con la portada de 112 px al centro y, debajo, el título, el registro y "Sobre este libro".
-  - **Desde 768 px:** dos columnas, con 32 px entre ambas: la escena, de 280 px, y lo que se lee.
-  - **Desde 1024 px:** las mismas dos columnas en proporción 4 a 7, con 48 px entre ambas y la escena de 264 px como mínimo. A 1024 px deja 392 px para el registro, donde dos carpetas y "Agregar o quitar" caben en una línea.
-  - La escena sigue la lectura desde 768 px (`sticky`), para que una descripción larga no deje la columna de la portada vacía.
+  - **Bajo 768 px:** la portada de 112 px a la izquierda y, a 16 px, el título en Heading con el autor, el año y las páginas. Debajo van el registro y "Sobre este libro", a todo el ancho.
+  - **Desde 768 px:** dos columnas, con 32 px entre ambas: la de la portada, de 280 px, y lo que se lee. La portada de 224 px queda arriba y a la izquierda de su columna.
+  - **Desde 1024 px:** las mismas dos columnas en proporción 4 a 7, con 48 px entre ambas y la de la portada de 264 px como mínimo. A 1024 px deja 392 px para el registro, donde dos carpetas y "Agregar o quitar" caben en una línea.
+  - La portada sigue la lectura desde 768 px (`sticky`), para que una descripción larga no deje su columna vacía.
 - **Áreas táctiles:** 44 px como mínimo en todo control. Las secciones de la barra inferior miden 56 px de alto, y a 320 px de ancho, 62 × 56 px. `TagFilter` mide 56 px y las opciones del menú 44 px. El recorrido final no encontró ningún control bajo 44 px ni scroll horizontal, en los cuatro dispositivos.
 
 ## Elevation & Depth
@@ -526,8 +526,8 @@ El sistema se ordena por espacio, tamaño de los títulos y pocos bloques de `sh
 
 - **Flotante** (`--shadow-float`: `0 2px 4px rgb(30 25 21 / 14%), 0 18px 34px -8px rgb(30 25 21 / 40%)`): `AnchoredMenu`, toast y `RailArrow`.
 - **Libro** (`--shadow-book`: `0 1px 1px rgb(30 25 21 / 20%), 0 6px 12px -5px rgb(30 25 21 / 35%)`): portadas en tamaños `sm` y `fill`.
-- **Libro grande** (`--shadow-book-lg`: `0 2px 3px rgb(30 25 21 / 22%), 0 16px 26px -10px rgb(30 25 21 / 50%)`): una portada `lg` sin `raised`. La ficha ya no la usa.
-- **Portada** (`--shadow-cover`: `0 1px 2px rgb(20 12 8 / 22%), 0 14px 28px -12px rgb(20 12 8 / 55%)`): una portada con `raised`, sobre un tono o sola en un riel, y la de la ficha sobre su escena.
+- **Libro grande** (`--shadow-book-lg`: `0 2px 3px rgb(30 25 21 / 22%), 0 16px 26px -10px rgb(30 25 21 / 50%)`): una portada `lg` sin `raised`, como la de la ficha.
+- **Portada** (`--shadow-cover`: `0 1px 2px rgb(20 12 8 / 22%), 0 14px 28px -12px rgb(20 12 8 / 55%)`): una portada con `raised`, sobre un tono o sola en un riel.
 
 ### Named Rules
 
@@ -626,7 +626,7 @@ Viven en la carpeta de su pantalla. Sirven de ejemplo, y se vuelven compartidas 
 - **Carpeta fija:** solo dice "Carpeta fija" de subtítulo.
 - **Sin carpeta:** `UnfiledPage`, en `src/features/library/`. Se ve como una carpeta en el tablero, así que es la misma pantalla, con "Mis libros" para volver, `TagFilter` y `BandSearch`, y sin Opciones. De subtítulo dice "Libros que no están en ninguna carpeta". Sin libros, un `EmptyState` lo dice en el mismo lugar, en vez de sacar a la persona de la página.
 - **Título de una carpeta:** en celular llega a dos líneas, porque comparte la fila con dos botones y un nombre de 40 caracteres dejaría el primer libro a media pantalla. Desde `md` se muestra entero.
-- **Escena de la ficha:** un bloque `tone-scene` con radio de escena, con `--tone` en `coverTone(book.id)`, y la portada `lg` con `raised` y su cinta al centro. Sin texto encima. Deja lugar bajo la portada para que la cinta baje a la vista cuando cambia el tag, porque sobre una tarjeta de tono no se leería.
+- **Portada de la ficha:** la portada `lg` sola, sin bloque de color detrás ni `raised`, y con 12 px bajo ella (20 px desde `md`) para que la cinta baje a la vista cuando cambia el tag. `BookSkeleton` tiene la misma forma, con el título, el autor y el año en el alto de su texto, para que el registro no salte al cargar. El título corta una palabra larga en vez de salirse de su columna.
 - **Sobre este libro:** el bloque va siempre en el mismo lugar, con su título en `section-title`. La descripción va en Body, entera, sin cortar ni "Leer más", hasta `max-w-[60ch]`. Sin descripción dice "Aún no tenemos descripción de este libro." en Body `muted`, sin ícono ni `EmptyState`, porque es el caso normal y no un problema.
 - **Procedencia de una descripción:** en Small `muted` y a 8 px bajo la descripción. "Traducción hecha con IA", con el ícono de destellos que pide `PLAN.md`, si el libro trae `descriptionTranslated`. "Descripción de Open Library, sin traducir", sin ícono, si es un libro en vivo que la tiene, venga de Buscar o de un enlace directo. Es un dato sobre el texto, como la línea del autor, y no un aviso: sin cinta ni color de acento. Da 7,22:1 sobre `paper`.
 - **Motivo de un botón deshabilitado:** Small en tinta con `CircleAlert` en `muted`, dentro de una región `status`.

@@ -1,7 +1,6 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter, Routes, useNavigate } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { coverTone } from '../../lib/coverTone'
 import { daysAgo, today } from '../../lib/dates'
 import { fetchDescription, fetchWork } from '../../lib/openlibrary'
 import { appRoutes } from '../../routes'
@@ -124,11 +123,34 @@ describe('BookPage', () => {
     expect(pageShape()).toEqual(withDescription)
   })
 
-  it('stands the cover on the colour of its book, never under the text', () => {
+  it('shows the cover on its own, with no block of colour behind it', () => {
     renderApp(CARRIE)
-    const scene = document.querySelector('.tone-scene') as HTMLElement
-    expect(scene.style.getPropertyValue('--tone')).toBe(coverTone(CARRIE_ID))
-    expect(scene).toHaveTextContent('')
+    const reading = main().getByRole('heading', { level: 1 }).closest('header')?.parentElement
+    const cover = reading?.previousElementSibling as HTMLElement
+    expect(document.querySelector('.tone-scene')).toBeNull()
+    expect(cover).toHaveClass('pb-3', 'md:pb-5', 'md:sticky')
+    expect(cover.className).not.toMatch(/\b(bg-|rounded-)/)
+  })
+
+  it('puts the title beside the cover on a phone, with what follows in both columns', () => {
+    renderApp(CARRIE)
+    const title = main().getByRole('heading', { level: 1 })
+    const header = title.closest('header') as HTMLElement
+    const reading = header.parentElement as HTMLElement
+    expect(title).toHaveClass('text-heading', 'tracking-tight', 'md:page-title')
+    expect(header).toHaveClass('min-w-0')
+    expect(reading).toHaveClass('contents', 'md:block')
+    expect(reading.parentElement).toHaveClass('grid', 'grid-cols-[7rem_minmax(0,1fr)]')
+    expect(document.querySelector('article dl')).toHaveClass('col-span-2', 'mt-2', 'md:mt-5')
+    expect(
+      main().getByRole('heading', { name: 'Sobre este libro' }).closest('section'),
+    ).toHaveClass('col-span-2')
+  })
+
+  it('breaks a long word of the title or the author instead of leaving its column', () => {
+    renderApp(CARRIE)
+    expect(main().getByRole('heading', { level: 1 })).toHaveClass('wrap-break-word', 'hyphens-auto')
+    expect(main().getByText('Stephen King').parentElement).toHaveClass('wrap-break-word')
   })
 
   it('does not say that a description is missing when there is one', () => {
@@ -729,6 +751,27 @@ describe('loading a book the store does not have', () => {
     return answers
   }
 
+  it('keeps the shape of the page when the book arrives, so nothing jumps', async () => {
+    const shape = () => {
+      const record = document.querySelector('article dl') as HTMLElement
+      const reading = record.parentElement as HTMLElement
+      const grid = reading.parentElement as HTMLElement
+      return [
+        grid.className.replace(' motion-safe:animate-pulse', ''),
+        grid.children[0].className,
+        reading.className,
+        record.className,
+      ]
+    }
+    const work = deferred<Book | null>()
+    vi.mocked(fetchWork).mockReturnValue(work.promise)
+    renderApp('/libro/OL999W')
+    const loading = shape()
+    await act(async () => work.resolve(REMOTE))
+    expect(main().getByRole('heading', { level: 1 })).toHaveTextContent('Un libro remoto')
+    expect(shape()).toEqual(loading)
+  })
+
   it('shows the loading state, then the book, and keeps it in the store', async () => {
     const work = deferred<Book | null>()
     vi.mocked(fetchWork).mockReturnValue(work.promise)
@@ -738,7 +781,6 @@ describe('loading a book the store does not have', () => {
     expect(main().getByText('Cargando libro…', { selector: '.sr-only' })).toBeInTheDocument()
     expect(main().getByRole('status')).toBeInTheDocument()
     expect(main().getByRole('link', { name: 'Mis libros' })).toBeInTheDocument()
-    expect(document.querySelector('article .rounded-stage')).not.toBeNull()
     expect(document.querySelector('article dl')).not.toBeNull()
 
     await act(async () => work.resolve(REMOTE))
