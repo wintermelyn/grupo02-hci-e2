@@ -4,7 +4,7 @@ Este documento es lo único que hay que leer para empezar a programar. Todo lo q
 
 **Fuente de las decisiones de diseño:** `docs/e2/informe-e2.pdf`. Si este plan y el informe se contradicen, manda el informe y se corrige el plan. Lo que el informe no define está resuelto en la sección 6.
 
-**Estado del código:** el bloque base se construyó antes del informe y todavía no coincide con este plan. Los "Ajustes al bloque base" de la sección 4 van primero.
+**Estado del código:** el bloque base ya tiene los "Ajustes al bloque base" de la sección 4. Su aspecto sigue siendo provisional hasta "Dirección visual".
 
 **URL:** tiene que seguir funcionando hasta fines de noviembre (E3, 25 de noviembre).
 
@@ -290,28 +290,28 @@ Si alguien necesita cambiar algo compartido, le avisa al otro rol antes y lo sub
 
 ### Ajustes al bloque base (primero; A y B dependen de ellos)
 Cambian tipos usados en todo el proyecto, así que van en un solo commit para que `npm run build` siga pasando.
-- [ ] **`types.ts`:** `ReadingStatus` con `'owned'`; `LibraryEntry` sin `owned` y con `wantCheckedAt`; `User` sin `code`; `AppState` con `lastWantPromptOn`.
-- [ ] **Store:**
+- [x] **`types.ts`:** `ReadingStatus` con `'owned'`; `LibraryEntry` sin `owned` y con `wantCheckedAt`; `User` sin `code`; `AppState` con `lastWantPromptOn`.
+- [x] **Store:**
   - `setStatus` acepta `owned` y deja `wantCheckedAt` al pasar a `want`;
   - `persist` guarda `lastWantPromptOn`, y se sube `BASE_VERSION`;
   - `buildInitialState` incluye `lastWantPromptOn: undefined`, porque `resetDemo` usa `set`, que combina claves, y sin ella el valor anterior sobrevive a "Reiniciar demo";
   - en `librarySlice`, quitar los stubs `toggleOwned` y `moveToFolder`, y agregar `answerWantPrompt`.
-- [ ] **Etiquetas y estilos:** cuatro tags en `STATUS_LABELS` (*Lo quiero, Lo tengo, Leyendo, Leído*), `STATUS_FILL`, `STATUS_ICONS` y `--color-owned`, con contraste de 4.5:1.
-- [ ] **Componentes:**
+- [x] **Etiquetas y estilos:** cuatro tags en `STATUS_LABELS` (*Lo quiero, Lo tengo, Leyendo, Leído*), `STATUS_FILL`, `STATUS_ICONS` y `--color-owned`, con contraste de 4.5:1.
+- [x] **Componentes:**
   - `StatusControl` nuevo, según "Componentes compartidos";
   - `BookRow` con `StatusTag`, sin `selectable`, `onLongPress` ni `onRequestFinish`;
   - quitar `useLongPress.ts` y `finishBookPath` de `paths.ts`.
-- [ ] **Navegación y rutas:**
+- [x] **Navegación y rutas:**
   - `AppShell` con *Inicio · Mis libros · Descubrir · Buscar · Más*;
   - `routes.tsx` con `/descubrir` y `/mas`;
   - placeholders `features/discover/DiscoverPage.tsx` y `features/more/MorePage.tsx`.
-- [ ] **Seed de la biblioteca** (se sube `LIBRARY_SEED_VERSION`):
+- [x] **Seed de la biblioteca** (se sube `LIBRARY_SEED_VERSION`):
   - **17 en "Lo quiero"**;
   - **5 en "Lo tengo":** los 4 de "Quiero" que tenían `owned` y el libro de Oliver Sacks;
   - **2 en "Leyendo":** *Carrie* (libro de T1, ya está en Terror), con `startedAt` hace 12 días, y *Dune*, hace 30;
   - 10 en "Leído".
-- [ ] **Seed social:** quitar `code` de `users.json`, y se sube `SOCIAL_SEED_VERSION`.
-- [ ] **Tests:** actualizar `coreSlice.test.ts`, `seed.test.ts`, `routes.test.tsx`, `StatusControl.test.tsx`, `BookRow.test.tsx` y `src/test/helpers.test.tsx`.
+- [x] **Seed social:** quitar `code` de `users.json`, y se sube `SOCIAL_SEED_VERSION`.
+- [x] **Tests:** actualizar `coreSlice.test.ts`, `seed.test.ts`, `routes.test.tsx`, `StatusControl.test.tsx`, `BookRow.test.tsx` y `src/test/helpers.test.tsx`.
 
 ### Dirección visual (después de los ajustes; A y B dependen de ella)
 Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarrollo/protocolo.md`. El aspecto del bloque base es provisional porque viene de antes del informe, así que se reemplaza. Mis libros se construye aquí por excepción para que los agentes tengan una pantalla real de referencia. `LibraryPage.tsx` sigue siendo del rol A.
