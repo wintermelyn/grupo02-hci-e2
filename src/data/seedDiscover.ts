@@ -49,7 +49,7 @@ export const DISCOVER_LISTS: readonly DiscoverList[] = [
     id: 'latinoamerica',
     label: 'Latinoamérica',
     title: 'Voces de Latinoamérica',
-    note: 'Novela y cuento de la región',
+    note: 'Novela y cuento',
     bookIds: ['OL274518W', 'OL110971W', 'OL617847W', 'OL698173W'],
   },
   {
