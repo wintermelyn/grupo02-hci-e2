@@ -38,7 +38,8 @@ export function Stars({ value, onChange, label = 'Puntaje' }: StarsProps) {
   return (
     <fieldset>
       <legend className="mb-1 font-medium">{label}</legend>
-      <div className="flex flex-wrap items-center">
+      {/* Each star is centred in its 44 px target, so this lines it up with the legend. */}
+      <div className="-ml-2 flex flex-wrap items-center">
         {RATINGS.map((rating) => (
           <label
             key={rating}

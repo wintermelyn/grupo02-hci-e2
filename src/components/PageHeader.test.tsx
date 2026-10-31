@@ -14,6 +14,13 @@ describe('PageHeader', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Mis libros' })).toBeInTheDocument()
   })
 
+  it('puts the media before the title', () => {
+    renderWithRouter(<PageHeader title="Camila Torres" media={<span>CT</span>} />)
+    const media = screen.getByText('CT')
+    const title = screen.getByRole('heading', { level: 1 })
+    expect(media.compareDocumentPosition(title)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+  })
+
   it('keeps the product name when there is an action, which goes with the title', () => {
     renderWithRouter(<PageHeader title="Terror" action={<Button>Opciones</Button>} />)
     expect(wordmark()).toBeInTheDocument()

@@ -34,6 +34,8 @@ export interface PageHeaderProps {
   title: string
   /** One line of context under the title. */
   subtitle?: string
+  /** Sits before the title, e.g. the <Avatar/> of a person. */
+  media?: ReactNode
   /** Where "Volver" goes. A fixed path, not history.back(), so it also works on a shared link. */
   backTo?: string
   backLabel?: string
@@ -47,6 +49,7 @@ export interface PageHeaderProps {
 export function PageHeader({
   title,
   subtitle,
+  media,
   backTo,
   backLabel,
   action,
@@ -64,9 +67,12 @@ export function PageHeader({
         </div>
       )}
       <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="font-serif text-display font-semibold tracking-tight">{title}</h1>
-          {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
+        <div className="flex min-w-0 items-center gap-3">
+          {media}
+          <div className="min-w-0">
+            <h1 className="font-serif text-display font-semibold tracking-tight">{title}</h1>
+            {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
+          </div>
         </div>
         {action && <div className="shrink-0">{action}</div>}
         {!wordmarkAbove && <Wordmark />}
