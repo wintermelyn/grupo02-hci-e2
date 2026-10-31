@@ -137,12 +137,17 @@ export function AnchoredMenu({
     const room = window.innerHeight - control.getBoundingClientRect().bottom - MENU_GAP * 2
     setMaxHeight(place === 'below' && room < menu.offsetHeight ? room : undefined)
     const items = [...menu.querySelectorAll<HTMLElement>(ITEM_SELECTOR)]
-    const selected = items.find((item) => item.getAttribute('aria-checked') === 'true')
+    // Only a single choice has a current option. Among checkboxes, starting on one that is on would
+    // leave Enter one key away from taking it off.
+    const selected =
+      kind === 'radio'
+        ? items.find((item) => item.getAttribute('aria-checked') === 'true')
+        : undefined
     // Opening with ArrowUp must not land on a command such as leaving the library, one Enter away.
     const last = items.filter((item) => !item.hasAttribute('data-command')).at(-1)
     const target = focusOnOpen.current === 'last' ? last : (selected ?? items[0])
     target?.focus()
-  }, [open])
+  }, [open, kind])
 
   useEffect(() => {
     if (!open) return

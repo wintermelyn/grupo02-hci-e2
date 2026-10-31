@@ -78,13 +78,13 @@ function pageShape() {
 }
 
 function chooseTag(name: string) {
-  fireEvent.click(main().getByRole('button', { name: /Cambiar estado/ }))
+  fireEvent.click(main().getByRole('button', { name: /Cambiar o quitar/ }))
   fireEvent.click(main().getByRole('menuitemradio', { name }))
 }
 
 function removeBook() {
-  fireEvent.click(main().getByRole('button', { name: /Cambiar estado/ }))
-  fireEvent.click(main().getByRole('menuitem', { name: /^Quitar de mi biblioteca/ }))
+  fireEvent.click(main().getByRole('button', { name: /Cambiar o quitar/ }))
+  fireEvent.click(main().getByRole('menuitem', { name: /^Quitar de Mis libros/ }))
 }
 
 beforeEach(() => {
@@ -295,7 +295,7 @@ describe('BookPage', () => {
 
   it('changes the tag in place and keeps the book in its folders', () => {
     renderApp(CARRIE)
-    fireEvent.click(main().getByRole('button', { name: /Cambiar estado/ }))
+    fireEvent.click(main().getByRole('button', { name: /Cambiar o quitar/ }))
     fireEvent.click(main().getByRole('menuitemradio', { name: 'Lo tengo' }))
     expect(main().getByRole('button', { name: /^Lo tengo\./ })).toBeInTheDocument()
     expect(main().getByRole('link', { name: 'Terror' })).toBeInTheDocument()
@@ -349,7 +349,7 @@ describe('T1', () => {
     fireEvent.click(main().getByRole('link', { name: /^Carrie/ }))
     expect(currentLocation()).toBe(CARRIE)
 
-    fireEvent.click(main().getByRole('button', { name: /Cambiar estado/ }))
+    fireEvent.click(main().getByRole('button', { name: /Cambiar o quitar/ }))
     fireEvent.click(main().getByRole('menuitemradio', { name: 'Leído' }))
     expect(main().getByRole('button', { name: /^Leído\./ })).toBeInTheDocument()
     expect(toast()).toHaveTextContent('Estado cambiado a «Leído»')
@@ -429,12 +429,12 @@ describe('folders of a book', () => {
   })
 })
 
-describe('Quitar de mi biblioteca', () => {
-  const removeOption = () => main().queryByRole('menuitem', { name: /^Quitar de mi biblioteca/ })
+describe('Quitar de Mis libros', () => {
+  const removeOption = () => main().queryByRole('menuitem', { name: /^Quitar de Mis libros/ })
 
   it('takes the two taps that adding takes, in the menu of the tag', () => {
     renderApp(CARRIE)
-    expect(main().queryByRole('button', { name: /Quitar de mi biblioteca/ })).toBeNull()
+    expect(main().queryByRole('button', { name: /Quitar de Mis libros/ })).toBeNull()
     removeBook()
     expect(currentLocation()).toBe(CARRIE)
     expect(state().library).not.toHaveProperty(CARRIE_ID)
@@ -448,7 +448,7 @@ describe('Quitar de mi biblioteca', () => {
     ['also a rating', CIEN_ANOS, 'Pierdes 1 carpeta, las fechas y el puntaje'],
   ])('says what will be lost before choosing: %s', (_case, path, lost) => {
     renderApp(path)
-    fireEvent.click(main().getByRole('button', { name: /Cambiar estado/ }))
+    fireEvent.click(main().getByRole('button', { name: /Cambiar o quitar/ }))
     expect(removeOption()).toHaveTextContent(lost)
   })
 

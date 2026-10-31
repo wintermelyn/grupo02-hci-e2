@@ -14,9 +14,14 @@ export interface BookRowProps {
   trailing?: ReactNode
   /** In a list about someone else: replaces my tag and stars, which could pass for theirs. */
   note?: ReactNode
+  /**
+   * In a list already filtered by status: the book's folders replace the text of the tag, which the
+   * filter already says. The ribbon on the cover stays.
+   */
+  folders?: string[]
 }
 
-export function BookRow({ book, trailing, note }: BookRowProps) {
+export function BookRow({ book, trailing, note, folders }: BookRowProps) {
   const upsertBook = useStore((state) => state.upsertBook)
   const entry = useStore(selectEntry(book.id))
   const { pathname, search } = useLocation()
@@ -45,10 +50,17 @@ export function BookRow({ book, trailing, note }: BookRowProps) {
       >
         <span className="line-clamp-2 font-serif text-lg/snug font-semibold">{book.title}</span>
         <span className="flex flex-wrap items-center gap-x-2 text-sm text-muted">
-          {entry && note === undefined && <StatusTag status={entry.status} size="sm" />}
+          {entry && note === undefined && folders === undefined && (
+            <StatusTag status={entry.status} size="sm" />
+          )}
           <span>{book.authors.join(', ')}</span>
         </span>
         {note}
+        {folders && folders.length > 0 && (
+          <span className="line-clamp-2 text-sm font-medium wrap-break-word">
+            {folders.join(' · ')}
+          </span>
+        )}
         {note === undefined && entry?.status === 'read' && entry.rating !== undefined && (
           <Stars value={entry.rating} />
         )}

@@ -20,6 +20,9 @@ export interface StatusControlProps {
 
 const LIST = new Intl.ListFormat('es-CL', { style: 'long', type: 'conjunction' })
 
+/** Says both things the menu does, in step with "Agregar o quitar" on the row below. */
+const CHANGE_LABEL = 'Cambiar o quitar'
+
 /** Says what leaving costs for this book, so it is read before and not in the toast after. */
 function whatIsLost(entry: LibraryEntry): string | undefined {
   const { folderIds, startedAt, finishedAt, rating } = entry
@@ -77,7 +80,7 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
         entry && [
           {
             id: 'remove',
-            label: 'Quitar de mi biblioteca',
+            label: 'Quitar de Mis libros',
             detail: whatIsLost(entry),
             onSelect: () => removeFromLibrary([bookId]),
           },
@@ -88,12 +91,12 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
         <button
           {...triggerProps}
           type="button"
-          aria-label={current && `${STATUS_LABELS[current]}. Cambiar estado de ${bookName}`}
+          aria-label={current && `${STATUS_LABELS[current]}. ${CHANGE_LABEL}: ${bookName}`}
           className={cx(
             'flex min-h-11 items-center gap-3 rounded-control font-semibold',
             'transition-[background-color,translate] duration-100',
             // The whole row opens the menu, so the row answers the cursor, like a date row, and
-            // Cambiar only reacts when the cursor is really on it.
+            // Cambiar o quitar only reacts when the cursor is really on it.
             current
               ? 'group -mx-2 w-[calc(100%+1rem)] justify-between pl-2 hover:bg-ink/5 active:bg-ink/10'
               : 'w-full justify-center bg-ink px-4 text-white hover:bg-ink/90 active:translate-y-px active:bg-ink/80',
@@ -107,10 +110,11 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
                 status={current}
                 className={statusChanged ? 'animate-tag-in' : undefined}
               />
-              {/* An action in a row, so it is drawn as a quiet compact Button. */}
-              <span className="inline-flex min-h-11 items-center gap-1.5 rounded-control px-2 transition-[background-color,translate] duration-100 group-aria-expanded:bg-ink/5 hover:bg-ink/5 active:translate-y-px active:bg-ink/10">
-                <Pencil aria-hidden size={16} />
-                Cambiar
+              {/* An action in a row, so it is drawn as a quiet compact Button. At 320 px it only
+                  fits next to "Lo quiero" smaller and without the pencil: the text says it all. */}
+              <span className="inline-flex min-h-11 items-center gap-1.5 rounded-control px-2 whitespace-nowrap transition-[background-color,translate] duration-100 group-aria-expanded:bg-ink/5 hover:bg-ink/5 active:translate-y-px active:bg-ink/10 max-[359px]:pl-0 max-[359px]:text-sm">
+                <Pencil aria-hidden size={16} className="max-[359px]:hidden" />
+                {CHANGE_LABEL}
               </span>
             </>
           ) : (

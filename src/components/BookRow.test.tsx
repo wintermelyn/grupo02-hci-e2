@@ -54,6 +54,20 @@ describe('BookRow', () => {
     expect(screen.queryByText('Lo quiero')).not.toBeInTheDocument()
   })
 
+  it('swaps the text of the tag for the folders, and keeps the ribbon on the cover', () => {
+    const book = libraryBook('OL81613W')
+    renderWithRouter(<BookRow book={book} folders={['Próximos', 'Terror']} />)
+    expect(screen.getByRole('link', { name: /It/ })).toHaveTextContent('Próximos · Terror')
+    expect(screen.queryByText('Lo quiero')).not.toBeInTheDocument()
+    expect(document.querySelector('.ribbon')).not.toBeNull()
+  })
+
+  it('leaves the line out for a book with no folders', () => {
+    renderWithRouter(<BookRow book={libraryBook('OL81613W')} folders={[]} />)
+    expect(screen.queryByText('Lo quiero')).not.toBeInTheDocument()
+    expect(screen.queryByText('·')).not.toBeInTheDocument()
+  })
+
   it('shows the rating of a rated book', () => {
     renderRow(libraryBook('OL274505W'))
     expect(screen.getByRole('img', { name: '5 de 5 estrellas' })).toBeInTheDocument()

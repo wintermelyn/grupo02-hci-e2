@@ -153,6 +153,13 @@ describe('AnchoredMenu with the keyboard', () => {
     expect(radio('Uno')).toHaveFocus()
   })
 
+  it('starts on the first option of checkboxes, so Enter does not take off the one that is on', () => {
+    render(<Menu kind="checkbox" />)
+    open()
+    expect(screen.getByRole('menuitemcheckbox', { name: 'Uno' })).toHaveFocus()
+    expect(screen.getByRole('menuitemcheckbox', { name: 'Dos' })).toBeChecked()
+  })
+
   it('jumps to the ends with Home and End', () => {
     render(<Menu />)
     open()

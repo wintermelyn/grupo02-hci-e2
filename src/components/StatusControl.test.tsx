@@ -14,13 +14,13 @@ const IT = 'OL81613W' // Lo quiero
 const CIEN_ANOS = 'OL274505W' // Leído
 
 const option = (name: string) => screen.getByRole('menuitemradio', { name })
-const removeOption = () => screen.getByRole('menuitem', { name: /^Quitar de mi biblioteca/ })
+const removeOption = () => screen.getByRole('menuitem', { name: /^Quitar de Mis libros/ })
 
 function renderControl(bookId: string, book?: Book) {
   renderWithRouter(<StatusControl bookId={bookId} book={book} />)
 }
 
-const trigger = (name: RegExp | string = /Cambiar estado/) => screen.getByRole('button', { name })
+const trigger = (name: RegExp | string = /Cambiar o quitar/) => screen.getByRole('button', { name })
 
 function openMenu(name?: RegExp | string) {
   fireEvent.click(trigger(name))
@@ -31,9 +31,9 @@ const key = (name: string) => fireEvent.keyDown(document.activeElement as Elemen
 describe('StatusControl', () => {
   it('shows the current tag with a labelled pencil, naming the book for screen readers', () => {
     renderControl(CARRIE)
-    const button = trigger('Leyendo. Cambiar estado de «Carrie»')
+    const button = trigger('Leyendo. Cambiar o quitar: «Carrie»')
     expect(button).toHaveTextContent('Leyendo')
-    expect(button).toHaveTextContent('Cambiar')
+    expect(button).toHaveTextContent('Cambiar o quitar')
   })
 
   it('offers the four tags in order and marks the current one', () => {
@@ -74,7 +74,7 @@ describe('StatusControl', () => {
   it('offers to leave the library below the tags, set apart and saying what it costs', () => {
     renderControl(CIEN_ANOS)
     openMenu()
-    const remove = screen.getByRole('menuitem', { name: /^Quitar de mi biblioteca/ })
+    const remove = removeOption()
     expect(remove).toHaveTextContent('Pierdes 1 carpeta, las fechas y el puntaje')
     expect(remove).toHaveAccessibleDescription('Pierdes 1 carpeta, las fechas y el puntaje')
     expect(screen.getByRole('separator')).toBeInTheDocument()
