@@ -16,8 +16,8 @@ export interface BookRowProps {
   /** In a list about someone else: replaces my tag and stars, which could pass for theirs. */
   note?: ReactNode
   /**
-   * In a list already filtered by status: the book's folders replace the text of the tag, which the
-   * filter already says. The ribbon on the cover stays.
+   * Where the book is filed, on a line of its own under the author. The tag keeps its text: the
+   * button of a filter leaves the screen as soon as the list scrolls.
    */
   folders?: string[]
   /** Smaller, for a list that has to be read at a glance, like the results of Buscar. */
@@ -73,9 +73,7 @@ export function BookRow({
           {highlight(book.title)}
         </span>
         <span className="flex flex-wrap items-center gap-x-2 text-sm text-muted">
-          {entry && note === undefined && folders === undefined && (
-            <StatusTag status={entry.status} size="sm" />
-          )}
+          {entry && note === undefined && <StatusTag status={entry.status} size="sm" />}
           <span>{highlight(book.authors.join(', '))}</span>
         </span>
         {note}

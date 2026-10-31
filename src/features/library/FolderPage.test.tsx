@@ -269,12 +269,12 @@ describe('FolderPage', () => {
       expect(main().getByText('Ningún libro de «Terror» coincide con «zzz».')).toBeInTheDocument()
     })
 
-    it('says the other folders of each book in a list of a tag, without this one', () => {
+    it('says the tag and the other folders of each book in a list of a tag', () => {
       renderApp(`${TERROR}?tag=owned`)
       const row = (name: RegExp) => main().getByRole('link', { name })
       expect(row(/^Nuestra parte de noche/)).toHaveTextContent('Próximos')
       expect(row(/^Nuestra parte de noche/)).not.toHaveTextContent('Terror')
-      expect(row(/^Nuestra parte de noche/)).not.toHaveTextContent('Lo tengo')
+      expect(row(/^Nuestra parte de noche/)).toHaveTextContent('Lo tengo')
       expect(row(/^Drácula/)).not.toHaveTextContent('Terror')
     })
 

@@ -8,7 +8,7 @@ export interface BookListProps {
   /** Names the list for screen readers. */
   title: string
   books: Book[]
-  /** The list is filtered by status: rows say where each book is filed, not what the filter says. */
+  /** The list is filtered by status, so its rows also say where each book is filed. */
   showFolders?: boolean
   /** The folder on screen, which every row would otherwise repeat. */
   openFolderId?: string

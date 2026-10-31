@@ -62,18 +62,19 @@ describe('BookRow', () => {
     expect(screen.queryByText('Lo quiero')).not.toBeInTheDocument()
   })
 
-  it('swaps the text of the tag for the folders, and keeps the ribbon on the cover', () => {
+  it('adds the folders on their own line, and keeps the tag with its text and the ribbon', () => {
     const book = libraryBook('OL81613W')
     renderWithRouter(<BookRow book={book} folders={['Próximos', 'Terror']} />)
-    expect(screen.getByRole('link', { name: /It/ })).toHaveTextContent('Próximos · Terror')
-    expect(screen.queryByText('Lo quiero')).not.toBeInTheDocument()
+    const row = screen.getByRole('link', { name: /It/ })
+    expect(row).toHaveTextContent('Lo quiero')
+    expect(screen.getByText('Próximos · Terror').parentElement).toBe(row)
     expect(document.querySelector('.ribbon')).not.toBeNull()
   })
 
   it('leaves the line out for a book with no folders', () => {
     renderWithRouter(<BookRow book={libraryBook('OL81613W')} folders={[]} />)
-    expect(screen.queryByText('Lo quiero')).not.toBeInTheDocument()
-    expect(screen.queryByText('·')).not.toBeInTheDocument()
+    expect(screen.getByText('Lo quiero')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /It/ })).not.toHaveTextContent('·')
   })
 
   it('shows the rating of a rated book', () => {

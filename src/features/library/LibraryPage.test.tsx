@@ -76,7 +76,6 @@ describe('LibraryPage', () => {
     expect(titles).toHaveLength(5)
     expect(titles[0]).toMatch(/^Drácula/)
     expect(titles.at(-1)).toMatch(/^Sapiens/)
-    for (const title of titles) expect(title).not.toContain('Lo tengo')
   })
 
   it('shows the 17 books of Lo quiero, as T2 expects', () => {
@@ -118,10 +117,10 @@ describe('LibraryPage', () => {
   describe('list of a tag', () => {
     const row = (name: RegExp) => main().getByRole('link', { name })
 
-    it('says the folders of each book, since the filter already says the tag', () => {
+    it('says the tag of each book in words, with its folders under the author', () => {
       renderApp('/biblioteca?tag=want')
+      for (const title of bookTitles()) expect(title).toContain('Lo quiero')
       expect(row(/^Fundación/)).toHaveTextContent('Ciencia ficción')
-      expect(row(/^Fundación/)).not.toHaveTextContent('Lo quiero')
       expect(row(/^La sombra del viento/)).toHaveTextContent('Próximos · Novela')
     })
 
@@ -131,10 +130,10 @@ describe('LibraryPage', () => {
       expect(row(/^Fundación/)).toHaveTextContent('Próximos · Ciencia ficción')
     })
 
-    it('keeps saying the folders while searching inside the tag', () => {
+    it('keeps saying the tag and the folders while searching inside the tag', () => {
       renderApp('/biblioteca?tag=want&q=fundaci')
       expect(row(/^Fundación/)).toHaveTextContent('Ciencia ficción')
-      expect(row(/^Fundación/)).not.toHaveTextContent('Lo quiero')
+      expect(row(/^Fundación/)).toHaveTextContent('Lo quiero')
     })
 
     it('keeps the tag in the results of Todos, where nothing else says it', () => {
