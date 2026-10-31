@@ -13,6 +13,8 @@ export interface BookCoverProps {
   size?: BookCoverSize
   /** Shows the ribbon of this status coming out from under the cover. */
   status?: ReadingStatus
+  /** The longer shadow of a cover that sits on a colour or stands alone in a rail. */
+  raised?: boolean
   className?: string
 }
 
@@ -60,7 +62,13 @@ const HINGE =
  * `lg` keeps the whole cover: it takes its real shape inside a fixed 2:3 box, so nothing around it
  * jumps when the image loads, and sits on the box's bottom edge, where the ribbon comes out.
  */
-export function BookCover({ book, size = 'fill', status, className }: BookCoverProps) {
+export function BookCover({
+  book,
+  size = 'fill',
+  status,
+  raised = false,
+  className,
+}: BookCoverProps) {
   const [failedUrl, setFailedUrl] = useState<string>()
   const statusChanged = useChanged(status)
   const [ratio, setRatio] = useState<number>()
@@ -76,7 +84,7 @@ export function BookCover({ book, size = 'fill', status, className }: BookCoverP
         <span
           className={cx(
             'relative block aspect-2/3 w-full overflow-hidden rounded-[2px_3px_3px_2px]',
-            size === 'lg' ? 'shadow-book-lg' : 'shadow-book',
+            raised ? 'shadow-cover' : size === 'lg' ? 'shadow-book-lg' : 'shadow-book',
             HINGE,
           )}
           style={

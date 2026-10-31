@@ -93,13 +93,13 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
           type="button"
           aria-label={current && `${STATUS_LABELS[current]}. ${CHANGE_LABEL}: ${bookName}`}
           className={cx(
-            'flex min-h-11 items-center gap-3 rounded-control font-semibold',
-            'transition-[background-color,translate] duration-100',
+            'flex min-h-11 items-center gap-3 font-semibold',
+            'transition-[background-color,scale] duration-150',
             // The whole row opens the menu, so the row answers the cursor, like a date row, and
             // Cambiar o quitar only reacts when the cursor is really on it.
             current
-              ? 'group -mx-2 w-[calc(100%+1rem)] justify-between pl-2 hover:bg-ink/5 active:bg-ink/10'
-              : 'w-full justify-center bg-ink px-4 text-white hover:bg-ink/90 active:translate-y-px active:bg-ink/80',
+              ? 'group -mx-2 w-[calc(100%+1rem)] justify-between rounded-control pl-2 hover:bg-ink/5 active:bg-ink/10'
+              : 'w-full justify-center rounded-full bg-ink px-4 text-white hover:bg-ink/90 active:scale-98 active:bg-ink/80',
           )}
         >
           {current ? (
@@ -112,7 +112,7 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
               />
               {/* An action in a row, so it is drawn as a quiet compact Button. At 320 px it only
                   fits next to "Lo quiero" smaller and without the pencil: the text says it all. */}
-              <span className="inline-flex min-h-11 items-center gap-1.5 rounded-control px-2 whitespace-nowrap transition-[background-color,translate] duration-100 group-aria-expanded:bg-ink/5 hover:bg-ink/5 active:translate-y-px active:bg-ink/10 max-[359px]:pl-0 max-[359px]:text-sm">
+              <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-2.5 whitespace-nowrap transition-[background-color,scale] duration-150 group-aria-expanded:bg-sand hover:bg-sand active:scale-98 active:bg-sand-deep max-[359px]:pl-0 max-[359px]:text-sm">
                 <Pencil aria-hidden size={16} className="max-[359px]:hidden" />
                 {CHANGE_LABEL}
               </span>

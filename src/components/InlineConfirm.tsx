@@ -44,7 +44,7 @@ export function InlineConfirm({
       aria-labelledby={titleId}
       onKeyDown={onKeyDown}
       className={cx(
-        'rounded-card border border-edge bg-white p-3 md:flex md:items-center md:justify-between md:gap-6',
+        'rounded-tile bg-shell p-5 md:flex md:items-center md:justify-between md:gap-6',
         className,
       )}
     >

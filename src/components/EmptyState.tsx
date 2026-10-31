@@ -9,13 +9,16 @@ export interface EmptyStateProps {
   action?: ReactNode
 }
 
+/** A block in the same place the content would be, so the page keeps its shape. */
 export function EmptyState({ title, description, icon: Icon = Inbox, action }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center gap-2 px-4 py-8 text-center md:py-12">
-      <Icon aria-hidden size={32} strokeWidth={1.5} className="text-muted" />
-      <h2 className="font-serif text-xl font-semibold">{title}</h2>
-      {description && <p className="max-w-prose wrap-anywhere text-muted">{description}</p>}
-      {action && <div className="mt-2">{action}</div>}
+    <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-3 rounded-tile bg-shell p-5">
+      <Icon aria-hidden size={24} className="shrink-0 text-muted" />
+      <div className="min-w-0 flex-1 basis-48">
+        <h2 className="font-serif text-lg font-semibold">{title}</h2>
+        {description && <p className="wrap-anywhere text-muted">{description}</p>}
+      </div>
+      {action && <div className="shrink-0">{action}</div>}
     </div>
   )
 }

@@ -251,7 +251,7 @@ export function AnchoredMenu({
             onClick={() => choose(option)}
             className={cx(
               'flex min-h-11 w-full items-center justify-between gap-3 rounded-control px-2.5 text-left',
-              'transition-colors duration-100 -outline-offset-2 hover:bg-shell active:bg-sand-deep',
+              'transition-colors duration-100 -outline-offset-2 hover:bg-sand active:bg-sand-deep',
             )}
           >
             {option.label}
@@ -278,7 +278,7 @@ export function AnchoredMenu({
             tabIndex={-1}
             aria-description={action.detail}
             onClick={() => choose(action)}
-            className="block min-h-11 w-full rounded-control px-2.5 py-1.5 text-left font-semibold transition-colors duration-100 -outline-offset-2 hover:bg-shell active:bg-sand-deep"
+            className="block min-h-11 w-full rounded-control px-2.5 py-1.5 text-left font-semibold transition-colors duration-100 -outline-offset-2 hover:bg-sand active:bg-sand-deep"
           >
             {action.label}
             {action.detail && (

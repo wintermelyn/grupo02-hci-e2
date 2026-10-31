@@ -31,6 +31,15 @@ describe('SearchField', () => {
     expect(field().parentElement).toHaveClass('min-h-11', 'border')
   })
 
+  it('is a pill, with a larger size for a screen that is about searching', () => {
+    const { unmount } = render(<SearchField label="Buscar personas" value="" onChange={() => {}} />)
+    expect(field().parentElement).toHaveClass('rounded-full')
+    unmount()
+    render(<SearchField label="Buscar personas" value="" onChange={() => {}} size="lg" />)
+    expect(field().parentElement).toHaveClass('rounded-full', 'min-h-14')
+    expect(field()).toHaveClass('min-h-11', 'text-lg')
+  })
+
   it('reports each change', () => {
     const onChange = vi.fn()
     render(<SearchField label="Buscar personas" value="" onChange={onChange} />)

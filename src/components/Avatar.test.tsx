@@ -25,6 +25,11 @@ describe('Avatar', () => {
     expect(screen.getByText('AM')).toHaveAttribute('aria-hidden', 'true')
   })
 
+  it('has a size to go inside a line of text, with a line that lifts it from a tinted row', () => {
+    render(<Avatar user={{ name: 'Alex Muñoz', avatarColor: '#000000' }} size="xs" />)
+    expect(screen.getByText('AM')).toHaveClass('size-6', 'ring-1', 'ring-line')
+  })
+
   it('takes the colour of the person', () => {
     render(<Avatar user={{ name: 'Alex Muñoz', avatarColor: '#1e1915' }} />)
     expect(screen.getByText('AM')).toHaveStyle({ backgroundColor: '#1e1915' })

@@ -24,6 +24,17 @@ describe('BookCover', () => {
     expect(image.parentElement).toHaveStyle({ aspectRatio: '0.5', width: '75%' })
   })
 
+  it('takes the shadow of its size, or the longer one when it is raised', () => {
+    const shadow = (container: HTMLElement) => container.querySelector('img')?.parentElement
+    const { container, rerender } = render(<BookCover book={book} />)
+    expect(shadow(container)).toHaveClass('shadow-book')
+    rerender(<BookCover book={book} size="lg" />)
+    expect(shadow(container)).toHaveClass('shadow-book-lg')
+    rerender(<BookCover book={book} size="lg" raised />)
+    expect(shadow(container)).toHaveClass('shadow-cover')
+    expect(shadow(container)).not.toHaveClass('shadow-book-lg')
+  })
+
   it('shows no ribbon for a book without a status', () => {
     const { container } = render(<BookCover book={book} />)
     expect(ribbonOf(container)).not.toBeInTheDocument()

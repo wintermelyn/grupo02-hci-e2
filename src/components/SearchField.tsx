@@ -15,12 +15,14 @@ export interface SearchFieldProps {
    * same, at every width.
    */
   onClose?: () => void
+  /** `lg` is for a screen whose first job is searching, like Buscar. */
+  size?: 'md' | 'lg'
   className?: string
 }
 
 // -my-px: 44 px to touch, reaching over the border, so the field also measures 44 px.
 const TEXT_BUTTON =
-  '-my-px inline-flex min-h-11 shrink-0 items-center gap-1 rounded-control px-2.5 font-semibold text-ink -outline-offset-2 transition-colors duration-100 hover:bg-sand active:bg-sand-deep'
+  '-my-px inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full px-3 font-semibold text-ink -outline-offset-2 transition-colors duration-100 hover:bg-sand active:bg-sand-deep'
 
 /** Filters as the person types, so it has no submit button. */
 export function SearchField({
@@ -29,8 +31,10 @@ export function SearchField({
   onChange,
   placeholder,
   onClose,
+  size = 'md',
   className,
 }: SearchFieldProps) {
+  const isLarge = size === 'lg'
   const inputRef = useRef<HTMLInputElement>(null)
 
   function clear() {
@@ -45,13 +49,14 @@ export function SearchField({
   return (
     <div
       className={cx(
-        'flex min-h-11 items-center gap-2 rounded-control border border-edge bg-white pl-3',
-        // The same focus style as everywhere, around the whole field and not just its text.
-        'has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-ink',
+        'flex items-center rounded-full border border-edge bg-white transition-[border-color,box-shadow] duration-150',
+        isLarge ? 'min-h-14 gap-3 pr-1.5 pl-5' : 'min-h-11 gap-2 pl-4',
+        // The whole pill answers, not just its text: the edge turns to ink and doubles.
+        'has-[input:focus]:border-ink has-[input:focus]:ring-1 has-[input:focus]:ring-ink',
         className,
       )}
     >
-      <Search aria-hidden size={20} className="shrink-0 text-muted" />
+      <Search aria-hidden size={isLarge ? 22 : 20} className="shrink-0 text-muted" />
       <input
         ref={inputRef}
         type="search"
@@ -62,7 +67,10 @@ export function SearchField({
         placeholder={placeholder}
         autoComplete="off"
         enterKeyHint="search"
-        className="-my-px min-h-11 w-full min-w-0 appearance-none bg-transparent py-2 outline-none placeholder:text-muted placeholder-shown:text-ellipsis [&::-webkit-search-cancel-button]:appearance-none"
+        className={cx(
+          '-my-px min-h-11 w-full min-w-0 appearance-none bg-transparent py-2 outline-none placeholder:text-muted placeholder-shown:text-ellipsis [&::-webkit-search-cancel-button]:appearance-none',
+          isLarge && 'text-lg',
+        )}
       />
       {value && (
         <button

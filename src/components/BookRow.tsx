@@ -30,7 +30,7 @@ export function BookRow({ book, trailing, note, folders }: BookRowProps) {
   const linkState = { from: pathname + search }
 
   return (
-    <div className="-mx-2 flex items-center gap-3.5 rounded-control px-2 transition-colors duration-100 has-[a:active]:bg-shell">
+    <div className="-mx-2 flex items-center gap-3.5 rounded-row px-2 transition-colors duration-100 hover:bg-shell has-[a:active]:bg-sand">
       {/* The title link is the one announced; the cover is a second, larger touch target. */}
       <Link
         to={bookPath(book.id)}
@@ -46,7 +46,7 @@ export function BookRow({ book, trailing, note, folders }: BookRowProps) {
         to={bookPath(book.id)}
         state={linkState}
         onClick={open}
-        className="block min-w-0 flex-1 rounded-control py-2.5"
+        className="block min-w-0 flex-1 rounded-row py-2.5"
       >
         <span className="line-clamp-2 font-serif text-lg/snug font-semibold">{book.title}</span>
         <span className="flex flex-wrap items-center gap-x-2 text-sm text-muted">

@@ -56,8 +56,8 @@ export function TextField({
         maxLength={maxLength}
         autoComplete="off"
         enterKeyHint="done"
-        // The focus outline already draws the field, so its line steps aside.
-        className="block min-h-11 w-full min-w-0 rounded-control border-b border-ink bg-transparent font-semibold focus-visible:border-transparent"
+        // The focus outline already draws the field, so its edge steps aside.
+        className="block min-h-11 w-full min-w-0 rounded-control border border-edge bg-white px-3 font-semibold focus-visible:border-transparent"
       />
       {/* Spans, so it also fits inside a heading. Mounted for screen readers. */}
       <span

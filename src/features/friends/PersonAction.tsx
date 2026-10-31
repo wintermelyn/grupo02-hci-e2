@@ -30,7 +30,7 @@ function StateLabel({ icon: Icon, children }: { icon?: LucideIcon; children: Rea
  * the action a Button, the same one for adding, cancelling and removing, so they weigh the same and
  * each takes one tap. Removing offers Deshacer. A tap meant for Cancelar that lands on Quitar de
  * amigos, when the timer accepts the request, ends where the person wanted: not being friends.
- * On the band of a person it is an action of the page, so it has a fill. In a row it has none.
+ * On the header of a person it is an action of the page, so it has an edge. In a row it has none.
  */
 export function PersonAction({
   user,
