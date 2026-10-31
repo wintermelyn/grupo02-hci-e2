@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { daysAgo, today } from '../lib/dates'
 import type { Book, ReadingStatus } from '../types'
+import translatedDescriptions from '../../scripts/translated-descriptions.json'
 import books from './books.json'
 import { buildInitialFolders, buildInitialLibrary } from './seedLibrary'
 import { buildInitialActivities, buildInitialFriendships, me, users } from './seedSocial'
@@ -8,7 +9,20 @@ import { buildInitialActivities, buildInitialFriendships, me, users } from './se
 // These checks pin the seed to PLAN.md section 4 and to the task data listed in docs/desarrollo/tareas.md.
 const T1_BOOK_ID = 'OL81626W'
 const PROMPTED_FIRST_BOOK_ID = 'OL81613W'
+// The only descriptions that came in Spanish from Open Library, so they carry no mark.
+const ORIGINAL_DESCRIPTION_IDS = [
+  'OL20901051W', // Nuestra parte de noche
+  'OL274505W', // Cien años de soledad
+  'OL274518W', // El amor en los tiempos del cólera
+  'OL1905255W', // La casa de los espíritus
+  'OL14860424W', // Rayuela
+  'OL1731119W', // Pedro Páramo
+  'OL278437W', // La sombra del viento
+  'OL503666W', // Don Quijote de la Mancha
+]
 const catalog: Book[] = books
+const translations: Record<string, { sourceLanguage: string; description: string }> =
+  translatedDescriptions
 const bookIds = new Set(catalog.map((book) => book.id))
 const initialLibrary = buildInitialLibrary()
 const initialFolders = buildInitialFolders()
@@ -36,6 +50,25 @@ describe('books.json', () => {
     const covers = catalog.flatMap((book) => (book.coverUrl ? [book.coverUrl] : []))
     expect(covers.length).toBeGreaterThanOrEqual(45)
     expect(covers.every((url) => /^\/covers\/OL\d+W\.jpg$/.test(url))).toBe(true)
+  })
+
+  it('marks every translated description and none of the original ones', () => {
+    const marked = catalog.filter((book) => book.descriptionTranslated)
+    const unmarked = catalog.filter((book) => book.description && !book.descriptionTranslated)
+    expect(unmarked.map((book) => book.id)).toEqual(ORIGINAL_DESCRIPTION_IDS)
+    expect(marked.map((book) => book.id).toSorted()).toEqual(Object.keys(translations).toSorted())
+    expect(marked.every((book) => book.description)).toBe(true)
+  })
+
+  it('takes each translated description from the file the script reads', () => {
+    for (const book of catalog.filter(({ descriptionTranslated }) => descriptionTranslated)) {
+      expect(book.description).toBe(translations[book.id].description)
+    }
+  })
+
+  it('records the language each translation came from', () => {
+    const languages = Object.values(translations).map(({ sourceLanguage }) => sourceLanguage)
+    expect(new Set(languages)).toEqual(new Set(['en', 'fr', 'nl']))
   })
 
   it('includes the T1 book', () => {
