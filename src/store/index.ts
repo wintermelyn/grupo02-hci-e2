@@ -33,13 +33,13 @@ export type SliceCreator<Slice> = StateCreator<
 
 type PersistedState = Pick<
   AppState,
-  'library' | 'folders' | 'friendships' | 'likedActivityIds' | 'extraBooks'
+  'library' | 'folders' | 'friendships' | 'likedActivityIds' | 'extraBooks' | 'lastWantPromptOn'
 >
 
 // Stored data from an older version is replaced by the seed. Each owner bumps only their own part
 // (base: the shared types; A and B: the constant in their seed file), so the sum always goes up
 // and nobody has to edit this file.
-const BASE_VERSION = 1
+const BASE_VERSION = 2
 const STORAGE_VERSION = BASE_VERSION + LIBRARY_SEED_VERSION + SOCIAL_SEED_VERSION
 
 const seedBooks: Book[] = books
@@ -56,14 +56,16 @@ function buildInitialState(): AppState {
     friendships: buildInitialFriendships(),
     activities: buildInitialActivities(),
     likedActivityIds: [],
+    // Explicit: resetDemo uses set, which merges, so a missing key would survive the reset.
+    lastWantPromptOn: undefined,
     toast: null,
     undoSnapshot: null,
   }
 }
 
 function toPersisted(state: AppState): PersistedState {
-  const { library, folders, friendships, likedActivityIds, extraBooks } = state
-  return { library, folders, friendships, likedActivityIds, extraBooks }
+  const { library, folders, friendships, likedActivityIds, extraBooks, lastWantPromptOn } = state
+  return { library, folders, friendships, likedActivityIds, extraBooks, lastWantPromptOn }
 }
 
 export const useStore = create<StoreState>()(

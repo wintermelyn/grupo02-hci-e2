@@ -106,7 +106,7 @@ La lista de pantallas vive en el script de `.claude/capturas/`. Cada fase agrega
 
 ## 5. Armar el checkpoint
 
-Cada fase cierra con un CP, una página en `.claude/entregables/cp<n>/index.html` que abre sin servidor. La arma la sesión principal. Lleva su CSS adentro y sus capturas copiadas al lado, con rutas relativas, para que no cambie cuando la fase siguiente vuelva a capturar.
+Cada fase cierra con un CP, una página en `docs/desarrollo/checkpoints/cp<n>/index.html` que abre sin servidor. Cada CP tiene su carpeta y queda en el repo con el PR de la fase. La arma la sesión principal. Lleva su CSS adentro y sus capturas copiadas al lado, con rutas relativas, para que no cambie cuando la fase siguiente vuelva a capturar.
 
 Trae cuatro cosas, en este orden:
 
@@ -125,7 +125,7 @@ Trae cuatro cosas, en este orden:
 2. Se agrega a `docs/registro-ia.md` una fila con el prompt en español formal y con ortografía correcta, con todo su contenido y cada pedido. Va en una sola línea, con `<br>` entre párrafos y con `|` y `<` escapados con `\`.
 3. Se hace commit en la rama de la fase y se hace push.
 4. Se abre el PR de la fase, o se actualiza si ya existe. No se integra.
-5. Se abre la página con `open .claude/entregables/cp<n>/index.html`.
+5. Se abre la página con `open docs/desarrollo/checkpoints/cp<n>/index.html`.
 6. Se resume el resultado en cinco líneas, con el enlace al PR.
 
 Ahí se termina y se espera la respuesta de Matías.

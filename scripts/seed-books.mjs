@@ -266,7 +266,8 @@ async function main() {
     console.log(`${book.id}  ${book.title}`)
   }
 
-  const json = JSON.stringify(books, null, 2)
+  // Open Library mixes composed and decomposed accents; decomposed ones break text search.
+  const json = JSON.stringify(books, null, 2).normalize('NFC')
   const options = await prettier.resolveConfig(OUTPUT_FILE)
   await writeFile(OUTPUT_FILE, await prettier.format(json, { ...options, filepath: OUTPUT_FILE }))
 

@@ -1,86 +1,60 @@
-import { fireEvent, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { act, fireEvent, screen } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
 import { currentLocation, renderWithRouter } from '../test/router'
 import { state } from '../test/store'
 import type { Book } from '../types'
 import { BookRow } from './BookRow'
-import { LONG_PRESS_MS } from './useLongPress'
 
 // Not in seedBooks or extraBooks, like a live search result.
 const apiBook: Book = { id: 'OL0000001W', title: 'Libro de la API', authors: ['Autora'] }
 
-function renderRow() {
-  renderWithRouter(<BookRow book={apiBook} />, { route: '/buscar' })
+function libraryBook(bookId: string): Book {
+  const book = state().getBook(bookId)
+  if (!book) throw new Error(`the catalog needs ${bookId}`)
+  return book
 }
 
-describe('BookRow with a book that is not in the store', () => {
-  it('adds the book before changing its status', () => {
-    renderRow()
-    fireEvent.click(screen.getByRole('button', { name: 'Quiero' }))
-    expect(state().getBook(apiBook.id)).toEqual(apiBook)
-    expect(state().library[apiBook.id]?.status).toBe('want')
-  })
+function renderRow(book: Book) {
+  renderWithRouter(<BookRow book={book} />, { route: '/buscar' })
+}
 
-  it('adds the book before opening the finish panel', () => {
-    renderRow()
-    fireEvent.click(screen.getByRole('button', { name: 'Leído' }))
-    expect(state().getBook(apiBook.id)).toEqual(apiBook)
-    expect(currentLocation()).toBe(`/libro/${apiBook.id}?accion=terminar`)
-  })
-
+describe('BookRow', () => {
   it('adds the book before opening its page', () => {
-    renderRow()
+    renderRow(apiBook)
     fireEvent.click(screen.getByRole('link', { name: /Libro de la API/ }))
     expect(state().getBook(apiBook.id)).toEqual(apiBook)
     expect(currentLocation()).toBe(`/libro/${apiBook.id}`)
   })
-})
 
-describe('BookRow long press', () => {
-  function renderPressable() {
-    const onLongPress = vi.fn()
-    renderWithRouter(<BookRow book={apiBook} onLongPress={onLongPress} />, { route: '/buscar' })
-    return { onLongPress, link: screen.getByRole('link', { name: /Libro de la API/ }) }
-  }
-
-  it('calls onLongPress after holding, and swallows the click that ends the press', () => {
-    vi.useFakeTimers()
-    const { onLongPress, link } = renderPressable()
-    fireEvent.pointerDown(link, { button: 0 })
-    vi.advanceTimersByTime(LONG_PRESS_MS)
-    expect(onLongPress).toHaveBeenCalledOnce()
-
-    expect(fireEvent.contextMenu(link)).toBe(false)
-    fireEvent.pointerUp(link)
-    fireEvent.click(link)
-    expect(currentLocation()).toBe('/buscar')
+  it('shows no tag for a book outside the library', () => {
+    renderRow(apiBook)
+    expect(screen.queryByText(/Lo quiero|Lo tengo|Leyendo|Leído/)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
-  it('a short press still opens the book', () => {
-    vi.useFakeTimers()
-    const { onLongPress, link } = renderPressable()
-    fireEvent.pointerDown(link, { button: 0 })
-    vi.advanceTimersByTime(LONG_PRESS_MS - 1)
-    fireEvent.pointerUp(link)
-    fireEvent.click(link)
-    vi.advanceTimersByTime(LONG_PRESS_MS)
-    expect(onLongPress).not.toHaveBeenCalled()
-    expect(currentLocation()).toBe(`/libro/${apiBook.id}`)
+  it('shows the tag read-only, inside the link to the book', () => {
+    renderRow(libraryBook('OL81626W'))
+    expect(screen.getByRole('link', { name: /Carrie.*Leyendo/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
-  it('moving the finger (a scroll) cancels the press', () => {
-    vi.useFakeTimers()
-    const { onLongPress, link } = renderPressable()
-    fireEvent.pointerDown(link, { button: 0, clientX: 0, clientY: 0 })
-    fireEvent.pointerMove(link, { clientX: 0, clientY: 30 })
-    vi.advanceTimersByTime(LONG_PRESS_MS)
-    expect(onLongPress).not.toHaveBeenCalled()
+  it('follows the tag when it changes', () => {
+    renderRow(libraryBook('OL81613W'))
+    expect(screen.getByText('Lo quiero')).toBeInTheDocument()
+    act(() => state().setStatus('OL81613W', 'owned'))
+    expect(screen.getByText('Lo tengo')).toBeInTheDocument()
+    expect(screen.queryByText('Lo quiero')).not.toBeInTheDocument()
   })
 
-  it('keeps the context menu for a right click', () => {
-    const { onLongPress, link } = renderPressable()
-    fireEvent.pointerDown(link, { button: 2 })
-    expect(fireEvent.contextMenu(link)).toBe(true)
-    expect(onLongPress).not.toHaveBeenCalled()
+  it('shows the rating of a rated book', () => {
+    renderRow(libraryBook('OL274505W'))
+    expect(screen.getByRole('img', { name: '5 de 5 estrellas' })).toBeInTheDocument()
+  })
+
+  it('shows the trailing content', () => {
+    renderWithRouter(<BookRow book={apiBook} trailing={<button>Quitar</button>} />, {
+      route: '/buscar',
+    })
+    expect(screen.getByRole('button', { name: 'Quitar' })).toBeInTheDocument()
   })
 })
