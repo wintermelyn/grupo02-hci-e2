@@ -47,6 +47,14 @@ describe('AnchoredMenu', () => {
     expect(onSelect).not.toHaveBeenCalled()
   })
 
+  it('breaks a long word of what a command costs, so it stays inside the menu', () => {
+    render(
+      <Menu actions={[{ id: 'x', label: 'Quitar', detail: 'M'.repeat(40), onSelect: vi.fn() }]} />,
+    )
+    open()
+    expect(screen.getByText('M'.repeat(40))).toHaveClass('wrap-anywhere')
+  })
+
   it('stays closed until the control opens it, and tells the control what it opens', () => {
     render(<Menu />)
     expect(menu()).not.toBeInTheDocument()

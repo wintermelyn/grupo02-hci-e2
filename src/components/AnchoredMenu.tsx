@@ -282,7 +282,7 @@ export function AnchoredMenu({
           >
             {action.label}
             {action.detail && (
-              <span aria-hidden className="block text-sm font-normal text-muted">
+              <span aria-hidden className="block text-sm font-normal wrap-anywhere text-muted">
                 {action.detail}
               </span>
             )}
