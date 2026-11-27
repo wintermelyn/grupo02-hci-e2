@@ -10,7 +10,7 @@ import type { Book } from '../../types'
 
 const CARRIE_ID = 'OL81626W'
 const CARRIE = `/libro/${CARRIE_ID}` // Leyendo, en Terror
-const IT = '/libro/OL81613W' // Lo quiero, en Terror
+const IT = '/libro/OL81613W' // Quiero leerlo, en Terror
 const NOCHE = '/libro/OL20901051W' // Lo tengo, en Próximos y Terror, con descripción
 const HOMBRE = '/libro/OL1811898W' // Lo tengo, sin carpeta
 const OUTSIDE = '/libro/OL698173W' // En el catálogo, fuera de la biblioteca
@@ -325,7 +325,7 @@ describe('BookPage', () => {
     const add = main().getByRole('button', { name: 'Agregar a Mis libros' })
     expect(add.parentElement).toHaveClass('md:w-fit')
     fireEvent.click(add)
-    fireEvent.click(main().getByRole('menuitemradio', { name: 'Lo quiero' }))
+    fireEvent.click(main().getByRole('menuitemradio', { name: 'Quiero leerlo' }))
     const change = main().getByRole('button', { name: /Cambiar o quitar/ })
     expect(change.parentElement).not.toHaveClass('md:w-fit')
   })
@@ -823,7 +823,7 @@ describe('a book the store does not have', () => {
     stubCatalog({ books: [LISTED] })
     renderApp('/libro/OL999W')
     fireEvent.click(await main().findByRole('button', { name: 'Agregar a Mis libros' }))
-    fireEvent.click(main().getByRole('menuitemradio', { name: 'Lo quiero' }))
+    fireEvent.click(main().getByRole('menuitemradio', { name: 'Quiero leerlo' }))
     expect(state().library.OL999W.status).toBe('want')
     expect(state().extraBooks.OL999W).toMatchObject({
       title: 'Un libro del catálogo',

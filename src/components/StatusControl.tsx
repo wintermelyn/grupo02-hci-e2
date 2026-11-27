@@ -1,7 +1,7 @@
 import { Pencil, Plus } from 'lucide-react'
 import { today } from '../lib/dates'
 import { foldersLeft } from '../lib/leaveLibrary'
-import { STATUS_LABELS, STATUS_ORDER } from '../lib/status'
+import { STATUS_HINTS, STATUS_LABELS, STATUS_ORDER } from '../lib/status'
 import { selectBook, selectEntry, useStore } from '../store'
 import type { Book, BookId, Folder, LibraryEntry, ReadingStatus } from '../types'
 import { AnchoredMenu } from './AnchoredMenu'
@@ -78,9 +78,12 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
       label={current ? `Estado de ${bookName}` : 'Agregar a Mis libros'}
       resetKey={bookId}
       className={className}
+      iconLabels
       options={STATUS_ORDER.map((status) => ({
         id: status,
         label: <StatusTag status={status} />,
+        // Lo tengo and Quiero leerlo were mixed up in testing: the menu says what each one means.
+        detail: STATUS_HINTS[status],
         checked: current === status,
         onSelect: () => choose(status),
       }))}
@@ -119,7 +122,7 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
                 className={statusChanged ? 'animate-tag-in' : undefined}
               />
               {/* An action in a row, so it is drawn as a quiet compact Button. At 320 px it only
-                  fits next to "Lo quiero" smaller and without the pencil: the text says it all. */}
+                  fits next to "Quiero leerlo" smaller and without the pencil: the text says it all. */}
               <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-2.5 whitespace-nowrap transition-[background-color,scale] duration-150 group-aria-expanded:bg-sand hover:bg-sand active:scale-98 active:bg-sand-deep max-[359px]:pl-0 max-[359px]:text-sm">
                 <Pencil aria-hidden size={16} className="max-[359px]:hidden" />
                 {CHANGE_LABEL}

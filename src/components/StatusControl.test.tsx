@@ -10,7 +10,7 @@ import { StatusControl } from './StatusControl'
 // Not in seedBooks or extraBooks, like a book that is only in the catalog.
 const apiBook: Book = { id: 'OL0000001W', title: 'Libro de prueba', authors: ['Autora'] }
 const CARRIE = 'OL81626W' // Leyendo
-const IT = 'OL81613W' // Lo quiero
+const IT = 'OL81613W' // Quiero leerlo
 const CIEN_ANOS = 'OL274505W' // Leído
 
 const option = (name: string) => screen.getByRole('menuitemradio', { name })
@@ -43,16 +43,33 @@ describe('StatusControl', () => {
     expect(
       within(menu)
         .getAllByRole('menuitemradio')
-        .map((item) => item.textContent?.replace('Actual', '')),
-    ).toEqual(['Lo quiero', 'Lo tengo', 'Leyendo', 'Leído'])
+        .map((item) => item.firstElementChild?.textContent?.replace('Actual', '')),
+    ).toEqual(['Quiero leerlo', 'Lo tengo', 'Leyendo', 'Leído'])
     expect(option('Leyendo')).toBeChecked()
     expect(option('Leyendo')).toHaveTextContent('Actual')
     expect(option('Lo tengo')).not.toBeChecked()
     expect(option('Lo tengo')).not.toHaveTextContent('Actual')
   })
 
+  it('says under each tag what it means, so Quiero leerlo and Lo tengo are not mixed up', () => {
+    renderControl(apiBook.id, apiBook)
+    openMenu('Agregar a Mis libros')
+    const hints = [
+      ['Quiero leerlo', 'Para más adelante'],
+      ['Lo tengo', 'En papel o digital, sin leer aún'],
+      ['Leyendo', 'Lo estás leyendo ahora'],
+      ['Leído', 'Ya lo terminaste'],
+    ]
+    for (const [name, hint] of hints) {
+      // The name stays the tag, so a screen reader hears the line after it, as a description.
+      expect(option(name)).toHaveAccessibleName(name)
+      expect(option(name)).toHaveAccessibleDescription(hint)
+      expect(option(name)).toHaveTextContent(hint)
+    }
+  })
+
   it.each([
-    ['Lo quiero', 'want'],
+    ['Quiero leerlo', 'want'],
     ['Lo tengo', 'owned'],
   ])('sets %s directly, closes the menu and shows the toast', (name, status) => {
     renderControl(CARRIE)
@@ -168,7 +185,7 @@ describe('StatusControl with the keyboard', () => {
     key('ArrowDown')
     expect(removeOption()).toHaveFocus()
     key('ArrowDown')
-    expect(option('Lo quiero')).toHaveFocus()
+    expect(option('Quiero leerlo')).toHaveFocus()
     key('ArrowUp')
     expect(removeOption()).toHaveFocus()
   })
@@ -177,7 +194,7 @@ describe('StatusControl with the keyboard', () => {
     renderControl(CARRIE)
     openMenu()
     key('Home')
-    expect(option('Lo quiero')).toHaveFocus()
+    expect(option('Quiero leerlo')).toHaveFocus()
     key('End')
     expect(removeOption()).toHaveFocus()
   })
@@ -240,7 +257,7 @@ describe('StatusControl with a book outside the library', () => {
     const button = trigger('Agregar a Mis libros')
     openMenu('Agregar a Mis libros')
     expect(screen.getByRole('menu', { name: 'Agregar a Mis libros' })).toBeInTheDocument()
-    for (const name of ['Lo quiero', 'Lo tengo', 'Leyendo', 'Leído']) {
+    for (const name of ['Quiero leerlo', 'Lo tengo', 'Leyendo', 'Leído']) {
       expect(option(name)).not.toBeChecked()
     }
     fireEvent.click(option('Lo tengo'))

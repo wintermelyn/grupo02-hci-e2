@@ -34,7 +34,7 @@ export interface CoreActions {
    * Adds the book to the library or changes its status. Ignores ids that getBook does not know,
    * so call upsertBook first for a catalog book. Leaving Leído deletes nothing, so a mistaken Leído
    * can be fixed at any time: only Leyendo drops finishedAt, because that reading is not over.
-   * Moving to Lo quiero sets wantCheckedAt to today, so the D5 prompt does not ask about a book the
+   * Moving to Quiero leerlo sets wantCheckedAt to today, so the D5 prompt does not ask about a book the
    * person just chose.
    */
   setStatus: (bookId: BookId, status: DirectStatus) => void

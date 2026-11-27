@@ -82,7 +82,7 @@ describe('setStatus', () => {
     state().upsertBook(unknownBook)
   })
 
-  it('adds a missing book as Lo quiero, checked today and without startedAt', () => {
+  it('adds a missing book as Quiero leerlo, checked today and without startedAt', () => {
     state().setStatus(unknownBook.id, 'want')
     expect(state().library[unknownBook.id]).toEqual({
       bookId: unknownBook.id,
@@ -108,17 +108,17 @@ describe('setStatus', () => {
     state().setStatus(seedEntry('want').bookId, 'owned')
     expect(state().toast).toMatchObject({ message: 'Estado cambiado a «Lo tengo»' })
     state().setStatus(unknownBook.id, 'want')
-    expect(state().toast).toMatchObject({ message: 'Agregado a Mis libros como «Lo quiero»' })
+    expect(state().toast).toMatchObject({ message: 'Agregado a Mis libros como «Quiero leerlo»' })
   })
 
-  it('sets wantCheckedAt when a book moves to Lo quiero', () => {
+  it('sets wantCheckedAt when a book moves to Quiero leerlo', () => {
     const reading = seedEntry('reading')
     expect(reading.wantCheckedAt).toBeUndefined()
     state().setStatus(reading.bookId, 'want')
     expect(state().library[reading.bookId].wantCheckedAt).toBe(today())
   })
 
-  it('renews wantCheckedAt when a book comes back to Lo quiero', () => {
+  it('renews wantCheckedAt when a book comes back to Quiero leerlo', () => {
     const want = seedEntry('want')
     state().setStatus(want.bookId, 'owned')
     useStore.setState((current) => ({
@@ -163,7 +163,7 @@ describe('setStatus', () => {
     })
   })
 
-  it('sets startedAt when a Lo quiero book moves to Leyendo', () => {
+  it('sets startedAt when a Quiero leerlo book moves to Leyendo', () => {
     const want = seedEntry('want')
     expect(want.startedAt).toBeUndefined()
     state().setStatus(want.bookId, 'reading')

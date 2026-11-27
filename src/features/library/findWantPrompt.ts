@@ -11,7 +11,7 @@ export interface PromptedBook {
 }
 
 /**
- * What the D5 prompt asks about today: the book in Lo quiero that has waited the longest, once it
+ * What the D5 prompt asks about today: the book in Quiero leerlo that has waited the longest, once it
  * has waited more than WANT_PROMPT_AFTER_DAYS. See "Aviso periódico" in PLAN.md.
  */
 export function findWantPrompt({
