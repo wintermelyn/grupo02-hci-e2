@@ -481,6 +481,16 @@ describe('without results', () => {
     expect(currentLocation()).toBe('/buscar?q=George+Orwell')
   })
 
+  it('counts the books of each author in Mis libros, as the start of Buscar does', async () => {
+    renderApp('/buscar?q=zzzz')
+    await screen.findByText('No encontramos «zzzz»')
+    const authors = within(section('Autores de Mis libros'))
+    expect(
+      authors.getByRole('button', { name: /Stephen King.*4 en Mis libros/ }),
+    ).toBeInTheDocument()
+    expect(authors.queryByText(/^\d+ libros?$/)).not.toBeInTheDocument()
+  })
+
   it('separates the way out from the block above as two sections', async () => {
     renderApp('/buscar?q=zzzz')
     await screen.findByText('No encontramos «zzzz»')
