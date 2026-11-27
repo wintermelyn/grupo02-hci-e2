@@ -221,7 +221,7 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 | `undo()`, `resetDemo()` | Base | `resetDemo` limpia localStorage y vuelve al estado inicial |
 | `finishBook(bookId, { startedAt, finishedAt, rating? })` | A | **Es la única forma de dejar un libro en `read`.** También guarda las fechas y el puntaje que se editan en la ficha |
 | `setStartDate(bookId, startedAt)` | A | Corrige el inicio de un libro en `reading`, sin terminarlo. Lo usa la fila "Inicio" de la ficha |
-| `setCurrentPage(bookId, page)` | A | Guarda la página de un libro en `reading`, de 1 al total del libro si se conoce, con el aviso "Vas en la página 210 de «Dune»" y Deshacer. Al terminar el libro la página queda guardada, pero no se muestra. Lo usa la fila "Vas en la página" |
+| `setCurrentPage(bookId, page)` | A | Guarda la página de un libro en `reading`, de 1 al total del libro si se conoce, con el aviso "Vas en la página 210 de «Dune»" y Deshacer. Al terminar el libro la página queda guardada, pero no se muestra. Lo usa la fila "Página", cuyo campo se llama "Vas en la página" |
 | `removeFromLibrary(bookIds[])` | A | |
 | `createFolder(name) → id`, `renameFolder(id, name)`, `deleteFolder(id)` | A | No se puede borrar una carpeta `pinned` |
 | `addToFolder(bookIds[], folderId)`, `removeFromFolder(bookIds[], folderId)` | A | |
@@ -233,7 +233,7 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 **Elegir "Leído":**
 - `StatusControl` llama a `finishBook(bookId, { startedAt: entry?.startedAt ?? entry?.addedAt ?? today(), finishedAt: entry?.finishedAt ?? today(), rating: entry?.rating })`, nunca a `setStatus`.
 - No hay un paso intermedio: el tag cambia al instante y aparece el toast con Deshacer. El libro sigue en sus carpetas.
-- Con el tag en "Leído", la ficha muestra inicio, fin y puntaje como filas editables, que guardan con `finishBook`. Con "Leyendo" muestra el inicio, que guarda con `setStartDate`, y "Vas en la página", con "de 608" al lado, que guarda con `setCurrentPage` al presionar Enter o salir del campo.
+- Con el tag en "Leído", la ficha muestra inicio, fin y puntaje como filas editables, que guardan con `finishBook`. Con "Leyendo" muestra el inicio, que guarda con `setStartDate`, y la fila "Página", con "de 608" al lado y "Vas en la página" como nombre del campo, que guarda con `setCurrentPage` al presionar Enter o salir del campo.
 
 ### Componentes compartidos (`src/components/`, del bloque base)
 - **`AppShell`:** barra inferior pegada al borde bajo `lg` y barra lateral desde `lg`, `main` con su margen y su ancho, `<Toast/>` y memoria de scroll: cada página parte arriba y volver deja la lista donde estaba.

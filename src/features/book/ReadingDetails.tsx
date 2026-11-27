@@ -124,10 +124,13 @@ function PageRow({ page, pages, onCommit }: PageRowProps) {
   }
 
   return (
-    <LedgerRow label={<label htmlFor={id}>Vas en la página</label>}>
+    // One word, like the other labels, so the row reads "Página [210] de 608". The field keeps the
+    // whole sentence as its name, the one the toast repeats.
+    <LedgerRow label={<label htmlFor={id}>Página</label>}>
       <span className="flex min-h-11 items-center gap-2">
         <input
           id={id}
+          aria-label="Vas en la página"
           value={draft}
           inputMode="numeric"
           enterKeyHint="done"

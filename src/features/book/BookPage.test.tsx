@@ -711,6 +711,13 @@ describe('the page in Leyendo', () => {
     expect(main().queryByLabelText('Vas en la página')).not.toBeInTheDocument()
   })
 
+  it('labels the row with one word, like the others, and keeps the sentence as its name', () => {
+    renderApp(`/libro/${DUNE_ID}`)
+    const label = main().getByText('Página', { selector: 'label' })
+    expect(label).toHaveAttribute('for', pageField().id)
+    expect(pageField()).toHaveAccessibleName('Vas en la página')
+  })
+
   it('saves the page with Enter, says so and can be undone', () => {
     renderApp(`/libro/${DUNE_ID}`)
     typePage('210')
