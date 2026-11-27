@@ -5,8 +5,6 @@ import { isAuthorName, matchesAuthor } from './searchCatalog'
 export interface AuthorGroup {
   name: string
   books: Book[]
-  /** How many books of theirs the card says. Unknown until the catalog arrives. */
-  count: number | undefined
 }
 
 export interface ArrangedResults {
@@ -36,7 +34,7 @@ export function groupByAuthor(books: Book[]): AuthorGroup[] {
     for (const name of book.authors) byName.set(name, [...(byName.get(name) ?? []), book])
   }
   return [...byName]
-    .map(([name, list]) => ({ name, books: list, count: list.length }))
+    .map(([name, list]) => ({ name, books: list }))
     .sort((a, b) => b.books.length - a.books.length || a.name.localeCompare(b.name, 'es-CL'))
 }
 
@@ -47,9 +45,14 @@ function leadOf(authors: AuthorGroup[], books: Book[], wanted: string, exact: bo
   return normalizeText(books[0].title).startsWith(wanted) ? 'book' : 'author'
 }
 
+/** How many books of something the person has, said the same on an author card and in a summary. */
+export function inLibraryLabel(count: number): string {
+  return `${count} en Mis libros`
+}
+
 function resultsSummary(total: number, shown: number, inLibrary: number): string {
   const amount = shown < total ? `Los ${shown} más relevantes de ${total}` : booksLabel(total)
-  return inLibrary > 0 ? `${amount} · ${inLibrary} en Mis libros` : amount
+  return inLibrary > 0 ? `${amount} · ${inLibraryLabel(inLibrary)}` : amount
 }
 
 /**
