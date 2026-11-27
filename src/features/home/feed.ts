@@ -81,8 +81,10 @@ export function readingTime(startedAt: ISODate | undefined): string {
 }
 
 export interface PageProgress {
-  /** "Página 210 de 608", or "Página 210" when the length of the book is not known. */
+  /** "Página 210". */
   page: string
+  /** "de 608", when the length of the book is known. */
+  total?: string
   /** "35 %", with no break before the sign. */
   percentLabel?: string
   percent?: number
@@ -94,14 +96,11 @@ export function pageProgress(
   pages: number | undefined,
 ): PageProgress | undefined {
   if (currentPage === undefined) return undefined
-  // Each number stays with its word, so a narrow card breaks between "Página 210" and "de 608".
-  if (!pages) return { page: `Página\u00a0${currentPage}` }
+  // Each number stays with its word. The total is apart, so a narrow card can leave it out.
+  const page = `Página\u00a0${currentPage}`
+  if (!pages) return { page }
   const percent = pagePercent(currentPage, pages)
-  return {
-    page: `Página\u00a0${currentPage} de\u00a0${pages}`,
-    percentLabel: `${percent}\u00a0%`,
-    percent,
-  }
+  return { page, total: `de\u00a0${pages}`, percentLabel: `${percent}\u00a0%`, percent }
 }
 
 /** What the person's current friends did, newest first. */

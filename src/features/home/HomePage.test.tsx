@@ -61,6 +61,8 @@ describe('Inicio', () => {
     const section = screen.getByRole('heading', { name: 'Leyendo ahora' }).closest('section')!
     const dune = within(section).getByRole('link', { name: /Dune/ })
     expect(dune).toHaveTextContent('Página 210 de 608 · 35 %')
+    // Two cards on a phone have room for one line: the total goes there, and the bar keeps the share.
+    expect(within(dune).getByText('de 608')).toHaveClass('max-lg:hidden')
     expect(dune).not.toHaveTextContent('Llevas')
     expect(dune.querySelector('[aria-hidden] > [style]')).toHaveStyle({ width: '35%' })
     expect(within(section).getByRole('link', { name: /Carrie/ })).toHaveTextContent(

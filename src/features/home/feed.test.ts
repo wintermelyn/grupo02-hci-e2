@@ -72,7 +72,8 @@ describe('alongsideSentence', () => {
 describe('pageProgress', () => {
   it('says the page, the length and the percent', () => {
     expect(pageProgress(210, 412)).toEqual({
-      page: 'Página\u00a0210 de\u00a0412',
+      page: 'Página\u00a0210',
+      total: 'de\u00a0412',
       percentLabel: '51\u00a0%',
       percent: 51,
     })

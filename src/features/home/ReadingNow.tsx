@@ -38,10 +38,12 @@ interface ReadingCardProps extends ReadingBook {
 
 /**
  * The saved page instead of the days, since it says how far the person is. The bar repeats the
- * percent for the eye, so screen readers get the text only.
+ * percent for the eye, so screen readers get the text only. Under lg the total goes, as the length
+ * of the book did before: two cards side by side on a phone have room for one line.
  */
 function ReadingProgress({
   page,
+  total,
   percentLabel,
   percent,
   company,
@@ -55,6 +57,7 @@ function ReadingProgress({
       )}
       <span className={cx('block font-semibold', company === 'many' && 'max-[359px]:text-xs')}>
         {page}
+        {total && <span className="max-lg:hidden"> {total}</span>}
         {percentLabel && (
           <span className="font-normal whitespace-nowrap text-white/88"> · {percentLabel}</span>
         )}
