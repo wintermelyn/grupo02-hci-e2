@@ -47,6 +47,14 @@ describe('whatIsLost', () => {
     expect(lost).toBe('También sale de Terror y pierdes las fechas y el puntaje.')
   })
 
+  it('names the saved page among what is lost', () => {
+    const lost = whatIsLost(
+      entry({ folderIds: ['terror'], startedAt: '2026-01-02', currentPage: 210 }),
+      folders,
+    )
+    expect(lost).toBe('También sale de Terror y pierdes las fechas y la página en la que vas.')
+  })
+
   it('counts several folders', () => {
     expect(whatIsLost(entry({ folderIds: ['terror', 'novela'] }), folders)).toBe(
       'También sale de sus 2 carpetas.',

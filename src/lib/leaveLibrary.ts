@@ -23,10 +23,11 @@ export function placesLeft(folderIds: string[], folders: Folder[]): string {
  * they stay, in the same words as the D5 prompt, and only what is really gone is called a loss.
  */
 export function whatIsLost(entry: LibraryEntry, allFolders: Folder[]): string {
-  const { folderIds, startedAt, finishedAt, rating } = entry
+  const { folderIds, startedAt, finishedAt, rating, currentPage } = entry
   const folders = foldersLeft(folderIds, allFolders)
   const lost = [
     (startedAt || finishedAt) && 'las fechas',
+    currentPage !== undefined && 'la página en la que vas',
     rating !== undefined && 'el puntaje',
   ].filter((item): item is string => Boolean(item))
   const data = lost.length > 0 ? LIST.format(lost) : undefined
