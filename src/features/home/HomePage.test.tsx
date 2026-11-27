@@ -97,6 +97,15 @@ describe('Inicio', () => {
     expect(within(section).getByRole('list')).toHaveClass('grid-cols-1')
   })
 
+  it('keeps the friend line on a phone when two books share the row, smaller and in two lines', () => {
+    renderApp('/')
+    const section = screen.getByRole('heading', { name: 'Leyendo ahora' }).closest('section')!
+    const line = within(section).getByText('Diego también lo lee')
+    expect(line.parentElement).not.toHaveClass('max-md:hidden')
+    expect(line.parentElement).toHaveClass('max-md:text-xs')
+    expect(line).toHaveClass('max-md:line-clamp-2')
+  })
+
   it('tints each reading card with the colour of its book', () => {
     renderApp('/')
     expect(screen.getByRole('link', { name: /Carrie/ }).style.backgroundColor).not.toBe('')

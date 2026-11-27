@@ -100,9 +100,24 @@ function ReadingCard({ book, entry, company, friend }: ReadingCardProps) {
         </span>
         <span className="mt-auto pt-2 text-sm md:pt-3">
           {friend && (
-            <span className={cx('mb-1 flex items-center gap-1.5 text-white/88', whenRoomy)}>
+            // Under the cover on a phone it stays, smaller and in up to two lines: the author can
+            // go, but who else reads the book is what the card adds to the person's own reading.
+            <span
+              className={cx(
+                'mb-1 flex items-center gap-1.5 text-white/88',
+                company !== 'alone' && 'max-md:items-start max-md:text-xs',
+              )}
+            >
               <Avatar user={friend.user} size="xs" />
-              <span className="min-w-0 truncate">{alongsideSentence(friend)}</span>
+              <span
+                className={cx(
+                  'min-w-0 truncate',
+                  company !== 'alone' && 'max-md:line-clamp-2 max-md:whitespace-normal',
+                  company === 'many' && 'max-[479px]:sr-only',
+                )}
+              >
+                {alongsideSentence(friend)}
+              </span>
             </span>
           )}
           {progress ? (
