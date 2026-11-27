@@ -50,6 +50,11 @@ export function inLibraryLabel(count: number): string {
   return `${count} en Mis libros`
 }
 
+/** The amount on an author card of "Autores de Mis libros", short enough for the foot of the card. */
+export function ownedLabel(count: number): string {
+  return `Tienes ${count}`
+}
+
 function resultsSummary(total: number, shown: number, inLibrary: number): string {
   const amount = shown < total ? `Los ${shown} más relevantes de ${total}` : booksLabel(total)
   return inLibrary > 0 ? `${amount} · ${inLibraryLabel(inLibrary)}` : amount

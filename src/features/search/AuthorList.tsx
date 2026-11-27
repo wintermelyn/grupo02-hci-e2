@@ -2,7 +2,7 @@ import { BookCover } from '../../components'
 import { cx } from '../../components/cx'
 import { coverTone } from '../../lib/coverTone'
 import { booksLabel } from '../library/filters'
-import { inLibraryLabel, type AuthorGroup } from './results'
+import { ownedLabel, type AuthorGroup } from './results'
 
 /** The cards in the rows that fit in each width. */
 export const AUTHOR_GRID = 'mt-3 grid grid-cols-2 gap-2.5 md:grid-cols-3 xl:grid-cols-4'
@@ -60,16 +60,18 @@ function AuthorTile({ author, featured, counts, onPick }: AuthorTileProps) {
       >
         {author.name}
       </span>
-      {/* "4 en Mis libros" does not clear the covers at the foot in most widths, so it goes under
-          the name, as in the card of the best result. */}
-      <span
-        className={cx(
-          'block min-h-5 text-sm text-white/88',
-          inLibrary ? 'mt-1' : 'mt-auto',
-          featured && 'lg:mt-1.5',
+      {/* At the foot, as approved. Under the title "Autores de Mis libros", "Tienes 4" is enough and
+          clears the covers down to 320 px, where "4 en Mis libros" ran under them. Screen readers
+          get the word "libros" too. */}
+      <span className={cx('mt-auto block min-h-5 text-sm text-white/88', featured && 'lg:mt-1.5')}>
+        {inLibrary ? (
+          <>
+            {ownedLabel(author.books.length)}{' '}
+            <span className="sr-only">{author.books.length === 1 ? 'libro' : 'libros'}</span>
+          </>
+        ) : (
+          booksLabel(author.books.length)
         )}
-      >
-        {inLibrary ? inLibraryLabel(author.books.length) : booksLabel(author.books.length)}
       </span>
       {covers.map((book, index) => (
         <span key={book.id} className={cx('absolute', places[index])}>

@@ -77,13 +77,13 @@ describe('before typing', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('counts the books of each author that are in Mis libros, as the summary of their books does', async () => {
+  it('counts at the foot the books of each author that are in Mis libros', async () => {
     catalog()
     renderApp('/buscar')
     const authors = within(section('Autores de Mis libros'))
-    const king = authors.getByRole('button', { name: /Stephen King.*4 en Mis libros/ })
-    // At the foot it would run under the covers, so it goes under the name.
-    expect(within(king).getByText('4 en Mis libros')).toHaveClass('mt-1')
+    const king = authors.getByRole('button', { name: /Stephen King\s*Tienes 4 libros/ })
+    // At the foot, as approved: short enough to clear the covers.
+    expect(within(king).getByText('Tienes 4', { exact: false })).toHaveClass('mt-auto')
     fireEvent.click(king)
     expect(await screen.findByText('5 libros · 4 en Mis libros')).toBeInTheDocument()
   })
@@ -93,10 +93,12 @@ describe('before typing', () => {
     renderApp('/buscar')
     const authors = within(section('Autores de Mis libros'))
     expect(
-      authors.getByRole('button', { name: /Stephen King.*4 en Mis libros/ }),
+      authors.getByRole('button', { name: /Stephen King\s*Tienes 4 libros/ }),
     ).toBeInTheDocument()
     await act(async () => undefined)
-    expect(authors.getByText('4 en Mis libros')).toBeInTheDocument()
+    expect(
+      authors.getByRole('button', { name: /Stephen King\s*Tienes 4 libros/ }),
+    ).toBeInTheDocument()
   })
 
   it('follows Mis libros when a book of the author leaves it', () => {
@@ -106,7 +108,9 @@ describe('before typing', () => {
     act(() => state().removeFromLibrary([kingBook!]))
     renderApp('/buscar')
     expect(
-      within(section('Autores de Mis libros')).getByText('3 en Mis libros'),
+      within(section('Autores de Mis libros')).getByRole('button', {
+        name: /Stephen King\s*Tienes 3 libros/,
+      }),
     ).toBeInTheDocument()
   })
 
@@ -486,7 +490,7 @@ describe('without results', () => {
     await screen.findByText('No encontramos «zzzz»')
     const authors = within(section('Autores de Mis libros'))
     expect(
-      authors.getByRole('button', { name: /Stephen King.*4 en Mis libros/ }),
+      authors.getByRole('button', { name: /Stephen King\s*Tienes 4 libros/ }),
     ).toBeInTheDocument()
     expect(authors.queryByText(/^\d+ libros?$/)).not.toBeInTheDocument()
   })
