@@ -72,11 +72,12 @@ export function LeaveLibrary({ book, entry, onLeave }: LeaveLibraryProps) {
   }
 
   return (
-    // Its text ends where "Elegir carpetas" ends, on the row above.
+    // Its text ends where "Elegir carpetas" ends, on the row above. It weighs less than the safe
+    // actions of the record, and the danger color waits for the button that confirms.
     <div className="col-span-2 -mr-2 mt-1 flex justify-end">
       <Button
         ref={button}
-        variant="quiet"
+        variant="subtle"
         compact
         aria-label={`Quitar de Mis libros: «${book.title}»`}
         onClick={() => setAsking(true)}

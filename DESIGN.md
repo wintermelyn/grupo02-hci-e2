@@ -146,6 +146,17 @@ components:
     backgroundColor: '{colors.sand}'
   button-quiet-pressed:
     backgroundColor: '{colors.sand-deep}'
+  button-subtle:
+    textColor: '{colors.muted}'
+    rounded: '{rounded.pill}'
+    padding: '0 16px'
+    height: '44px'
+  button-subtle-hover:
+    backgroundColor: '{colors.sand}'
+    textColor: '{colors.ink}'
+  button-subtle-pressed:
+    backgroundColor: '{colors.sand-deep}'
+    textColor: '{colors.ink}'
   button-compact:
     padding: '0 10px'
     height: '44px'
@@ -575,7 +586,7 @@ Importa todo desde `src/components/`. Son del bloque base: si necesitas cambiar 
 | Mostrar el estado de un libro, sin cambiarlo       | `StatusTag`; en listas, `size="sm"`                                                                                                       |
 | Cambiar o agregar el tag de un libro               | `StatusControl`, y no otro control. Recibe `book` si el libro puede no estar en el store                                                  |
 | Mostrar o elegir un puntaje                        | `Stars`; con `onChange` es un campo                                                                                                       |
-| Acción con botón                                   | `Button`: `primary`, `secondary`, `quiet` o `danger`; `compact` en una fila o junto al título                                             |
+| Acción con botón                                   | `Button`: `primary`, `secondary`, `quiet`, `subtle` o `danger`; `compact` en una fila o junto al título                                   |
 | Cambio rápido con pocas opciones, junto al control | `AnchoredMenu`                                                                                                                            |
 | Editar un dato                                     | En su lugar, en la misma fila o título donde se lee                                                                                       |
 | Escribir un texto corto donde se lee               | `TextField`, con Guardar y Cancelar al lado                                                                                               |
@@ -700,12 +711,13 @@ Pregunta dentro de la página, junto a lo que afecta, para que siga a la vista. 
 
 ### Buttons
 
-Píldoras con texto en peso 600, con un solo llamado por pantalla. Solo `primary` y `danger` van rellenos, así que la pantalla tiene una sola forma negra y el ojo sabe a dónde ir. Los demás se dibujan con su borde o con nada. Un campo se distingue porque es blanco y trae su lupa o su texto; por eso ningún botón es blanco.
+Píldoras con texto en peso 600 (500 en `subtle`), con un solo llamado por pantalla. Solo `primary` y `danger` van rellenos, así que la pantalla tiene una sola forma negra y el ojo sabe a dónde ir. Los demás se dibujan con su borde o con nada. Un campo se distingue porque es blanco y trae su lupa o su texto; por eso ningún botón es blanco.
 
 - **Shape:** píldora, 44 px de alto, 16 px de relleno lateral y texto Control. El ícono mide 18 px y va antes del texto. Nunca hay botones de solo ícono, salvo la flecha de un riel y el corazón de "Me gusta" en celular y en las filas de Inicio en tablet, las dos excepciones aprobadas en `PLAN.md`. Si algo sobra en una fila angosta, sobra el ícono, no el texto.
 - **Primary:** relleno de tinta con texto blanco. Al pasar el cursor baja al 90 % y al presionar al 80 %.
 - **Secondary:** sin relleno, con borde `edge` de 1 px y texto de tinta. Al pasar el cursor toma `sand`, y al presionar, `sand-deep`. Con su menú abierto (`aria-expanded`) se invierte a tinta con texto blanco, con o sin cursor: la tinta significa abierto. Es la variante por defecto.
-- **Quiet:** texto de tinta sin borde ni relleno. Al pasar el cursor y con su menú abierto toma `sand`, y al presionar, `sand-deep`. Es para las acciones de una fila, como "Elegir carpetas" o "+ Agregar", y para "Quitar de Mis libros" bajo el registro, y para lo secundario de la página, como "Invitar contactos". En una fila, el texto queda sobre el margen y el relleno sobresale con el cursor.
+- **Quiet:** texto de tinta sin borde ni relleno. Al pasar el cursor y con su menú abierto toma `sand`, y al presionar, `sand-deep`. Es para las acciones de una fila, como "Elegir carpetas" o "+ Agregar", y para lo secundario de la página, como "Invitar contactos". En una fila, el texto queda sobre el margen y el relleno sobresale con el cursor.
+- **Subtle:** un `quiet` que se aparta hasta que se lo busca: texto `muted` en peso 500, sin borde ni relleno. Al pasar el cursor y con el foco toma `sand` y texto de tinta, y al presionar, `sand-deep`. Es para "Quitar de Mis libros" bajo el registro: quita algo, así que no pesa lo mismo que "Cambiar estado" y "Elegir carpetas", que son seguras. No lleva color de peligro; ese queda para el `danger` que confirma.
 - **Compact:** 10 px de relleno lateral y 6 px entre ícono y texto, para una fila o un título que comparte el ancho con texto. Conserva los 44 px de alto.
 - **Danger:** relleno `danger` con texto blanco, con el mismo comportamiento que `primary`. Es para lo destructivo que pide confirmación, como Reiniciar demo, eliminar carpeta y Quitar de Mis libros.
 - **Disabled:** relleno `sand`, texto `muted`, sin borde.
@@ -721,7 +733,7 @@ La flecha de un riel: un círculo blanco de 48 px con `shadow-float` y un chevro
 
 ### StatusControl
 
-La fila Estado de la ficha, a todo el ancho y de 44 px de alto, y toda ella abre el menú. A la izquierda va `StatusTag` y a la derecha el lápiz con "Cambiar estado", dibujado como un botón `quiet` `compact`, en paralelo con "Elegir carpetas" de la fila Carpetas. Bajo 360 px el texto baja a Small y el lápiz se va. "Quiero leerlo" es el tag más largo: junto a él, el lápiz se va bajo 390 px y bajo 375 px el texto dice "Cambiar", para caber en una línea; el nombre accesible sigue diciendo "Cambiar estado". Bajo el cursor, la fila toma tinta al 5 %, como una fecha, con radio de control, y "Cambiar estado" solo reacciona si el cursor está sobre él, con `sand`, igual que con el menú abierto. Si el libro no está en la biblioteca, la fila es una píldora de tinta con un más y "Agregar a Mis libros", dentro de los márgenes del registro, y abre el mismo menú. En la ficha ocupa toda la fila en celular y toma su propio ancho desde 768 px. El menú es un `AnchoredMenu`. Bajo cada tag, una línea dice qué significa ("Para más adelante", "En papel o digital, sin leer aún", "Lo estás leyendo ahora", "Ya lo terminaste"), porque en la E3 "Lo quiero" y "Lo tengo" se confundían. La opción actual tiene un check con "Actual" en tinta, en la línea del tag. Se aplica de inmediato. "Leído" se elige aquí mismo, sin pasos intermedios. El menú solo trae los tags. "Quitar de Mis libros" va aparte, como `Button` `quiet` `compact` bajo el registro, con su texto alineado al de "Elegir carpetas". Al tocarlo, en su lugar aparece `InlineConfirm`, "¿Quitar «título» de Mis libros?", con lo que se pierde. Las carpetas no se pierden, así que se dicen con las palabras del aviso de D5: "También sale de Terror.", o "También sale de sus 2 carpetas." con varias. Si además pierde datos, siguen ahí: "También sale de Terror y pierdes las fechas y el puntaje." Sin carpetas dice "Pierdes las fechas y el puntaje.", y sin nada que perder, "No tiene carpetas, fechas ni puntaje que perder." Confirmar aplica el cambio con Deshacer; con teclado, el foco va a Deshacer. Cancelar devuelve el foco al botón.
+La fila Estado de la ficha, a todo el ancho y de 44 px de alto, y toda ella abre el menú. A la izquierda va `StatusTag` y a la derecha el lápiz con "Cambiar estado", dibujado como un botón `quiet` `compact`, en paralelo con "Elegir carpetas" de la fila Carpetas. Bajo 360 px el texto baja a Small y el lápiz se va. "Quiero leerlo" es el tag más largo: junto a él, el lápiz se va bajo 390 px y bajo 375 px el texto dice "Cambiar", para caber en una línea; el nombre accesible sigue diciendo "Cambiar estado". Bajo el cursor, la fila toma tinta al 5 %, como una fecha, con radio de control, y "Cambiar estado" solo reacciona si el cursor está sobre él, con `sand`, igual que con el menú abierto. Si el libro no está en la biblioteca, la fila es una píldora de tinta con un más y "Agregar a Mis libros", dentro de los márgenes del registro, y abre el mismo menú. En la ficha ocupa toda la fila en celular y toma su propio ancho desde 768 px. El menú es un `AnchoredMenu`. Bajo cada tag, una línea dice qué significa ("Para más adelante", "En papel o digital, sin leer aún", "Lo estás leyendo ahora", "Ya lo terminaste"), porque en la E3 "Lo quiero" y "Lo tengo" se confundían. La opción actual tiene un check con "Actual" en tinta, en la línea del tag. Se aplica de inmediato. "Leído" se elige aquí mismo, sin pasos intermedios. El menú solo trae los tags. "Quitar de Mis libros" va aparte, como `Button` `subtle` `compact` bajo el registro, con su texto alineado al de "Elegir carpetas", y pesa menos que las acciones seguras. Al tocarlo, en su lugar aparece `InlineConfirm`, "¿Quitar «título» de Mis libros?", con lo que se pierde. Las carpetas no se pierden, así que se dicen con las palabras del aviso de D5: "También sale de Terror.", o "También sale de sus 2 carpetas." con varias. Si además pierde datos, siguen ahí: "También sale de Terror y pierdes las fechas y el puntaje." Sin carpetas dice "Pierdes las fechas y el puntaje.", y sin nada que perder, "No tiene carpetas, fechas ni puntaje que perder." Confirmar aplica el cambio con Deshacer; con teclado, el foco va a Deshacer. Cancelar devuelve el foco al botón.
 
 ### StatusTag
 

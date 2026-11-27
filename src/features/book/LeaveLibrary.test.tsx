@@ -32,6 +32,16 @@ describe('LeaveLibrary', () => {
     expect(state().library).not.toHaveProperty(carrie.bookId)
   })
 
+  it('weighs less than the safe actions of the record, and leaves the danger color to Quitar', () => {
+    renderCarrie()
+    const leave = screen.getByRole('button', { name: 'Quitar de Mis libros: «Carrie»' })
+    expect(leave).toHaveClass('text-muted', 'font-medium')
+    expect(leave).not.toHaveClass('text-ink', 'font-semibold')
+    expect(leave.className).not.toMatch(/danger/)
+    fireEvent.click(leave)
+    expect(screen.getByRole('button', { name: 'Quitar de Mis libros' })).toHaveClass('bg-danger')
+  })
+
   it('lets whoever shows it move the focus before the book leaves', () => {
     const onLeave = vi.fn(() => expect(state().library).toHaveProperty('OL81626W'))
     renderCarrie(onLeave)
