@@ -656,6 +656,76 @@ describe('dates and rating', () => {
   })
 })
 
+describe('the page in Leyendo', () => {
+  const DUNE_ID = 'OL893414W' // Leyendo, 608 páginas
+  const pageField = () => main().getByRole('textbox', { name: 'Vas en la página' })
+  const entry = () => state().library[DUNE_ID]
+
+  function typePage(value: string, key = 'Enter') {
+    fireEvent.change(pageField(), { target: { value } })
+    fireEvent.keyDown(pageField(), { key })
+  }
+
+  it('offers a field with the length of the book, only in Leyendo', () => {
+    renderApp(`/libro/${DUNE_ID}`)
+    expect(pageField()).toHaveValue('')
+    expect(pageField()).toHaveAccessibleDescription('de 608')
+    cleanup()
+    renderApp(CIEN_ANOS)
+    expect(main().queryByLabelText('Vas en la página')).not.toBeInTheDocument()
+  })
+
+  it('saves the page with Enter, says so and can be undone', () => {
+    renderApp(`/libro/${DUNE_ID}`)
+    typePage('210')
+    expect(entry().currentPage).toBe(210)
+    expect(toast()).toHaveTextContent('Vas en la página 210 de «Dune»')
+    fireEvent.click(undoButton())
+    expect(entry()).not.toHaveProperty('currentPage')
+    expect(pageField()).toHaveValue('')
+  })
+
+  it('saves the page on leaving the field', () => {
+    renderApp(`/libro/${DUNE_ID}`)
+    fireEvent.change(pageField(), { target: { value: ' 35 ' } })
+    expect(entry()).not.toHaveProperty('currentPage')
+    fireEvent.blur(pageField())
+    expect(entry().currentPage).toBe(35)
+  })
+
+  it.each([
+    ['a page past the end', '609', 'El libro tiene 608 páginas.'],
+    ['page zero', '0', 'Escribe un número de página.'],
+    ['a word', 'diez', 'Escribe un número de página.'],
+  ])('holds back %s, says why and goes back to the saved page', (_case, value, reason) => {
+    state().setCurrentPage(DUNE_ID, 210)
+    renderApp(`/libro/${DUNE_ID}`)
+    typePage(value)
+    expect(entry().currentPage).toBe(210)
+    expect(main().getByText(`${reason} Dejamos la página guardada.`)).toBeInTheDocument()
+    expect(pageField()).toHaveValue('210')
+  })
+
+  it('goes back to the saved page with Escape or an empty field, without a word', () => {
+    state().setCurrentPage(DUNE_ID, 210)
+    renderApp(`/libro/${DUNE_ID}`)
+    typePage('300', 'Escape')
+    expect(pageField()).toHaveValue('210')
+    typePage('')
+    expect(pageField()).toHaveValue('210')
+    expect(entry().currentPage).toBe(210)
+    expect(main().queryByText(/Escribe un número/)).not.toBeInTheDocument()
+  })
+
+  it('keeps the page out of sight once the book is finished', () => {
+    state().setCurrentPage(DUNE_ID, 210)
+    renderApp(`/libro/${DUNE_ID}`)
+    chooseTag('Leído')
+    expect(main().queryByLabelText('Vas en la página')).not.toBeInTheDocument()
+    expect(entry()).toMatchObject({ status: 'read', currentPage: 210 })
+  })
+})
+
 describe('a Leído chosen by mistake', () => {
   const entry = () => state().library[CARRIE_ID]
 

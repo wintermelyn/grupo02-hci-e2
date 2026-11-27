@@ -1,5 +1,6 @@
 import { today } from '../lib/dates'
 import { placesLeft } from '../lib/leaveLibrary'
+import { pageProblem } from '../lib/pages'
 import { STATUS_LABELS } from '../lib/status'
 import type { AppState, BookId, ISODate, LibraryEntry } from '../types'
 import type { SliceCreator } from '.'
@@ -20,6 +21,8 @@ export interface LibraryActions {
   finishBook: (bookId: BookId, details: FinishDetails) => void
   /** Corrects when a book in Leyendo was started, which finishBook cannot do: it ends the reading. */
   setStartDate: (bookId: BookId, startedAt: ISODate) => void
+  /** Saves the page a book in Leyendo is on, from 1 to its pages when they are known. */
+  setCurrentPage: (bookId: BookId, page: number) => void
   removeFromLibrary: (bookIds: BookId[]) => void
   /** Returns the new folder id. */
   createFolder: (name: string) => string
@@ -134,6 +137,15 @@ export const createLibrarySlice: SliceCreator<LibraryActions> = (set, get) => {
       if (current?.status !== 'reading' || current.startedAt === startedAt) return
       get().commit('Fecha de inicio cambiada', ({ library }) => ({
         library: { ...library, [bookId]: { ...current, startedAt } },
+      }))
+    },
+
+    setCurrentPage: (bookId, page) => {
+      const current = selectEntry(bookId)(get())
+      if (current?.status !== 'reading' || current.currentPage === page) return
+      if (pageProblem(page, get().getBook(bookId)?.pages)) return
+      get().commit(`Vas en la página ${page} de ${bookName(bookId)}`, ({ library }) => ({
+        library: { ...library, [bookId]: { ...current, currentPage: page } },
       }))
     },
 

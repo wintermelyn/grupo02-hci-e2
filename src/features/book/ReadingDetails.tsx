@@ -3,6 +3,7 @@ import { useId, useRef, useState, type KeyboardEvent } from 'react'
 import { Stars } from '../../components'
 import { cx } from '../../components/cx'
 import { today } from '../../lib/dates'
+import { pageProblem } from '../../lib/pages'
 import { useStore } from '../../store'
 import type { BookId, ISODate, LibraryEntry } from '../../types'
 import { LedgerRow } from './LedgerRow'
@@ -86,18 +87,83 @@ function DateRow({ label, value, min, max, onCommit }: DateRowProps) {
   )
 }
 
+interface PageRowProps {
+  page?: number
+  pages?: number
+  /** Says whether the page was saved. A rejected page goes back to the saved one. */
+  onCommit: (page: number) => boolean
+}
+
+/**
+ * The page a book in Leyendo is on. A white field, unlike the dates, because it starts empty and a
+ * blank row would not look like a place to write. Saved on Enter or on leaving, like a typed date.
+ */
+function PageRow({ page, pages, onCommit }: PageRowProps) {
+  const id = useId()
+  const totalId = useId()
+  const saved = page === undefined ? '' : String(page)
+  const [draft, setDraft] = useState(saved)
+  const [shown, setShown] = useState(saved)
+
+  // Deshacer changes the page from outside.
+  if (shown !== saved) {
+    setShown(saved)
+    setDraft(saved)
+  }
+
+  function commit() {
+    const text = draft.trim()
+    if (text === saved) return
+    // Emptying the field is not a page: it goes back to the saved one.
+    if (!text || !onCommit(/^\d+$/.test(text) ? Number(text) : Number.NaN)) setDraft(saved)
+  }
+
+  function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter') commit()
+    if (event.key === 'Escape') setDraft(saved)
+  }
+
+  return (
+    <LedgerRow label={<label htmlFor={id}>Vas en la página</label>}>
+      <span className="flex min-h-11 items-center gap-2">
+        <input
+          id={id}
+          value={draft}
+          inputMode="numeric"
+          enterKeyHint="done"
+          autoComplete="off"
+          aria-describedby={pages ? totalId : undefined}
+          onChange={(event) => setDraft(event.target.value)}
+          onKeyDown={onKeyDown}
+          onBlur={commit}
+          // Room for four digits; the focus outline already draws the field, so its edge steps aside.
+          className="min-h-11 w-[5.5rem] min-w-0 rounded-control border border-edge bg-white px-3 font-medium tabular-nums focus-visible:border-transparent"
+        />
+        {pages && (
+          <span id={totalId} className="text-muted tabular-nums">
+            de {pages}
+          </span>
+        )}
+      </span>
+    </LedgerRow>
+  )
+}
+
 export interface ReadingDetailsProps {
   bookId: BookId
   entry: LibraryEntry
+  /** The book's length, for the page row. */
+  pages?: number
 }
 
 /**
  * The dates and rating of a reading, as rows of the record: "Leído" applies at once, so they are
  * corrected right here and each change offers Deshacer.
  */
-export function ReadingDetails({ bookId, entry }: ReadingDetailsProps) {
+export function ReadingDetails({ bookId, entry, pages }: ReadingDetailsProps) {
   const finishBook = useStore((state) => state.finishBook)
   const setStartDate = useStore((state) => state.setStartDate)
+  const setCurrentPage = useStore((state) => state.setCurrentPage)
   const [problem, setProblem] = useState<string>()
   const limit = today()
   const startedAt = entry.startedAt ?? entry.addedAt
@@ -108,7 +174,7 @@ export function ReadingDetails({ bookId, entry }: ReadingDetailsProps) {
     // A start after the end takes the end with it, so the order of the two edits does not matter.
     const end = entry.status === 'read' && next > finishedAt ? next : finishedAt
     const found = readingDatesProblem(next, end)
-    setProblem(found)
+    setProblem(found && `${found} Dejamos la fecha guardada.`)
     if (found) return false
     if (entry.status === 'read') finishBook(bookId, { startedAt: next, finishedAt: end, rating })
     else setStartDate(bookId, next)
@@ -117,15 +183,27 @@ export function ReadingDetails({ bookId, entry }: ReadingDetailsProps) {
 
   function changeEnd(next: ISODate) {
     const found = readingDatesProblem(startedAt, next)
-    setProblem(found)
+    setProblem(found && `${found} Dejamos la fecha guardada.`)
     if (found) return false
     finishBook(bookId, { startedAt, finishedAt: next, rating })
+    return true
+  }
+
+  function changePage(next: number) {
+    const found = pageProblem(next, pages)
+    const kept = entry.currentPage === undefined ? '' : ' Dejamos la página guardada.'
+    setProblem(found && `${found}${kept}`)
+    if (found) return false
+    setCurrentPage(bookId, next)
     return true
   }
 
   return (
     <>
       <DateRow label="Inicio" value={startedAt} max={limit} onCommit={changeStart} />
+      {entry.status === 'reading' && (
+        <PageRow page={entry.currentPage} pages={pages} onCommit={changePage} />
+      )}
       {entry.status === 'read' && (
         <>
           <DateRow
@@ -148,7 +226,7 @@ export function ReadingDetails({ bookId, entry }: ReadingDetailsProps) {
         {problem && (
           <p className="flex items-center gap-1.5 border-b border-line py-2 text-sm">
             <CircleAlert aria-hidden size={16} className="shrink-0 text-muted" />
-            {problem} Dejamos la fecha guardada.
+            {problem}
           </p>
         )}
       </div>

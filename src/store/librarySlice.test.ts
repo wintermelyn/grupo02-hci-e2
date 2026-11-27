@@ -274,6 +274,44 @@ describe('setStartDate', () => {
   })
 })
 
+describe('setCurrentPage', () => {
+  const DUNE = 'OL893414W' // Leyendo, 608 páginas
+  const IT = 'OL81613W' // Lo quiero
+
+  it('saves the page of a book in Leyendo, with Deshacer', () => {
+    const before = state().library[DUNE]
+    state().setCurrentPage(DUNE, 210)
+    expect(state().library[DUNE]).toEqual({ ...before, currentPage: 210 })
+    expect(state().toast).toMatchObject({
+      message: 'Vas en la página 210 de «Dune»',
+      undoable: true,
+    })
+    state().undo()
+    expect(state().library[DUNE]).toBe(before)
+  })
+
+  it.each([0, 609, 2.5])('holds back page %s, outside the book', (page) => {
+    const commit = stubAction('commit')
+    state().setCurrentPage(DUNE, page)
+    expect(commit).not.toHaveBeenCalled()
+  })
+
+  it('does nothing with the same page or a book that is not in Leyendo', () => {
+    state().setCurrentPage(DUNE, 210)
+    state().dismissToast()
+    state().setCurrentPage(DUNE, 210)
+    state().setCurrentPage(IT, 10)
+    expect(state().toast).toBeNull()
+    expect(state().library[IT]).not.toHaveProperty('currentPage')
+  })
+
+  it('keeps the page after the book is finished', () => {
+    state().setCurrentPage(DUNE, 210)
+    state().finishBook(DUNE, { startedAt: daysAgo(30), finishedAt: today() })
+    expect(state().library[DUNE]).toMatchObject({ status: 'read', currentPage: 210 })
+  })
+})
+
 describe('answerWantPrompt', () => {
   const IT = 'OL81613W' // Lo quiero hace 210 días, en Terror
 

@@ -140,7 +140,7 @@ export function BookPage() {
               />
             </LedgerRow>
             {entry && WITH_READING.includes(entry.status) && (
-              <ReadingDetails bookId={book.id} entry={entry} />
+              <ReadingDetails bookId={book.id} entry={entry} pages={book.pages} />
             )}
             {entry && <BookFolders book={book} entry={entry} />}
           </dl>
