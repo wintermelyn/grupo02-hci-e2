@@ -760,6 +760,21 @@ describe('the page in Leyendo', () => {
     expect(main().queryByText(/Escribe un número/)).not.toBeInTheDocument()
   })
 
+  it('shows the saved page again when it is written another way or with only spaces', () => {
+    state().setCurrentPage(DUNE_ID, 608)
+    renderApp(`/libro/${DUNE_ID}`)
+    typePage('0608')
+    expect(pageField()).toHaveValue('608')
+    expect(entry().currentPage).toBe(608)
+  })
+
+  it('clears a field of only spaces when there is no saved page', () => {
+    renderApp(`/libro/${DUNE_ID}`)
+    typePage('   ')
+    expect(pageField()).toHaveValue('')
+    expect(entry()).not.toHaveProperty('currentPage')
+  })
+
   it('keeps the page out of sight once the book is finished', () => {
     state().setCurrentPage(DUNE_ID, 210)
     renderApp(`/libro/${DUNE_ID}`)

@@ -113,9 +113,14 @@ function PageRow({ page, pages, onCommit }: PageRowProps) {
 
   function commit() {
     const text = draft.trim()
-    if (text === saved) return
-    // Emptying the field is not a page: it goes back to the saved one.
-    if (!text || !onCommit(/^\d+$/.test(text) ? Number(text) : Number.NaN)) setDraft(saved)
+    const next = /^\d+$/.test(text) ? Number(text) : Number.NaN
+    // An empty field is not a page, and "0608" or " 608 " is the saved page written another way:
+    // both show the saved page again, as the store does not change.
+    if (!text || String(next) === saved) {
+      setDraft(saved)
+      return
+    }
+    if (!onCommit(next)) setDraft(saved)
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
