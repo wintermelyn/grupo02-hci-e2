@@ -221,7 +221,7 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 | `undo()`, `resetDemo()` | Base | `resetDemo` limpia localStorage y vuelve al estado inicial |
 | `finishBook(bookId, { startedAt, finishedAt, rating? })` | A | **Es la única forma de dejar un libro en `read`.** También guarda las fechas y el puntaje que se editan en la ficha |
 | `setStartDate(bookId, startedAt)` | A | Corrige el inicio de un libro en `reading`, sin terminarlo. Lo usa la fila "Inicio" de la ficha |
-| `setCurrentPage(bookId, page)` | A | Guarda la página de un libro en `reading`, de 1 al total del libro si se conoce, con el aviso "Vas en la página 210 de «Dune»" y Deshacer. Al terminar el libro la página queda guardada, pero no se muestra. Lo usa la fila "Página", cuyo campo se llama "Vas en la página" |
+| `setCurrentPage(bookId, page)` | A | Guarda la página de un libro en `reading`, de 1 al total del libro si se conoce, con el aviso "Vas en la página 210" y Deshacer (la persona está en la ficha del libro, así que el aviso cabe en una línea en el celular). Al terminar el libro la página queda guardada, pero no se muestra. Lo usa la fila "Página", cuyo campo se llama "Vas en la página" |
 | `removeFromLibrary(bookIds[])` | A | |
 | `createFolder(name) → id`, `renameFolder(id, name)`, `deleteFolder(id)` | A | No se puede borrar una carpeta `pinned` |
 | `addToFolder(bookIds[], folderId)`, `removeFromFolder(bookIds[], folderId)` | A | |

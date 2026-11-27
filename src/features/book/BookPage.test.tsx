@@ -722,7 +722,7 @@ describe('the page in Leyendo', () => {
     renderApp(`/libro/${DUNE_ID}`)
     typePage('210')
     expect(entry().currentPage).toBe(210)
-    expect(toast()).toHaveTextContent('Vas en la página 210 de «Dune»')
+    expect(toast()).toHaveTextContent('Vas en la página 210')
     fireEvent.click(undoButton())
     expect(entry()).not.toHaveProperty('currentPage')
     expect(pageField()).toHaveValue('')

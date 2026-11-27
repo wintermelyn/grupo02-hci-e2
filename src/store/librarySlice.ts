@@ -144,7 +144,7 @@ export const createLibrarySlice: SliceCreator<LibraryActions> = (set, get) => {
       const current = selectEntry(bookId)(get())
       if (current?.status !== 'reading' || current.currentPage === page) return
       if (pageProblem(page, get().getBook(bookId)?.pages)) return
-      get().commit(`Vas en la página ${page} de ${bookName(bookId)}`, ({ library }) => ({
+      get().commit(`Vas en la página ${page}`, ({ library }) => ({
         library: { ...library, [bookId]: { ...current, currentPage: page } },
       }))
     },

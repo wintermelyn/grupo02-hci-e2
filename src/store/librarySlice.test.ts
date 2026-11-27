@@ -283,7 +283,7 @@ describe('setCurrentPage', () => {
     state().setCurrentPage(DUNE, 210)
     expect(state().library[DUNE]).toEqual({ ...before, currentPage: 210 })
     expect(state().toast).toMatchObject({
-      message: 'Vas en la página 210 de «Dune»',
+      message: 'Vas en la página 210',
       undoable: true,
     })
     state().undo()
