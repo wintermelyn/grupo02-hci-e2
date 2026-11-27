@@ -209,7 +209,7 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 **Deshacer y toast.**
 - Todo cambio en `library` o `folders` pasa por `commit(label, mutator)`. Este guarda en `undoSnapshot` solo `{ library, folders }` y llama a `showToast(label, { undoable: true })`.
 - `<Toast/>` está montado en `AppShell` y lee `toast` del store. El botón Deshacer llama a `undo()`.
-- La copia se descarta cuando el toast desaparece (5 s).
+- La copia se descarta cuando el toast desaparece (10 s).
 
 **Selectores (Zustand v5).** Nunca escribir `useStore(s => s.lista.filter(...))`, porque cada render crea un array nuevo y entra en un loop. Se selecciona el dato tal cual y se deriva con `useMemo`, o se usa `useShallow`.
 

@@ -13,7 +13,7 @@ import type { Toast as ToastData } from '../types'
 type Hold = 'hover' | 'focus' | 'menu'
 
 /**
- * Renders the store's toast. The store hides it after 5 s (TOAST_DURATION_MS) and drops the
+ * Renders the store's toast. The store hides it after 10 s (TOAST_DURATION_MS) and drops the
  * undo copy at the same time. Mounted once, in AppShell.
  */
 export function Toast() {
