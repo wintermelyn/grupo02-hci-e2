@@ -8,6 +8,11 @@ import type { Book, LibraryEntry } from '../../types'
 export interface LeaveLibraryProps {
   book: Book
   entry: LibraryEntry
+  /**
+   * The question goes with the book, so whoever shows it decides where the focus goes. It has to be
+   * something that stays: the toast keeps it, to give it back after Deshacer or on Tab.
+   */
+  onLeave: () => void
 }
 
 /**
@@ -15,7 +20,7 @@ export interface LeaveLibraryProps {
  * sits one tap away from it. In testing the two together made people wary of the menu, so this one
  * asks in the page and says what goes with the book. Deshacer still follows.
  */
-export function LeaveLibrary({ book, entry }: LeaveLibraryProps) {
+export function LeaveLibrary({ book, entry, onLeave }: LeaveLibraryProps) {
   const folders = useStore((state) => state.folders)
   const removeFromLibrary = useStore((state) => state.removeFromLibrary)
   const focusToast = useStore((state) => state.focusToast)
@@ -45,6 +50,7 @@ export function LeaveLibrary({ book, entry }: LeaveLibraryProps) {
   function leave({ detail }: MouseEvent) {
     // The record shrinks as the book leaves, and the second tap would land on what comes up.
     ignoreSecondClick()
+    onLeave()
     removeFromLibrary([book.id])
     // Enter and Space send a click with no clicks counted. By keyboard, Deshacer is too far away.
     if (detail === 0) focusToast()
