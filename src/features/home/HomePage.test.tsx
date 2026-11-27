@@ -100,10 +100,12 @@ describe('Inicio', () => {
     expect(screen.getByRole('link', { name: /Carrie/ }).style.backgroundColor).not.toBe('')
   })
 
-  it('says on a reading card which friend has the same book', () => {
+  it('says on a reading card what a friend does with the same book, next to the person', () => {
     renderApp('/')
     const section = screen.getByRole('heading', { name: 'Leyendo ahora' }).closest('section')!
-    expect(within(section).getByRole('link', { name: /Dune/ })).toHaveTextContent('Diego empezó')
+    const dune = within(section).getByRole('link', { name: /Dune/ })
+    expect(dune).toHaveTextContent('Diego también lo lee')
+    expect(dune).not.toHaveTextContent('empezó')
   })
 
   it('puts the rows on shell, with the cover loose and no tone of its book', () => {

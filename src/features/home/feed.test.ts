@@ -6,6 +6,7 @@ import {
   activitySentence,
   buildFeed,
   groupByPeriod,
+  alongsideSentence,
   pageProgress,
   readingTime,
   shortTimeAgo,
@@ -52,6 +53,19 @@ describe('activitySentence', () => {
     const user = state().users.find(({ id }) => id === 'diego')!
     const item = { activity: activity('a', daysAgo(0), { kind: 'want' }), user, book }
     expect(activitySentence(item)).toBe('Diego quiere leer Un libro')
+  })
+})
+
+describe('alongsideSentence', () => {
+  it.each([
+    ['started', 'Diego también lo lee'],
+    ['finished', 'Diego ya lo terminó'],
+    ['want', 'Diego también lo quiere leer'],
+  ] as const)('says what a friend who %s the book does alongside the person', (kind, sentence) => {
+    const user = state().users.find(({ id }) => id === 'diego')!
+    expect(alongsideSentence({ activity: activity('a', daysAgo(0), { kind }), user })).toBe(
+      sentence,
+    )
   })
 })
 

@@ -4,8 +4,7 @@ import { Avatar, BookCover, bookPath, Button, EmptyState } from '../../component
 import { cx } from '../../components/cx'
 import { coverTone } from '../../lib/coverTone'
 import {
-  ACTIVITY_VERBS,
-  firstName,
+  alongsideSentence,
   pageProgress,
   readingTime,
   type FeedItem,
@@ -100,9 +99,7 @@ function ReadingCard({ book, entry, company, friend }: ReadingCardProps) {
           {friend && (
             <span className={cx('mb-1 flex items-center gap-1.5 text-white/88', whenRoomy)}>
               <Avatar user={friend.user} size="xs" />
-              <span className="min-w-0 truncate">
-                {firstName(friend.user.name)} {ACTIVITY_VERBS[friend.activity.kind]}
-              </span>
+              <span className="min-w-0 truncate">{alongsideSentence(friend)}</span>
             </span>
           )}
           {progress ? (
