@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { TOAST_DURATION_MS } from '../store/coreSlice'
 import { state } from '../test/store'
-import { Toast } from './Toast'
+import { Toast, TOAST_SPACE } from './Toast'
 
 beforeEach(() => {
   vi.useFakeTimers()
@@ -16,6 +16,19 @@ describe('Toast', () => {
     expect(screen.queryByRole('button', { name: 'Deshacer' })).not.toBeInTheDocument()
     act(() => vi.advanceTimersByTime(TOAST_DURATION_MS))
     expect(screen.getByRole('status')).toBeEmptyDOMElement()
+  })
+
+  it('says how far it reaches from the bottom while it is up, so the page can clear it', () => {
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(
+      DOMRect.fromRect({ x: 16, y: window.innerHeight - 132, width: 358, height: 52 }),
+    )
+    const space = () => document.documentElement.style.getPropertyValue(TOAST_SPACE)
+    render(<Toast />)
+    expect(space()).toBe('')
+    act(() => state().commit('Agregado a «Próximos»', () => ({})))
+    expect(space()).toBe('132px')
+    act(() => vi.advanceTimersByTime(TOAST_DURATION_MS))
+    expect(space()).toBe('')
   })
 
   it('keeps Deshacer on screen with a long name without spaces', () => {

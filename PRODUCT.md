@@ -44,9 +44,9 @@ El informe y el plan mandan sobre este archivo. Si se contradicen, el orden es `
 **Lo que hace el producto:**
 
 - Mis libros, con tablero de carpetas y la carpeta fija "Próximos" primero.
-- Cuatro tags excluyentes y visibles en cada lista: Lo quiero, Lo tengo, Leyendo y Leído. "Lo tengo" significa que lo tengo y no lo he leído.
+- Cuatro tags excluyentes y visibles en cada lista: Quiero leerlo, Lo tengo, Leyendo y Leído. "Lo tengo" significa que lo tengo y no lo he leído.
 - Botones de tag para filtrar, en Mis libros y dentro de cada carpeta.
-- Aviso "¿Sigues queriendo leer este libro?", con un libro antiguo a la vez y botones "Sí" y "No".
+- Aviso "¿Sigues queriendo leer este libro?", con un libro antiguo a la vez y botones "Sí" y "No, quitarlo", que pide confirmar.
 - Búsqueda de cualquier usuario dentro de Amigos, con "+ Agregar" y el estado "Solicitud enviada".
 - Descubrir, con "Seleccionados para ti" al mismo nivel que las listas prehechas.
 - Buscar, solo de libros y autores.
@@ -88,8 +88,8 @@ No hay métricas de uso, resultados de evaluación con usuarios ni testimonios p
 1. **Se entiende al primer uso.** Si algo requiere explicación, conocer la app antes o una instrucción de la evaluación, hay que corregirlo en la pantalla.
 2. **El archivo va primero.** Ante la duda, gana lo que ayuda a mantener la biblioteca ordenada y al día.
 3. **El estado y el lugar son independientes.** Ningún cambio de tag mueve un libro de sus carpetas, y ninguna pantalla debe sugerir lo contrario.
-4. **Equivocarse no cuesta.** Lo reversible se aplica de inmediato y se puede deshacer. Solo Reiniciar demo y eliminar carpeta piden confirmación.
-5. **Las opciones pesan lo mismo.** Agregar y quitar, o "Sí" y "No", cuestan los mismos pasos, y la interfaz no empuja a la persona hacia ninguna.
+4. **Equivocarse no cuesta.** Lo reversible se aplica de inmediato y se puede deshacer. Solo Reiniciar demo, eliminar carpeta y sacar un libro de Mis libros piden confirmación, y lo último además se puede deshacer.
+5. **Las opciones pesan lo mismo.** Agregar y quitar, o "Sí" y "No", cuestan los mismos pasos, y la interfaz no empuja a la persona hacia ninguna. La excepción es sacar un libro de Mis libros, que pide confirmar porque en la E3 asustó.
 
 ## Accessibility & Inclusion
 

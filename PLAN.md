@@ -27,7 +27,7 @@ Son las tareas que el prototipo debe permitir completar de principio a fin. Las 
   - **Punto de partida:** el libro está en la carpeta "Terror", con el tag "Leyendo".
   - **Resultado:** el libro tiene el tag "Leído", sigue en "Terror" y muestra sus fechas de inicio y fin. El puntaje es opcional.
 - **T2:** ordenar mi lista de pendientes, separando lo que quiero leer pronto y sacando lo que ya no me interesa (decisiones 1, 3 y 5).
-  - **Punto de partida:** Mis libros → botón "Lo quiero", que muestra 17 libros.
+  - **Punto de partida:** Mis libros → botón "Quiero leerlo", que muestra 17 libros.
   - **Resultado:** los libros elegidos están también en la carpeta "Próximos", sin salir de sus otras carpetas, y los descartados ya no están en mi biblioteca.
 - **T3:** agregar como amigo a una persona que conozco (journey 2.1 y decisión 4).
   - **Punto de partida:** Más → Amigos.
@@ -56,7 +56,7 @@ Es una página web responsiva. En el celular y la tablet tiene una barra de nave
 | `/amigos/:userId` | **Persona:** qué lee, libros en común, botón agregar o estado de la solicitud | B |
 | `/perfil` | **Mi perfil:** nombre, @usuario, **Reiniciar demo** | B |
 
-Barra de navegación, en este orden: **Inicio · Mis libros · Descubrir · Buscar · Más**. Cada ícono va con su etiqueta de texto. "Más" queda activa también en `/amigos` y `/perfil`.
+Barra de navegación, en este orden: **Inicio · Mis libros · Descubrir · Buscar · Más**. Cada ícono va con su etiqueta de texto. "Más" queda activa también en `/amigos` y `/perfil`. En la barra lateral, "Más" lleva debajo "Amigos y perfil", porque en la E3 una persona buscó a sus amigos en la barra y no encontró pista; en la barra inferior no cabe.
 
 ### Decisiones de diseño que el prototipo debe mostrar
 D1 a D6 son las decisiones 1 a 6 del informe, con la misma numeración. La columna "Pantalla" sirve para llenar "Dónde se ve en el prototipo" (sección 5 del informe).
@@ -64,10 +64,10 @@ D1 a D6 son las decisiones 1 a 6 del informe, con la misma numeración. La colum
 | # | Elemento | Necesidad | Pantalla |
 |---|---|---|---|
 | D1 | **Carpetas en tablero:** reemplazan a las estanterías. Un libro puede estar en varias a la vez y el tag no depende de la carpeta. Carpeta fija **"Próximos"** primero | N1 | Mis libros, ficha |
-| D2 | **Tags visibles:** *Lo quiero · Lo tengo · Leyendo · Leído* junto al título en cada lista. Se cambian en la ficha: el tag con un lápiz abre el selector | N4 | Listas, ficha |
-| D3 | **Botones de tag:** *Todos · Lo quiero · Lo tengo · Leyendo · Leído*. En Mis libros muestran los libros de toda la biblioteca y dentro de una carpeta solo los de esa carpeta. El botón activo se ve marcado | N4 | Mis libros, carpeta |
+| D2 | **Tags visibles:** *Quiero leerlo · Lo tengo · Leyendo · Leído* junto al título en cada lista. Se cambian en la ficha: el tag con un lápiz abre el selector | N4 | Listas, ficha |
+| D3 | **Botones de tag:** *Todos · Quiero leerlo · Lo tengo · Leyendo · Leído*. En Mis libros muestran los libros de toda la biblioteca y dentro de una carpeta solo los de esa carpeta. El botón activo se ve marcado | N4 | Mis libros, carpeta |
 | D4 | **Buscar usuarios en Amigos:** la barra encuentra a cualquier usuario por nombre o @usuario. Cada resultado trae avatar, amigos en común y "+ Agregar". Estado "Solicitud enviada" visible. "Conectar con más amigos" pasa a llamarse "Invitar contactos" y queda como opción secundaria | N2 | Amigos |
-| D5 | **Aviso "¿Sigues queriendo leer este libro?":** un libro antiguo de "Lo quiero" a la vez, con portada, título, lo que cuesta el "No" y botones "Sí" y "No". "No" muestra "«It» salió de Mis libros y de Terror" con Deshacer | N1 | Mis libros |
+| D5 | **Aviso "¿Sigues queriendo leer este libro?":** un libro antiguo de "Quiero leerlo" a la vez, con portada, título, lo que cuesta el "No" y botones "Sí" y "No, quitarlo". "No, quitarlo" pide confirmar en la fila y muestra "«It» salió de Mis libros y de Terror" con Deshacer | N1 | Mis libros |
 | D6 | **"Seleccionados para ti" en Descubrir:** las recomendaciones según los gustos quedan al mismo nivel que las listas prehechas | N5 | Descubrir |
 | — | **Toast con Deshacer** después de cada cambio en la biblioteca | — | Global |
 | — | Pantallas de **carga, sin resultados y error** | — | Buscar y ficha. Amigos solo tiene "sin resultados" y "sin amigos", porque su directorio está en la app |
@@ -138,8 +138,8 @@ Una app real tendría su propia base de datos indexada, con cada libro nuevo ya 
 ### Aviso periódico (D5)
 - **A qué libro pregunta:** al libro en `want` con la fecha `wantCheckedAt ?? addedAt` más antigua, si tiene más de 90 días (`WANT_PROMPT_AFTER_DAYS`). Con el seed, el primero es *It*.
 - **Cuándo aparece:** como tarjeta arriba de Mis libros, sin bloquear la pantalla, si hay un libro que cumpla y `lastWantPromptOn` no es hoy. Sigue ahí hasta que la persona responde, así que una tarea no lo pierde por entrar y salir de la sección.
-- **"Sí":** deja `wantCheckedAt = today()` y muestra el toast "«It» sigue en Lo quiero", con Deshacer como todo cambio en la biblioteca.
-- **"No":** saca el libro de la biblioteca y de sus carpetas, y muestra el toast "«It» salió de Mis libros y de Terror" con Deshacer. Bajo la pregunta, el aviso ya dijo "Si dices No, sale de Mis libros y de Terror".
+- **"Sí":** deja `wantCheckedAt = today()` y muestra el toast "«It» sigue en Quiero leerlo", con Deshacer como todo cambio en la biblioteca.
+- **"No, quitarlo":** pide confirmar en la misma fila, con `InlineConfirm` ("¿Quitar «It» de Mis libros?", "Sale de Mis libros y de Terror."). Al confirmar saca el libro de la biblioteca y de sus carpetas, y muestra el toast "«It» salió de Mis libros y de Terror" con Deshacer. Bajo la pregunta, el aviso ya dijo "Si dices No, sale de Mis libros y de Terror". En la E3, "Sí" y "No" iguales hicieron temer el "No", así que se distingue: dice lo que hace, va sin borde (`quiet`) y no actúa al primer toque.
 - **Después de responder:** `lastWantPromptOn = today()`, así que no aparece otro aviso ese día. Deshacer también devuelve ese dato, en `undoSnapshot`, así que el aviso vuelve a preguntar por el mismo libro, igual que al deshacer "Quitar de Mis libros" en la ficha. El foco va a la pregunta y el aviso queda completo a la vista.
 
 ### Glosario (interfaz ↔ código)
@@ -148,7 +148,7 @@ Una app real tendría su propia base de datos indexada, con cada libro nuevo ya 
 | Libro | `Book` | Datos del catálogo; no depende del usuario |
 | Mi biblioteca | `library` | Libros que el usuario agregó |
 | Entrada | `LibraryEntry` | Relación usuario–libro: tag, fechas, puntaje, carpetas |
-| Tag: Lo quiero / Lo tengo / Leyendo / Leído | `status: 'want' \| 'owned' \| 'reading' \| 'read'` | Uno solo a la vez y sin relación con las carpetas. "Lo tengo" significa que lo tengo y no lo he leído. "Tag" es palabra del plan: la interfaz muestra solo el nombre de cada uno |
+| Tag: Quiero leerlo / Lo tengo / Leyendo / Leído | `status: 'want' \| 'owned' \| 'reading' \| 'read'` | Uno solo a la vez y sin relación con las carpetas. "Lo tengo" significa que lo tengo y no lo he leído. "Tag" es palabra del plan: la interfaz muestra solo el nombre de cada uno |
 | Carpeta | `Folder` | La crea el usuario. Un libro puede estar en varias |
 | Mis carpetas | | Título del tablero dentro de la sección Mis libros |
 | Próximos | `Folder` con `pinned: true` | Viene precargada y no se puede borrar |
@@ -164,7 +164,7 @@ type ReadingStatus = 'want' | 'owned' | 'reading' | 'read';
 type ISODate = string;           // "2026-10-27"
 
 interface Book { id: BookId; title: string; authors: string[]; coverUrl?: string; description?: string; descriptionTranslated?: boolean; year?: number; pages?: number; coverColor?: string }
-interface LibraryEntry { bookId: BookId; status: ReadingStatus; folderIds: string[]; addedAt: ISODate; wantCheckedAt?: ISODate; startedAt?: ISODate; finishedAt?: ISODate; rating?: number }
+interface LibraryEntry { bookId: BookId; status: ReadingStatus; folderIds: string[]; addedAt: ISODate; wantCheckedAt?: ISODate; startedAt?: ISODate; finishedAt?: ISODate; rating?: number; currentPage?: number }
 interface Folder { id: string; name: string; pinned?: boolean; createdAt: ISODate }
 interface User { id: string; name: string; username: string; avatarColor: string; mutualFriends: number; readingIds: BookId[]; readIds: BookId[] }
 interface Friendship { userId: string; status: 'pending' | 'friends'; since: string } // fecha y hora ISO
@@ -209,7 +209,7 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 **Deshacer y toast.**
 - Todo cambio en `library` o `folders` pasa por `commit(label, mutator)`. Este guarda en `undoSnapshot` solo `{ library, folders }` y llama a `showToast(label, { undoable: true })`.
 - `<Toast/>` está montado en `AppShell` y lee `toast` del store. El botón Deshacer llama a `undo()`.
-- La copia se descarta cuando el toast desaparece (5 s).
+- La copia se descarta cuando el toast desaparece (10 s).
 
 **Selectores (Zustand v5).** Nunca escribir `useStore(s => s.lista.filter(...))`, porque cada render crea un array nuevo y entra en un loop. Se selecciona el dato tal cual y se deriva con `useMemo`, o se usa `useShallow`.
 
@@ -221,6 +221,7 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 | `undo()`, `resetDemo()` | Base | `resetDemo` limpia localStorage y vuelve al estado inicial |
 | `finishBook(bookId, { startedAt, finishedAt, rating? })` | A | **Es la única forma de dejar un libro en `read`.** También guarda las fechas y el puntaje que se editan en la ficha |
 | `setStartDate(bookId, startedAt)` | A | Corrige el inicio de un libro en `reading`, sin terminarlo. Lo usa la fila "Inicio" de la ficha |
+| `setCurrentPage(bookId, page)` | A | Guarda la página de un libro en `reading`, de 1 al total del libro si se conoce, con el aviso "Vas en la página 210" y Deshacer (la persona está en la ficha del libro, así que el aviso cabe en una línea en el celular). Al terminar el libro la página queda guardada, pero no se muestra. Lo usa la fila "Página", cuyo campo se llama "Vas en la página" |
 | `removeFromLibrary(bookIds[])` | A | |
 | `createFolder(name) → id`, `renameFolder(id, name)`, `deleteFolder(id)` | A | No se puede borrar una carpeta `pinned` |
 | `addToFolder(bookIds[], folderId)`, `removeFromFolder(bookIds[], folderId)` | A | |
@@ -232,7 +233,7 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 **Elegir "Leído":**
 - `StatusControl` llama a `finishBook(bookId, { startedAt: entry?.startedAt ?? entry?.addedAt ?? today(), finishedAt: entry?.finishedAt ?? today(), rating: entry?.rating })`, nunca a `setStatus`.
 - No hay un paso intermedio: el tag cambia al instante y aparece el toast con Deshacer. El libro sigue en sus carpetas.
-- Con el tag en "Leído", la ficha muestra inicio, fin y puntaje como filas editables, que guardan con `finishBook`. Con "Leyendo" muestra el inicio, que guarda con `setStartDate`.
+- Con el tag en "Leído", la ficha muestra inicio, fin y puntaje como filas editables, que guardan con `finishBook`. Con "Leyendo" muestra el inicio, que guarda con `setStartDate`, y la fila "Página", con "de 608" al lado y "Vas en la página" como nombre del campo, que guarda con `setCurrentPage` al presionar Enter o salir del campo.
 
 ### Componentes compartidos (`src/components/`, del bloque base)
 - **`AppShell`:** barra inferior pegada al borde bajo `lg` y barra lateral desde `lg`, `main` con su margen y su ancho, `<Toast/>` y memoria de scroll: cada página parte arriba y volver deja la lista donde estaba.
@@ -243,7 +244,7 @@ Si un rol necesita una acción nueva, la agrega en su propio slice, con su tipo 
 - **`TextField`:** un texto corto que se escribe donde se lee, con Enter para guardar, Escape para cancelar y `problem` para decir por qué no se puede guardar. Quien lo usa pone Guardar y Cancelar.
 - **`SearchField`:** campo de búsqueda que filtra mientras se escribe, con "Borrar". Con `onClose` suma "Cerrar", para un campo que el celular abre a pedido. `size="lg"` es para una pantalla cuyo primer trabajo es buscar.
 - **`Avatar`:** círculo con las iniciales sobre `avatarColor`, siempre junto al nombre. `xs` va dentro de una línea de texto.
-- **`StatusControl`:** el tag de la ficha con su lápiz (D2). Al tocarlo abre un `AnchoredMenu` junto al control, con las cuatro opciones de 48 px de alto. El menú no oscurece la pantalla y deja ver el libro. Funciona con foco, flechas, Inicio, Fin, Escape y clic afuera. El informe solo pide una "vista de selección de opciones de tags". Si el libro no está en la biblioteca, muestra "Agregar a Mis libros" y abre el mismo menú. Si está, el menú suma "Quitar de Mis libros" bajo una línea, con lo que cuesta, así que entrar y salir cuestan dos toques. Recibe `bookId` y `book`.
+- **`StatusControl`:** el tag de la ficha con su lápiz (D2). Al tocarlo abre un `AnchoredMenu` junto al control, con las cuatro opciones de 48 px de alto. Bajo cada una, una línea dice qué significa: Quiero leerlo "Para más adelante", Lo tengo "En papel o digital, sin leer aún", Leyendo "Lo estás leyendo ahora" y Leído "Ya lo terminaste". La línea va solo en el menú: las filas y los filtros quedan cortos. El menú no oscurece la pantalla y deja ver el libro. Funciona con foco, flechas, Inicio, Fin, Escape y clic afuera. El informe solo pide una "vista de selección de opciones de tags". Si el libro no está en la biblioteca, muestra "Agregar a Mis libros" y abre el mismo menú. El menú solo cambia el tag: "Quitar de Mis libros" es una acción aparte, bajo el registro de la ficha, que pide confirmar en la página. Recibe `bookId` y `book`.
 - **`StatusTag`:** el tag en solo lectura, con ícono, texto y color, sin relleno. Tamaño `sm` para las listas.
 - **`TagFilter`:** los botones de tag (D3), con la cantidad de libros de cada uno. El activo se marca con la cinta. Lo usan Mis libros y la carpeta.
 - **`Ribbon`:** la cinta, la marca de lo activo.
@@ -272,8 +273,8 @@ Si alguien necesita cambiar algo compartido, le avisa al otro rol antes y lo sub
 7. **Prevenir antes que avisar:** fechas futuras deshabilitadas, "Guardar" deshabilitado mientras algo sea inválido, "Próximos" sin la opción de borrar.
 8. **Valores por defecto útiles:** fechas ya completadas, la carpeta actual preseleccionada y nunca pedir de nuevo un dato que se mostró en la pantalla anterior.
 9. **Consistencia:** la misma acción tiene el mismo nombre (según el glosario) y el mismo componente en toda la app.
-10. **Deshacer en vez de "¿Estás seguro?"** para lo reversible. Se pide confirmación solo para Reiniciar demo y eliminar carpeta.
-11. **Simetría:** agregar y quitar tienen el mismo peso visual y la misma cantidad de pasos. Lo mismo vale para "Sí" y "No" en el aviso. "Invitar contactos" no va preseleccionado ni reaparece si se ignora.
+10. **Deshacer en vez de "¿Estás seguro?"** para lo reversible. Se pide confirmación solo para Reiniciar demo, eliminar carpeta y sacar un libro de Mis libros (en la ficha o con el "No" del aviso), que además deja Deshacer.
+11. **Simetría:** agregar y quitar tienen el mismo peso visual y la misma cantidad de pasos. En el aviso, "Sí" y "No, quitarlo" cuestan un toque cada uno para responder, pero "No" se distingue y pide confirmar, porque saca el libro (E3). "Invitar contactos" no va preseleccionado ni reaparece si se ignora.
 12. **Agrupar con tarjetas y cercanía:** cada etiqueta pegada a su campo.
 13. **Barras de acciones cortas:** máximo 4–5 opciones visibles a la vez.
 14. **Animación solo como respuesta a una acción**, nunca decorativa.
@@ -313,7 +314,7 @@ Cambian tipos usados en todo el proyecto, así que van en un solo commit para qu
   - `persist` guarda `lastWantPromptOn`, y se sube `BASE_VERSION`;
   - `buildInitialState` incluye `lastWantPromptOn: undefined`, porque `resetDemo` usa `set`, que combina claves, y sin ella el valor anterior sobrevive a "Reiniciar demo";
   - en `librarySlice`, quitar los stubs `toggleOwned` y `moveToFolder`, y agregar `answerWantPrompt`.
-- [x] **Etiquetas y estilos:** cuatro tags en `STATUS_LABELS` (*Lo quiero, Lo tengo, Leyendo, Leído*), sus estilos, `STATUS_ICONS` y `--color-owned`, con contraste de 4.5:1.
+- [x] **Etiquetas y estilos:** cuatro tags en `STATUS_LABELS` (*Quiero leerlo, Lo tengo, Leyendo, Leído*), sus estilos, `STATUS_ICONS` y `--color-owned`, con contraste de 4.5:1.
 - [x] **Componentes:**
   - `StatusControl` nuevo, según "Componentes compartidos";
   - `BookRow` con `StatusTag`, sin `selectable`, `onLongPress` ni `onRequestFinish`;
@@ -323,7 +324,7 @@ Cambian tipos usados en todo el proyecto, así que van en un solo commit para qu
   - `routes.tsx` con `/descubrir` y `/mas`;
   - placeholders `features/discover/DiscoverPage.tsx` y `features/more/MorePage.tsx`.
 - [x] **Seed de la biblioteca** (se sube `LIBRARY_SEED_VERSION`):
-  - **17 en "Lo quiero"**;
+  - **17 en "Quiero leerlo"**;
   - **5 en "Lo tengo":** los 4 de "Quiero" que tenían `owned` y el libro de Oliver Sacks;
   - **2 en "Leyendo":** *Carrie* (libro de T1, ya está en Terror), con `startedAt` hace 12 días, y *Dune*, hace 30;
   - 10 en "Leído".
@@ -355,7 +356,7 @@ Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarr
 - [x] **Carpeta:** `TagFilter`, lista de `BookRow`, buscador interno, renombrar y eliminar carpeta, y estado vacío. El título y la banda ya están.
 - [x] **Ficha**, sobre lo que dejó "Dirección visual":
   - agregar y quitar carpetas desde la fila "Carpetas", cuyos enlaces llevan a cada una;
-  - "Quitar de Mis libros", en el menú del tag;
+  - "Quitar de Mis libros", aparte y bajo el registro, con confirmación en la página;
   - estado de carga mientras se ejecuta `fetchWork`, antes de "Libro no encontrado".
 - [x] **Fechas y puntaje en la ficha:**
   - se muestran cuando el tag es "Leído";
@@ -422,11 +423,12 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Tema | Qué dice el informe | Qué hace el prototipo |
 |---|---|---|
 | "Lo tengo" | "Cada libro tiene un estado", el selector ofrece una opción entre cuatro y el filtro muestra los que "tiene y no ha leído" | Es el cuarto valor de `status`, excluyente. Reemplaza a "Poseo", así que un libro en "Leído" no registra si lo tengo |
+| "Quiero leerlo" | El tag se llama "Lo quiero" | En la prueba de la E3, 3 de 4 personas dudaron entre "Lo quiero" y "Lo tengo", y una eligió "Lo tengo" por error. Pasa a "Quiero leerlo", que dice el plan y no la posesión, y el menú del tag explica cada estado en una línea. Bajo 400 px, su botón de tag parte la etiqueta en dos líneas |
 | Fechas y puntaje al terminar | El journey 2.2.2 pasa de elegir "Leído" a volver a Mis libros, sin un paso intermedio. N4 nombra fechas y puntaje | "Leído" se aplica de inmediato con fin = hoy. Las fechas y el puntaje se editan después en la ficha |
 | Tag inicial de T1 | El paso 3 del journey 2.2.2 dice "Quiero leer", un nombre que no está entre los tags de la decisión 2 | T1 parte en "Leyendo". Falta corregir ese paso en el informe |
 | Selección múltiple | No aparece | Queda fuera. Los libros se agregan a carpetas y se quitan desde la ficha |
 | "Próximos" | No aparece | Se mantiene como carpeta fija porque es el destino de T2 |
-| "No" del aviso | "Lo quita de Lo quiero" y muestra "Quitado de tu lista" | El libro sale de Mis libros y de sus carpetas, y el aviso lo dice antes y después, con el título y sin hablar de "tu lista". Deshacer devuelve el libro y la pregunta |
+| "No" del aviso | "Lo quita de Lo quiero" y muestra "Quitado de tu lista" | El botón dice "No, quitarlo" y pide confirmar en la fila. El libro sale de Mis libros y de sus carpetas, y el aviso lo dice antes y después, con el título y sin hablar de "tu lista". Deshacer devuelve el libro y la pregunta |
 | "Cada cierto tiempo" y "mucho tiempo" | Sin valores | Un aviso respondido por día y 90 días en la lista |
 | "Mis carpetas" y "Mis libros" | La decisión 3 usa "Mis carpetas" y los journeys, "Mis libros" | "Mis libros" es la sección y "Mis carpetas", el título del tablero |
 | Libros sin carpeta | La decisión 3 habla de "todas las carpetas" | Los botones de tag en Mis libros filtran toda la biblioteca, así que también aparecen. En "Todos", una tarjeta "Sin carpeta" al final del tablero los reúne. Se ve como una carpeta, así que abre la misma pantalla, en su propia ruta: con "< Mis libros", título, botones de tag y buscador, y partiendo desde arriba |
@@ -441,18 +443,18 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Orden de la lista por tag | No aparece | Por título, para encontrar un libro conocido en una lista larga |
 | Salir de "Leído" | No aparece | No se distingue un error de una relectura, así que nada se borra: inicio y puntaje quedan, y volver a "Leyendo" solo quita el fin. Una relectura corrige el inicio en la ficha, en su fila |
 | Sección marcada en la ficha | No aparece | Ninguna, porque la ficha se abre desde cualquier sección |
-| Nombre del selector | Habla de "un lápiz" | "Cambiar o quitar" junto al lápiz, porque todo ícono lleva texto y el menú también saca el libro. Bajo 360 px va sin lápiz, para caber en una línea. El selector se titula "Estado de «título»" |
+| Nombre del selector | Habla de "un lápiz" | "Cambiar estado" junto al lápiz, porque todo ícono lleva texto, y el menú solo cambia el tag. Bajo 360 px va sin lápiz, para caber en una línea. Junto a "Quiero leerlo", el lápiz se va bajo 390 px y bajo 375 px dice "Cambiar". El selector se titula "Estado de «título»" |
 | Libros sin descripción | No aparece | La ficha mantiene la misma forma en todos los anchos. "Sobre este libro" va siempre en el mismo lugar y, sin descripción, dice "Aún no tenemos descripción de este libro.". Hoy son 2 de 1.046 libros, ambos de los 54. Mientras baja el archivo de las descripciones dice "Buscando la descripción…" en ese mismo lugar y, si falla, "No pudimos cargar la descripción." con Reintentar |
 | Descripción traducida | No aparece | Bajo la descripción, "Traducción hecha con IA" como dato de procedencia, sin cinta ni color de acento, si el libro trae `descriptionTranslated` |
 | Estrellas | No aparece | De tinta. El naranja de Goodreads compite con las portadas y como ícono llega a 3,03:1 |
 | Color de la cinta | No aparece | Burdeo `#7a2334`. Se parece al ciruela de "Lo tengo", pero el estado nunca se apoya solo en el color |
 | Nombre bajo `lg` | No aparece | "Goodreads prototipo" junto al título en cada pantalla, porque bajo `lg` no hay barra lateral. Con una acción sube a la fila de arriba, salvo en Mis libros, donde va apilado para caber a 320 px |
-| Confirmar Reiniciar demo y eliminar carpeta | No aparece. El plan pide confirmación sin decir con qué pieza | `InlineConfirm`, dentro de la página, con el foco en Cancelar. Reiniciar demo la usa cuando exista Mi perfil, en la fase 4 |
+| Confirmar Reiniciar demo, eliminar carpeta y Quitar de Mis libros | No aparece. El plan pide confirmación sin decir con qué pieza | `InlineConfirm`, dentro de la página, con el foco en Cancelar. Reiniciar demo la usa cuando exista Mi perfil, en la fase 4 |
 | Agregar y quitar a una persona | El journey solo dice "+" y "Solicitud enviada" | Estado y acción no comparten control, porque la aceptación llega sola a los 4 s. "Solicitud enviada" y "Amigos" son texto, y Agregar, Cancelar y "Quitar de amigos" son el mismo botón: pesan lo mismo y cuestan un toque, como pide la regla 11. Quitar ofrece Deshacer, y solo está en Persona. Un toque a Cancelar que cae en Quitar justo al aceptarse termina igual: sin ser amigos |
-| Carpetas de un libro sin carpetas | No aparece | La fila dice "Sin carpetas" y el botón, "Agregar". Con carpetas dice "Agregar o quitar", sin ícono, porque el más diría solo la mitad |
+| Carpetas de un libro sin carpetas | No aparece | La fila dice "Sin carpetas" y el botón, "Agregar". Con carpetas dice "Elegir carpetas", sin ícono: en la E3, "quitar" se leyó como borrar el libro, y sacarlo de una carpeta no lo saca de Mis libros |
 | Libros en común | Persona debe mostrarlos | Cada libro aparece una vez, en "Está leyendo" o "Últimos leídos", marcado "En común", y la cantidad va en el encabezado. Esas filas no muestran mi tag ni mis estrellas |
 | Buscador de la carpeta | "Buscador interno" | En la fila del título. Desde 768 px está siempre visible. En celular, "Buscar" lo abre sobre esa misma fila y "Cerrar" lo vacía y lo cierra, así aparece donde se tocó y ningún libro se mueve. En Amigos sigue siempre visible, porque es el camino de T3 |
-| Quitar de Mis libros | No aparece | Dos toques en el menú del tag, con Deshacer y sin confirmación (reglas 10 y 11). Dice lo que cuesta en una línea, con la frase del aviso de D5, porque las carpetas no se borran: "También sale de Terror", o "de sus 2 carpetas", y si además pierde fechas o puntaje, "y pierdes las fechas y el puntaje". Sin carpetas dice "Pierdes…" |
+| Quitar de Mis libros | No aparece | Un botón `quiet` aparte, bajo el registro de la ficha, y no en el menú del tag: en la E3, tenerlo junto a los estados hizo desconfiar del menú. Pide confirmar con `InlineConfirm` y dice lo que se pierde, con la frase del aviso de D5, porque las carpetas no se borran: "También sale de Terror.", o "de sus 2 carpetas", y si además pierde fechas o puntaje, "y pierdes las fechas y el puntaje". Sin carpetas dice "Pierdes…", y sin nada que perder, "No tiene carpetas, fechas ni puntaje que perder." Después ofrece Deshacer, y si se confirmó con teclado el foco va a Deshacer |
 | Aspecto de los botones | No aparece | Píldoras, como describe `DESIGN.md`. Solo el principal va relleno, y el secundario se dibuja con su borde |
 | Texto en agregar y quitar | Solo menciona "+" y un lápiz | Todo botón lleva texto (regla 1). Sin carpetas, el botón de la ficha dice "Agregar" |
 | Forma y color del avatar | No aparece | Círculo, para separarlo de una portada de un vistazo. Cinco fondos de la portada de reemplazo, sin el burdeo. Entre homónimos distingue el @usuario |
@@ -467,9 +469,9 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Orden en Amigos | No aparece | Amigos y solicitudes por nombre. Los resultados siguen el orden del directorio |
 | Largo de la actividad en Inicio | No aparece | Inicio muestra las 5 últimas. "Ver toda la actividad" abre una vista aparte, agrupada por Hoy, Esta semana y Antes, con "Ver más" por tandas y un final claro. Sin lista infinita ni caja con scroll propio |
 | "Me gusta" | No aparece en el informe E2. P1 y P2 lo mencionan en las entrevistas del E1 | Es un gesto hacia un amigo, no una cifra: sin contador ni lista de nombres. Al tocarlo, el aviso dice a quién le llega, como "Valentina verá que te gustó" |
-| Forma del aviso de D5 | Portada, título, pregunta y "Sí" y "No" | Una fila compacta sobre la lista, con portada chica, sin tarjeta, en "Todos" y "Lo quiero" |
-| "Leyendo ahora" en Inicio | "Tarjeta" que abre la ficha | Portadas grandes en dos columnas, o tres con tres libros, porque casi nadie lee más de dos o tres a la vez. Bajo cada una, "Llevas 12 días" |
-| Buscar antes de escribir | No aparece | Búsquedas recientes, cuando las hay, autores de tu biblioteca y "Lo que leen tus amigos", para reconocer en vez de recordar. Cada autor dice cuántos libros suyos hay en el catálogo, el mismo número que aparece al tocarlo. Sin el índice, esa línea queda vacía, sin mover nada |
+| Forma del aviso de D5 | Portada, título, pregunta y "Sí" y "No" | Una fila compacta sobre la lista, con portada chica, sin tarjeta, en "Todos" y "Quiero leerlo" |
+| "Leyendo ahora" en Inicio | "Tarjeta" que abre la ficha | Portadas grandes en dos columnas, o tres con tres libros, porque casi nadie lee más de dos o tres a la vez. Bajo cada una, "Llevas 12 días", o, si la persona guardó su página en la ficha, una barra de avance y "Página 210 de 608 · 35 %", sin "de 608" bajo `lg`, donde dos tarjetas comparten el ancho. Si un amigo tiene el mismo libro, la tarjeta lo dice en relación con la persona, como "Diego también lo lee", "Diego ya lo terminó" o "Diego también lo quiere leer", para no confundirlo con el estado propio |
+| Buscar antes de escribir | No aparece | Búsquedas recientes, cuando las hay, autores de tu biblioteca y "Lo que leen tus amigos", para reconocer en vez de recordar. Cada autor dice al pie cuántos libros suyos tienes, como "Tienes 4": en la E3, contar el catálogo bajo "Autores de Mis libros" se leyó como más libros de los que tiene la biblioteca. Tocarlo lista todos sus libros, con "5 libros · 4 en Mis libros" |
 | Resultados de Buscar | "Libros y autores" | Dicen cuántos hay y cuántos ya tienes. Si son más de 40 muestran los más relevantes y dicen de cuántos, como "Los 40 más relevantes de 48". Los autores siempre dicen su cantidad. Van en "Autores" y "Libros", y tocar un autor lista todos sus libros, con Atrás de vuelta a la búsqueda. Sin resultados, se ofrecen los autores como salida |
 | Catálogo y búsqueda | No aparece | 1.046 libros en archivos estáticos, buscados en el navegador. Una app real tendría su base de datos indexada; aquí se evita un segundo servicio. Los libros son muchos para que buscar tenga sentido, sin pretender que estén todos: lo que no está, no se encuentra |
 | Buscador y "+ Nueva carpeta" en Mis libros | "Buscador" sin ubicación | El buscador va en la fila del título, como en una carpeta. "+ Nueva carpeta" es la última tarjeta del tablero y el nombre se escribe ahí mismo. Mientras se escribe toma dos celdas, para que se lea el nombre y Crear y Cancelar quepan en una fila |

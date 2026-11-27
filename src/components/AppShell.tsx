@@ -1,5 +1,5 @@
 import { Compass, Ellipsis, House, LibraryBig, Search, type LucideIcon } from 'lucide-react'
-import { useRef, type ReactNode } from 'react'
+import { useId, useRef, type ReactNode } from 'react'
 import { Link, matchPath, Outlet, useLocation } from 'react-router'
 import { cx } from './cx'
 import { Ribbon } from './Ribbon'
@@ -13,6 +13,8 @@ interface Section {
   icon: LucideIcon
   /** Other sections reached from this one, which keep it marked as active. */
   alsoActiveOn?: readonly string[]
+  /** What the section holds, when its name does not say it. Only the sidebar has room for it. */
+  hint?: string
 }
 
 const SECTIONS: readonly Section[] = [
@@ -20,7 +22,14 @@ const SECTIONS: readonly Section[] = [
   { to: '/biblioteca', label: 'Mis libros', icon: LibraryBig },
   { to: '/descubrir', label: 'Descubrir', icon: Compass },
   { to: '/buscar', label: 'Buscar', icon: Search },
-  { to: '/mas', label: 'Más', icon: Ellipsis, alsoActiveOn: ['/amigos', '/perfil'] },
+  // In the E3 a person looked for their friends in the bar and found no clue in "Más".
+  {
+    to: '/mas',
+    label: 'Más',
+    icon: Ellipsis,
+    alsoActiveOn: ['/amigos', '/perfil'],
+    hint: 'Amigos y perfil',
+  },
 ]
 
 /** Screens made of rails and big cards take all the width. The rest keep a column they can read. */
@@ -44,13 +53,18 @@ interface NavItemsProps {
   iconSize: number
   /** What marks the active section, besides its fill, its weight and aria-current. */
   activeMark?: ReactNode
+  /** Shows the hint of a section under its name. */
+  withHints?: boolean
 }
 
-function NavItems({ item, link, active, idle, iconSize, activeMark }: NavItemsProps) {
+function NavItems({ item, link, active, idle, iconSize, activeMark, withHints }: NavItemsProps) {
   const { pathname, search } = useLocation()
+  const hintId = useId()
   return SECTIONS.map((section) => {
-    const { to, label, icon: Icon } = section
+    const { to, label, icon: Icon, hint } = section
     const isActive = isSectionActive(section, pathname)
+    const shownHint = withHints ? hint : undefined
+    const shownHintId = `${hintId}${to}`
     return (
       <li key={to} className={item}>
         {/* NavLink only knows its own URL. "true" says the page belongs to the section without being it. */}
@@ -58,14 +72,31 @@ function NavItems({ item, link, active, idle, iconSize, activeMark }: NavItemsPr
           to={to}
           state={linkState(to, pathname, search)}
           aria-current={isActive ? (matchPath(to, pathname) ? 'page' : 'true') : undefined}
+          aria-describedby={shownHint && shownHintId}
           className={cx(
             'relative flex transition-colors duration-100',
             link,
             isActive ? active : idle,
           )}
         >
-          <Icon aria-hidden size={iconSize} strokeWidth={isActive ? 2.4 : 2} />
-          {label}
+          {/* With a hint the icon stays on the line of the name, like the icons above it. */}
+          <Icon
+            aria-hidden
+            size={iconSize}
+            strokeWidth={isActive ? 2.4 : 2}
+            className={shownHint && 'mt-2 self-start'}
+          />
+          {shownHint ? (
+            // The name stays "Más" and the hint is read as its description.
+            <span className="flex flex-col py-1.5">
+              {label}
+              <span id={shownHintId} aria-hidden className="text-xs font-medium text-muted">
+                {shownHint}
+              </span>
+            </span>
+          ) : (
+            label
+          )}
           {isActive && activeMark}
         </Link>
       </li>
@@ -94,17 +125,19 @@ export function AppShell() {
               idle="font-medium text-muted hover:bg-shell hover:text-ink active:bg-sand"
               iconSize={20}
               activeMark={<Ribbon className="absolute top-0 right-3 h-4 w-2.5 bg-ribbon" />}
+              withHints
             />
           </ul>
         </nav>
         <p className="mt-auto px-3 text-xs text-muted">Prototipo de rediseño, proyecto de curso</p>
       </aside>
 
-      {/* Under lg the bar takes 65 px of the bottom, and the last row has to clear it and the toast. */}
+      {/* Under lg the bar takes 65 px of the bottom, and the last row has to clear it and the toast.
+          While a toast is up, Toast says how far it reaches, and the page can scroll 24 px past it. */}
       <main
         ref={main}
         className={cx(
-          'w-full min-w-0 px-(--gut) pb-[calc(8rem+env(safe-area-inset-bottom))] lg:pb-16',
+          'w-full min-w-0 px-(--gut) pb-[max(calc(8rem+env(safe-area-inset-bottom)),calc(var(--toast-space,0px)+1.5rem))] lg:pb-[max(4rem,calc(var(--toast-space,0px)+1.5rem))]',
           !isWide && 'mx-auto max-w-app lg:mx-0',
         )}
       >

@@ -2,6 +2,7 @@ import { Undo2 } from 'lucide-react'
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   type FocusEvent,
   type KeyboardEvent,
@@ -12,8 +13,11 @@ import type { Toast as ToastData } from '../types'
 
 type Hold = 'hover' | 'focus' | 'menu'
 
+/** How far the toast reaches from the bottom of the screen. `main` keeps that much room under the page. */
+export const TOAST_SPACE = '--toast-space'
+
 /**
- * Renders the store's toast. The store hides it after 5 s (TOAST_DURATION_MS) and drops the
+ * Renders the store's toast. The store hides it after 10 s (TOAST_DURATION_MS) and drops the
  * undo copy at the same time. Mounted once, in AppShell.
  */
 export function Toast() {
@@ -46,6 +50,7 @@ function ToastCard({ toast }: { toast: ToastData }) {
   const holds = useRef(new Set<Hold>())
   const focusedBefore = useRef<HTMLElement | null>(null)
   const undoRef = useRef<HTMLButtonElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
 
   const setHold = useCallback(
     (hold: Hold, active: boolean) => {
@@ -60,6 +65,28 @@ function ToastCard({ toast }: { toast: ToastData }) {
   useEffect(() => {
     if (toast.takesFocus) undoRef.current?.focus()
   }, [toast.takesFocus])
+
+  // In the E3 the toast covered the last lines of a book page. Measured, because a long message
+  // takes two lines, and the toast sits higher over the bottom bar than over the page on a computer.
+  useLayoutEffect(() => {
+    const card = cardRef.current
+    if (!card) return
+    const root = document.documentElement
+    const measure = () => {
+      const { top, height } = card.getBoundingClientRect()
+      if (height > 0)
+        root.style.setProperty(TOAST_SPACE, `${Math.ceil(window.innerHeight - top)}px`)
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(card)
+    window.addEventListener('resize', measure)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', measure)
+      root.style.removeProperty(TOAST_SPACE)
+    }
+  }, [])
 
   useEffect(() => {
     if (!menuOpen) return
@@ -102,6 +129,7 @@ function ToastCard({ toast }: { toast: ToastData }) {
 
   return (
     <div
+      ref={cardRef}
       onPointerEnter={(event) => setHover(event, true)}
       onPointerLeave={(event) => setHover(event, false)}
       onFocus={onFocus}

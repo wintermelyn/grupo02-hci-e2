@@ -1,5 +1,6 @@
 import { today } from '../lib/dates'
 import { placesLeft } from '../lib/leaveLibrary'
+import { pageProblem } from '../lib/pages'
 import { STATUS_LABELS } from '../lib/status'
 import type { AppState, BookId, ISODate, LibraryEntry } from '../types'
 import type { SliceCreator } from '.'
@@ -20,6 +21,8 @@ export interface LibraryActions {
   finishBook: (bookId: BookId, details: FinishDetails) => void
   /** Corrects when a book in Leyendo was started, which finishBook cannot do: it ends the reading. */
   setStartDate: (bookId: BookId, startedAt: ISODate) => void
+  /** Saves the page a book in Leyendo is on, from 1 to its pages when they are known. */
+  setCurrentPage: (bookId: BookId, page: number) => void
   removeFromLibrary: (bookIds: BookId[]) => void
   /** Returns the new folder id. */
   createFolder: (name: string) => string
@@ -59,6 +62,22 @@ function uniqueFolderId(name: string, taken: Set<string>): string {
 function without(library: Library, bookIds: Iterable<BookId>): Library {
   const removed = new Set(bookIds)
   return Object.fromEntries(Object.entries(library).filter(([bookId]) => !removed.has(bookId)))
+}
+
+/** What the toast says after correcting a reading already in Leído, so it names what was saved. */
+function readingChangeLabel(before: LibraryEntry, after: LibraryEntry): string {
+  const start = before.startedAt !== after.startedAt
+  const end = before.finishedAt !== after.finishedAt
+  const rating = before.rating !== after.rating
+  if (rating && !start && !end) {
+    if (after.rating === undefined) return 'Puntaje quitado'
+    return `Puntaje guardado: ${after.rating} ${after.rating === 1 ? 'estrella' : 'estrellas'}`
+  }
+  if (rating) return 'Lectura actualizada'
+  if (start && end) return 'Fechas de inicio y término cambiadas'
+  if (start) return 'Fecha de inicio cambiada'
+  if (end) return 'Fecha de término cambiada'
+  return 'Lectura actualizada'
 }
 
 function withFolderIds(
@@ -109,15 +128,24 @@ export const createLibrarySlice: SliceCreator<LibraryActions> = (set, get) => {
 
       let label = `Agregado a Mis libros como «${STATUS_LABELS.read}»`
       if (current) label = `Estado cambiado a «${STATUS_LABELS.read}»`
-      if (current?.status === 'read') label = 'Lectura actualizada'
+      if (current?.status === 'read') label = readingChangeLabel(current, entry)
       get().commit(label, ({ library }) => ({ library: { ...library, [bookId]: entry } }))
     },
 
     setStartDate: (bookId, startedAt) => {
       const current = selectEntry(bookId)(get())
       if (current?.status !== 'reading' || current.startedAt === startedAt) return
-      get().commit('Lectura actualizada', ({ library }) => ({
+      get().commit('Fecha de inicio cambiada', ({ library }) => ({
         library: { ...library, [bookId]: { ...current, startedAt } },
+      }))
+    },
+
+    setCurrentPage: (bookId, page) => {
+      const current = selectEntry(bookId)(get())
+      if (current?.status !== 'reading' || current.currentPage === page) return
+      if (pageProblem(page, get().getBook(bookId)?.pages)) return
+      get().commit(`Vas en la página ${page}`, ({ library }) => ({
+        library: { ...library, [bookId]: { ...current, currentPage: page } },
       }))
     },
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { Folder } from '../types'
-import { foldersLeft, placesLeft } from './leaveLibrary'
+import type { Folder, LibraryEntry } from '../types'
+import { foldersLeft, placesLeft, whatIsLost } from './leaveLibrary'
 
 const folders: Folder[] = [
   { id: 'terror', name: 'Terror', createdAt: '2026-01-01' },
@@ -27,5 +27,41 @@ describe('foldersLeft', () => {
     ['nothing when none still exists', ['borrada'], undefined],
   ])('says %s', (_case, folderIds, left) => {
     expect(foldersLeft(folderIds, folders)).toBe(left)
+  })
+})
+
+const entry = (fields: Partial<LibraryEntry>): LibraryEntry => ({
+  bookId: 'OL1W',
+  status: 'owned',
+  folderIds: [],
+  addedAt: '2026-01-01',
+  ...fields,
+})
+
+describe('whatIsLost', () => {
+  it('names the folder the book leaves, and the dates and rating it loses', () => {
+    const lost = whatIsLost(
+      entry({ folderIds: ['terror'], startedAt: '2026-01-02', rating: 4 }),
+      folders,
+    )
+    expect(lost).toBe('También sale de Terror y pierdes las fechas y el puntaje.')
+  })
+
+  it('names the saved page among what is lost', () => {
+    const lost = whatIsLost(
+      entry({ folderIds: ['terror'], startedAt: '2026-01-02', currentPage: 210 }),
+      folders,
+    )
+    expect(lost).toBe('También sale de Terror y pierdes las fechas y la página en la que vas.')
+  })
+
+  it('counts several folders', () => {
+    expect(whatIsLost(entry({ folderIds: ['terror', 'novela'] }), folders)).toBe(
+      'También sale de sus 2 carpetas.',
+    )
+  })
+
+  it('says there is nothing to lose', () => {
+    expect(whatIsLost(entry({}), folders)).toBe('No tiene carpetas, fechas ni puntaje que perder.')
   })
 })

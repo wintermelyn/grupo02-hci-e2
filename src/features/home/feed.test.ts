@@ -6,6 +6,8 @@ import {
   activitySentence,
   buildFeed,
   groupByPeriod,
+  alongsideSentence,
+  pageProgress,
   readingTime,
   shortTimeAgo,
   timeAgo,
@@ -51,6 +53,38 @@ describe('activitySentence', () => {
     const user = state().users.find(({ id }) => id === 'diego')!
     const item = { activity: activity('a', daysAgo(0), { kind: 'want' }), user, book }
     expect(activitySentence(item)).toBe('Diego quiere leer Un libro')
+  })
+})
+
+describe('alongsideSentence', () => {
+  it.each([
+    ['started', 'Diego también lo lee'],
+    ['finished', 'Diego ya lo terminó'],
+    ['want', 'Diego también lo quiere leer'],
+  ] as const)('says what a friend who %s the book does alongside the person', (kind, sentence) => {
+    const user = state().users.find(({ id }) => id === 'diego')!
+    expect(alongsideSentence({ activity: activity('a', daysAgo(0), { kind }), user })).toBe(
+      sentence,
+    )
+  })
+})
+
+describe('pageProgress', () => {
+  it('says the page, the length and the percent', () => {
+    expect(pageProgress(210, 412)).toEqual({
+      page: 'Página\u00a0210',
+      total: 'de\u00a0412',
+      percentLabel: '51\u00a0%',
+      percent: 51,
+    })
+  })
+
+  it('says only the page of a book with no known length', () => {
+    expect(pageProgress(210, undefined)).toEqual({ page: 'Página\u00a0210' })
+  })
+
+  it('is nothing until a page is saved', () => {
+    expect(pageProgress(undefined, 412)).toBeUndefined()
   })
 })
 

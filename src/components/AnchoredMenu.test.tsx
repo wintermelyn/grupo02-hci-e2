@@ -48,6 +48,29 @@ describe('AnchoredMenu', () => {
     expect(onSelect).not.toHaveBeenCalled()
   })
 
+  it('says what an option means below its label, out of its name, with the check on the label', () => {
+    render(
+      <Menu
+        options={[
+          { id: 'a', label: 'Uno', detail: 'El primero', checked: true, onSelect },
+          { id: 'b', label: 'Dos', onSelect },
+        ]}
+      />,
+    )
+    open()
+    const first = radio('Uno')
+    expect(first).toHaveAccessibleDescription('El primero')
+    expect(first.firstElementChild).toHaveTextContent('UnoActual')
+    expect(screen.getByText('El primero')).toHaveAttribute('aria-hidden', 'true')
+    expect(radio('Dos')).not.toHaveAccessibleDescription()
+  })
+
+  it('lines the detail up with the text of a label that starts with an icon', () => {
+    render(<Menu iconLabels options={[{ id: 'a', label: 'Uno', detail: 'Ayuda', onSelect }]} />)
+    open()
+    expect(screen.getByText('Ayuda')).toHaveClass('pl-6')
+  })
+
   it('breaks a long word of what a command costs, so it stays inside the menu', () => {
     render(
       <Menu actions={[{ id: 'x', label: 'Quitar', detail: 'M'.repeat(40), onSelect: vi.fn() }]} />,

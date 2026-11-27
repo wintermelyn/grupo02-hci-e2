@@ -55,6 +55,21 @@ describe('Inicio', () => {
     )
   })
 
+  it('shows how far the person is in a book with a saved page, instead of the days', () => {
+    state().setCurrentPage('OL893414W', 210)
+    renderApp('/')
+    const section = screen.getByRole('heading', { name: 'Leyendo ahora' }).closest('section')!
+    const dune = within(section).getByRole('link', { name: /Dune/ })
+    expect(dune).toHaveTextContent('Página 210 de 608 · 35 %')
+    // Two cards on a phone have room for one line: the total goes there, and the bar keeps the share.
+    expect(within(dune).getByText('de 608')).toHaveClass('max-lg:hidden')
+    expect(dune).not.toHaveTextContent('Llevas')
+    expect(dune.querySelector('[aria-hidden] > [style]')).toHaveStyle({ width: '35%' })
+    expect(within(section).getByRole('link', { name: /Carrie/ })).toHaveTextContent(
+      'Llevas 12 días',
+    )
+  })
+
   it('lets a long word of a title break, so three columns do not cut it', () => {
     setReadingBooks(3)
     renderApp('/')
@@ -82,15 +97,26 @@ describe('Inicio', () => {
     expect(within(section).getByRole('list')).toHaveClass('grid-cols-1')
   })
 
+  it('keeps the friend line on a phone when two books share the row, smaller and in two lines', () => {
+    renderApp('/')
+    const section = screen.getByRole('heading', { name: 'Leyendo ahora' }).closest('section')!
+    const line = within(section).getByText('Diego también lo lee')
+    expect(line.parentElement).not.toHaveClass('max-md:hidden')
+    expect(line.parentElement).toHaveClass('max-md:text-xs')
+    expect(line).toHaveClass('max-md:line-clamp-2')
+  })
+
   it('tints each reading card with the colour of its book', () => {
     renderApp('/')
     expect(screen.getByRole('link', { name: /Carrie/ }).style.backgroundColor).not.toBe('')
   })
 
-  it('says on a reading card which friend has the same book', () => {
+  it('says on a reading card what a friend does with the same book, next to the person', () => {
     renderApp('/')
     const section = screen.getByRole('heading', { name: 'Leyendo ahora' }).closest('section')!
-    expect(within(section).getByRole('link', { name: /Dune/ })).toHaveTextContent('Diego empezó')
+    const dune = within(section).getByRole('link', { name: /Dune/ })
+    expect(dune).toHaveTextContent('Diego también lo lee')
+    expect(dune).not.toHaveTextContent('empezó')
   })
 
   it('puts the rows on shell, with the cover loose and no tone of its book', () => {

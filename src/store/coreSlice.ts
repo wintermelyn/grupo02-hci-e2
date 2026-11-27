@@ -18,7 +18,7 @@ export interface CoreActions {
   dismissToast: () => void
   /**
    * Takes the focus to Deshacer, for an action run from the keyboard whose control leaves with it.
-   * Deshacer is the last stop of the page, too far to reach in 5 s from the middle of a list.
+   * Deshacer is the last stop of the page, too far to reach in 10 s from the middle of a list.
    */
   focusToast: () => void
   /** Stops the auto-dismiss timer while the toast is hovered or focused. */
@@ -34,7 +34,7 @@ export interface CoreActions {
    * Adds the book to the library or changes its status. Ignores ids that getBook does not know,
    * so call upsertBook first for a catalog book. Leaving Leído deletes nothing, so a mistaken Leído
    * can be fixed at any time: only Leyendo drops finishedAt, because that reading is not over.
-   * Moving to Lo quiero sets wantCheckedAt to today, so the D5 prompt does not ask about a book the
+   * Moving to Quiero leerlo sets wantCheckedAt to today, so the D5 prompt does not ask about a book the
    * person just chose.
    */
   setStatus: (bookId: BookId, status: DirectStatus) => void
@@ -42,7 +42,8 @@ export interface CoreActions {
   getBook: (id: BookId) => Book | undefined
 }
 
-export const TOAST_DURATION_MS = 5000
+/** Long enough to notice a mistake and reach Deshacer, which 5 s was not in testing. */
+export const TOAST_DURATION_MS = 10_000
 
 const DIRECT_STATUSES: readonly ReadingStatus[] = ['want', 'owned', 'reading']
 
