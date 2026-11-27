@@ -21,7 +21,14 @@ export function LeaveLibrary({ book, entry }: LeaveLibraryProps) {
   const focusToast = useStore((state) => state.focusToast)
   const [asking, setAsking] = useState(false)
   const button = useRef<HTMLButtonElement>(null)
+  const question = useRef<HTMLDivElement>(null)
   const returnFocus = useRef(false)
+
+  // The question opens where the button was, which on a phone can be under the bottom bar. After the
+  // focus goes to Cancelar, so the margins decide where it stops: clear of the bar and of the toast.
+  useEffect(() => {
+    if (asking) question.current?.scrollIntoView?.({ block: 'nearest' })
+  }, [asking])
 
   // The button only exists again once the question is gone.
   useEffect(() => {
@@ -45,15 +52,16 @@ export function LeaveLibrary({ book, entry }: LeaveLibraryProps) {
 
   if (asking) {
     return (
-      <InlineConfirm
-        title={`¿Quitar «${book.title}» de Mis libros?`}
-        confirmLabel="Quitar de Mis libros"
-        onConfirm={leave}
-        onCancel={cancel}
-        className="col-span-2 mt-3"
-      >
-        {whatIsLost(entry, folders)}
-      </InlineConfirm>
+      <div ref={question} className="col-span-2 mt-3 scroll-mt-4 scroll-mb-36 lg:scroll-mb-20">
+        <InlineConfirm
+          title={`¿Quitar «${book.title}» de Mis libros?`}
+          confirmLabel="Quitar de Mis libros"
+          onConfirm={leave}
+          onCancel={cancel}
+        >
+          {whatIsLost(entry, folders)}
+        </InlineConfirm>
+      </div>
     )
   }
 
