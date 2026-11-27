@@ -1,9 +1,8 @@
 import { Pencil, Plus } from 'lucide-react'
 import { today } from '../lib/dates'
-import { foldersLeft } from '../lib/leaveLibrary'
 import { STATUS_HINTS, STATUS_LABELS, STATUS_ORDER } from '../lib/status'
 import { selectBook, selectEntry, useStore } from '../store'
-import type { Book, BookId, Folder, LibraryEntry, ReadingStatus } from '../types'
+import type { Book, BookId, ReadingStatus } from '../types'
 import { AnchoredMenu } from './AnchoredMenu'
 import { cx } from './cx'
 import { StatusTag } from './StatusTag'
@@ -19,32 +18,12 @@ export interface StatusControlProps {
   className?: string
 }
 
-const LIST = new Intl.ListFormat('es-CL', { style: 'long', type: 'conjunction' })
-
-/** Says both things the menu does, in step with "Agregar o quitar" on the row below. */
-const CHANGE_LABEL = 'Cambiar o quitar'
+/** Only changes the tag: taking the book out is its own action, below the record, and asks first. */
+const CHANGE_LABEL = 'Cambiar estado'
 
 /**
- * Says what leaving costs for this book, so it is read before and not in the toast after. The book
- * goes out of its folders and they stay, in the same words as the D5 prompt, and only what is really
- * gone is called a loss.
- */
-function whatIsLost(entry: LibraryEntry, allFolders: Folder[]): string | undefined {
-  const { folderIds, startedAt, finishedAt, rating } = entry
-  const folders = foldersLeft(folderIds, allFolders)
-  const lost = [
-    (startedAt || finishedAt) && 'las fechas',
-    rating !== undefined && 'el puntaje',
-  ].filter((item): item is string => Boolean(item))
-  const data = lost.length > 0 ? LIST.format(lost) : undefined
-  if (folders && data) return `También sale de ${folders} y pierdes ${data}`
-  if (folders) return `También sale de ${folders}`
-  return data && `Pierdes ${data}`
-}
-
-/**
- * The tag with its pencil (D2). Opens a menu next to it; a chosen tag applies at once. Taking the
- * book out of the library lives here too: it takes the same two taps as adding it.
+ * The tag with its pencil (D2). Opens a menu next to it; a chosen tag applies at once. The menu only
+ * holds the tags, so choosing one never risks taking the book out of the library.
  */
 export function StatusControl({ bookId, book, className }: StatusControlProps) {
   const entry = useStore(selectEntry(bookId))
@@ -52,10 +31,9 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
   const setStatus = useStore((state) => state.setStatus)
   const finishBook = useStore((state) => state.finishBook)
   const upsertBook = useStore((state) => state.upsertBook)
-  const removeFromLibrary = useStore((state) => state.removeFromLibrary)
-  const folders = useStore((state) => state.folders)
   const current = entry?.status
   const statusChanged = useChanged(current)
+  const isWant = current === 'want'
 
   function choose(status: ReadingStatus) {
     // Finishing again would replace finishedAt and drop the rating of a book already in Leído.
@@ -87,16 +65,6 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
         checked: current === status,
         onSelect: () => choose(status),
       }))}
-      actions={
-        entry && [
-          {
-            id: 'remove',
-            label: 'Quitar de Mis libros',
-            detail: whatIsLost(entry, folders),
-            onSelect: () => removeFromLibrary([bookId]),
-          },
-        ]
-      }
       trigger={(triggerProps) => (
         // One button for both states, so the focus can come back to it after adding the book.
         <button
@@ -107,7 +75,7 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
             'flex min-h-11 items-center gap-3 font-semibold',
             'transition-[background-color,scale] duration-150',
             // The whole row opens the menu, so the row answers the cursor, like a date row, and
-            // Cambiar o quitar only reacts when the cursor is really on it.
+            // Cambiar estado only reacts when the cursor is really on it.
             current
               ? 'group -mx-2 w-[calc(100%+1rem)] justify-between rounded-control pl-2 hover:bg-ink/5 active:bg-ink/10'
               : 'w-full justify-center rounded-full bg-ink px-4 text-white hover:bg-ink/90 active:scale-98 active:bg-ink/80',
@@ -121,11 +89,18 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
                 status={current}
                 className={statusChanged ? 'animate-tag-in' : undefined}
               />
-              {/* An action in a row, so it is drawn as a quiet compact Button. At 320 px it only
-                  fits next to "Quiero leerlo" smaller and without the pencil: the text says it all. */}
+              {/* An action in a row, so it is drawn as a quiet compact Button. Under 360 px it is
+                  smaller and loses the pencil. "Quiero leerlo" is the longest tag: next to it the
+                  pencil goes under 390 px, and under 375 px the text says "Cambiar". The row is
+                  called Estado, and the name of the button still says it in full. */}
               <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-2.5 whitespace-nowrap transition-[background-color,scale] duration-150 group-aria-expanded:bg-sand hover:bg-sand active:scale-98 active:bg-sand-deep max-[359px]:pl-0 max-[359px]:text-sm">
-                <Pencil aria-hidden size={16} className="max-[359px]:hidden" />
-                {CHANGE_LABEL}
+                <Pencil
+                  aria-hidden
+                  size={16}
+                  className={isWant ? 'max-[390px]:hidden' : 'max-[359px]:hidden'}
+                />
+                <span className={cx(isWant && 'max-[375px]:hidden')}>{CHANGE_LABEL}</span>
+                {isWant && <span className="min-[375px]:hidden">Cambiar</span>}
               </span>
             </>
           ) : (

@@ -88,7 +88,7 @@ No hay métricas de uso, resultados de evaluación con usuarios ni testimonios p
 1. **Se entiende al primer uso.** Si algo requiere explicación, conocer la app antes o una instrucción de la evaluación, hay que corregirlo en la pantalla.
 2. **El archivo va primero.** Ante la duda, gana lo que ayuda a mantener la biblioteca ordenada y al día.
 3. **El estado y el lugar son independientes.** Ningún cambio de tag mueve un libro de sus carpetas, y ninguna pantalla debe sugerir lo contrario.
-4. **Equivocarse no cuesta.** Lo reversible se aplica de inmediato y se puede deshacer. Solo Reiniciar demo y eliminar carpeta piden confirmación.
+4. **Equivocarse no cuesta.** Lo reversible se aplica de inmediato y se puede deshacer. Solo Reiniciar demo, eliminar carpeta y Quitar de Mis libros piden confirmación, y lo último además se puede deshacer.
 5. **Las opciones pesan lo mismo.** Agregar y quitar, o "Sí" y "No", cuestan los mismos pasos, y la interfaz no empuja a la persona hacia ninguna.
 
 ## Accessibility & Inclusion

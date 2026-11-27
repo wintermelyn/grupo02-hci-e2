@@ -14,6 +14,7 @@ import {
   BOOK_RECORD,
   BookTopRow,
 } from './BookSkeleton'
+import { LeaveLibrary } from './LeaveLibrary'
 import { LedgerRow } from './LedgerRow'
 import { MissingBook } from './MissingBook'
 import { ReadingDetails } from './ReadingDetails'
@@ -144,6 +145,8 @@ export function BookPage() {
             )}
             {entry && <BookFolders book={book} entry={entry} />}
           </dl>
+          {/* A new one for each book, so a question left open is never about another one. */}
+          {entry && <LeaveLibrary key={book.id} book={book} entry={entry} />}
 
           <AboutBook book={book} />
         </div>

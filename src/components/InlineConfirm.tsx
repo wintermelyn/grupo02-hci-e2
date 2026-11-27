@@ -1,4 +1,11 @@
-import { useEffect, useId, useRef, type KeyboardEvent, type ReactNode } from 'react'
+import {
+  useEffect,
+  useId,
+  useRef,
+  type KeyboardEvent,
+  type MouseEvent,
+  type ReactNode,
+} from 'react'
 import { Button } from './Button'
 import { cx } from './cx'
 
@@ -8,7 +15,8 @@ export interface InlineConfirmProps {
   children: ReactNode
   /** Names the action, e.g. "Eliminar carpeta". */
   confirmLabel: string
-  onConfirm: () => void
+  /** Gets the click, so a confirmation made from the keyboard can send the focus on. */
+  onConfirm: (event: MouseEvent<HTMLButtonElement>) => void
   onCancel: () => void
   /**
    * From md, the title and the text share a line, for a place as tall as a row of buttons. The title

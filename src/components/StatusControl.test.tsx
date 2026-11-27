@@ -14,13 +14,12 @@ const IT = 'OL81613W' // Quiero leerlo
 const CIEN_ANOS = 'OL274505W' // Leído
 
 const option = (name: string) => screen.getByRole('menuitemradio', { name })
-const removeOption = () => screen.getByRole('menuitem', { name: /^Quitar de Mis libros/ })
 
 function renderControl(bookId: string, book?: Book) {
   renderWithRouter(<StatusControl bookId={bookId} book={book} />)
 }
 
-const trigger = (name: RegExp | string = /Cambiar o quitar/) => screen.getByRole('button', { name })
+const trigger = (name: RegExp | string = /Cambiar estado/) => screen.getByRole('button', { name })
 
 function openMenu(name?: RegExp | string) {
   fireEvent.click(trigger(name))
@@ -31,9 +30,9 @@ const key = (name: string) => fireEvent.keyDown(document.activeElement as Elemen
 describe('StatusControl', () => {
   it('shows the current tag with a labelled pencil, naming the book for screen readers', () => {
     renderControl(CARRIE)
-    const button = trigger('Leyendo. Cambiar o quitar: «Carrie»')
+    const button = trigger('Leyendo. Cambiar estado: «Carrie»')
     expect(button).toHaveTextContent('Leyendo')
-    expect(button).toHaveTextContent('Cambiar o quitar')
+    expect(button).toHaveTextContent('Cambiar estado')
   })
 
   it('offers the four tags in order and marks the current one', () => {
@@ -88,14 +87,22 @@ describe('StatusControl', () => {
     expect(state().library[IT].status).toBe('reading')
   })
 
-  it('offers to leave the library below the tags, set apart and saying what it costs', () => {
+  it('only changes the tag: leaving the library is not in the menu', () => {
     renderControl(CIEN_ANOS)
     openMenu()
-    const remove = removeOption()
-    const cost = 'También sale de Novela y pierdes las fechas y el puntaje'
-    expect(remove).toHaveTextContent(cost)
-    expect(remove).toHaveAccessibleDescription(cost)
-    expect(screen.getByRole('separator')).toBeInTheDocument()
+    const menu = screen.getByRole('menu', { name: /^Estado de/ })
+    expect(within(menu).queryByRole('menuitem')).not.toBeInTheDocument()
+    expect(within(menu).queryByText(/Quitar/)).not.toBeInTheDocument()
+    expect(screen.queryByRole('separator')).not.toBeInTheDocument()
+    expect(within(menu).getAllByRole('menuitemradio')).toHaveLength(4)
+  })
+
+  it('says Cambiar next to Quiero leerlo on a narrow phone, and the full name for screen readers', () => {
+    renderControl(IT)
+    const button = trigger('Quiero leerlo. Cambiar estado: «It»')
+    expect(screen.getByText('Cambiar estado')).toHaveClass('max-[375px]:hidden')
+    expect(screen.getByText('Cambiar', { exact: true })).toHaveClass('min-[375px]:hidden')
+    expect(button.querySelector('svg.lucide-pencil')).toHaveClass('max-[390px]:hidden')
   })
 
   it('has nothing to leave when the book is not in the library', () => {
@@ -183,11 +190,9 @@ describe('StatusControl with the keyboard', () => {
     key('ArrowDown')
     expect(option('Leído')).toHaveFocus()
     key('ArrowDown')
-    expect(removeOption()).toHaveFocus()
-    key('ArrowDown')
     expect(option('Quiero leerlo')).toHaveFocus()
     key('ArrowUp')
-    expect(removeOption()).toHaveFocus()
+    expect(option('Leído')).toHaveFocus()
   })
 
   it('jumps to the ends with Home and End', () => {
@@ -196,10 +201,10 @@ describe('StatusControl with the keyboard', () => {
     key('Home')
     expect(option('Quiero leerlo')).toHaveFocus()
     key('End')
-    expect(removeOption()).toHaveFocus()
+    expect(option('Leído')).toHaveFocus()
   })
 
-  it('opens from the control with the arrow keys, on the last tag and not on leaving', () => {
+  it('opens from the control with the arrow keys, on the last tag', () => {
     renderControl(IT)
     trigger().focus()
     key('ArrowUp')
