@@ -99,9 +99,13 @@ describe('AppShell', () => {
     },
   )
 
-  it('leaves room under the last row for the bar and the toast', () => {
+  it('leaves room under the last row for the bar, and more while a toast reaches higher', () => {
     renderApp('/')
-    expect(screen.getByRole('main').className).toContain('pb-[calc(8rem+')
+    const main = screen.getByRole('main').className
+    expect(main).toContain(
+      'pb-[max(calc(8rem+env(safe-area-inset-bottom)),calc(var(--toast-space,0px)+1.5rem))]',
+    )
+    expect(main).toContain('lg:pb-[max(4rem,calc(var(--toast-space,0px)+1.5rem))]')
   })
 
   describe('scroll between pages', () => {

@@ -100,11 +100,12 @@ export function AppShell() {
         <p className="mt-auto px-3 text-xs text-muted">Prototipo de rediseño, proyecto de curso</p>
       </aside>
 
-      {/* Under lg the bar takes 65 px of the bottom, and the last row has to clear it and the toast. */}
+      {/* Under lg the bar takes 65 px of the bottom, and the last row has to clear it and the toast.
+          While a toast is up, Toast says how far it reaches, and the page can scroll 24 px past it. */}
       <main
         ref={main}
         className={cx(
-          'w-full min-w-0 px-(--gut) pb-[calc(8rem+env(safe-area-inset-bottom))] lg:pb-16',
+          'w-full min-w-0 px-(--gut) pb-[max(calc(8rem+env(safe-area-inset-bottom)),calc(var(--toast-space,0px)+1.5rem))] lg:pb-[max(4rem,calc(var(--toast-space,0px)+1.5rem))]',
           !isWide && 'mx-auto max-w-app lg:mx-0',
         )}
       >
