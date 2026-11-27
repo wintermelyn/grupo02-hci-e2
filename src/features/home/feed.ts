@@ -1,5 +1,6 @@
 import { differenceInCalendarDays } from 'date-fns'
 import { parseDate, today } from '../../lib/dates'
+import { pagePercent } from '../../lib/pages'
 import type { Activity, Book, BookId, Friendship, ISODate, User } from '../../types'
 
 export interface FeedItem {
@@ -62,6 +63,30 @@ export function readingTime(startedAt: ISODate | undefined): string {
   const days = daysSince(startedAt)
   if (days <= 0) return 'Empezaste hoy'
   return days === 1 ? 'Llevas 1 día' : `Llevas ${days} días`
+}
+
+export interface PageProgress {
+  /** "Página 210 de 608", or "Página 210" when the length of the book is not known. */
+  page: string
+  /** "35 %", with no break before the sign. */
+  percentLabel?: string
+  percent?: number
+}
+
+/** How far the person is into a book, once they saved a page. */
+export function pageProgress(
+  currentPage: number | undefined,
+  pages: number | undefined,
+): PageProgress | undefined {
+  if (currentPage === undefined) return undefined
+  // Each number stays with its word, so a narrow card breaks between "Página 210" and "de 608".
+  if (!pages) return { page: `Página\u00a0${currentPage}` }
+  const percent = pagePercent(currentPage, pages)
+  return {
+    page: `Página\u00a0${currentPage} de\u00a0${pages}`,
+    percentLabel: `${percent}\u00a0%`,
+    percent,
+  }
 }
 
 /** What the person's current friends did, newest first. */

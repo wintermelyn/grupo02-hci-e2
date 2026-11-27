@@ -6,6 +6,7 @@ import {
   activitySentence,
   buildFeed,
   groupByPeriod,
+  pageProgress,
   readingTime,
   shortTimeAgo,
   timeAgo,
@@ -51,6 +52,24 @@ describe('activitySentence', () => {
     const user = state().users.find(({ id }) => id === 'diego')!
     const item = { activity: activity('a', daysAgo(0), { kind: 'want' }), user, book }
     expect(activitySentence(item)).toBe('Diego quiere leer Un libro')
+  })
+})
+
+describe('pageProgress', () => {
+  it('says the page, the length and the percent', () => {
+    expect(pageProgress(210, 412)).toEqual({
+      page: 'Página\u00a0210 de\u00a0412',
+      percentLabel: '51\u00a0%',
+      percent: 51,
+    })
+  })
+
+  it('says only the page of a book with no known length', () => {
+    expect(pageProgress(210, undefined)).toEqual({ page: 'Página\u00a0210' })
+  })
+
+  it('is nothing until a page is saved', () => {
+    expect(pageProgress(undefined, 412)).toBeUndefined()
   })
 })
 

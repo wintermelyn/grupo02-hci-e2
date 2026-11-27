@@ -55,6 +55,19 @@ describe('Inicio', () => {
     )
   })
 
+  it('shows how far the person is in a book with a saved page, instead of the days', () => {
+    state().setCurrentPage('OL893414W', 210)
+    renderApp('/')
+    const section = screen.getByRole('heading', { name: 'Leyendo ahora' }).closest('section')!
+    const dune = within(section).getByRole('link', { name: /Dune/ })
+    expect(dune).toHaveTextContent('Página 210 de 608 · 35 %')
+    expect(dune).not.toHaveTextContent('Llevas')
+    expect(dune.querySelector('[aria-hidden] > [style]')).toHaveStyle({ width: '35%' })
+    expect(within(section).getByRole('link', { name: /Carrie/ })).toHaveTextContent(
+      'Llevas 12 días',
+    )
+  })
+
   it('lets a long word of a title break, so three columns do not cut it', () => {
     setReadingBooks(3)
     renderApp('/')

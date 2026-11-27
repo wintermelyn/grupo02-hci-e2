@@ -3,7 +3,14 @@ import { Link, useNavigate } from 'react-router'
 import { Avatar, BookCover, bookPath, Button, EmptyState } from '../../components'
 import { cx } from '../../components/cx'
 import { coverTone } from '../../lib/coverTone'
-import { ACTIVITY_VERBS, firstName, readingTime, type FeedItem } from './feed'
+import {
+  ACTIVITY_VERBS,
+  firstName,
+  pageProgress,
+  readingTime,
+  type FeedItem,
+  type PageProgress,
+} from './feed'
 import type { ReadingBook } from './useHome'
 
 const THREE_COLUMNS = 3
@@ -30,10 +37,38 @@ interface ReadingCardProps extends ReadingBook {
   friend?: FeedItem
 }
 
+/**
+ * The saved page instead of the days, since it says how far the person is. The bar repeats the
+ * percent for the eye, so screen readers get the text only.
+ */
+function ReadingProgress({
+  page,
+  percentLabel,
+  percent,
+  company,
+}: PageProgress & { company: Company }) {
+  return (
+    <>
+      {percent !== undefined && (
+        <span aria-hidden className="mb-2 block h-1.5 overflow-hidden rounded-full bg-white/25">
+          <span className="block h-full rounded-full bg-white" style={{ width: `${percent}%` }} />
+        </span>
+      )}
+      <span className={cx('block font-semibold', company === 'many' && 'max-[359px]:text-xs')}>
+        {page}
+        {percentLabel && (
+          <span className="font-normal whitespace-nowrap text-white/88"> · {percentLabel}</span>
+        )}
+      </span>
+    </>
+  )
+}
+
 /** The whole cover, always. */
 function ReadingCard({ book, entry, company, friend }: ReadingCardProps) {
   // Under the cover, on a phone, the column has room for the title and little else.
   const whenRoomy = company === 'alone' ? '' : 'max-md:hidden'
+  const progress = pageProgress(entry.currentPage, book.pages)
   return (
     <Link
       to={bookPath(book.id)}
@@ -70,15 +105,21 @@ function ReadingCard({ book, entry, company, friend }: ReadingCardProps) {
               </span>
             </span>
           )}
-          <span className={cx('block font-semibold', company === 'many' && 'max-[359px]:text-xs')}>
-            {readingTime(entry.startedAt)}
-            {book.pages && (
-              <span className="font-normal text-white/88 max-lg:hidden">
-                {' '}
-                · {book.pages} páginas
-              </span>
-            )}
-          </span>
+          {progress ? (
+            <ReadingProgress {...progress} company={company} />
+          ) : (
+            <span
+              className={cx('block font-semibold', company === 'many' && 'max-[359px]:text-xs')}
+            >
+              {readingTime(entry.startedAt)}
+              {book.pages && (
+                <span className="font-normal text-white/88 max-lg:hidden">
+                  {' '}
+                  · {book.pages} páginas
+                </span>
+              )}
+            </span>
+          )}
         </span>
       </span>
     </Link>
