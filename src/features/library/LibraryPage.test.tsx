@@ -166,6 +166,15 @@ describe('LibraryPage', () => {
       expect(main().getByRole('button', { name: 'No, quitarlo' })).toHaveAccessibleDescription(cost)
     })
 
+    it('drops the line under the row while confirming, as the confirmation draws its own box', () => {
+      renderApp('/biblioteca')
+      expect(prompt()).toHaveClass('border-b')
+      fireEvent.click(main().getByRole('button', { name: 'No, quitarlo' }))
+      expect(prompt()).not.toHaveClass('border-b')
+      fireEvent.click(main().getByRole('button', { name: 'Cancelar' }))
+      expect(prompt()).toHaveClass('border-b')
+    })
+
     it('does not mention folders for a book in none', () => {
       act(() => state().removeFromFolder([IT], 'terror'))
       renderApp('/biblioteca')

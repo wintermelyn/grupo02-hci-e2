@@ -8,6 +8,7 @@ import {
   type MouseEvent,
 } from 'react'
 import { BookCover, Button, InlineConfirm } from '../../components'
+import { cx } from '../../components/cx'
 import { ignoreSecondClick } from '../../components/ignoreSecondClick'
 import { placesLeft } from '../../lib/leaveLibrary'
 import { STATUS_LABELS } from '../../lib/status'
@@ -90,7 +91,11 @@ export function WantPrompt({ onAnswered }: WantPromptProps) {
       ref={rowRef}
       aria-labelledby={confirming ? undefined : questionId}
       aria-label={confirming ? '¿Sigues queriendo leer este libro?' : undefined}
-      className="mt-4 scroll-mt-4 scroll-mb-36 border-b border-line pb-3 lg:scroll-mb-20"
+      className={cx(
+        'mt-4 scroll-mt-4 scroll-mb-36 lg:scroll-mb-20',
+        // The confirmation draws its own box, so the row's line would sit loose under it.
+        !confirming && 'border-b border-line pb-3',
+      )}
     >
       {confirming ? (
         <InlineConfirm
