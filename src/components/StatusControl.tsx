@@ -56,6 +56,8 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
       label={current ? `Estado de ${bookName}` : 'Agregar a Mis libros'}
       resetKey={bookId}
       className={className}
+      // In the record the row spans the whole page, and the options would sit far from Actual.
+      align={current ? 'start' : 'fill'}
       iconLabels
       options={STATUS_ORDER.map((status) => ({
         id: status,

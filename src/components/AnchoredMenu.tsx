@@ -18,7 +18,7 @@ import { ignoreSecondClick } from './ignoreSecondClick'
 export type AnchoredMenuKind = 'radio' | 'checkbox' | 'action'
 
 /** `fill` takes the width of the control. `end` is for a control narrower than the menu. */
-export type AnchoredMenuAlign = 'fill' | 'end'
+export type AnchoredMenuAlign = 'fill' | 'start' | 'end'
 
 export interface AnchoredMenuOption {
   id: string
@@ -86,6 +86,8 @@ const ITEM_ROLES: Record<AnchoredMenuKind, string> = {
 const ALIGN_CLASSES: Record<AnchoredMenuAlign, string> = {
   // From md, a narrow control such as Agregar a Mis libros still gives a detail one line.
   fill: 'inset-x-0 md:min-w-64',
+  // Under a control that spans a wide row: from md, as wide as its options and under the value.
+  start: 'inset-x-0 md:right-auto md:w-80',
   end: 'right-0 w-64',
 }
 

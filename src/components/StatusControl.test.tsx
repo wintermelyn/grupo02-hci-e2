@@ -105,6 +105,22 @@ describe('StatusControl', () => {
     expect(button.querySelector('svg.lucide-pencil')).toHaveClass('max-[390px]:hidden')
   })
 
+  it('opens as wide as its options under the tag from md, so Actual sits next to the name', () => {
+    renderControl(CARRIE)
+    openMenu()
+    expect(screen.getByRole('menu', { name: 'Estado de «Carrie»' })).toHaveClass(
+      'inset-x-0',
+      'md:right-auto',
+      'md:w-80',
+    )
+  })
+
+  it('spans the button that adds a book, which is already as wide as the menu needs', () => {
+    renderControl(apiBook.id, apiBook)
+    openMenu('Agregar a Mis libros')
+    expect(screen.getByRole('menu', { name: 'Agregar a Mis libros' })).not.toHaveClass('md:w-80')
+  })
+
   it('has nothing to leave when the book is not in the library', () => {
     renderControl(apiBook.id, apiBook)
     openMenu('Agregar a Mis libros')
