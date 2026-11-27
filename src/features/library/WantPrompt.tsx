@@ -1,5 +1,13 @@
-import { useId, useLayoutEffect, useMemo, useRef, type MouseEvent } from 'react'
-import { BookCover, Button } from '../../components'
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MouseEvent,
+} from 'react'
+import { BookCover, Button, InlineConfirm } from '../../components'
 import { ignoreSecondClick } from '../../components/ignoreSecondClick'
 import { placesLeft } from '../../lib/leaveLibrary'
 import { STATUS_LABELS } from '../../lib/status'
@@ -14,8 +22,9 @@ export interface WantPromptProps {
 
 /**
  * The D5 prompt: one old book of Quiero leerlo at a time, above the list and without blocking it. It
- * stays until it is answered, so a task does not lose it by leaving the section. Sí and No are the
- * same button, because neither answer is the expected one.
+ * stays until it is answered, so a task does not lose it by leaving the section. Sí keeps the book
+ * and No takes it out of Mis libros and its folders, so they do not look alike: No says what it
+ * does, weighs less, and asks in the row before taking the book out. Deshacer still follows.
  */
 export function WantPrompt({ onAnswered }: WantPromptProps) {
   const library = useStore((state) => state.library)
@@ -35,6 +44,11 @@ export function WantPrompt({ onAnswered }: WantPromptProps) {
   const answeredId = useRef<BookId>(undefined)
   const rowRef = useRef<HTMLElement>(null)
   const questionRef = useRef<HTMLHeadingElement>(null)
+  const noRef = useRef<HTMLButtonElement>(null)
+  const returnFocus = useRef(false)
+  // Tied to the book, so a question left open never shows up for the next one.
+  const [confirmingId, setConfirmingId] = useState<BookId>()
+  const confirming = Boolean(promptId) && confirmingId === promptId
 
   // Only Deshacer brings back the book that was just answered. The row comes in above the list and
   // above where the person is, so the question goes to them instead of the page leaving it behind.
@@ -45,12 +59,25 @@ export function WantPrompt({ onAnswered }: WantPromptProps) {
     rowRef.current?.scrollIntoView?.({ block: 'nearest' })
   }, [promptId])
 
+  // No only exists again once the confirmation is gone.
+  useEffect(() => {
+    if (confirming || !returnFocus.current) return
+    returnFocus.current = false
+    noRef.current?.focus()
+  }, [confirming])
+
   if (!prompt || !book || !entry) return null
+
+  function cancel() {
+    returnFocus.current = true
+    setConfirmingId(undefined)
+  }
 
   function answer(keep: boolean, { detail }: MouseEvent) {
     // The list moves up as the row leaves, and the second tap would open whatever lands below it.
     ignoreSecondClick()
     answeredId.current = book!.id
+    setConfirmingId(undefined)
     answerWantPrompt(book!.id, keep)
     onAnswered()
     // Enter and Space send a click with no clicks counted. By keyboard, Deshacer is too far away.
@@ -61,44 +88,63 @@ export function WantPrompt({ onAnswered }: WantPromptProps) {
     // The margins keep the whole row clear of the bottom bar and of the toast of Deshacer.
     <section
       ref={rowRef}
-      aria-labelledby={questionId}
+      aria-labelledby={confirming ? undefined : questionId}
+      aria-label={confirming ? '¿Sigues queriendo leer este libro?' : undefined}
       className="mt-4 scroll-mt-4 scroll-mb-36 border-b border-line pb-3 lg:scroll-mb-20"
     >
-      <div className="flex items-center gap-3.5">
-        <div className="w-14 shrink-0">
-          <BookCover book={book} />
-        </div>
-        <div className="min-w-0 flex-1 md:flex md:items-center md:justify-between md:gap-6">
-          <div className="min-w-0">
-            <h2
-              ref={questionRef}
-              id={questionId}
-              tabIndex={-1}
-              className="font-serif text-lg/snug font-semibold"
+      {confirming ? (
+        <InlineConfirm
+          title={`¿Quitar «${book.title}» de Mis libros?`}
+          confirmLabel="Quitar de Mis libros"
+          onConfirm={(event) => answer(false, event)}
+          onCancel={cancel}
+        >
+          Sale de {placesLeft(entry.folderIds, folders)}.
+        </InlineConfirm>
+      ) : (
+        <div className="flex items-center gap-3.5">
+          <div className="w-14 shrink-0">
+            <BookCover book={book} />
+          </div>
+          <div className="min-w-0 flex-1 md:flex md:items-center md:justify-between md:gap-6">
+            <div className="min-w-0">
+              <h2
+                ref={questionRef}
+                id={questionId}
+                tabIndex={-1}
+                className="font-serif text-lg/snug font-semibold"
+              >
+                ¿Sigues queriendo leer este libro?
+              </h2>
+              <p className="line-clamp-2 text-sm wrap-break-word text-muted">
+                {book.title} · {prompt.days} días en {STATUS_LABELS.want}
+              </p>
+              <p id={costId} className="text-sm wrap-break-word text-muted">
+                Si dices No, sale de {placesLeft(entry.folderIds, folders)}
+              </p>
+            </div>
+            <div
+              role="group"
+              aria-label={`¿Sigues queriendo leer ${book.title}?`}
+              className="mt-2 flex gap-2 md:mt-0 md:shrink-0"
             >
-              ¿Sigues queriendo leer este libro?
-            </h2>
-            <p className="line-clamp-2 text-sm wrap-break-word text-muted">
-              {book.title} · {prompt.days} días en {STATUS_LABELS.want}
-            </p>
-            <p id={costId} className="text-sm wrap-break-word text-muted">
-              Si dices No, sale de {placesLeft(entry.folderIds, folders)}
-            </p>
-          </div>
-          <div
-            role="group"
-            aria-label={`¿Sigues queriendo leer ${book.title}?`}
-            className="mt-2 grid max-w-52 grid-cols-2 gap-2 md:mt-0 md:w-52 md:shrink-0"
-          >
-            <Button compact onClick={(event) => answer(true, event)}>
-              Sí
-            </Button>
-            <Button compact aria-describedby={costId} onClick={(event) => answer(false, event)}>
-              No
-            </Button>
+              {/* Sí is drawn by its edge and No by its words alone, as an action of the row. */}
+              <Button compact onClick={(event) => answer(true, event)} className="min-w-20">
+                Sí
+              </Button>
+              <Button
+                ref={noRef}
+                variant="quiet"
+                compact
+                aria-describedby={costId}
+                onClick={() => setConfirmingId(book.id)}
+              >
+                No, quitarlo
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </section>
   )
 }

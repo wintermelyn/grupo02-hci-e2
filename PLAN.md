@@ -67,7 +67,7 @@ D1 a D6 son las decisiones 1 a 6 del informe, con la misma numeración. La colum
 | D2 | **Tags visibles:** *Quiero leerlo · Lo tengo · Leyendo · Leído* junto al título en cada lista. Se cambian en la ficha: el tag con un lápiz abre el selector | N4 | Listas, ficha |
 | D3 | **Botones de tag:** *Todos · Quiero leerlo · Lo tengo · Leyendo · Leído*. En Mis libros muestran los libros de toda la biblioteca y dentro de una carpeta solo los de esa carpeta. El botón activo se ve marcado | N4 | Mis libros, carpeta |
 | D4 | **Buscar usuarios en Amigos:** la barra encuentra a cualquier usuario por nombre o @usuario. Cada resultado trae avatar, amigos en común y "+ Agregar". Estado "Solicitud enviada" visible. "Conectar con más amigos" pasa a llamarse "Invitar contactos" y queda como opción secundaria | N2 | Amigos |
-| D5 | **Aviso "¿Sigues queriendo leer este libro?":** un libro antiguo de "Quiero leerlo" a la vez, con portada, título, lo que cuesta el "No" y botones "Sí" y "No". "No" muestra "«It» salió de Mis libros y de Terror" con Deshacer | N1 | Mis libros |
+| D5 | **Aviso "¿Sigues queriendo leer este libro?":** un libro antiguo de "Quiero leerlo" a la vez, con portada, título, lo que cuesta el "No" y botones "Sí" y "No, quitarlo". "No, quitarlo" pide confirmar en la fila y muestra "«It» salió de Mis libros y de Terror" con Deshacer | N1 | Mis libros |
 | D6 | **"Seleccionados para ti" en Descubrir:** las recomendaciones según los gustos quedan al mismo nivel que las listas prehechas | N5 | Descubrir |
 | — | **Toast con Deshacer** después de cada cambio en la biblioteca | — | Global |
 | — | Pantallas de **carga, sin resultados y error** | — | Buscar y ficha. Amigos solo tiene "sin resultados" y "sin amigos", porque su directorio está en la app |
@@ -139,7 +139,7 @@ Una app real tendría su propia base de datos indexada, con cada libro nuevo ya 
 - **A qué libro pregunta:** al libro en `want` con la fecha `wantCheckedAt ?? addedAt` más antigua, si tiene más de 90 días (`WANT_PROMPT_AFTER_DAYS`). Con el seed, el primero es *It*.
 - **Cuándo aparece:** como tarjeta arriba de Mis libros, sin bloquear la pantalla, si hay un libro que cumpla y `lastWantPromptOn` no es hoy. Sigue ahí hasta que la persona responde, así que una tarea no lo pierde por entrar y salir de la sección.
 - **"Sí":** deja `wantCheckedAt = today()` y muestra el toast "«It» sigue en Quiero leerlo", con Deshacer como todo cambio en la biblioteca.
-- **"No":** saca el libro de la biblioteca y de sus carpetas, y muestra el toast "«It» salió de Mis libros y de Terror" con Deshacer. Bajo la pregunta, el aviso ya dijo "Si dices No, sale de Mis libros y de Terror".
+- **"No, quitarlo":** pide confirmar en la misma fila, con `InlineConfirm` ("¿Quitar «It» de Mis libros?", "Sale de Mis libros y de Terror."). Al confirmar saca el libro de la biblioteca y de sus carpetas, y muestra el toast "«It» salió de Mis libros y de Terror" con Deshacer. Bajo la pregunta, el aviso ya dijo "Si dices No, sale de Mis libros y de Terror". En la E3, "Sí" y "No" iguales hicieron temer el "No", así que se distingue: dice lo que hace, va sin borde (`quiet`) y no actúa al primer toque.
 - **Después de responder:** `lastWantPromptOn = today()`, así que no aparece otro aviso ese día. Deshacer también devuelve ese dato, en `undoSnapshot`, así que el aviso vuelve a preguntar por el mismo libro, igual que al deshacer "Quitar de Mis libros" en la ficha. El foco va a la pregunta y el aviso queda completo a la vista.
 
 ### Glosario (interfaz ↔ código)
@@ -273,8 +273,8 @@ Si alguien necesita cambiar algo compartido, le avisa al otro rol antes y lo sub
 7. **Prevenir antes que avisar:** fechas futuras deshabilitadas, "Guardar" deshabilitado mientras algo sea inválido, "Próximos" sin la opción de borrar.
 8. **Valores por defecto útiles:** fechas ya completadas, la carpeta actual preseleccionada y nunca pedir de nuevo un dato que se mostró en la pantalla anterior.
 9. **Consistencia:** la misma acción tiene el mismo nombre (según el glosario) y el mismo componente en toda la app.
-10. **Deshacer en vez de "¿Estás seguro?"** para lo reversible. Se pide confirmación solo para Reiniciar demo, eliminar carpeta y sacar un libro de Mis libros, que además deja Deshacer.
-11. **Simetría:** agregar y quitar tienen el mismo peso visual y la misma cantidad de pasos. Lo mismo vale para "Sí" y "No" en el aviso. "Invitar contactos" no va preseleccionado ni reaparece si se ignora.
+10. **Deshacer en vez de "¿Estás seguro?"** para lo reversible. Se pide confirmación solo para Reiniciar demo, eliminar carpeta y sacar un libro de Mis libros (en la ficha o con el "No" del aviso), que además deja Deshacer.
+11. **Simetría:** agregar y quitar tienen el mismo peso visual y la misma cantidad de pasos. En el aviso, "Sí" y "No, quitarlo" cuestan un toque cada uno para responder, pero "No" se distingue y pide confirmar, porque saca el libro (E3). "Invitar contactos" no va preseleccionado ni reaparece si se ignora.
 12. **Agrupar con tarjetas y cercanía:** cada etiqueta pegada a su campo.
 13. **Barras de acciones cortas:** máximo 4–5 opciones visibles a la vez.
 14. **Animación solo como respuesta a una acción**, nunca decorativa.
@@ -428,7 +428,7 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | Tag inicial de T1 | El paso 3 del journey 2.2.2 dice "Quiero leer", un nombre que no está entre los tags de la decisión 2 | T1 parte en "Leyendo". Falta corregir ese paso en el informe |
 | Selección múltiple | No aparece | Queda fuera. Los libros se agregan a carpetas y se quitan desde la ficha |
 | "Próximos" | No aparece | Se mantiene como carpeta fija porque es el destino de T2 |
-| "No" del aviso | "Lo quita de Lo quiero" y muestra "Quitado de tu lista" | El libro sale de Mis libros y de sus carpetas, y el aviso lo dice antes y después, con el título y sin hablar de "tu lista". Deshacer devuelve el libro y la pregunta |
+| "No" del aviso | "Lo quita de Lo quiero" y muestra "Quitado de tu lista" | El botón dice "No, quitarlo" y pide confirmar en la fila. El libro sale de Mis libros y de sus carpetas, y el aviso lo dice antes y después, con el título y sin hablar de "tu lista". Deshacer devuelve el libro y la pregunta |
 | "Cada cierto tiempo" y "mucho tiempo" | Sin valores | Un aviso respondido por día y 90 días en la lista |
 | "Mis carpetas" y "Mis libros" | La decisión 3 usa "Mis carpetas" y los journeys, "Mis libros" | "Mis libros" es la sección y "Mis carpetas", el título del tablero |
 | Libros sin carpeta | La decisión 3 habla de "todas las carpetas" | Los botones de tag en Mis libros filtran toda la biblioteca, así que también aparecen. En "Todos", una tarjeta "Sin carpeta" al final del tablero los reúne. Se ve como una carpeta, así que abre la misma pantalla, en su propia ruta: con "< Mis libros", título, botones de tag y buscador, y partiendo desde arriba |

@@ -39,7 +39,7 @@ El aviso de Mis libros pregunta primero por _It_, que lleva 210 días en la list
 Propuesta para las instrucciones de la E3:
 
 - **Agregar a "Próximos":** _Fundación_ y _El problema de los tres cuerpos_. Siguen también en "Ciencia ficción".
-- **Quitar de Mis libros:** _It_ (con "No" en el aviso) y _Hábitos atómicos_ (con "Quitar de Mis libros", bajo el registro de la ficha, que pide confirmar).
+- **Quitar de Mis libros:** _It_ (con "No, quitarlo" en el aviso, que pide confirmar) y _Hábitos atómicos_ (con "Quitar de Mis libros", bajo el registro de la ficha, que pide confirmar).
 
 ## T3 · Agregar un amigo
 

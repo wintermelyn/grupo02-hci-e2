@@ -146,6 +146,12 @@ describe('LibraryPage', () => {
   describe('prompt', () => {
     const IT = 'OL81613W'
 
+    /** No, then the confirmation in the row. */
+    function answerNo(init?: { detail: number }) {
+      fireEvent.click(main().getByRole('button', { name: 'No, quitarlo' }))
+      fireEvent.click(main().getByRole('button', { name: 'Quitar de Mis libros' }), init)
+    }
+
     it('asks about It, with how long it has been waiting, in Todos and in Quiero leerlo', () => {
       renderApp('/biblioteca')
       expect(prompt()).toHaveTextContent('It · 210 días en Quiero leerlo')
@@ -157,7 +163,7 @@ describe('LibraryPage', () => {
       renderApp('/biblioteca')
       const cost = 'Si dices No, sale de Mis libros y de Terror'
       expect(prompt()).toHaveTextContent(cost)
-      expect(main().getByRole('button', { name: 'No' })).toHaveAccessibleDescription(cost)
+      expect(main().getByRole('button', { name: 'No, quitarlo' })).toHaveAccessibleDescription(cost)
     })
 
     it('does not mention folders for a book in none', () => {
@@ -172,11 +178,36 @@ describe('LibraryPage', () => {
       expect(prompt()).not.toBeInTheDocument()
     })
 
-    it('gives Sí and No the same weight', () => {
+    it('sets No apart from Sí: it says what it does and weighs less', () => {
       renderApp('/biblioteca')
       const yes = main().getByRole('button', { name: 'Sí' })
-      const no = main().getByRole('button', { name: 'No' })
-      expect(yes.className).toBe(no.className)
+      const no = main().getByRole('button', { name: 'No, quitarlo' })
+      expect(yes).toHaveClass('border')
+      expect(no).not.toHaveClass('border')
+      expect(main().queryByRole('button', { name: 'No' })).not.toBeInTheDocument()
+    })
+
+    it('asks in the row before No takes the book out, and Cancelar keeps everything', () => {
+      const library = state().library
+      renderApp('/biblioteca')
+      fireEvent.click(main().getByRole('button', { name: 'No, quitarlo' }))
+      expect(state().library).toBe(library)
+      const confirm = main().getByRole('region', { name: '¿Quitar «It» de Mis libros?' })
+      expect(confirm).toHaveTextContent('Sale de Mis libros y de Terror.')
+      expect(within(confirm).getByRole('button', { name: 'Cancelar' })).toHaveFocus()
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+      fireEvent.click(within(confirm).getByRole('button', { name: 'Cancelar' }))
+      expect(state().library).toBe(library)
+      expect(main().getByRole('button', { name: 'No, quitarlo' })).toHaveFocus()
+      expect(question()).toBeInTheDocument()
+    })
+
+    it('cancels the question with Escape', () => {
+      renderApp('/biblioteca')
+      fireEvent.click(main().getByRole('button', { name: 'No, quitarlo' }))
+      fireEvent.keyDown(document.activeElement as Element, { key: 'Escape' })
+      expect(main().getByRole('button', { name: 'No, quitarlo' })).toHaveFocus()
+      expect(state().library).toHaveProperty(IT)
     })
 
     it('keeps the book with Sí, and does not ask again today', () => {
@@ -189,7 +220,7 @@ describe('LibraryPage', () => {
 
     it('takes the book out with No, and Deshacer brings back the book and the question', () => {
       renderApp('/biblioteca')
-      fireEvent.click(main().getByRole('button', { name: 'No' }))
+      answerNo()
       expect(state().library).not.toHaveProperty(IT)
       expect(toast()).toHaveTextContent('«It» salió de Mis libros y de Terror')
       expect(main().getByRole('link', { name: /Terror/ })).toHaveTextContent('9 libros')
@@ -212,7 +243,8 @@ describe('LibraryPage', () => {
           Reflect.deleteProperty(Element.prototype, 'scrollIntoView')
         })
         renderApp(path)
-        fireEvent.click(main().getByRole('button', { name: answer }), { detail: 1 })
+        if (answer === 'No') answerNo({ detail: 1 })
+        else fireEvent.click(main().getByRole('button', { name: answer }), { detail: 1 })
         expect(reveal).not.toHaveBeenCalled()
 
         fireEvent.click(screen.getByRole('button', { name: 'Deshacer' }))
@@ -243,9 +275,9 @@ describe('LibraryPage', () => {
 
     it('keeps the second tap from opening what moves up under it', () => {
       renderApp('/biblioteca')
-      const no = main().getByRole('button', { name: 'No' })
+      fireEvent.click(main().getByRole('button', { name: 'No, quitarlo' }))
       const ignored = vi.spyOn(window, 'addEventListener')
-      fireEvent.click(no)
+      fireEvent.click(main().getByRole('button', { name: 'Quitar de Mis libros' }))
       expect(ignored).toHaveBeenCalledWith('click', expect.any(Function), {
         capture: true,
         once: true,
@@ -259,28 +291,26 @@ describe('LibraryPage', () => {
     })
 
     describe('from the keyboard', () => {
-      function answerNo() {
+      function answerNoByKeyboard() {
         renderApp('/biblioteca?tag=want')
-        const no = main().getByRole('button', { name: 'No' })
-        no.focus()
         // The click of Enter or Space counts no clicks.
-        fireEvent.click(no, { detail: 0 })
+        answerNo({ detail: 0 })
         return screen.getByRole('button', { name: 'Deshacer' })
       }
 
       it('takes the focus to Deshacer, so it can be reached in time', () => {
-        expect(answerNo()).toHaveFocus()
+        expect(answerNoByKeyboard()).toHaveFocus()
       })
 
       it('brings the book back and the focus to the question with Enter on Deshacer', () => {
-        const undo = answerNo()
+        const undo = answerNoByKeyboard()
         fireEvent.click(undo, { detail: 0 })
         expect(state().library[IT].folderIds).toEqual(['terror'])
         expect(question()).toHaveFocus()
       })
 
       it('goes on through the list with Tab', () => {
-        const undo = answerNo()
+        const undo = answerNoByKeyboard()
         fireEvent.keyDown(undo, { key: 'Tab' })
         expect(document.activeElement).toContainElement(main().getAllByRole('link')[0])
       })

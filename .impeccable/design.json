@@ -572,7 +572,7 @@
       },
       {
         "name": "La regla de confirmar en la página",
-        "body": "Solo eliminar carpeta, Reiniciar demo y Quitar de Mis libros piden confirmación, con `InlineConfirm`. Quitar de Mis libros además ofrece Deshacer: en la E3, sacar un libro sin aviso hizo desconfiar del menú del tag. Lo demás se aplica de inmediato y ofrece Deshacer.",
+        "body": "Solo eliminar carpeta, Reiniciar demo y sacar un libro de Mis libros, en la ficha o con el \"No, quitarlo\" del aviso de D5, piden confirmación, con `InlineConfirm`. Sacar un libro además ofrece Deshacer: en la E3, sacar un libro sin aviso hizo desconfiar del menú del tag. Lo demás se aplica de inmediato y ofrece Deshacer.",
         "section": "components"
       },
       {
@@ -606,7 +606,7 @@
       "Don't abras un panel o un modal: no existen en este sistema.",
       "Don't pongas sombra en lo que no flota, salvo las portadas.",
       "Don't dibujes un botón blanco: es el aspecto de un campo. La flecha de un riel es la excepción, porque va sobre portadas.",
-      "Don't agregues un \"¿Estás seguro?\" a lo reversible: se resuelve con Deshacer. La excepción es Quitar de Mis libros, que la E3 mostró que asusta.",
+      "Don't agregues un \"¿Estás seguro?\" a lo reversible: se resuelve con Deshacer. La excepción es sacar un libro de Mis libros, en la ficha o con el \"No, quitarlo\" del aviso, que la E3 mostró que asusta.",
       "Don't pongas más de un `primary` por pantalla; \"Agregar a Mis libros\" y \"Ver ficha\" también cuentan.",
       "Don't apiles tarjetas dentro de tarjetas ni uses bordes de 2 px para separar capas.",
       "Don't escribas colores o sombras sueltos en una pantalla, ni uses la paleta por defecto de Tailwind, que no existe.",
