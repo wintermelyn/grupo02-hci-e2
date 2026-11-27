@@ -41,7 +41,9 @@ export function TagFilter({ value, counts, onChange }: TagFilterProps) {
             aria-label={`${option.label}: ${booksLabel(counts[option.value])}`}
             onClick={() => onChange(option.value)}
             className={cx(
-              'relative flex min-h-14 flex-col items-center justify-end rounded-control pt-3 pb-1.5 text-xs whitespace-nowrap',
+              // Under 400 px "Quiero leerlo" takes two lines. The counts stay on one line across the
+              // group, so the labels hang from them instead of sitting on the bottom.
+              'relative flex min-h-14 flex-col items-center justify-start rounded-control pt-3 pb-1.5 text-center text-xs text-balance',
               'transition-colors duration-100',
               active
                 ? 'font-bold text-ink'

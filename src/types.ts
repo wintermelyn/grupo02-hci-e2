@@ -28,6 +28,8 @@ export interface LibraryEntry {
   startedAt?: ISODate
   finishedAt?: ISODate
   rating?: number
+  /** The page a book in Leyendo is on. It stays saved after finishing, out of sight. */
+  currentPage?: number
 }
 
 export interface Folder {

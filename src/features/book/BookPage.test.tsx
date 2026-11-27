@@ -10,7 +10,7 @@ import type { Book } from '../../types'
 
 const CARRIE_ID = 'OL81626W'
 const CARRIE = `/libro/${CARRIE_ID}` // Leyendo, en Terror
-const IT = '/libro/OL81613W' // Lo quiero, en Terror
+const IT = '/libro/OL81613W' // Quiero leerlo, en Terror
 const NOCHE = '/libro/OL20901051W' // Lo tengo, en Próximos y Terror, con descripción
 const HOMBRE = '/libro/OL1811898W' // Lo tengo, sin carpeta
 const OUTSIDE = '/libro/OL698173W' // En el catálogo, fuera de la biblioteca
@@ -27,7 +27,8 @@ const TRANSLATED_TEXT = 'Una descripción traducida.'
 const main = () => within(screen.getByRole('main'))
 const toast = () => screen.getByText(/./, { selector: '[role="status"] p' })
 const undoButton = () => screen.getByRole('button', { name: 'Deshacer' })
-const foldersButton = () => main().getByRole('button', { name: /^Agregar (o quitar|a carpeta):/ })
+const foldersButton = () =>
+  main().getByRole('button', { name: /^(Elegir carpetas|Agregar a carpeta):/ })
 const folderOption = (name: string) => main().getByRole('menuitemcheckbox', { name })
 
 const dateField = (label: string) => main().getByLabelText(label)
@@ -76,13 +77,19 @@ function pageShape() {
 }
 
 function chooseTag(name: string) {
-  fireEvent.click(main().getByRole('button', { name: /Cambiar o quitar/ }))
+  fireEvent.click(main().getByRole('button', { name: /Cambiar estado/ }))
   fireEvent.click(main().getByRole('menuitemradio', { name }))
 }
 
-function removeBook() {
-  fireEvent.click(main().getByRole('button', { name: /Cambiar o quitar/ }))
-  fireEvent.click(main().getByRole('menuitem', { name: /^Quitar de Mis libros/ }))
+const leaveButton = () => main().queryByRole('button', { name: /^Quitar de Mis libros:/ })
+const confirmLeave = () => main().getByRole('region', { name: /^¿Quitar/ })
+
+function removeBook(init?: { detail: number }) {
+  fireEvent.click(leaveButton()!)
+  fireEvent.click(
+    within(confirmLeave()).getByRole('button', { name: 'Quitar de Mis libros' }),
+    init,
+  )
 }
 
 describe('BookPage', () => {
@@ -302,9 +309,10 @@ describe('BookPage', () => {
     expect(main().getByText('Sin carpetas')).toBeInTheDocument()
   })
 
-  it('leaves the plus out of Agregar o quitar, since the button also takes out', () => {
+  it('says Elegir carpetas, without the plus and without "quitar", which read as deleting', () => {
     renderApp(CARRIE)
-    expect(foldersButton().textContent).toBe('Agregar o quitar')
+    expect(foldersButton().textContent).toBe('Elegir carpetas')
+    expect(foldersButton()).toHaveAccessibleName('Elegir carpetas: «Carrie»')
     expect(foldersButton().querySelector('svg')).toBeNull()
   })
 
@@ -325,14 +333,14 @@ describe('BookPage', () => {
     const add = main().getByRole('button', { name: 'Agregar a Mis libros' })
     expect(add.parentElement).toHaveClass('md:w-fit')
     fireEvent.click(add)
-    fireEvent.click(main().getByRole('menuitemradio', { name: 'Lo quiero' }))
-    const change = main().getByRole('button', { name: /Cambiar o quitar/ })
+    fireEvent.click(main().getByRole('menuitemradio', { name: 'Quiero leerlo' }))
+    const change = main().getByRole('button', { name: /Cambiar estado/ })
     expect(change.parentElement).not.toHaveClass('md:w-fit')
   })
 
   it('tells the two controls apart: only the tag says Cambiar', () => {
     renderApp(CARRIE)
-    expect(foldersButton()).toHaveTextContent('Agregar o quitar')
+    expect(foldersButton()).toHaveTextContent('Elegir carpetas')
     expect(main().getAllByRole('button', { name: /Cambiar/ })).toHaveLength(1)
   })
 
@@ -344,7 +352,7 @@ describe('BookPage', () => {
 
   it('changes the tag in place and keeps the book in its folders', () => {
     renderApp(CARRIE)
-    fireEvent.click(main().getByRole('button', { name: /Cambiar o quitar/ }))
+    fireEvent.click(main().getByRole('button', { name: /Cambiar estado/ }))
     fireEvent.click(main().getByRole('menuitemradio', { name: 'Lo tengo' }))
     expect(main().getByRole('button', { name: /^Lo tengo\./ })).toBeInTheDocument()
     expect(main().getByRole('link', { name: 'Terror' })).toBeInTheDocument()
@@ -399,7 +407,7 @@ describe('T1', () => {
     fireEvent.click(main().getByRole('link', { name: /^Carrie/ }))
     expect(currentLocation()).toBe(CARRIE)
 
-    fireEvent.click(main().getByRole('button', { name: /Cambiar o quitar/ }))
+    fireEvent.click(main().getByRole('button', { name: /Cambiar estado/ }))
     fireEvent.click(main().getByRole('menuitemradio', { name: 'Leído' }))
     expect(main().getByRole('button', { name: /^Leído\./ })).toBeInTheDocument()
     expect(toast()).toHaveTextContent('Estado cambiado a «Leído»')
@@ -487,63 +495,91 @@ describe('folders of a book', () => {
 })
 
 describe('Quitar de Mis libros', () => {
-  const removeOption = () => main().queryByRole('menuitem', { name: /^Quitar de Mis libros/ })
-
-  it('takes the two taps that adding takes, in the menu of the tag', () => {
+  it('is its own action below the record, out of the menu of the tag', () => {
     renderApp(CARRIE)
-    expect(main().queryByRole('button', { name: /Quitar de Mis libros/ })).toBeNull()
-    removeBook()
+    fireEvent.click(main().getByRole('button', { name: /Cambiar estado/ }))
+    expect(main().queryByRole('menuitem', { name: /Quitar/ })).not.toBeInTheDocument()
+    fireEvent.click(main().getByRole('button', { name: /Cambiar estado/ }))
+    expect(leaveButton()).toHaveTextContent('Quitar de Mis libros')
+    expect(leaveButton()).toHaveAccessibleName('Quitar de Mis libros: «Carrie»')
+  })
+
+  it('asks in the page first, with the focus on Cancelar, and takes the book out once confirmed', () => {
+    renderApp(CARRIE)
+    fireEvent.click(leaveButton()!)
+    expect(state().library).toHaveProperty(CARRIE_ID)
+    expect(confirmLeave()).toHaveTextContent('¿Quitar «Carrie» de Mis libros?')
+    expect(within(confirmLeave()).getByRole('button', { name: 'Cancelar' })).toHaveFocus()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    fireEvent.click(within(confirmLeave()).getByRole('button', { name: 'Quitar de Mis libros' }))
     expect(currentLocation()).toBe(CARRIE)
     expect(state().library).not.toHaveProperty(CARRIE_ID)
     expect(main().getByRole('button', { name: 'Agregar a Mis libros' })).toBeInTheDocument()
     expect(main().queryByText('Carpetas')).not.toBeInTheDocument()
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(leaveButton()).not.toBeInTheDocument()
+  })
+
+  it('changes nothing on Cancelar and gives the focus back to the button', () => {
+    const library = state().library
+    renderApp(CARRIE)
+    fireEvent.click(leaveButton()!)
+    fireEvent.click(within(confirmLeave()).getByRole('button', { name: 'Cancelar' }))
+    expect(state().library).toBe(library)
+    expect(main().queryByRole('region', { name: /^¿Quitar/ })).not.toBeInTheDocument()
+    expect(leaveButton()).toHaveFocus()
+  })
+
+  it('cancels with Escape', () => {
+    renderApp(CARRIE)
+    fireEvent.click(leaveButton()!)
+    fireEvent.keyDown(document.activeElement as Element, { key: 'Escape' })
+    expect(leaveButton()).toHaveFocus()
   })
 
   it.each([
-    ['one folder, by its name', IT, 'También sale de Terror'],
-    ['several folders, by how many', NOCHE, 'También sale de sus 2 carpetas'],
-    ['a folder and dates, in one line', CARRIE, 'También sale de Terror y pierdes las fechas'],
-    ['also a rating', CIEN_ANOS, 'También sale de Novela y pierdes las fechas y el puntaje'],
-  ])('says what will be lost before choosing: %s', (_case, path, lost) => {
+    ['one folder, by its name', IT, 'También sale de Terror.'],
+    ['several folders, by how many', NOCHE, 'También sale de sus 2 carpetas.'],
+    ['a folder and dates', CARRIE, 'También sale de Terror y pierdes las fechas.'],
+    ['also a rating', CIEN_ANOS, 'También sale de Novela y pierdes las fechas y el puntaje.'],
+  ])('says what will be lost before confirming: %s', (_case, path, lost) => {
     renderApp(path)
-    fireEvent.click(main().getByRole('button', { name: /Cambiar o quitar/ }))
-    expect(removeOption()?.textContent).toBe(`Quitar de Mis libros${lost}`)
+    fireEvent.click(leaveButton()!)
+    expect(confirmLeave()).toHaveTextContent(lost)
   })
 
   it('says only what is lost when the book has no folder to leave', () => {
     act(() => state().removeFromFolder([CIEN_ANOS_ID], 'novela'))
     renderApp(CIEN_ANOS)
-    fireEvent.click(main().getByRole('button', { name: /Cambiar o quitar/ }))
-    expect(removeOption()?.textContent).toBe('Quitar de Mis librosPierdes las fechas y el puntaje')
+    fireEvent.click(leaveButton()!)
+    expect(confirmLeave()).toHaveTextContent('Pierdes las fechas y el puntaje.')
   })
 
-  it('has no line under Quitar when nothing goes with the book', () => {
+  it('says so when nothing goes with the book', () => {
     renderApp(HOMBRE)
-    fireEvent.click(main().getByRole('button', { name: /Cambiar o quitar/ }))
-    expect(removeOption()?.textContent).toBe('Quitar de Mis libros')
+    fireEvent.click(leaveButton()!)
+    expect(confirmLeave()).toHaveTextContent('No tiene carpetas, fechas ni puntaje que perder.')
   })
 
-  it('leaves the focus on the same control, which now adds the book', () => {
+  it('takes the focus to Deshacer when confirmed from the keyboard', () => {
     renderApp(CARRIE)
-    removeBook()
-    expect(main().getByRole('button', { name: 'Agregar a Mis libros' })).toHaveFocus()
+    removeBook({ detail: 0 })
+    expect(undoButton()).toHaveFocus()
   })
 
   it('can be undone, with the tag and the folders it had', () => {
     const before = state().library[CARRIE_ID]
     renderApp(CARRIE)
-    removeBook()
+    removeBook({ detail: 1 })
     expect(toast()).toHaveTextContent('«Carrie» salió de Mis libros y de Terror')
     fireEvent.click(undoButton())
     expect(state().library[CARRIE_ID]).toEqual(before)
     expect(main().getByRole('link', { name: 'Terror' })).toBeInTheDocument()
+    expect(leaveButton()).toBeInTheDocument()
   })
 
   it('is not there for a book outside the library', () => {
     renderApp(OUTSIDE)
-    fireEvent.click(main().getByRole('button', { name: 'Agregar a Mis libros' }))
-    expect(removeOption()).not.toBeInTheDocument()
+    expect(leaveButton()).not.toBeInTheDocument()
   })
 })
 
@@ -566,7 +602,7 @@ describe('dates and rating', () => {
       status: 'reading',
       startedAt: daysAgo(20),
     })
-    expect(toast()).toHaveTextContent('Lectura actualizada')
+    expect(toast()).toHaveTextContent('Fecha de inicio cambiada')
   })
 
   it('shows the start, the end and the rating of a book in Leído, ready to change', () => {
@@ -589,7 +625,7 @@ describe('dates and rating', () => {
     pickDate('Fin', daysAgo(340))
     expect(entry()).toMatchObject({ status: 'read', finishedAt: daysAgo(340), rating: 5 })
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-    expect(toast()).toHaveTextContent('Lectura actualizada')
+    expect(toast()).toHaveTextContent('Fecha de término cambiada')
     fireEvent.click(undoButton())
     expect(entry()).toEqual(before)
     expect(dateField('Fin')).toHaveValue(before.finishedAt)
@@ -624,7 +660,7 @@ describe('dates and rating', () => {
     renderApp(CIEN_ANOS)
     fireEvent.click(main().getByRole('radio', { name: '3 estrellas' }))
     expect(entry().rating).toBe(3)
-    expect(toast()).toHaveTextContent('Lectura actualizada')
+    expect(toast()).toHaveTextContent('Puntaje guardado: 3 estrellas')
     fireEvent.click(undoButton())
     expect(entry()).toEqual(before)
   })
@@ -633,6 +669,7 @@ describe('dates and rating', () => {
     renderApp(CIEN_ANOS)
     fireEvent.click(main().getByRole('button', { name: 'Quitar puntaje' }))
     expect(entry()).not.toHaveProperty('rating')
+    expect(toast()).toHaveTextContent('Puntaje quitado')
   })
 
   it.each([
@@ -652,6 +689,98 @@ describe('dates and rating', () => {
   it('has no primary action: each row saves itself', () => {
     renderApp(CIEN_ANOS)
     expect(main().queryByRole('button', { name: 'Guardar' })).not.toBeInTheDocument()
+  })
+})
+
+describe('the page in Leyendo', () => {
+  const DUNE_ID = 'OL893414W' // Leyendo, 608 páginas
+  const pageField = () => main().getByRole('textbox', { name: 'Vas en la página' })
+  const entry = () => state().library[DUNE_ID]
+
+  function typePage(value: string, key = 'Enter') {
+    fireEvent.change(pageField(), { target: { value } })
+    fireEvent.keyDown(pageField(), { key })
+  }
+
+  it('offers a field with the length of the book, only in Leyendo', () => {
+    renderApp(`/libro/${DUNE_ID}`)
+    expect(pageField()).toHaveValue('')
+    expect(pageField()).toHaveAccessibleDescription('de 608')
+    cleanup()
+    renderApp(CIEN_ANOS)
+    expect(main().queryByLabelText('Vas en la página')).not.toBeInTheDocument()
+  })
+
+  it('labels the row with one word, like the others, and keeps the sentence as its name', () => {
+    renderApp(`/libro/${DUNE_ID}`)
+    const label = main().getByText('Página', { selector: 'label' })
+    expect(label).toHaveAttribute('for', pageField().id)
+    expect(pageField()).toHaveAccessibleName('Vas en la página')
+  })
+
+  it('saves the page with Enter, says so and can be undone', () => {
+    renderApp(`/libro/${DUNE_ID}`)
+    typePage('210')
+    expect(entry().currentPage).toBe(210)
+    expect(toast()).toHaveTextContent('Vas en la página 210')
+    fireEvent.click(undoButton())
+    expect(entry()).not.toHaveProperty('currentPage')
+    expect(pageField()).toHaveValue('')
+  })
+
+  it('saves the page on leaving the field', () => {
+    renderApp(`/libro/${DUNE_ID}`)
+    fireEvent.change(pageField(), { target: { value: ' 35 ' } })
+    expect(entry()).not.toHaveProperty('currentPage')
+    fireEvent.blur(pageField())
+    expect(entry().currentPage).toBe(35)
+  })
+
+  it.each([
+    ['a page past the end', '609', 'El libro tiene 608 páginas.'],
+    ['page zero', '0', 'Escribe un número de página.'],
+    ['a word', 'diez', 'Escribe un número de página.'],
+  ])('holds back %s, says why and goes back to the saved page', (_case, value, reason) => {
+    state().setCurrentPage(DUNE_ID, 210)
+    renderApp(`/libro/${DUNE_ID}`)
+    typePage(value)
+    expect(entry().currentPage).toBe(210)
+    expect(main().getByText(`${reason} Dejamos la página guardada.`)).toBeInTheDocument()
+    expect(pageField()).toHaveValue('210')
+  })
+
+  it('goes back to the saved page with Escape or an empty field, without a word', () => {
+    state().setCurrentPage(DUNE_ID, 210)
+    renderApp(`/libro/${DUNE_ID}`)
+    typePage('300', 'Escape')
+    expect(pageField()).toHaveValue('210')
+    typePage('')
+    expect(pageField()).toHaveValue('210')
+    expect(entry().currentPage).toBe(210)
+    expect(main().queryByText(/Escribe un número/)).not.toBeInTheDocument()
+  })
+
+  it('shows the saved page again when it is written another way or with only spaces', () => {
+    state().setCurrentPage(DUNE_ID, 608)
+    renderApp(`/libro/${DUNE_ID}`)
+    typePage('0608')
+    expect(pageField()).toHaveValue('608')
+    expect(entry().currentPage).toBe(608)
+  })
+
+  it('clears a field of only spaces when there is no saved page', () => {
+    renderApp(`/libro/${DUNE_ID}`)
+    typePage('   ')
+    expect(pageField()).toHaveValue('')
+    expect(entry()).not.toHaveProperty('currentPage')
+  })
+
+  it('keeps the page out of sight once the book is finished', () => {
+    state().setCurrentPage(DUNE_ID, 210)
+    renderApp(`/libro/${DUNE_ID}`)
+    chooseTag('Leído')
+    expect(main().queryByLabelText('Vas en la página')).not.toBeInTheDocument()
+    expect(entry()).toMatchObject({ status: 'read', currentPage: 210 })
   })
 })
 
@@ -752,7 +881,7 @@ describe('a book the store does not have', () => {
     stubCatalog({ books: [LISTED] })
     renderApp('/libro/OL999W')
     fireEvent.click(await main().findByRole('button', { name: 'Agregar a Mis libros' }))
-    fireEvent.click(main().getByRole('menuitemradio', { name: 'Lo quiero' }))
+    fireEvent.click(main().getByRole('menuitemradio', { name: 'Quiero leerlo' }))
     expect(state().library.OL999W.status).toBe('want')
     expect(state().extraBooks.OL999W).toMatchObject({
       title: 'Un libro del catálogo',

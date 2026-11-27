@@ -9,7 +9,7 @@ describe('TagFilter', () => {
     render(<TagFilter value="all" counts={COUNTS} onChange={vi.fn()} />)
     expect(screen.getAllByRole('button').map((button) => button.textContent)).toEqual([
       '34Todos',
-      '17Lo quiero',
+      '17Quiero leerlo',
       '5Lo tengo',
       '2Leyendo',
       '1Leído',
@@ -18,8 +18,15 @@ describe('TagFilter', () => {
 
   it('names each button with its label and count, in singular when there is one', () => {
     render(<TagFilter value="all" counts={COUNTS} onChange={vi.fn()} />)
-    expect(screen.getByRole('button', { name: 'Lo quiero: 17 libros' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Quiero leerlo: 17 libros' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Leído: 1 libro' })).toBeInTheDocument()
+  })
+
+  it('lets a long label take two lines on a narrow phone, with the counts still on one line', () => {
+    render(<TagFilter value="all" counts={COUNTS} onChange={vi.fn()} />)
+    const want = screen.getByRole('button', { name: /^Quiero leerlo/ })
+    expect(want).not.toHaveClass('whitespace-nowrap')
+    expect(want).toHaveClass('text-balance', 'justify-start')
   })
 
   it('marks only the active button', () => {

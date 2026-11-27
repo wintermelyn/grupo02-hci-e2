@@ -32,6 +32,7 @@ export function SearchStart({
           title="Autores de Mis libros"
           authors={authors}
           className="lg:mt-7"
+          counts="library"
           onPick={onPickAuthor}
         />
       )}

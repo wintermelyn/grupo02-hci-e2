@@ -46,6 +46,23 @@ describe('finishBook', () => {
     expect(state().toast?.message).toBe('Lectura actualizada')
   })
 
+  it.each([
+    ['the rating', { rating: 4 }, 'Puntaje guardado: 4 estrellas'],
+    ['a rating of one', { rating: 1 }, 'Puntaje guardado: 1 estrella'],
+    ['a cleared rating', { rating: undefined }, 'Puntaje quitado'],
+    ['the end', { finishedAt: daysAgo(340) }, 'Fecha de término cambiada'],
+    ['the start', { startedAt: daysAgo(390) }, 'Fecha de inicio cambiada'],
+    [
+      'both dates',
+      { startedAt: daysAgo(10), finishedAt: daysAgo(10) },
+      'Fechas de inicio y término cambiadas',
+    ],
+  ])('names %s when it corrects a reading in Leído', (_case, change, message) => {
+    const { startedAt = '', finishedAt = '', rating } = state().library[CIEN_ANOS]
+    state().finishBook(CIEN_ANOS, { startedAt, finishedAt, rating, ...change })
+    expect(state().toast).toMatchObject({ message, undoable: true })
+  })
+
   it('clears the rating when it comes undefined', () => {
     state().finishBook(CIEN_ANOS, details)
     expect(state().library[CIEN_ANOS]).not.toHaveProperty('rating')
@@ -237,13 +254,13 @@ describe('every change', () => {
 
 describe('setStartDate', () => {
   const CARRIE = 'OL81626W' // Leyendo
-  const IT = 'OL81613W' // Lo quiero
+  const IT = 'OL81613W' // Quiero leerlo
 
   it('corrects the start of a book in Leyendo, with Deshacer', () => {
     const before = state().library[CARRIE]
     state().setStartDate(CARRIE, daysAgo(40))
     expect(state().library[CARRIE]).toEqual({ ...before, startedAt: daysAgo(40) })
-    expect(state().toast).toMatchObject({ message: 'Lectura actualizada', undoable: true })
+    expect(state().toast).toMatchObject({ message: 'Fecha de inicio cambiada', undoable: true })
     state().undo()
     expect(state().library[CARRIE]).toBe(before)
   })
@@ -257,15 +274,53 @@ describe('setStartDate', () => {
   })
 })
 
+describe('setCurrentPage', () => {
+  const DUNE = 'OL893414W' // Leyendo, 608 páginas
+  const IT = 'OL81613W' // Quiero leerlo
+
+  it('saves the page of a book in Leyendo, with Deshacer', () => {
+    const before = state().library[DUNE]
+    state().setCurrentPage(DUNE, 210)
+    expect(state().library[DUNE]).toEqual({ ...before, currentPage: 210 })
+    expect(state().toast).toMatchObject({
+      message: 'Vas en la página 210',
+      undoable: true,
+    })
+    state().undo()
+    expect(state().library[DUNE]).toBe(before)
+  })
+
+  it.each([0, 609, 2.5])('holds back page %s, outside the book', (page) => {
+    const commit = stubAction('commit')
+    state().setCurrentPage(DUNE, page)
+    expect(commit).not.toHaveBeenCalled()
+  })
+
+  it('does nothing with the same page or a book that is not in Leyendo', () => {
+    state().setCurrentPage(DUNE, 210)
+    state().dismissToast()
+    state().setCurrentPage(DUNE, 210)
+    state().setCurrentPage(IT, 10)
+    expect(state().toast).toBeNull()
+    expect(state().library[IT]).not.toHaveProperty('currentPage')
+  })
+
+  it('keeps the page after the book is finished', () => {
+    state().setCurrentPage(DUNE, 210)
+    state().finishBook(DUNE, { startedAt: daysAgo(30), finishedAt: today() })
+    expect(state().library[DUNE]).toMatchObject({ status: 'read', currentPage: 210 })
+  })
+})
+
 describe('answerWantPrompt', () => {
-  const IT = 'OL81613W' // Lo quiero hace 210 días, en Terror
+  const IT = 'OL81613W' // Quiero leerlo hace 210 días, en Terror
 
   it('keeps the book with Sí and remembers that it asked', () => {
     state().answerWantPrompt(IT, true)
     expect(state().library[IT].wantCheckedAt).toBe(today())
     expect(state().library[IT].status).toBe('want')
     expect(state().lastWantPromptOn).toBe(today())
-    expect(state().toast?.message).toBe('«It» sigue en Lo quiero')
+    expect(state().toast?.message).toBe('«It» sigue en Quiero leerlo')
   })
 
   it('takes the book out of the library and its folders with No', () => {

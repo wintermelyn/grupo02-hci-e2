@@ -9,11 +9,18 @@ function navigationBars() {
   return screen.getAllByRole('navigation', { name: 'Principal' })
 }
 
+/** The name of a section, without the hint the sidebar reads as its description. */
+function sectionName(link: HTMLElement) {
+  const copy = link.cloneNode(true) as HTMLElement
+  for (const hidden of copy.querySelectorAll('[aria-hidden]')) hidden.remove()
+  return copy.textContent
+}
+
 function activeSections(nav: HTMLElement) {
   return within(nav)
     .getAllByRole('link')
     .filter((link) => link.hasAttribute('aria-current'))
-    .map((link) => link.textContent)
+    .map(sectionName)
 }
 
 describe('AppShell', () => {
@@ -22,12 +29,19 @@ describe('AppShell', () => {
     const bars = navigationBars()
     expect(bars).toHaveLength(2)
     for (const nav of bars) {
-      expect(
-        within(nav)
-          .getAllByRole('link')
-          .map((link) => link.textContent),
-      ).toEqual(SECTIONS)
+      expect(within(nav).getAllByRole('link').map(sectionName)).toEqual(SECTIONS)
     }
+  })
+
+  it('says what Más holds in the sidebar, as its description, and not in the bottom bar', () => {
+    renderApp('/')
+    const [sidebar, bottomBar] = navigationBars()
+    const more = within(sidebar).getByRole('link', { name: 'Más' })
+    expect(more).toHaveAccessibleDescription('Amigos y perfil')
+    expect(within(more).getByText('Amigos y perfil')).toHaveClass('text-xs', 'text-muted')
+    const moreBelow = within(bottomBar).getByRole('link', { name: 'Más' })
+    expect(moreBelow).not.toHaveAccessibleDescription()
+    expect(moreBelow).toHaveTextContent(/^Más$/)
   })
 
   it.each([
@@ -99,9 +113,13 @@ describe('AppShell', () => {
     },
   )
 
-  it('leaves room under the last row for the bar and the toast', () => {
+  it('leaves room under the last row for the bar, and more while a toast reaches higher', () => {
     renderApp('/')
-    expect(screen.getByRole('main').className).toContain('pb-[calc(8rem+')
+    const main = screen.getByRole('main').className
+    expect(main).toContain(
+      'pb-[max(calc(8rem+env(safe-area-inset-bottom)),calc(var(--toast-space,0px)+1.5rem))]',
+    )
+    expect(main).toContain('lg:pb-[max(4rem,calc(var(--toast-space,0px)+1.5rem))]')
   })
 
   describe('scroll between pages', () => {

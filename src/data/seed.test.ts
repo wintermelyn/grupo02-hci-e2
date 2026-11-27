@@ -119,7 +119,7 @@ describe('initial library', () => {
     )
   })
 
-  it('makes It the oldest Lo quiero book, so the D5 prompt asks about it first', () => {
+  it('makes It the oldest Quiero leerlo book, so the D5 prompt asks about it first', () => {
     const [oldest] = withStatus('want').toSorted((a, b) => a.addedAt.localeCompare(b.addedAt))
     expect(oldest.bookId).toBe(PROMPTED_FIRST_BOOK_ID)
     expect(oldest.addedAt).toBe(daysAgo(210))

@@ -30,7 +30,7 @@ describe('LibraryPage', () => {
     renderApp('/biblioteca')
     expect(screen.getByRole('heading', { level: 1, name: 'Mis libros' })).toBeInTheDocument()
     expect(tagButton(/^Todos: 34 libros/)).toHaveAttribute('aria-pressed', 'true')
-    for (const name of [/Lo quiero: 17/, /Lo tengo: 5/, /Leyendo: 2/, /Leído: 10/]) {
+    for (const name of [/Quiero leerlo: 17/, /Lo tengo: 5/, /Leyendo: 2/, /Leído: 10/]) {
       expect(tagButton(name)).toHaveAttribute('aria-pressed', 'false')
     }
   })
@@ -78,7 +78,7 @@ describe('LibraryPage', () => {
     expect(titles.at(-1)).toMatch(/^Sapiens/)
   })
 
-  it('shows the 17 books of Lo quiero, as T2 expects', () => {
+  it('shows the 17 books of Quiero leerlo, as T2 expects', () => {
     renderApp('/biblioteca?tag=want')
     expect(bookTitles()).toHaveLength(17)
   })
@@ -119,7 +119,7 @@ describe('LibraryPage', () => {
 
     it('says the tag of each book in words, with its folders under the author', () => {
       renderApp('/biblioteca?tag=want')
-      for (const title of bookTitles()) expect(title).toContain('Lo quiero')
+      for (const title of bookTitles()) expect(title).toContain('Quiero leerlo')
       expect(row(/^Fundación/)).toHaveTextContent('Ciencia ficción')
       expect(row(/^La sombra del viento/)).toHaveTextContent('Próximos · Novela')
     })
@@ -133,12 +133,12 @@ describe('LibraryPage', () => {
     it('keeps saying the tag and the folders while searching inside the tag', () => {
       renderApp('/biblioteca?tag=want&q=fundaci')
       expect(row(/^Fundación/)).toHaveTextContent('Ciencia ficción')
-      expect(row(/^Fundación/)).toHaveTextContent('Lo quiero')
+      expect(row(/^Fundación/)).toHaveTextContent('Quiero leerlo')
     })
 
     it('keeps the tag in the results of Todos, where nothing else says it', () => {
       renderApp('/biblioteca?q=fundaci')
-      expect(row(/^Fundación/)).toHaveTextContent('Lo quiero')
+      expect(row(/^Fundación/)).toHaveTextContent('Quiero leerlo')
       expect(row(/^Fundación/)).not.toHaveTextContent('Ciencia ficción')
     })
   })
@@ -146,18 +146,33 @@ describe('LibraryPage', () => {
   describe('prompt', () => {
     const IT = 'OL81613W'
 
-    it('asks about It, with how long it has been waiting, in Todos and in Lo quiero', () => {
+    /** No, then the confirmation in the row. */
+    function answerNo(init?: { detail: number }) {
+      fireEvent.click(main().getByRole('button', { name: 'No, quitarlo' }))
+      fireEvent.click(main().getByRole('button', { name: 'Quitar de Mis libros' }), init)
+    }
+
+    it('asks about It, with how long it has been waiting, in Todos and in Quiero leerlo', () => {
       renderApp('/biblioteca')
-      expect(prompt()).toHaveTextContent('It · 210 días en Lo quiero')
-      fireEvent.click(tagButton(/^Lo quiero/))
-      expect(prompt()).toHaveTextContent('It · 210 días en Lo quiero')
+      expect(prompt()).toHaveTextContent('It · 210 días en Quiero leerlo')
+      fireEvent.click(tagButton(/^Quiero leerlo/))
+      expect(prompt()).toHaveTextContent('It · 210 días en Quiero leerlo')
     })
 
     it('says what No costs before it is pressed, also to a screen reader', () => {
       renderApp('/biblioteca')
       const cost = 'Si dices No, sale de Mis libros y de Terror'
       expect(prompt()).toHaveTextContent(cost)
-      expect(main().getByRole('button', { name: 'No' })).toHaveAccessibleDescription(cost)
+      expect(main().getByRole('button', { name: 'No, quitarlo' })).toHaveAccessibleDescription(cost)
+    })
+
+    it('drops the line under the row while confirming, as the confirmation draws its own box', () => {
+      renderApp('/biblioteca')
+      expect(prompt()).toHaveClass('border-b')
+      fireEvent.click(main().getByRole('button', { name: 'No, quitarlo' }))
+      expect(prompt()).not.toHaveClass('border-b')
+      fireEvent.click(main().getByRole('button', { name: 'Cancelar' }))
+      expect(prompt()).toHaveClass('border-b')
     })
 
     it('does not mention folders for a book in none', () => {
@@ -172,31 +187,56 @@ describe('LibraryPage', () => {
       expect(prompt()).not.toBeInTheDocument()
     })
 
-    it('gives Sí and No the same weight', () => {
+    it('sets No apart from Sí: it says what it does and weighs less', () => {
       renderApp('/biblioteca')
       const yes = main().getByRole('button', { name: 'Sí' })
-      const no = main().getByRole('button', { name: 'No' })
-      expect(yes.className).toBe(no.className)
+      const no = main().getByRole('button', { name: 'No, quitarlo' })
+      expect(yes).toHaveClass('border')
+      expect(no).not.toHaveClass('border')
+      expect(main().queryByRole('button', { name: 'No' })).not.toBeInTheDocument()
+    })
+
+    it('asks in the row before No takes the book out, and Cancelar keeps everything', () => {
+      const library = state().library
+      renderApp('/biblioteca')
+      fireEvent.click(main().getByRole('button', { name: 'No, quitarlo' }))
+      expect(state().library).toBe(library)
+      const confirm = main().getByRole('region', { name: '¿Quitar «It» de Mis libros?' })
+      expect(confirm).toHaveTextContent('Sale de Mis libros y de Terror.')
+      expect(within(confirm).getByRole('button', { name: 'Cancelar' })).toHaveFocus()
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+      fireEvent.click(within(confirm).getByRole('button', { name: 'Cancelar' }))
+      expect(state().library).toBe(library)
+      expect(main().getByRole('button', { name: 'No, quitarlo' })).toHaveFocus()
+      expect(question()).toBeInTheDocument()
+    })
+
+    it('cancels the question with Escape', () => {
+      renderApp('/biblioteca')
+      fireEvent.click(main().getByRole('button', { name: 'No, quitarlo' }))
+      fireEvent.keyDown(document.activeElement as Element, { key: 'Escape' })
+      expect(main().getByRole('button', { name: 'No, quitarlo' })).toHaveFocus()
+      expect(state().library).toHaveProperty(IT)
     })
 
     it('keeps the book with Sí, and does not ask again today', () => {
       renderApp('/biblioteca')
       fireEvent.click(main().getByRole('button', { name: 'Sí' }))
       expect(state().library[IT].wantCheckedAt).toBe(today())
-      expect(toast()).toHaveTextContent('«It» sigue en Lo quiero')
+      expect(toast()).toHaveTextContent('«It» sigue en Quiero leerlo')
       expect(prompt()).not.toBeInTheDocument()
     })
 
     it('takes the book out with No, and Deshacer brings back the book and the question', () => {
       renderApp('/biblioteca')
-      fireEvent.click(main().getByRole('button', { name: 'No' }))
+      answerNo()
       expect(state().library).not.toHaveProperty(IT)
       expect(toast()).toHaveTextContent('«It» salió de Mis libros y de Terror')
       expect(main().getByRole('link', { name: /Terror/ })).toHaveTextContent('9 libros')
 
       fireEvent.click(screen.getByRole('button', { name: 'Deshacer' }))
       expect(state().library[IT].folderIds).toEqual(['terror'])
-      expect(prompt()).toHaveTextContent('It · 210 días en Lo quiero')
+      expect(prompt()).toHaveTextContent('It · 210 días en Quiero leerlo')
     })
 
     describe('after Deshacer', () => {
@@ -212,7 +252,8 @@ describe('LibraryPage', () => {
           Reflect.deleteProperty(Element.prototype, 'scrollIntoView')
         })
         renderApp(path)
-        fireEvent.click(main().getByRole('button', { name: answer }), { detail: 1 })
+        if (answer === 'No') answerNo({ detail: 1 })
+        else fireEvent.click(main().getByRole('button', { name: answer }), { detail: 1 })
         expect(reveal).not.toHaveBeenCalled()
 
         fireEvent.click(screen.getByRole('button', { name: 'Deshacer' }))
@@ -243,9 +284,9 @@ describe('LibraryPage', () => {
 
     it('keeps the second tap from opening what moves up under it', () => {
       renderApp('/biblioteca')
-      const no = main().getByRole('button', { name: 'No' })
+      fireEvent.click(main().getByRole('button', { name: 'No, quitarlo' }))
       const ignored = vi.spyOn(window, 'addEventListener')
-      fireEvent.click(no)
+      fireEvent.click(main().getByRole('button', { name: 'Quitar de Mis libros' }))
       expect(ignored).toHaveBeenCalledWith('click', expect.any(Function), {
         capture: true,
         once: true,
@@ -259,28 +300,26 @@ describe('LibraryPage', () => {
     })
 
     describe('from the keyboard', () => {
-      function answerNo() {
+      function answerNoByKeyboard() {
         renderApp('/biblioteca?tag=want')
-        const no = main().getByRole('button', { name: 'No' })
-        no.focus()
         // The click of Enter or Space counts no clicks.
-        fireEvent.click(no, { detail: 0 })
+        answerNo({ detail: 0 })
         return screen.getByRole('button', { name: 'Deshacer' })
       }
 
       it('takes the focus to Deshacer, so it can be reached in time', () => {
-        expect(answerNo()).toHaveFocus()
+        expect(answerNoByKeyboard()).toHaveFocus()
       })
 
       it('brings the book back and the focus to the question with Enter on Deshacer', () => {
-        const undo = answerNo()
+        const undo = answerNoByKeyboard()
         fireEvent.click(undo, { detail: 0 })
         expect(state().library[IT].folderIds).toEqual(['terror'])
         expect(question()).toHaveFocus()
       })
 
       it('goes on through the list with Tab', () => {
-        const undo = answerNo()
+        const undo = answerNoByKeyboard()
         fireEvent.keyDown(undo, { key: 'Tab' })
         expect(document.activeElement).toContainElement(main().getAllByRole('link')[0])
       })

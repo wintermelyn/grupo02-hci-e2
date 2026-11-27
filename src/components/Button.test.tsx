@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react'
 import { describe, expect, it } from 'vitest'
 import { Button, type ButtonVariant } from './Button'
 
-const VARIANTS: ButtonVariant[] = ['primary', 'secondary', 'quiet', 'danger']
+const VARIANTS: ButtonVariant[] = ['primary', 'secondary', 'quiet', 'subtle', 'danger']
 
 describe('Button', () => {
   it.each(VARIANTS)('is never white in %s, so it does not look like a field', (variant) => {
@@ -37,6 +37,27 @@ describe('Button', () => {
     expect(button).not.toHaveClass('border')
     expect(button.className).not.toMatch(/(^|\s)bg-/)
     expect(button.classList.contains('aria-expanded:bg-sand')).toBe(true)
+  })
+
+  it('draws the subtle lighter than the quiet at rest, and in ink under the cursor and with focus', () => {
+    render(<Button variant="subtle">Quitar de Mis libros</Button>)
+    const button = screen.getByRole('button')
+    expect(button).toHaveClass('font-medium', 'text-muted')
+    expect(button).not.toHaveClass('font-semibold', 'text-ink')
+    expect(button.className).not.toMatch(/(^|\s)bg-/)
+    for (const name of [
+      'hover:bg-sand',
+      'hover:text-ink',
+      'focus-visible:bg-sand',
+      'focus-visible:text-ink',
+    ])
+      expect(button.classList.contains(name)).toBe(true)
+    expect(button.className).not.toMatch(/danger/)
+  })
+
+  it('keeps the weight of the control in every other variant', () => {
+    render(<Button variant="quiet">Elegir carpetas</Button>)
+    expect(screen.getByRole('button')).toHaveClass('font-semibold')
   })
 
   it('is 44 px tall at every size, also compact', () => {

@@ -1,5 +1,6 @@
 import { differenceInCalendarDays } from 'date-fns'
 import { parseDate, today } from '../../lib/dates'
+import { pagePercent } from '../../lib/pages'
 import type { Activity, Book, BookId, Friendship, ISODate, User } from '../../types'
 
 export interface FeedItem {
@@ -31,6 +32,16 @@ export const ACTIVITY_VERBS: Record<Activity['kind'], string> = {
   want: 'quiere leer',
 }
 
+/**
+ * What a friend does with a book the person is reading, said in relation to them, so it does not
+ * read like the person's own state: "Diego también lo lee", not "Diego empezó".
+ */
+const ALONGSIDE_PHRASES: Record<Activity['kind'], string> = {
+  started: 'también lo lee',
+  finished: 'ya lo terminó',
+  want: 'también lo quiere leer',
+}
+
 export const firstName = (name: string) => name.split(' ')[0]
 
 export function daysSince(date: ISODate): number {
@@ -56,12 +67,40 @@ export function activitySentence({ activity, user, book }: FeedItem): string {
   return `${firstName(user.name)} ${ACTIVITY_VERBS[activity.kind]} ${book.title}`
 }
 
+/** The friend's line on a card of "Leyendo ahora". */
+export function alongsideSentence({ activity, user }: Pick<FeedItem, 'activity' | 'user'>): string {
+  return `${firstName(user.name)} ${ALONGSIDE_PHRASES[activity.kind]}`
+}
+
 /** What goes under a book in "Leyendo ahora". */
 export function readingTime(startedAt: ISODate | undefined): string {
   if (!startedAt) return 'Sin fecha de inicio'
   const days = daysSince(startedAt)
   if (days <= 0) return 'Empezaste hoy'
   return days === 1 ? 'Llevas 1 día' : `Llevas ${days} días`
+}
+
+export interface PageProgress {
+  /** "Página 210". */
+  page: string
+  /** "de 608", when the length of the book is known. */
+  total?: string
+  /** "35 %", with no break before the sign. */
+  percentLabel?: string
+  percent?: number
+}
+
+/** How far the person is into a book, once they saved a page. */
+export function pageProgress(
+  currentPage: number | undefined,
+  pages: number | undefined,
+): PageProgress | undefined {
+  if (currentPage === undefined) return undefined
+  // Each number stays with its word. The total is apart, so a narrow card can leave it out.
+  const page = `Página\u00a0${currentPage}`
+  if (!pages) return { page }
+  const percent = pagePercent(currentPage, pages)
+  return { page, total: `de\u00a0${pages}`, percentLabel: `${percent}\u00a0%`, percent }
 }
 
 /** What the person's current friends did, newest first. */

@@ -77,31 +77,41 @@ describe('before typing', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('counts the books of each author in the catalog, the number that tapping them shows', async () => {
+  it('counts at the foot the books of each author that are in Mis libros', async () => {
     catalog()
     renderApp('/buscar')
     const authors = within(section('Autores de Mis libros'))
-    const king = await authors.findByRole('button', { name: /Stephen King.*5 libros/ })
+    const king = authors.getByRole('button', { name: /Stephen King\s*Tienes 4 libros/ })
+    // At the foot, as approved: short enough to clear the covers.
+    expect(within(king).getByText('Tienes 4', { exact: false })).toHaveClass('mt-auto')
     fireEvent.click(king)
-    expect(screen.getByText('5 libros · 4 en Mis libros')).toBeInTheDocument()
+    expect(await screen.findByText('5 libros · 4 en Mis libros')).toBeInTheDocument()
   })
 
-  it('says no amount until the catalog arrives, and keeps its line', async () => {
-    catalog()
-    renderApp('/buscar')
-    const authors = within(section('Autores de Mis libros'))
-    const king = authors.getByRole('button', { name: 'Stephen King' })
-    expect(king.querySelector('.min-h-5')).toBeEmptyDOMElement()
-    expect(await authors.findByText('5 libros')).toBeInTheDocument()
-  })
-
-  it('says no amount if the catalog fails', async () => {
+  it('says the amount before the catalog arrives, and also if it fails', async () => {
     stubCatalog({ failing: [/index/] })
     renderApp('/buscar')
-    await act(async () => undefined)
     const authors = within(section('Autores de Mis libros'))
-    expect(authors.getByRole('button', { name: 'Stephen King' })).toBeInTheDocument()
-    expect(authors.queryByText(/\d+ libros?$/)).not.toBeInTheDocument()
+    expect(
+      authors.getByRole('button', { name: /Stephen King\s*Tienes 4 libros/ }),
+    ).toBeInTheDocument()
+    await act(async () => undefined)
+    expect(
+      authors.getByRole('button', { name: /Stephen King\s*Tienes 4 libros/ }),
+    ).toBeInTheDocument()
+  })
+
+  it('follows Mis libros when a book of the author leaves it', () => {
+    const kingBook = Object.keys(state().library).find((id) =>
+      state().seedBooks[id]?.authors.includes('Stephen King'),
+    )
+    act(() => state().removeFromLibrary([kingBook!]))
+    renderApp('/buscar')
+    expect(
+      within(section('Autores de Mis libros')).getByRole('button', {
+        name: /Stephen King\s*Tienes 3 libros/,
+      }),
+    ).toBeInTheDocument()
   })
 
   it('keeps the place of friends when there are none', () => {
@@ -291,11 +301,11 @@ describe('with results', () => {
     expect(await screen.findByText('Los 40 más relevantes de 51')).toBeInTheDocument()
   })
 
-  it('counts the books of an author', async () => {
+  it('counts the books of an author that match, at the foot of the card', async () => {
     renderApp('/buscar?q=king')
     const authors = within(await waitForSection('Autores'))
     expect(authors.getByRole('button', { name: /Stephen King/ })).toBeInTheDocument()
-    expect(authors.getByText('5 libros')).toBeInTheDocument()
+    expect(authors.getByText('5 libros')).toHaveClass('mt-auto')
   })
 
   it('separates authors and books, and tapping an author filters their books', async () => {
@@ -473,6 +483,16 @@ describe('without results', () => {
       within(section('Autores de Mis libros')).getByRole('button', { name: /George Orwell/ }),
     )
     expect(currentLocation()).toBe('/buscar?q=George+Orwell')
+  })
+
+  it('counts the books of each author in Mis libros, as the start of Buscar does', async () => {
+    renderApp('/buscar?q=zzzz')
+    await screen.findByText('No encontramos «zzzz»')
+    const authors = within(section('Autores de Mis libros'))
+    expect(
+      authors.getByRole('button', { name: /Stephen King\s*Tienes 4 libros/ }),
+    ).toBeInTheDocument()
+    expect(authors.queryByText(/^\d+ libros?$/)).not.toBeInTheDocument()
   })
 
   it('separates the way out from the block above as two sections', async () => {

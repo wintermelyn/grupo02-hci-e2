@@ -14,7 +14,7 @@ export interface BookFoldersProps {
 
 /**
  * The links lead to each folder and the button next to them changes them. A quick change, so it is
- * a menu: adding and removing cost the same two taps, with or without folders. The button keeps its
+ * a menu: adding and taking out cost the same two taps, with or without folders. The button keeps its
  * place at the end of the first line, and it is the links that wrap.
  */
 export function BookFolders({ book, entry }: BookFoldersProps) {
@@ -38,9 +38,10 @@ export function BookFolders({ book, entry }: BookFoldersProps) {
       }),
     [folders, entry.folderIds, book.id, addToFolder, removeFromFolder],
   )
-  // Named after what the person came to do. With no folders, there is nothing to take out yet.
+  // Named after what the person came to do. It says "choose" and never "quitar": taking a book out
+  // of a folder keeps it in Mis libros, and in testing "quitar" read as deleting it.
   const hasFolders = bookFolders.length > 0
-  const change = hasFolders ? 'Agregar o quitar' : 'Agregar'
+  const change = hasFolders ? 'Elegir carpetas' : 'Agregar'
   // The row says "Carpetas" on screen; a screen reader that lands on the button needs it said.
   const changeName = hasFolders ? change : 'Agregar a carpeta'
 
@@ -69,7 +70,7 @@ export function BookFolders({ book, entry }: BookFoldersProps) {
           checkedLabel="Agregado"
           align="end"
           resetKey={book.id}
-          // Its text ends where "Cambiar o quitar" ends, on the row above.
+          // Its text ends where "Cambiar estado" ends, on the row above.
           className="-mr-2 shrink-0"
           options={options}
           trigger={(triggerProps) => (
@@ -77,7 +78,7 @@ export function BookFolders({ book, entry }: BookFoldersProps) {
               {...triggerProps}
               variant="quiet"
               compact
-              // The plus only says half of "Agregar o quitar".
+              // The plus would only say half of "Elegir carpetas".
               icon={hasFolders ? undefined : Plus}
               aria-label={`${changeName}: «${book.title}»`}
             >

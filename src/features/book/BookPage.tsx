@@ -1,4 +1,5 @@
 import { RotateCcw, Sparkle } from 'lucide-react'
+import { useRef } from 'react'
 import { matchPath, useLocation, useParams } from 'react-router'
 import { BookCover, Button, StatusControl } from '../../components'
 import { useCatalogBook } from '../../lib/catalog'
@@ -14,6 +15,7 @@ import {
   BOOK_RECORD,
   BookTopRow,
 } from './BookSkeleton'
+import { LeaveLibrary } from './LeaveLibrary'
 import { LedgerRow } from './LedgerRow'
 import { MissingBook } from './MissingBook'
 import { ReadingDetails } from './ReadingDetails'
@@ -23,7 +25,7 @@ const LIBRARY_PATH = '/biblioteca'
 const SEARCH_PATH = '/buscar'
 const FOLDER_PATTERN = `${LIBRARY_PATH}/carpeta/:folderId`
 
-/** The tags that have a reading to show. Lo quiero and Lo tengo keep theirs, out of sight. */
+/** The tags that have a reading to show. Quiero leerlo and Lo tengo keep theirs, out of sight. */
 const WITH_READING: readonly ReadingStatus[] = ['reading', 'read']
 
 /** BookRow says which list the book was opened from; a shared link has no such state. */
@@ -106,6 +108,15 @@ export function BookPage() {
   const entry = useStore(selectEntry(bookId))
   const folders = useStore((state) => state.folders)
   const back = backTarget(state, folders)
+  const record = useRef<HTMLDListElement>(null)
+
+  // The control of Estado is the first of the record, and one button whether the book is in Mis
+  // libros or not: it says «Agregar a Mis libros» once the book leaves, and its tag after Deshacer.
+  function focusStatus() {
+    record.current
+      ?.querySelector<HTMLElement>('[aria-haspopup="menu"]')
+      ?.focus({ preventScroll: true })
+  }
 
   if (!book) return <MissingBook key={bookId} bookId={bookId} back={back} />
 
@@ -130,7 +141,7 @@ export function BookPage() {
             <BookDetails {...book} />
           </header>
 
-          <dl className={BOOK_RECORD}>
+          <dl ref={record} className={BOOK_RECORD}>
             <LedgerRow label="Estado">
               {/* On a wide record, a full-width black pill would weigh more than the title. */}
               <StatusControl
@@ -140,10 +151,12 @@ export function BookPage() {
               />
             </LedgerRow>
             {entry && WITH_READING.includes(entry.status) && (
-              <ReadingDetails bookId={book.id} entry={entry} />
+              <ReadingDetails bookId={book.id} entry={entry} pages={book.pages} />
             )}
             {entry && <BookFolders book={book} entry={entry} />}
           </dl>
+          {/* A new one for each book, so a question left open is never about another one. */}
+          {entry && <LeaveLibrary key={book.id} book={book} entry={entry} onLeave={focusStatus} />}
 
           <AboutBook book={book} />
         </div>

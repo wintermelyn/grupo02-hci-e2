@@ -18,12 +18,14 @@ import { ignoreSecondClick } from './ignoreSecondClick'
 export type AnchoredMenuKind = 'radio' | 'checkbox' | 'action'
 
 /** `fill` takes the width of the control. `end` is for a control narrower than the menu. */
-export type AnchoredMenuAlign = 'fill' | 'end'
+export type AnchoredMenuAlign = 'fill' | 'start' | 'end'
 
 export interface AnchoredMenuOption {
   id: string
   /** Its text is also the name of the option. */
   label: ReactNode
+  /** What the option means, in a line below it, for choices that are easy to mix up. */
+  detail?: string
   /** Only for `radio` and `checkbox`. */
   checked?: boolean
   onSelect: () => void
@@ -58,6 +60,11 @@ export interface AnchoredMenuProps {
   /** Says in words that an option is on, since the check alone would rely on an icon. */
   checkedLabel?: string
   align?: AnchoredMenuAlign
+  /**
+   * The labels start with an 18 px icon, as a StatusTag does, so the detail of an option lines up
+   * with the text of its label and not with the icon.
+   */
+  iconLabels?: boolean
   /** The control, drawn by whoever uses the menu. */
   trigger: (props: AnchoredMenuTriggerProps) => ReactNode
   /** A new value closes the menu, e.g. the book on screen after the browser's back button. */
@@ -77,7 +84,10 @@ const ITEM_ROLES: Record<AnchoredMenuKind, string> = {
 }
 
 const ALIGN_CLASSES: Record<AnchoredMenuAlign, string> = {
-  fill: 'inset-x-0',
+  // From md, a narrow control such as Agregar a Mis libros still gives a detail one line.
+  fill: 'inset-x-0 md:min-w-64',
+  // Under a control that spans a wide row: from md, as wide as its options and under the value.
+  start: 'inset-x-0 md:right-auto md:w-80',
   end: 'right-0 w-64',
 }
 
@@ -113,6 +123,7 @@ export function AnchoredMenu({
   kind = 'radio',
   checkedLabel = 'Actual',
   align = 'fill',
+  iconLabels = false,
   trigger,
   resetKey = '',
   className,
@@ -256,22 +267,36 @@ export function AnchoredMenu({
             type="button"
             role={ITEM_ROLES[kind]}
             aria-checked={kind === 'action' ? undefined : Boolean(option.checked)}
+            // The detail is read after the name, which stays the label alone.
+            aria-description={option.detail}
             tabIndex={-1}
             onClick={() => choose(option)}
             className={cx(
-              'flex min-h-11 w-full items-center justify-between gap-3 rounded-control px-2.5 text-left',
+              'flex min-h-11 w-full flex-col justify-center rounded-control px-2.5 text-left',
               'transition-colors duration-100 -outline-offset-2 hover:bg-sand active:bg-sand-deep',
+              option.detail && 'pt-1 pb-2',
             )}
           >
-            {option.label}
-            {/* aria-checked already says this, so it stays out of the option's name. */}
-            {option.checked && (
+            {/* The check goes on the line of the label, so the detail below keeps the full width. */}
+            <span className="flex min-h-8 items-center justify-between gap-3">
+              {option.label}
+              {/* aria-checked already says this, so it stays out of the option's name. */}
+              {option.checked && (
+                <span
+                  aria-hidden
+                  className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-ink"
+                >
+                  <Check size={16} strokeWidth={3} />
+                  {checkedLabel}
+                </span>
+              )}
+            </span>
+            {option.detail && (
               <span
                 aria-hidden
-                className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-ink"
+                className={cx('block text-sm wrap-anywhere text-muted', iconLabels && 'pl-6')}
               >
-                <Check size={16} strokeWidth={3} />
-                {checkedLabel}
+                {option.detail}
               </span>
             )}
           </button>
