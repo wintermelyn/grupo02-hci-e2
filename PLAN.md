@@ -56,7 +56,7 @@ Es una página web responsiva. En el celular y la tablet tiene una barra de nave
 | `/amigos/:userId` | **Persona:** qué lee, libros en común, botón agregar o estado de la solicitud | B |
 | `/perfil` | **Mi perfil:** nombre, @usuario, **Reiniciar demo** | B |
 
-Barra de navegación, en este orden: **Inicio · Mis libros · Descubrir · Buscar · Más**. Cada ícono va con su etiqueta de texto. "Más" queda activa también en `/amigos` y `/perfil`.
+Barra de navegación, en este orden: **Inicio · Mis libros · Descubrir · Buscar · Más**. Cada ícono va con su etiqueta de texto. "Más" queda activa también en `/amigos` y `/perfil`. En la barra lateral, "Más" lleva debajo "Amigos y perfil", porque en la E3 una persona buscó a sus amigos en la barra y no encontró pista; en la barra inferior no cabe.
 
 ### Decisiones de diseño que el prototipo debe mostrar
 D1 a D6 son las decisiones 1 a 6 del informe, con la misma numeración. La columna "Pantalla" sirve para llenar "Dónde se ve en el prototipo" (sección 5 del informe).

@@ -486,7 +486,7 @@ Todos superan el 3:1 que pide el borde de un control. Sobre `sand-deep` da 2,88:
 - **Control** (600, 16 px, 24 px de línea): botones y `StatusTag` en tamaño normal. Los enlaces de volver y de carpeta usan 500.
 - **Small** (400, 14 px, 20 px de línea): subtítulos, autores, cantidades y procedencia de una descripción, en `muted`.
 - **Small label** (600, 14 px, 20 px de línea): `StatusTag` en listas, @usuario, estado de una persona, "En común".
-- **Caption** (500, 12 px, 16 px de línea): etiquetas de `TagFilter`, el aviso de prototipo y la barra inferior en 600. Las activas pasan a 700. Bajo 360 px, también los amigos en común y el estado en una fila de persona.
+- **Caption** (500, 12 px, 16 px de línea): etiquetas de `TagFilter`, el aviso de prototipo, la pista de "Más" en la barra lateral y la barra inferior en 600. Las activas pasan a 700. Bajo 360 px, también los amigos en común y el estado en una fila de persona.
 
 La marca "Goodreads" usa la serif a 600: 24 px en la barra lateral, 16 px en `Wordmark` y 14 px cuando va apilada. La cantidad de `TagFilter` usa la serif a 600, 16 px y 20 px de línea, con cifras tabulares.
 
@@ -503,7 +503,7 @@ Todo `h1`, `h2` y `h3` usa `text-wrap: balance`.
 El diseño parte del celular. `AppShell` pone el marco y cada pantalla solo llena `main`.
 
 - **Puntos de quiebre:** `lg` (1024 px) cambia la barra inferior por la lateral. `md` (768 px) cambia las grillas. `sm` (640 px) solo afina Descubrir.
-- **Barra lateral:** 232 px (`--sidebar`), fija al alto de la pantalla, desde `lg`.
+- **Barra lateral:** 232 px (`--sidebar`), fija al alto de la pantalla, desde `lg`. "Más" lleva bajo su nombre lo que guarda, "Amigos y perfil", en Caption `muted`, y mide 52 px. Su ícono queda en la línea del nombre. El nombre accesible sigue siendo "Más", y la pista es su descripción. En la barra inferior no cabe: a 320 px cada sección mide 62 px.
 - **Margen:** `--gut` mide 16 px, 28 px desde `md` y 44 px desde `lg`. `main` lo pone siempre, así que una pantalla no agrega su propio margen lateral. Lo que deba llegar al borde de la columna, como un riel, usa `full-bleed`.
 - **Ancho:** Inicio, Descubrir y Buscar, también la actividad completa (`/?actividad=`), usan todo el ancho que deja la barra lateral (`WIDE_PATHS` en `AppShell`). Las demás pantallas van en una columna de hasta 1040 px (`max-w-app`), centrada bajo `lg` y pegada a la barra lateral desde ahí.
 - **Inicio de página:** `PageHeader` deja 12 px arriba, 32 px desde `lg`, y 16 px abajo si no lleva nada bajo el título. El margen inferior de lo que lleva adentro queda en el encabezado, gracias a `flow-root`. La acción de la página, si la hay, va en la misma fila del título.
