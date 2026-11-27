@@ -46,6 +46,23 @@ describe('finishBook', () => {
     expect(state().toast?.message).toBe('Lectura actualizada')
   })
 
+  it.each([
+    ['the rating', { rating: 4 }, 'Puntaje guardado: 4 estrellas'],
+    ['a rating of one', { rating: 1 }, 'Puntaje guardado: 1 estrella'],
+    ['a cleared rating', { rating: undefined }, 'Puntaje quitado'],
+    ['the end', { finishedAt: daysAgo(340) }, 'Fecha de término cambiada'],
+    ['the start', { startedAt: daysAgo(390) }, 'Fecha de inicio cambiada'],
+    [
+      'both dates',
+      { startedAt: daysAgo(10), finishedAt: daysAgo(10) },
+      'Fechas de inicio y término cambiadas',
+    ],
+  ])('names %s when it corrects a reading in Leído', (_case, change, message) => {
+    const { startedAt = '', finishedAt = '', rating } = state().library[CIEN_ANOS]
+    state().finishBook(CIEN_ANOS, { startedAt, finishedAt, rating, ...change })
+    expect(state().toast).toMatchObject({ message, undoable: true })
+  })
+
   it('clears the rating when it comes undefined', () => {
     state().finishBook(CIEN_ANOS, details)
     expect(state().library[CIEN_ANOS]).not.toHaveProperty('rating')
@@ -243,7 +260,7 @@ describe('setStartDate', () => {
     const before = state().library[CARRIE]
     state().setStartDate(CARRIE, daysAgo(40))
     expect(state().library[CARRIE]).toEqual({ ...before, startedAt: daysAgo(40) })
-    expect(state().toast).toMatchObject({ message: 'Lectura actualizada', undoable: true })
+    expect(state().toast).toMatchObject({ message: 'Fecha de inicio cambiada', undoable: true })
     state().undo()
     expect(state().library[CARRIE]).toBe(before)
   })

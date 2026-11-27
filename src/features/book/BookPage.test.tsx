@@ -566,7 +566,7 @@ describe('dates and rating', () => {
       status: 'reading',
       startedAt: daysAgo(20),
     })
-    expect(toast()).toHaveTextContent('Lectura actualizada')
+    expect(toast()).toHaveTextContent('Fecha de inicio cambiada')
   })
 
   it('shows the start, the end and the rating of a book in Leído, ready to change', () => {
@@ -589,7 +589,7 @@ describe('dates and rating', () => {
     pickDate('Fin', daysAgo(340))
     expect(entry()).toMatchObject({ status: 'read', finishedAt: daysAgo(340), rating: 5 })
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-    expect(toast()).toHaveTextContent('Lectura actualizada')
+    expect(toast()).toHaveTextContent('Fecha de término cambiada')
     fireEvent.click(undoButton())
     expect(entry()).toEqual(before)
     expect(dateField('Fin')).toHaveValue(before.finishedAt)
@@ -624,7 +624,7 @@ describe('dates and rating', () => {
     renderApp(CIEN_ANOS)
     fireEvent.click(main().getByRole('radio', { name: '3 estrellas' }))
     expect(entry().rating).toBe(3)
-    expect(toast()).toHaveTextContent('Lectura actualizada')
+    expect(toast()).toHaveTextContent('Puntaje guardado: 3 estrellas')
     fireEvent.click(undoButton())
     expect(entry()).toEqual(before)
   })
@@ -633,6 +633,7 @@ describe('dates and rating', () => {
     renderApp(CIEN_ANOS)
     fireEvent.click(main().getByRole('button', { name: 'Quitar puntaje' }))
     expect(entry()).not.toHaveProperty('rating')
+    expect(toast()).toHaveTextContent('Puntaje quitado')
   })
 
   it.each([

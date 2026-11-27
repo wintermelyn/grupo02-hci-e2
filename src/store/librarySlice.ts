@@ -61,6 +61,22 @@ function without(library: Library, bookIds: Iterable<BookId>): Library {
   return Object.fromEntries(Object.entries(library).filter(([bookId]) => !removed.has(bookId)))
 }
 
+/** What the toast says after correcting a reading already in Leído, so it names what was saved. */
+function readingChangeLabel(before: LibraryEntry, after: LibraryEntry): string {
+  const start = before.startedAt !== after.startedAt
+  const end = before.finishedAt !== after.finishedAt
+  const rating = before.rating !== after.rating
+  if (rating && !start && !end) {
+    if (after.rating === undefined) return 'Puntaje quitado'
+    return `Puntaje guardado: ${after.rating} ${after.rating === 1 ? 'estrella' : 'estrellas'}`
+  }
+  if (rating) return 'Lectura actualizada'
+  if (start && end) return 'Fechas de inicio y término cambiadas'
+  if (start) return 'Fecha de inicio cambiada'
+  if (end) return 'Fecha de término cambiada'
+  return 'Lectura actualizada'
+}
+
 function withFolderIds(
   library: Library,
   bookIds: BookId[],
@@ -109,14 +125,14 @@ export const createLibrarySlice: SliceCreator<LibraryActions> = (set, get) => {
 
       let label = `Agregado a Mis libros como «${STATUS_LABELS.read}»`
       if (current) label = `Estado cambiado a «${STATUS_LABELS.read}»`
-      if (current?.status === 'read') label = 'Lectura actualizada'
+      if (current?.status === 'read') label = readingChangeLabel(current, entry)
       get().commit(label, ({ library }) => ({ library: { ...library, [bookId]: entry } }))
     },
 
     setStartDate: (bookId, startedAt) => {
       const current = selectEntry(bookId)(get())
       if (current?.status !== 'reading' || current.startedAt === startedAt) return
-      get().commit('Lectura actualizada', ({ library }) => ({
+      get().commit('Fecha de inicio cambiada', ({ library }) => ({
         library: { ...library, [bookId]: { ...current, startedAt } },
       }))
     },
