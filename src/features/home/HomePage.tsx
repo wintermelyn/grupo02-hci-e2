@@ -21,7 +21,7 @@ export function HomePage() {
       {/* "Leyendo ahora" is what shows, but the page is Inicio: that is its name and its tab. */}
       <h1 className="sr-only">Inicio</h1>
       <Wordmark className="mb-2" />
-      <ReadingNow reading={reading} feed={feed} />
+      <ReadingNow reading={reading} />
       <ActivityPreview feed={feed} viewLinkRef={viewLink} />
     </section>
   )

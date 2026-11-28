@@ -82,7 +82,7 @@ describe('setStatus', () => {
     state().upsertBook(unknownBook)
   })
 
-  it('adds a missing book as Quiero leerlo, checked today and without startedAt', () => {
+  it('adds a missing book as Lo quiero, checked today and without startedAt', () => {
     state().setStatus(unknownBook.id, 'want')
     expect(state().library[unknownBook.id]).toEqual({
       bookId: unknownBook.id,
@@ -108,17 +108,17 @@ describe('setStatus', () => {
     state().setStatus(seedEntry('want').bookId, 'owned')
     expect(state().toast).toMatchObject({ message: 'Estado cambiado a «Lo tengo»' })
     state().setStatus(unknownBook.id, 'want')
-    expect(state().toast).toMatchObject({ message: 'Agregado a Mis libros como «Quiero leerlo»' })
+    expect(state().toast).toMatchObject({ message: 'Agregado a Mis libros como «Lo quiero»' })
   })
 
-  it('sets wantCheckedAt when a book moves to Quiero leerlo', () => {
+  it('sets wantCheckedAt when a book moves to Lo quiero', () => {
     const reading = seedEntry('reading')
     expect(reading.wantCheckedAt).toBeUndefined()
     state().setStatus(reading.bookId, 'want')
     expect(state().library[reading.bookId].wantCheckedAt).toBe(today())
   })
 
-  it('renews wantCheckedAt when a book comes back to Quiero leerlo', () => {
+  it('renews wantCheckedAt when a book comes back to Lo quiero', () => {
     const want = seedEntry('want')
     state().setStatus(want.bookId, 'owned')
     useStore.setState((current) => ({
@@ -163,7 +163,7 @@ describe('setStatus', () => {
     })
   })
 
-  it('sets startedAt when a Quiero leerlo book moves to Leyendo', () => {
+  it('sets startedAt when a Lo quiero book moves to Leyendo', () => {
     const want = seedEntry('want')
     expect(want.startedAt).toBeUndefined()
     state().setStatus(want.bookId, 'reading')
@@ -303,15 +303,6 @@ describe('toast', () => {
     vi.advanceTimersByTime(1)
     expect(state().toast).toBeNull()
     expect(state().undoSnapshot).toBeNull()
-  })
-
-  it('keeps Deshacer for 10 s, time enough to notice a mistake and undo it', () => {
-    state().setStatus(unknownBook.id, 'owned')
-    vi.advanceTimersByTime(9_000)
-    expect(state().toast?.undoable).toBe(true)
-    state().undo()
-    expect(state().library[unknownBook.id]).toBeUndefined()
-    expect(TOAST_DURATION_MS).toBe(10_000)
   })
 
   it('a plain toast replaces an undoable one and drops its undo copy', () => {

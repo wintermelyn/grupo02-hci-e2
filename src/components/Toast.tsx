@@ -17,7 +17,7 @@ type Hold = 'hover' | 'focus' | 'menu'
 export const TOAST_SPACE = '--toast-space'
 
 /**
- * Renders the store's toast. The store hides it after 10 s (TOAST_DURATION_MS) and drops the
+ * Renders the store's toast. The store hides it after 5 s (TOAST_DURATION_MS) and drops the
  * undo copy at the same time. Mounted once, in AppShell.
  */
 export function Toast() {

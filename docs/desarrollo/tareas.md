@@ -10,7 +10,7 @@ Todo parte desde **Reiniciar demo**. La persona que usa la app es **Alex Muñoz*
 
 ## T2 · Ordenar los pendientes
 
-"Quiero leerlo" tiene estos 17 libros. "Próximos" ya trae 2: _La sombra del viento_ y _Nuestra parte de noche_ (este último en "Lo tengo").
+"Lo quiero" tiene estos 17 libros. "Próximos" ya trae 2: _La sombra del viento_ y _Nuestra parte de noche_ (este último en "Lo tengo").
 
 | Libro                              | Autor                | Carpetas         |
 | ---------------------------------- | -------------------- | ---------------- |

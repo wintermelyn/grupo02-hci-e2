@@ -44,7 +44,7 @@ El informe y el plan mandan sobre este archivo. Si se contradicen, el orden es `
 **Lo que hace el producto:**
 
 - Mis libros, con tablero de carpetas y la carpeta fija "Próximos" primero.
-- Cuatro tags excluyentes y visibles en cada lista: Quiero leerlo, Lo tengo, Leyendo y Leído. "Lo tengo" significa que lo tengo y no lo he leído.
+- Cuatro tags excluyentes y visibles en cada lista: Lo quiero, Lo tengo, Leyendo y Leído. "Lo tengo" significa que lo tengo y no lo he leído.
 - Botones de tag para filtrar, en Mis libros y dentro de cada carpeta.
 - Aviso "¿Sigues queriendo leer este libro?", con un libro antiguo a la vez y botones "Sí" y "No, quitarlo", que pide confirmar.
 - Búsqueda de cualquier usuario dentro de Amigos, con "+ Agregar" y el estado "Solicitud enviada".

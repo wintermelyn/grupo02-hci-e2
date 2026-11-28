@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { currentLocation, renderApp } from '../../test/router'
 import { state, stubAction } from '../../test/store'
 
-const TERROR = '/biblioteca/carpeta/terror' // 10 libros: 6 Quiero leerlo, 2 Lo tengo, 1 Leyendo, 1 Leído
+const TERROR = '/biblioteca/carpeta/terror' // 10 libros: 6 Lo quiero, 2 Lo tengo, 1 Leyendo, 1 Leído
 const PROXIMOS = '/biblioteca/carpeta/proximos' // Fija
 
 const main = () => within(screen.getByRole('main'))
@@ -60,7 +60,7 @@ describe('FolderPage', () => {
   it('starts on Todos, counting only the books of this folder', () => {
     renderApp(TERROR)
     expect(tagButton(/^Todos: 10/)).toHaveAttribute('aria-pressed', 'true')
-    for (const name of [/Quiero leerlo: 6/, /Lo tengo: 2/, /Leyendo: 1/, /Leído: 1/]) {
+    for (const name of [/Lo quiero: 6/, /Lo tengo: 2/, /Leyendo: 1/, /Leído: 1/]) {
       expect(tagButton(name)).toHaveAttribute('aria-pressed', 'false')
     }
   })
@@ -70,7 +70,7 @@ describe('FolderPage', () => {
     const titles = bookTitles()
     expect(titles).toHaveLength(10)
     expect(titles[0]).toMatch(/^Carrie.*Leyendo/)
-    expect(titles[1]).toMatch(/^Cementerio de animales.*Quiero leerlo/)
+    expect(titles[1]).toMatch(/^Cementerio de animales.*Lo quiero/)
   })
 
   it('filters by tag, in the URL', () => {

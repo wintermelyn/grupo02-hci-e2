@@ -25,7 +25,7 @@ const LIBRARY_PATH = '/biblioteca'
 const SEARCH_PATH = '/buscar'
 const FOLDER_PATTERN = `${LIBRARY_PATH}/carpeta/:folderId`
 
-/** The tags that have a reading to show. Quiero leerlo and Lo tengo keep theirs, out of sight. */
+/** The tags that have a reading to show. Lo quiero and Lo tengo keep theirs, out of sight. */
 const WITH_READING: readonly ReadingStatus[] = ['reading', 'read']
 
 /** BookRow says which list the book was opened from; a shared link has no such state. */
