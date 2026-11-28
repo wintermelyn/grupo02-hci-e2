@@ -39,10 +39,10 @@ describe('FriendsPage without text', () => {
     expect(searchBox().closest('.rounded-full')).toHaveClass('md:w-[calc((100%-0.625rem)/2)]')
   })
 
-  it('has its header, search field and back link', () => {
+  it('has its header and search field, as a section of its own with no way back', () => {
     renderApp('/amigos')
     expect(screen.getByRole('heading', { level: 1, name: 'Amigos' })).toBeInTheDocument()
-    expect(main().getByRole('link', { name: 'Más' })).toHaveAttribute('href', '/mas')
+    expect(main().queryByRole('link', { name: /Volver|Más/ })).not.toBeInTheDocument()
     expect(searchBox()).toHaveAttribute('placeholder', 'Nombre o @usuario')
   })
 
@@ -336,9 +336,10 @@ describe('T3', () => {
     vi.useFakeTimers()
   })
 
-  it('goes from Más to Camila Torres as a friend', () => {
-    renderApp('/mas')
-    fireEvent.click(main().getByRole('link', { name: 'Amigos' }))
+  it('goes from the Amigos tab to Camila Torres as a friend', () => {
+    renderApp('/')
+    const bar = screen.getAllByRole('navigation', { name: 'Principal' }).at(-1)!
+    fireEvent.click(within(bar).getByRole('link', { name: 'Amigos' }))
     type('Camila Torres')
     fireEvent.click(addButton('camitorres'))
 

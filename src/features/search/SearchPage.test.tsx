@@ -15,10 +15,10 @@ function GoBack() {
   return <button onClick={() => navigate(-1)}>Atrás</button>
 }
 
-/** The whole app with Más before the search in the history, and a button for the browser's Back. */
-function renderAfterMas(path: string) {
+/** The whole app with Amigos before the search in the history, and a button for the browser's Back. */
+function renderAfterFriends(path: string) {
   render(
-    <MemoryRouter initialEntries={['/mas', path]} initialIndex={1}>
+    <MemoryRouter initialEntries={['/amigos', path]} initialIndex={1}>
       <GoBack />
       <Routes>{appRoutes}</Routes>
       <CurrentLocation />
@@ -134,7 +134,8 @@ describe('before typing', () => {
   it('does not hint that people are found elsewhere, which a question of the evaluation asks', () => {
     renderApp('/buscar')
     expect(screen.queryByText(/Buscas a una persona/)).not.toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Amigos' })).not.toBeInTheDocument()
+    const main = within(screen.getByRole('main'))
+    expect(main.queryByRole('link', { name: 'Amigos' })).not.toBeInTheDocument()
   })
 
   it('names Buscar on the way back from a book of the shelf', () => {
@@ -325,7 +326,7 @@ describe('with results', () => {
   })
 
   it('takes Back from an author to the search it was found in, not out of Buscar', async () => {
-    renderAfterMas('/buscar?q=king')
+    renderAfterFriends('/buscar?q=king')
     await screen.findByText('Apocalipsis')
     fireEvent.click(screen.getByRole('button', { name: /Stephen King/ }))
     expect(currentLocation()).toBe('/buscar?q=Stephen+King')
@@ -336,11 +337,11 @@ describe('with results', () => {
   })
 
   it('does not fill the history while typing', async () => {
-    renderAfterMas('/buscar')
+    renderAfterFriends('/buscar')
     type('k')
     type('ki')
     fireEvent.click(screen.getByRole('button', { name: 'Atrás' }))
-    expect(currentLocation()).toBe('/mas')
+    expect(currentLocation()).toBe('/amigos')
   })
 
   it('does not take Hawking for King', async () => {

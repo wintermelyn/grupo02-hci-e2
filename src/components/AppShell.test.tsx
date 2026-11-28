@@ -2,19 +2,15 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { renderApp } from '../test/router'
 
-const SECTIONS = ['Inicio', 'Mis libros', 'Descubrir', 'Buscar', 'Más']
+const BAR = ['Inicio', 'Mis libros', 'Descubrir', 'Buscar', 'Amigos']
+const SIDEBAR = [...BAR, 'Mi perfil']
 
 // Both bars are in the DOM; CSS shows one or the other. Each list is checked on its own.
 function navigationBars() {
   return screen.getAllByRole('navigation', { name: 'Principal' })
 }
 
-/** The name of a section, without the hint the sidebar reads as its description. */
-function sectionName(link: HTMLElement) {
-  const copy = link.cloneNode(true) as HTMLElement
-  for (const hidden of copy.querySelectorAll('[aria-hidden]')) hidden.remove()
-  return copy.textContent
-}
+const sectionName = (link: HTMLElement) => link.textContent
 
 function activeSections(nav: HTMLElement) {
   return within(nav)
@@ -24,24 +20,19 @@ function activeSections(nav: HTMLElement) {
 }
 
 describe('AppShell', () => {
-  it('has the five sections, in order, on both bars', () => {
-    renderApp('/')
-    const bars = navigationBars()
-    expect(bars).toHaveLength(2)
-    for (const nav of bars) {
-      expect(within(nav).getAllByRole('link').map(sectionName)).toEqual(SECTIONS)
-    }
-  })
-
-  it('says what Más holds in the sidebar, as its description, and not in the bottom bar', () => {
+  it('has the five sections in the bar, and Mi perfil after them in the sidebar', () => {
     renderApp('/')
     const [sidebar, bottomBar] = navigationBars()
-    const more = within(sidebar).getByRole('link', { name: 'Más' })
-    expect(more).toHaveAccessibleDescription('Amigos y perfil')
-    expect(within(more).getByText('Amigos y perfil')).toHaveClass('text-xs', 'text-muted')
-    const moreBelow = within(bottomBar).getByRole('link', { name: 'Más' })
-    expect(moreBelow).not.toHaveAccessibleDescription()
-    expect(moreBelow).toHaveTextContent(/^Más$/)
+    expect(within(sidebar).getAllByRole('link').map(sectionName)).toEqual(SIDEBAR)
+    expect(within(bottomBar).getAllByRole('link').map(sectionName)).toEqual(BAR)
+  })
+
+  it('names each section by what it holds, with no hint under it', () => {
+    renderApp('/')
+    for (const nav of navigationBars()) {
+      expect(within(nav).getByRole('link', { name: 'Amigos' })).toHaveAttribute('href', '/amigos')
+      expect(within(nav).queryByRole('link', { name: 'Más' })).not.toBeInTheDocument()
+    }
   })
 
   it.each([
@@ -50,19 +41,24 @@ describe('AppShell', () => {
     ['/biblioteca/carpeta/terror', 'Mis libros'],
     ['/descubrir', 'Descubrir'],
     ['/buscar', 'Buscar'],
-    ['/mas', 'Más'],
-    ['/amigos', 'Más'],
-    ['/amigos/camila', 'Más'],
-    ['/perfil', 'Más'],
+    ['/amigos', 'Amigos'],
+    ['/amigos/camila', 'Amigos'],
   ])('%s marks only %s', (path, section) => {
     renderApp(path)
     for (const nav of navigationBars()) expect(activeSections(nav)).toEqual([section])
   })
 
+  it('marks Mi perfil in the sidebar and no section in the bar, where it is not', () => {
+    renderApp('/perfil')
+    const [sidebar, bottomBar] = navigationBars()
+    expect(activeSections(sidebar)).toEqual(['Mi perfil'])
+    expect(activeSections(bottomBar)).toEqual([])
+  })
+
   it.each([
-    ['/mas', 'page'],
-    ['/amigos', 'true'],
-    ['/perfil', 'true'],
+    ['/amigos', 'page'],
+    ['/amigos/camila', 'true'],
+    ['/perfil', 'page'],
     ['/biblioteca', 'page'],
     ['/biblioteca/carpeta/terror', 'true'],
   ])('%s is announced as aria-current=%s', (path, value) => {

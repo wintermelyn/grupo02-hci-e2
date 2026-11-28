@@ -1,5 +1,13 @@
-import { Compass, Ellipsis, House, LibraryBig, Search, type LucideIcon } from 'lucide-react'
-import { useId, useRef, type ReactNode } from 'react'
+import {
+  CircleUser,
+  Compass,
+  House,
+  LibraryBig,
+  Search,
+  Users,
+  type LucideIcon,
+} from 'lucide-react'
+import { useRef, type ReactNode } from 'react'
 import { Link, matchPath, Outlet, useLocation } from 'react-router'
 import { cx } from './cx'
 import { Ribbon } from './Ribbon'
@@ -11,10 +19,8 @@ interface Section {
   to: string
   label: string
   icon: LucideIcon
-  /** Other sections reached from this one, which keep it marked as active. */
-  alsoActiveOn?: readonly string[]
-  /** What the section holds, when its name does not say it. Only the sidebar has room for it. */
-  hint?: string
+  /** Under lg it is not in the bar, which keeps five sections, and ProfileLink takes its place. */
+  onlyInSidebar?: boolean
 }
 
 const SECTIONS: readonly Section[] = [
@@ -22,21 +28,17 @@ const SECTIONS: readonly Section[] = [
   { to: '/biblioteca', label: 'Mis libros', icon: LibraryBig },
   { to: '/descubrir', label: 'Descubrir', icon: Compass },
   { to: '/buscar', label: 'Buscar', icon: Search },
-  // In the E3 a person looked for their friends in the bar and found no clue in "Más".
-  {
-    to: '/mas',
-    label: 'Más',
-    icon: Ellipsis,
-    alsoActiveOn: ['/amigos', '/perfil'],
-    hint: 'Amigos y perfil',
-  },
+  // In the E3 a person looked for their friends in the bar, and "Más" gave no clue of them.
+  { to: '/amigos', label: 'Amigos', icon: Users },
+  { to: '/perfil', label: 'Mi perfil', icon: CircleUser, onlyInSidebar: true },
 ]
 
 /** Screens made of rails and big cards take all the width. The rest keep a column they can read. */
 const WIDE_PATHS: readonly string[] = ['/', '/descubrir', '/buscar']
 
-function isSectionActive({ to, alsoActiveOn = [] }: Section, pathname: string): boolean {
-  return [to, ...alsoActiveOn].some((path) => matchPath({ path, end: to === '/' }, pathname))
+/** A section stays active on the pages under it, like a person under Amigos. */
+function isSectionActive({ to }: Section, pathname: string): boolean {
+  return Boolean(matchPath({ path: to, end: to === '/' }, pathname))
 }
 
 /** La actividad lives inside Inicio, so touching Inicio from there is also going back. */
@@ -53,18 +55,16 @@ interface NavItemsProps {
   iconSize: number
   /** What marks the active section, besides its fill, its weight and aria-current. */
   activeMark?: ReactNode
-  /** Shows the hint of a section under its name. */
-  withHints?: boolean
+  /** The sidebar, which also has the sections that do not fit in the bar. */
+  inSidebar?: boolean
 }
 
-function NavItems({ item, link, active, idle, iconSize, activeMark, withHints }: NavItemsProps) {
+function NavItems({ item, link, active, idle, iconSize, activeMark, inSidebar }: NavItemsProps) {
   const { pathname, search } = useLocation()
-  const hintId = useId()
-  return SECTIONS.map((section) => {
-    const { to, label, icon: Icon, hint } = section
+  const sections = inSidebar ? SECTIONS : SECTIONS.filter(({ onlyInSidebar }) => !onlyInSidebar)
+  return sections.map((section) => {
+    const { to, label, icon: Icon } = section
     const isActive = isSectionActive(section, pathname)
-    const shownHint = withHints ? hint : undefined
-    const shownHintId = `${hintId}${to}`
     return (
       <li key={to} className={item}>
         {/* NavLink only knows its own URL. "true" says the page belongs to the section without being it. */}
@@ -72,31 +72,14 @@ function NavItems({ item, link, active, idle, iconSize, activeMark, withHints }:
           to={to}
           state={linkState(to, pathname, search)}
           aria-current={isActive ? (matchPath(to, pathname) ? 'page' : 'true') : undefined}
-          aria-describedby={shownHint && shownHintId}
           className={cx(
             'relative flex transition-colors duration-100',
             link,
             isActive ? active : idle,
           )}
         >
-          {/* With a hint the icon stays on the line of the name, like the icons above it. */}
-          <Icon
-            aria-hidden
-            size={iconSize}
-            strokeWidth={isActive ? 2.4 : 2}
-            className={shownHint && 'mt-2 self-start'}
-          />
-          {shownHint ? (
-            // The name stays "Más" and the hint is read as its description.
-            <span className="flex flex-col py-1.5">
-              {label}
-              <span id={shownHintId} aria-hidden className="text-xs font-medium text-muted">
-                {shownHint}
-              </span>
-            </span>
-          ) : (
-            label
-          )}
+          <Icon aria-hidden size={iconSize} strokeWidth={isActive ? 2.4 : 2} />
+          {label}
           {isActive && activeMark}
         </Link>
       </li>
@@ -125,7 +108,7 @@ export function AppShell() {
               idle="font-medium text-muted hover:bg-shell hover:text-ink active:bg-sand"
               iconSize={20}
               activeMark={<Ribbon className="absolute top-0 right-3 h-4 w-2.5 bg-ribbon" />}
-              withHints
+              inSidebar
             />
           </ul>
         </nav>
