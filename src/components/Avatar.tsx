@@ -1,7 +1,7 @@
 import type { User } from '../types'
 import { cx } from './cx'
 
-export type AvatarSize = 'xs' | 'md' | 'sm' | 'lg'
+export type AvatarSize = 'xs' | 'sm' | 'lg'
 
 export interface AvatarProps {
   user: Pick<User, 'name' | 'avatarColor'>
@@ -12,7 +12,6 @@ export interface AvatarProps {
 // `xs` goes inside a line of text: at that size the serif closes up, so it takes the sans.
 const SIZE_CLASSES: Record<AvatarSize, string> = {
   xs: 'size-6 font-sans text-[0.625rem] font-bold ring-1 ring-line',
-  md: 'size-8 font-sans text-xs font-bold',
   sm: 'size-10 font-serif text-sm font-semibold',
   lg: 'size-16 font-serif text-xl font-semibold',
 }

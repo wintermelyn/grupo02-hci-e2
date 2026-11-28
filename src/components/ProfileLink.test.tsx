@@ -17,11 +17,17 @@ describe('ProfileLink', () => {
     },
   )
 
-  it('shows the face of the person, with a target of 44 px', () => {
+  it('shows the icon of a person and not the initials, which a friend also has', () => {
     renderApp('/')
     const [link] = profileLinks()
     expect(link).toHaveClass('size-11')
-    expect(link).toHaveTextContent('AM')
+    expect(link.querySelector('svg')).toHaveClass('lucide-circle-user')
+    expect(link).not.toHaveTextContent('AM')
+  })
+
+  it('fills its circle on Mi perfil, as the active section of the bar', () => {
+    renderApp('/perfil')
+    expect(profileLinks()[0]).toHaveClass('bg-sand')
   })
 
   it('opens Mi perfil, and says it is there', () => {
