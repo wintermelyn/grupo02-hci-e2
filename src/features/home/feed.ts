@@ -32,16 +32,6 @@ export const ACTIVITY_VERBS: Record<Activity['kind'], string> = {
   want: 'quiere leer',
 }
 
-/**
- * What a friend does with a book the person is reading, said in relation to them, so it does not
- * read like the person's own state: "Diego también lo lee", not "Diego empezó".
- */
-const ALONGSIDE_PHRASES: Record<Activity['kind'], string> = {
-  started: 'también lo lee',
-  finished: 'ya lo terminó',
-  want: 'también lo quiere leer',
-}
-
 export const firstName = (name: string) => name.split(' ')[0]
 
 export function daysSince(date: ISODate): number {
@@ -68,9 +58,6 @@ export function activitySentence({ activity, user, book }: FeedItem): string {
 }
 
 /** The friend's line on a card of "Leyendo ahora". */
-export function alongsideSentence({ activity, user }: Pick<FeedItem, 'activity' | 'user'>): string {
-  return `${firstName(user.name)} ${ALONGSIDE_PHRASES[activity.kind]}`
-}
 
 /** What goes under a book in "Leyendo ahora". */
 export function readingTime(startedAt: ISODate | undefined): string {
