@@ -46,4 +46,4 @@ Propuesta para las instrucciones de la E3:
 - **Persona:** **Camila Torres**, **@camitorres**, 3 amigos en común. Todavía no es amiga.
 - **Homónimo para distinguir:** Camila Torres, @ctorres_99, 0 amigos en común y otro color de avatar.
 - Amigos de Alex al partir: Diego Fuentes (@diegolee), Valentina Soto (@valelee) y Tomás Rojas (@tomasreads).
-- Recorrido esperado: Más → Amigos → buscar en la barra → "+ Agregar" → mensaje "Solicitud enviada".
+- Recorrido esperado: Amigos, en la barra → buscar en la barra → "+ Agregar" → mensaje "Solicitud enviada".

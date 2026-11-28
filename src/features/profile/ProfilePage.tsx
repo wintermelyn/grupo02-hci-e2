@@ -48,8 +48,6 @@ export function ProfilePage() {
         title={me.name}
         subtitle={`@${me.username}`}
         media={<Avatar user={me} size="lg" />}
-        backTo="/mas"
-        backLabel="Más"
       >
         <p className="text-sm text-muted">{summary}</p>
       </PageHeader>

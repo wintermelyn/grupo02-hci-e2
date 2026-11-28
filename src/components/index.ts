@@ -25,6 +25,7 @@ export {
   type WordmarkProps,
 } from './PageHeader'
 export { bookPath, folderPath } from './paths'
+export { PROFILE_PATH, ProfileLink } from './ProfileLink'
 export { RailArrow, type RailArrowProps } from './RailArrow'
 export { Ribbon } from './Ribbon'
 export { SearchField, type SearchFieldProps } from './SearchField'

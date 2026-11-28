@@ -49,18 +49,32 @@ describe('PageHeader', () => {
 
   it('shows the product name only under lg, where there is no sidebar', () => {
     renderWithRouter(<PageHeader title="Mis libros" />)
-    expect(wordmark().parentElement).toHaveClass('lg:hidden')
+    expect(wordmark().parentElement?.parentElement).toHaveClass('lg:hidden')
     expect(screen.getByText('prototipo')).toBeInTheDocument()
   })
 
   it('leaves no empty row from lg when only the product name goes above the title', () => {
     renderWithRouter(<PageHeader title="Terror" action={<Button>Opciones</Button>} />)
-    expect(wordmark().parentElement?.parentElement).toHaveClass('lg:hidden')
+    expect(wordmark().parentElement?.parentElement?.parentElement).toHaveClass('lg:hidden')
   })
 
   it('keeps that row from lg when it also carries the way back', () => {
     renderWithRouter(<PageHeader title="Terror" backTo="/biblioteca" backLabel="Mis libros" />)
-    expect(wordmark().parentElement?.parentElement).not.toHaveClass('lg:hidden')
+    expect(wordmark().parentElement?.parentElement?.parentElement).not.toHaveClass('lg:hidden')
+  })
+
+  it('puts the way to Mi perfil beside the product name, which hides with it from lg', () => {
+    renderWithRouter(<PageHeader title="Mis libros" />)
+    const block = wordmark().parentElement?.parentElement
+    expect(block).toHaveClass('lg:hidden')
+    expect(block).toContainElement(screen.getByRole('link', { name: 'Mi perfil' }))
+  })
+
+  it('puts the product name above a title that goes beside a face', () => {
+    renderWithRouter(<PageHeader title="Alex Muñoz" media={<span>AM</span>} />)
+    expect(wordmark().parentElement?.parentElement?.parentElement).not.toContainElement(
+      screen.getByRole('heading', { level: 1 }),
+    )
   })
 
   it('stacks the product name when it shares the row with a title and an action', () => {
@@ -68,6 +82,14 @@ describe('PageHeader', () => {
       <PageHeader title="Mis libros" action={<Button compact>Buscar</Button>} wordmarkBeside />,
     )
     expect(wordmark().parentElement).toHaveClass('flex-col')
+  })
+
+  it('keeps only the way to Mi perfil beside a title and an action under 380 px', () => {
+    renderWithRouter(
+      <PageHeader title="Mis libros" action={<Button compact>Buscar</Button>} wordmarkBeside />,
+    )
+    expect(wordmark().parentElement).toHaveClass('max-[379px]:hidden')
+    expect(screen.getByRole('link', { name: 'Mi perfil' })).toBeVisible()
   })
 
   it('lets an action cover the row of the title', () => {

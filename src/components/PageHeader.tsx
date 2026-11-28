@@ -2,6 +2,7 @@ import { ChevronLeft } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router'
 import { cx } from './cx'
+import { ProfileLink } from './ProfileLink'
 
 export interface BackLinkProps {
   to: string
@@ -27,26 +28,32 @@ export interface WordmarkProps {
   className?: string
 }
 
-/** The name of the product under lg. From lg, the sidebar says it. */
+/**
+ * The name of the product under lg, with the way to Mi perfil beside it. From lg, the sidebar has
+ * both.
+ */
 export function Wordmark({ stacked = false, className }: WordmarkProps) {
   return (
-    <p
-      className={cx(
-        'flex shrink-0 lg:hidden',
-        stacked ? 'flex-col items-end' : 'items-baseline gap-1.5',
-        className,
-      )}
-    >
-      <span
+    <div className={cx('flex shrink-0 items-center gap-2 lg:hidden', className)}>
+      {/* Beside a title and a button, under 380 px only the face fits, which is the way to a page. */}
+      <p
         className={cx(
-          'font-serif font-semibold tracking-tight',
-          stacked ? 'text-sm/tight' : 'text-base',
+          'flex',
+          stacked ? 'flex-col items-end max-[379px]:hidden' : 'items-baseline gap-1.5',
         )}
       >
-        Goodreads
-      </span>
-      <span className={cx('text-xs text-muted', stacked && 'leading-tight')}>prototipo</span>
-    </p>
+        <span
+          className={cx(
+            'font-serif font-semibold tracking-tight',
+            stacked ? 'text-sm/tight' : 'text-base',
+          )}
+        >
+          Goodreads
+        </span>
+        <span className={cx('text-xs text-muted', stacked && 'leading-tight')}>prototipo</span>
+      </p>
+      <ProfileLink />
+    </div>
   )
 }
 
@@ -82,8 +89,9 @@ export function PageHeader({
   children,
   wordmarkBeside = false,
 }: PageHeaderProps) {
-  // Next to the title it would leave no room for an action on a phone, or for a long title.
-  const wordmarkAbove = Boolean(backTo || action) && !wordmarkBeside
+  // Next to the title it would leave no room for an action on a phone, or for a long title, or for
+  // the title of a person beside their face.
+  const wordmarkAbove = Boolean(backTo || action || media) && !wordmarkBeside
 
   return (
     // flow-root: a margin at the foot of a child stays in the header instead of collapsing out of it.
