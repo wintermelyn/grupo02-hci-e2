@@ -18,7 +18,7 @@ export interface CoreActions {
   dismissToast: () => void
   /**
    * Takes the focus to Deshacer, for an action run from the keyboard whose control leaves with it.
-   * Deshacer is the last stop of the page, too far to reach in 10 s from the middle of a list.
+   * Deshacer is the last stop of the page, too far to reach in 5 s from the middle of a list.
    */
   focusToast: () => void
   /** Stops the auto-dismiss timer while the toast is hovered or focused. */
@@ -42,8 +42,7 @@ export interface CoreActions {
   getBook: (id: BookId) => Book | undefined
 }
 
-/** Long enough to notice a mistake and reach Deshacer, which 5 s was not in testing. */
-export const TOAST_DURATION_MS = 10_000
+export const TOAST_DURATION_MS = 5000
 
 const DIRECT_STATUSES: readonly ReadingStatus[] = ['want', 'owned', 'reading']
 

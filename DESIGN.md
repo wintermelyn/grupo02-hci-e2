@@ -775,7 +775,7 @@ Las portadas no se tiñen ni se recortan en la ficha. `lg` mide 112 px en celula
 
 ### Toast
 
-Una capa de tinta de hasta 448 px, con radio `float` y `shadow-float`. Bajo `lg` queda centrada, a 15 px sobre la barra inferior, y desde `lg` a 24 px del borde, centrada en el contenido y sin pisar la barra lateral. Entra en 200 ms. Deshacer es una píldora con ícono y texto en `shell`. Dura 10 s y se detiene mientras el cursor o el foco están encima, o mientras hay un menú abierto, que puede taparlo. Si la acción se hizo con teclado y su control desapareció, como en el aviso de D5, el foco llega a Deshacer y Tab lo devuelve a donde estaba. El mensaje corta una palabra larga, para que Deshacer siga a la vista. No tapa el final de una página: mientras está, la página se puede bajar hasta dejar lo último 24 px sobre él.
+Una capa de tinta de hasta 448 px, con radio `float` y `shadow-float`. Bajo `lg` queda centrada, a 15 px sobre la barra inferior, y desde `lg` a 24 px del borde, centrada en el contenido y sin pisar la barra lateral. Entra en 200 ms. Deshacer es una píldora con ícono y texto en `shell`. Dura 5 s y se detiene mientras el cursor o el foco están encima, o mientras hay un menú abierto, que puede taparlo. Si la acción se hizo con teclado y su control desapareció, como en el aviso de D5, el foco llega a Deshacer y Tab lo devuelve a donde estaba. El mensaje corta una palabra larga, para que Deshacer siga a la vista. No tapa el final de una página: mientras está, la página se puede bajar hasta dejar lo último 24 px sobre él.
 
 ### Estados de pantalla
 

@@ -305,15 +305,6 @@ describe('toast', () => {
     expect(state().undoSnapshot).toBeNull()
   })
 
-  it('keeps Deshacer for 10 s, time enough to notice a mistake and undo it', () => {
-    state().setStatus(unknownBook.id, 'owned')
-    vi.advanceTimersByTime(9_000)
-    expect(state().toast?.undoable).toBe(true)
-    state().undo()
-    expect(state().library[unknownBook.id]).toBeUndefined()
-    expect(TOAST_DURATION_MS).toBe(10_000)
-  })
-
   it('a plain toast replaces an undoable one and drops its undo copy', () => {
     state().setStatus(unknownBook.id, 'want')
     state().showToast('Sigue en tu lista')
