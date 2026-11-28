@@ -1,14 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { today } from '../../lib/dates'
 import type { Book, LibraryEntry } from '../../types'
-import {
-  arrangeResults,
-  groupByAuthor,
-  matchRange,
-  MAX_AUTHORS,
-  MAX_BOOKS,
-  ownedLabel,
-} from './results'
+import { arrangeResults, groupByAuthor, matchRange, MAX_AUTHORS, MAX_BOOKS } from './results'
 
 const book = (id: string, ...authors: string[]): Book => ({ id, title: `Libro ${id}`, authors })
 const entry = (bookId: string): LibraryEntry => ({
@@ -165,12 +158,5 @@ describe('arrangeResults', () => {
       book(String(index), `Autor ${index}`),
     )
     expect(arrangeResults(many, 'autor', NOTHING).authors).toHaveLength(MAX_AUTHORS)
-  })
-})
-
-describe('ownedLabel', () => {
-  it('says how many books of the author the person has, short enough for the foot of the card', () => {
-    expect(ownedLabel(4)).toBe('Tienes 4')
-    expect(ownedLabel(1)).toBe('Tienes 1')
   })
 })

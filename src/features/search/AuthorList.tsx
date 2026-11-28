@@ -2,7 +2,7 @@ import { BookCover } from '../../components'
 import { cx } from '../../components/cx'
 import { coverTone } from '../../lib/coverTone'
 import { booksLabel } from '../library/filters'
-import { ownedLabel, type AuthorGroup } from './results'
+import type { AuthorGroup } from './results'
 
 /** The cards in the rows that fit in each width. */
 export const AUTHOR_GRID = 'mt-3 grid grid-cols-2 gap-2.5 md:grid-cols-3 xl:grid-cols-4'
@@ -34,12 +34,10 @@ const FEATURED_COVER_PLACES = [
 interface AuthorTileProps {
   author: AuthorGroup
   featured: boolean
-  counts: AuthorCounts
   onPick: (name: string) => void
 }
 
-function AuthorTile({ author, featured, counts, onPick }: AuthorTileProps) {
-  const inLibrary = counts === 'library'
+function AuthorTile({ author, featured, onPick }: AuthorTileProps) {
   const places = featured ? FEATURED_COVER_PLACES : COVER_PLACES
   const covers = author.books.slice(0, featured ? FEATURED_COVERS : COVERS)
   return (
@@ -60,18 +58,9 @@ function AuthorTile({ author, featured, counts, onPick }: AuthorTileProps) {
       >
         {author.name}
       </span>
-      {/* At the foot, as approved. Under the title "Autores de Mis libros", "Tienes 4" is enough and
-          clears the covers down to 320 px, where "4 en Mis libros" ran under them. Screen readers
-          get the word "libros" too. */}
+      {/* Its line stays while the catalog arrives, so the amount shows up without moving anything. */}
       <span className={cx('mt-auto block min-h-5 text-sm text-white/88', featured && 'lg:mt-1.5')}>
-        {inLibrary ? (
-          <>
-            {ownedLabel(author.books.length)}{' '}
-            <span className="sr-only">{author.books.length === 1 ? 'libro' : 'libros'}</span>
-          </>
-        ) : (
-          booksLabel(author.books.length)
-        )}
+        {author.count !== undefined && booksLabel(author.count)}
       </span>
       {covers.map((book, index) => (
         <span key={book.id} className={cx('absolute', places[index])}>
@@ -90,16 +79,12 @@ function AuthorTile({ author, featured, counts, onPick }: AuthorTileProps) {
  */
 export type AuthorListLayout = 'grid' | 'lead' | 'row'
 
-/** What each card counts: the books that matched the search, or only the ones in Mis libros. */
-export type AuthorCounts = 'matches' | 'library'
-
 export interface AuthorListProps {
   title: string
   authors: AuthorGroup[]
   layout?: AuthorListLayout
   /** What separates it from the block above on a computer. Beside the books, nothing does. */
   className?: string
-  counts?: AuthorCounts
   onPick: (name: string) => void
 }
 
@@ -109,7 +94,6 @@ export function AuthorList({
   authors,
   layout = 'grid',
   className = 'lg:mt-0',
-  counts = 'matches',
   onPick,
 }: AuthorListProps) {
   const lead = layout === 'lead'
@@ -141,7 +125,7 @@ export function AuthorList({
                 featured ? 'lg:col-span-5 lg:row-start-2 lg:mt-3' : cell,
               )}
             >
-              <AuthorTile author={author} featured={featured} counts={counts} onPick={onPick} />
+              <AuthorTile author={author} featured={featured} onPick={onPick} />
             </li>
           )
         })}

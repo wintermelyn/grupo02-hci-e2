@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useCatalog } from '../../lib/catalog'
 import { useStore } from '../../store'
 import type { Book, User } from '../../types'
 import { useBookLookup } from '../library/filters'
@@ -14,20 +15,26 @@ export interface FriendsBook {
 }
 
 /**
- * The authors of the library, to recognise a name instead of recalling how it is spelled. Each one
- * brings only the books the person has, which is what its card counts: in the E3, a count of the
- * whole catalog under "Autores de Mis libros" read as more books than Mis libros holds.
+ * The authors of the library, to recognise a name instead of recalling how it is spelled. Tapping
+ * one lists the catalog, so that is what the card counts, and it stays blank without the catalog.
  */
 export function useLibraryAuthors(): AuthorGroup[] {
   const library = useStore((state) => state.library)
   const bookOf = useBookLookup()
+  const { status, books } = useCatalog()
+  const inCatalog = useMemo(
+    () => new Map(groupByAuthor(books).map(({ name, count }) => [name, count])),
+    [books],
+  )
   return useMemo(
     () =>
-      groupByAuthor(Object.keys(library).flatMap((id) => bookOf(id) ?? [])).slice(
-        0,
-        MAX_LIBRARY_AUTHORS,
-      ),
-    [library, bookOf],
+      groupByAuthor(Object.keys(library).flatMap((id) => bookOf(id) ?? []))
+        .slice(0, MAX_LIBRARY_AUTHORS)
+        .map((author) => ({
+          ...author,
+          count: status === 'ready' ? (inCatalog.get(author.name) ?? 0) : undefined,
+        })),
+    [library, bookOf, status, inCatalog],
   )
 }
 
