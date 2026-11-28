@@ -1,26 +1,35 @@
-import { CircleUser } from 'lucide-react'
 import { Link, useMatch } from 'react-router'
+import { useStore } from '../store'
+import { Avatar } from './Avatar'
 import { cx } from './cx'
 
 export const PROFILE_PATH = '/perfil'
 
 /**
- * Mi perfil under lg, where the bar keeps its five sections: at the top of every page, where Gmail
- * or the App Store put the account. The icon and not the initials, which a friend also has.
+ * Mi perfil under lg, where the bar keeps its five sections: the person's own picture at the top of
+ * every page, where Gmail or the App Store put the account. The prototype has no photos, so the
+ * picture is the initials.
  */
 export function ProfileLink() {
+  const me = useStore((state) => state.me)
   const isHere = Boolean(useMatch(PROFILE_PATH))
   return (
     <Link
       to={PROFILE_PATH}
       aria-label="Mi perfil"
       aria-current={isHere ? 'page' : undefined}
-      className={cx(
-        '-mr-1.5 flex size-11 shrink-0 items-center justify-center rounded-full text-ink transition-colors duration-100',
-        isHere ? 'bg-sand' : 'active:bg-sand',
-      )}
+      className="group -mr-1.5 flex size-11 shrink-0 items-center justify-center rounded-full"
     >
-      <CircleUser aria-hidden size={26} strokeWidth={isHere ? 2.4 : 2} />
+      <Avatar
+        user={me}
+        size="md"
+        className={cx(
+          'transition-[box-shadow] duration-100',
+          isHere
+            ? 'ring-2 ring-ink ring-offset-2 ring-offset-paper'
+            : 'group-active:ring-2 group-active:ring-sand-deep',
+        )}
+      />
     </Link>
   )
 }

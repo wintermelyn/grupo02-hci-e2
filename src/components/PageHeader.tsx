@@ -35,7 +35,7 @@ export interface WordmarkProps {
 export function Wordmark({ stacked = false, className }: WordmarkProps) {
   return (
     <div className={cx('flex shrink-0 items-center justify-end gap-2 lg:hidden', className)}>
-      {/* Beside a title and a button, under 380 px only the icon of Mi perfil fits, which leads somewhere. */}
+      {/* Beside a title and a button, under 380 px only the picture of Mi perfil fits, which leads somewhere. */}
       <p
         className={cx(
           'flex',
