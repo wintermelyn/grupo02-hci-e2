@@ -66,7 +66,7 @@ describe('PageHeader', () => {
   it('puts the way to Mi perfil beside the product name, which hides with it from lg', () => {
     renderWithRouter(<PageHeader title="Mis libros" />)
     const block = wordmark().parentElement?.parentElement
-    expect(block).toHaveClass('lg:hidden')
+    expect(block).toHaveClass('lg:hidden', 'justify-end')
     expect(block).toContainElement(screen.getByRole('link', { name: 'Mi perfil' }))
   })
 

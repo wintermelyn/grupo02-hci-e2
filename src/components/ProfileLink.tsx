@@ -16,7 +16,7 @@ export function ProfileLink() {
       aria-label="Mi perfil"
       aria-current={isHere ? 'page' : undefined}
       className={cx(
-        '-mr-1.5 ml-auto flex size-11 shrink-0 items-center justify-center rounded-full text-ink transition-colors duration-100',
+        '-mr-1.5 flex size-11 shrink-0 items-center justify-center rounded-full text-ink transition-colors duration-100',
         isHere ? 'bg-sand' : 'active:bg-sand',
       )}
     >

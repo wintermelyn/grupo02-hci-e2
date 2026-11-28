@@ -29,12 +29,12 @@ export interface WordmarkProps {
 }
 
 /**
- * The name of the product under lg, with the way to Mi perfil beside it. From lg, the sidebar has
- * both.
+ * The name of the product under lg, with the way to Mi perfil beside it. Both stay on the right of
+ * every page, also where they have the row to themselves, as on Inicio. From lg, the sidebar has both.
  */
 export function Wordmark({ stacked = false, className }: WordmarkProps) {
   return (
-    <div className={cx('flex shrink-0 items-center gap-2 lg:hidden', className)}>
+    <div className={cx('flex shrink-0 items-center justify-end gap-2 lg:hidden', className)}>
       {/* Beside a title and a button, under 380 px only the icon of Mi perfil fits, which leads somewhere. */}
       <p
         className={cx(
