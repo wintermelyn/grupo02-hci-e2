@@ -66,8 +66,19 @@ describe('PageHeader', () => {
   it('puts the way to Mi perfil beside the product name, which hides with it from lg', () => {
     renderWithRouter(<PageHeader title="Mis libros" />)
     const block = wordmark().parentElement?.parentElement
-    expect(block).toHaveClass('lg:hidden', 'justify-end')
+    expect(block).toHaveClass('lg:hidden')
     expect(block).toContainElement(screen.getByRole('link', { name: 'Mi perfil' }))
+  })
+
+  it('starts a row of its own with the product name and ends it with Mi perfil', () => {
+    renderWithRouter(<PageHeader title="Amigos" action={<Button>Invitar</Button>} />)
+    expect(wordmark().parentElement?.parentElement).toHaveClass('flex-1')
+    expect(screen.getByRole('link', { name: 'Mi perfil' })).toHaveClass('ml-auto')
+  })
+
+  it('keeps both on the right after a way back', () => {
+    renderWithRouter(<PageHeader title="Terror" backTo="/biblioteca" backLabel="Mis libros" />)
+    expect(wordmark().parentElement?.parentElement).toHaveClass('ml-auto')
   })
 
   it('puts the product name above a title that goes beside a face', () => {

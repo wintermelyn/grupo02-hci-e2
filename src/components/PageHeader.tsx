@@ -29,12 +29,13 @@ export interface WordmarkProps {
 }
 
 /**
- * The name of the product under lg, with the way to Mi perfil beside it. Both stay on the right of
- * every page, also where they have the row to themselves, as on Inicio. From lg, the sidebar has both.
+ * The name of the product under lg, with the way to Mi perfil beside it. With a row of their own the
+ * name starts it and Mi perfil ends it; beside a title or a way back, both go on the right. From lg,
+ * the sidebar has both.
  */
 export function Wordmark({ stacked = false, className }: WordmarkProps) {
   return (
-    <div className={cx('flex shrink-0 items-center justify-end gap-2 lg:hidden', className)}>
+    <div className={cx('flex shrink-0 items-center gap-2 lg:hidden', className)}>
       {/* Beside a title and a button, under 380 px only the picture of Mi perfil fits, which leads somewhere. */}
       <p
         className={cx(
@@ -99,7 +100,7 @@ export function PageHeader({
       {wordmarkAbove && (
         <div className={cx('flex min-h-11 items-center gap-3', !backTo && 'lg:hidden')}>
           {backTo && <BackLink to={backTo} label={backLabel} />}
-          <Wordmark className="ml-auto" />
+          <Wordmark className={backTo ? 'ml-auto' : 'flex-1'} />
         </div>
       )}
       <div className="relative flex min-h-11 items-center justify-between gap-3">

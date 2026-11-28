@@ -18,7 +18,7 @@ export function ProfileLink() {
       to={PROFILE_PATH}
       aria-label="Mi perfil"
       aria-current={isHere ? 'page' : undefined}
-      className="group -mr-1.5 flex size-11 shrink-0 items-center justify-center rounded-full"
+      className="group -mr-1.5 ml-auto flex size-11 shrink-0 items-center justify-center rounded-full"
     >
       <Avatar
         user={me}
