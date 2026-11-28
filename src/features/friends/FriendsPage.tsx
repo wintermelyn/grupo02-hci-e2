@@ -122,8 +122,6 @@ export function FriendsPage() {
     <section>
       <PageHeader
         title="Amigos"
-        backTo="/mas"
-        backLabel="Más"
         action={
           <Button
             variant="quiet"

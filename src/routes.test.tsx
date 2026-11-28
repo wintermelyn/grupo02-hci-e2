@@ -14,7 +14,7 @@ const SCREENS: Record<string, string> = {
   '/libro/:bookId': '/libro/OL81626W',
   '/descubrir': '/descubrir',
   '/buscar': '/buscar',
-  '/mas': '/mas',
+  '/mas': '/amigos',
   '/amigos': '/amigos',
   '/amigos/:userId': '/amigos/camila',
   '/perfil': '/perfil',
@@ -49,6 +49,11 @@ describe('routes', () => {
   })
 
   it.each(Object.values(SCREENS))('%s renders one page inside the shell', expectScreen)
+
+  it('sends the old Más to Amigos, which took its place in the bar', () => {
+    renderApp('/mas')
+    expect(currentLocation()).toBe('/amigos')
+  })
 
   it('sends unknown URLs to Inicio', () => {
     renderApp('/ruta-inexistente')

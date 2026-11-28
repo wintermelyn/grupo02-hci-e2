@@ -7,6 +7,11 @@ import { state, stubAction } from '../../test/store'
 const FUNDACION = 'OL46125W'
 
 const main = () => within(screen.getByRole('main'))
+/** The links of the page, without the way to Mi perfil at the top of every page. */
+const bookLinks = () =>
+  main()
+    .getAllByRole('link')
+    .filter((link) => link.getAttribute('aria-label') !== 'Mi perfil')
 const tagButton = (name: RegExp) => main().getByRole('button', { name })
 const board = () => main().queryByRole('heading', { name: 'Mis carpetas' })
 const prompt = () => main().queryByRole('region', { name: '¿Sigues queriendo leer este libro?' })
@@ -38,7 +43,7 @@ describe('LibraryPage', () => {
   it('shows the folder board with Próximos first and a link to each folder', () => {
     renderApp('/biblioteca')
     expect(board()).toBeInTheDocument()
-    const links = main().getAllByRole('link')
+    const links = bookLinks()
     expect(links[0]).toHaveTextContent('Próximos')
     expect(links[0]).toHaveTextContent('2 libros · fija')
     expect(links[0]).toHaveAttribute('href', '/biblioteca/carpeta/proximos')
@@ -321,7 +326,7 @@ describe('LibraryPage', () => {
       it('goes on through the list with Tab', () => {
         const undo = answerNoByKeyboard()
         fireEvent.keyDown(undo, { key: 'Tab' })
-        expect(document.activeElement).toContainElement(main().getAllByRole('link')[0])
+        expect(document.activeElement).toContainElement(bookLinks()[0])
       })
     })
 

@@ -30,7 +30,7 @@ Son las tareas que el prototipo debe permitir completar de principio a fin. Las 
   - **Punto de partida:** Mis libros → botón "Lo quiero", que muestra 17 libros.
   - **Resultado:** los libros elegidos están también en la carpeta "Próximos", sin salir de sus otras carpetas, y los descartados ya no están en mi biblioteca.
 - **T3:** agregar como amigo a una persona que conozco (journey 2.1 y decisión 4).
-  - **Punto de partida:** Más → Amigos.
+  - **Punto de partida:** Amigos, en la barra.
   - **Resultado:** la persona aparece en Amigos, primero como "Solicitud enviada" y luego como amiga.
 
 `docs/desarrollo/tareas.md` lista qué libros y qué persona concretos usa cada tarea, para que se puedan redactar las instrucciones de la E3.
@@ -51,12 +51,12 @@ Es una página web responsiva. En el celular y la tablet tiene una barra de nave
 | `/libro/:bookId` | **Ficha:** portada, datos, tag con lápiz, carpetas del libro, fechas y puntaje | A |
 | `/descubrir` | **Descubrir:** carrusel con "Seleccionados para ti" y las listas prehechas, al mismo nivel y siempre a la vista | B |
 | `/buscar` | **Buscar:** libros y autores, sin personas ni pestañas | B |
-| `/mas` | **Más:** enlaces a Amigos y Mi perfil | B |
+| `/mas` | Lleva a `/amigos`: "Más" solo guardaba Amigos y Mi perfil, que ahora están en las barras | B |
 | `/amigos` | **Amigos:** barra para buscar a cualquier usuario, amigos, solicitudes pendientes, "Invitar contactos" | B |
 | `/amigos/:userId` | **Persona:** qué lee, libros en común, botón agregar o estado de la solicitud | B |
 | `/perfil` | **Mi perfil:** nombre, @usuario, **Reiniciar demo** | B |
 
-Barra de navegación, en este orden: **Inicio · Mis libros · Descubrir · Buscar · Más**. Cada ícono va con su etiqueta de texto. "Más" queda activa también en `/amigos` y `/perfil`. En la barra lateral, "Más" lleva debajo "Amigos y perfil", porque en la E3 una persona buscó a sus amigos en la barra y no encontró pista; en la barra inferior no cabe.
+Barra de navegación, en este orden: **Inicio · Mis libros · Descubrir · Buscar · Amigos**. Cada ícono va con su etiqueta de texto. "Amigos" queda activa también en `/amigos/:userId`. En la E3 una persona buscó a sus amigos en la barra y "Más" no le dio pista, así que la sección se llama por lo que guarda. La barra lateral suma **Mi perfil** al final. Una sexta sección en la barra inferior dejaría cada una en 52 px a 320 px, así que bajo `lg` Mi perfil es la foto de perfil de la persona arriba a la derecha de cada página, junto al nombre del producto.
 
 ### Decisiones de diseño que el prototipo debe mostrar
 D1 a D6 son las decisiones 1 a 6 del informe, con la misma numeración. La columna "Pantalla" sirve para llenar "Dónde se ve en el prototipo" (sección 5 del informe).
@@ -376,7 +376,7 @@ Es una sola sesión con Impeccable, sin trabajo en paralelo, según `docs/desarr
   - todas las secciones usan el mismo componente y tamaño;
   - "Seleccionados para ti" oculta los libros que ya están en la biblioteca;
   - al tocar un libro se abre la ficha.
-- [x] **Más:** enlaces a Amigos y Mi perfil, con el botón "Amigos" a la vista.
+- [x] **Más:** enlaces a Amigos y Mi perfil, con el botón "Amigos" a la vista. En la E3 la reemplazan la sección Amigos y la foto de perfil arriba a la derecha.
 - [x] **Amigos (D4):**
   - sin texto en la barra, lista de amigos y solicitudes pendientes;
   - con texto, resultados de todo el directorio por nombre o @usuario;
@@ -436,7 +436,7 @@ Son decisiones de implementación tomadas para poder programar. El equipo puede 
 | "Conectar con más amigos" | La decisión 4 habla de un renombrado, sin dar el nombre nuevo | "Invitar contactos" |
 | Código de amigo | No aparece | Queda fuera. Compartir un código exige coordinarse por otro medio, lo contrario de N2 |
 | Seguidores | El journey 2.1.2 menciona "amigos y seguidores" | Amigos muestra solo amigos y solicitudes |
-| Barra de navegación | Nombra "Mis libros", "Más", "Descubrir" y el buscador principal, sin dar el orden | *Inicio · Mis libros · Descubrir · Buscar · Más* |
+| Barra de navegación | Nombra "Mis libros", "Más", "Descubrir" y el buscador principal, sin dar el orden | *Inicio · Mis libros · Descubrir · Buscar · Más*; en la E3, "Más" pasa a "Amigos" y Mi perfil a la foto de perfil arriba a la derecha |
 | Selector de tags | Pide una "vista de selección de opciones de tags", sin decir cuál | Un menú anclado junto al tag, porque cambiarlo es rápido y reversible |
 | Tag en las listas | "Junto al título" | Bajo el título, junto al autor y con la cinta de su color bajo la portada, porque un título largo no deja lugar a su lado en un celular |
 | Cantidad en los botones de tag | No aparece | Cada botón muestra cuántos libros tiene, porque T2 parte de saber que son 17 |

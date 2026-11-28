@@ -9,14 +9,11 @@ const CARRIE = 'OL81626W'
 const openConfirm = () => fireEvent.click(screen.getByRole('button', { name: 'Reiniciar demo' }))
 
 describe('ProfilePage', () => {
-  it('shows the name and the username, with a way back to Más', () => {
+  it('shows the name and the username, as a section of its own with no way back', () => {
     renderApp('/perfil')
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Alex Muñoz')
     expect(screen.getByText('@alexlee')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Más', current: false })).toHaveAttribute(
-      'href',
-      '/mas',
-    )
+    expect(screen.queryByRole('link', { name: /Volver|Más/ })).not.toBeInTheDocument()
   })
 
   it('sums up my books and friends under the name, and follows them', () => {
