@@ -22,7 +22,7 @@ export interface WantPromptProps {
 }
 
 /**
- * The D5 prompt: one old book of Quiero leerlo at a time, above the list and without blocking it. It
+ * The D5 prompt: one old book of Lo quiero at a time, above the list and without blocking it. It
  * stays until it is answered, so a task does not lose it by leaving the section. Sí keeps the book
  * and No takes it out of Mis libros and its folders, so they do not look alike: No says what it
  * does, weighs less, and asks in the row before taking the book out. Deshacer still follows.

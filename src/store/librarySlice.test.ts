@@ -254,7 +254,7 @@ describe('every change', () => {
 
 describe('setStartDate', () => {
   const CARRIE = 'OL81626W' // Leyendo
-  const IT = 'OL81613W' // Quiero leerlo
+  const IT = 'OL81613W' // Lo quiero
 
   it('corrects the start of a book in Leyendo, with Deshacer', () => {
     const before = state().library[CARRIE]
@@ -276,7 +276,7 @@ describe('setStartDate', () => {
 
 describe('setCurrentPage', () => {
   const DUNE = 'OL893414W' // Leyendo, 608 páginas
-  const IT = 'OL81613W' // Quiero leerlo
+  const IT = 'OL81613W' // Lo quiero
 
   it('saves the page of a book in Leyendo, with Deshacer', () => {
     const before = state().library[DUNE]
@@ -313,14 +313,14 @@ describe('setCurrentPage', () => {
 })
 
 describe('answerWantPrompt', () => {
-  const IT = 'OL81613W' // Quiero leerlo hace 210 días, en Terror
+  const IT = 'OL81613W' // Lo quiero hace 210 días, en Terror
 
   it('keeps the book with Sí and remembers that it asked', () => {
     state().answerWantPrompt(IT, true)
     expect(state().library[IT].wantCheckedAt).toBe(today())
     expect(state().library[IT].status).toBe('want')
     expect(state().lastWantPromptOn).toBe(today())
-    expect(state().toast?.message).toBe('«It» sigue en Quiero leerlo')
+    expect(state().toast?.message).toBe('«It» sigue en Lo quiero')
   })
 
   it('takes the book out of the library and its folders with No', () => {

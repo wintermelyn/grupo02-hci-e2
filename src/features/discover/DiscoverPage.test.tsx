@@ -163,7 +163,7 @@ describe('what is already in the library', () => {
 
   it('shows no tag for a book outside the library', () => {
     renderApp(`/descubrir?lista=${classics.id}`)
-    expect(screen.queryByText(/Quiero leerlo|Lo tengo|Leyendo|Leído/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Lo quiero|Lo tengo|Leyendo|Leído/)).not.toBeInTheDocument()
     expect(rail().querySelector('.ribbon')).not.toBeInTheDocument()
   })
 
