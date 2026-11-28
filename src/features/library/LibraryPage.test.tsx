@@ -30,7 +30,7 @@ describe('LibraryPage', () => {
     renderApp('/biblioteca')
     expect(screen.getByRole('heading', { level: 1, name: 'Mis libros' })).toBeInTheDocument()
     expect(tagButton(/^Todos: 34 libros/)).toHaveAttribute('aria-pressed', 'true')
-    for (const name of [/Quiero leerlo: 17/, /Lo tengo: 5/, /Leyendo: 2/, /Leído: 10/]) {
+    for (const name of [/Lo quiero: 17/, /Lo tengo: 5/, /Leyendo: 2/, /Leído: 10/]) {
       expect(tagButton(name)).toHaveAttribute('aria-pressed', 'false')
     }
   })
@@ -78,7 +78,7 @@ describe('LibraryPage', () => {
     expect(titles.at(-1)).toMatch(/^Sapiens/)
   })
 
-  it('shows the 17 books of Quiero leerlo, as T2 expects', () => {
+  it('shows the 17 books of Lo quiero, as T2 expects', () => {
     renderApp('/biblioteca?tag=want')
     expect(bookTitles()).toHaveLength(17)
   })
@@ -119,7 +119,7 @@ describe('LibraryPage', () => {
 
     it('says the tag of each book in words, with its folders under the author', () => {
       renderApp('/biblioteca?tag=want')
-      for (const title of bookTitles()) expect(title).toContain('Quiero leerlo')
+      for (const title of bookTitles()) expect(title).toContain('Lo quiero')
       expect(row(/^Fundación/)).toHaveTextContent('Ciencia ficción')
       expect(row(/^La sombra del viento/)).toHaveTextContent('Próximos · Novela')
     })
@@ -133,12 +133,12 @@ describe('LibraryPage', () => {
     it('keeps saying the tag and the folders while searching inside the tag', () => {
       renderApp('/biblioteca?tag=want&q=fundaci')
       expect(row(/^Fundación/)).toHaveTextContent('Ciencia ficción')
-      expect(row(/^Fundación/)).toHaveTextContent('Quiero leerlo')
+      expect(row(/^Fundación/)).toHaveTextContent('Lo quiero')
     })
 
     it('keeps the tag in the results of Todos, where nothing else says it', () => {
       renderApp('/biblioteca?q=fundaci')
-      expect(row(/^Fundación/)).toHaveTextContent('Quiero leerlo')
+      expect(row(/^Fundación/)).toHaveTextContent('Lo quiero')
       expect(row(/^Fundación/)).not.toHaveTextContent('Ciencia ficción')
     })
   })
@@ -152,11 +152,11 @@ describe('LibraryPage', () => {
       fireEvent.click(main().getByRole('button', { name: 'Quitar de Mis libros' }), init)
     }
 
-    it('asks about It, with how long it has been waiting, in Todos and in Quiero leerlo', () => {
+    it('asks about It, with how long it has been waiting, in Todos and in Lo quiero', () => {
       renderApp('/biblioteca')
-      expect(prompt()).toHaveTextContent('It · 210 días en Quiero leerlo')
-      fireEvent.click(tagButton(/^Quiero leerlo/))
-      expect(prompt()).toHaveTextContent('It · 210 días en Quiero leerlo')
+      expect(prompt()).toHaveTextContent('It · 210 días en Lo quiero')
+      fireEvent.click(tagButton(/^Lo quiero/))
+      expect(prompt()).toHaveTextContent('It · 210 días en Lo quiero')
     })
 
     it('says what No costs before it is pressed, also to a screen reader', () => {
@@ -223,7 +223,7 @@ describe('LibraryPage', () => {
       renderApp('/biblioteca')
       fireEvent.click(main().getByRole('button', { name: 'Sí' }))
       expect(state().library[IT].wantCheckedAt).toBe(today())
-      expect(toast()).toHaveTextContent('«It» sigue en Quiero leerlo')
+      expect(toast()).toHaveTextContent('«It» sigue en Lo quiero')
       expect(prompt()).not.toBeInTheDocument()
     })
 
@@ -236,7 +236,7 @@ describe('LibraryPage', () => {
 
       fireEvent.click(screen.getByRole('button', { name: 'Deshacer' }))
       expect(state().library[IT].folderIds).toEqual(['terror'])
-      expect(prompt()).toHaveTextContent('It · 210 días en Quiero leerlo')
+      expect(prompt()).toHaveTextContent('It · 210 días en Lo quiero')
     })
 
     describe('after Deshacer', () => {

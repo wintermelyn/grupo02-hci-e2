@@ -1,15 +1,9 @@
 import { BookOpen } from 'lucide-react'
 import { Link, useNavigate } from 'react-router'
-import { Avatar, BookCover, bookPath, Button, EmptyState } from '../../components'
+import { BookCover, bookPath, Button, EmptyState } from '../../components'
 import { cx } from '../../components/cx'
 import { coverTone } from '../../lib/coverTone'
-import {
-  alongsideSentence,
-  pageProgress,
-  readingTime,
-  type FeedItem,
-  type PageProgress,
-} from './feed'
+import { pageProgress, readingTime, type PageProgress } from './feed'
 import type { ReadingBook } from './useHome'
 
 const THREE_COLUMNS = 3
@@ -32,8 +26,6 @@ const COVER_WIDTHS: Record<Company, string> = {
 interface ReadingCardProps extends ReadingBook {
   /** How the card shares the row: alone, with one more book, or with two or more. */
   company: Company
-  /** What a friend did with this same book. */
-  friend?: FeedItem
 }
 
 /**
@@ -67,7 +59,7 @@ function ReadingProgress({
 }
 
 /** The whole cover, always. */
-function ReadingCard({ book, entry, company, friend }: ReadingCardProps) {
+function ReadingCard({ book, entry, company }: ReadingCardProps) {
   // Under the cover, on a phone, the column has room for the title and little else.
   const whenRoomy = company === 'alone' ? '' : 'max-md:hidden'
   const progress = pageProgress(entry.currentPage, book.pages)
@@ -99,27 +91,6 @@ function ReadingCard({ book, entry, company, friend }: ReadingCardProps) {
           {book.authors[0]}
         </span>
         <span className="mt-auto pt-2 text-sm md:pt-3">
-          {friend && (
-            // Under the cover on a phone it stays, smaller and in up to two lines: the author can
-            // go, but who else reads the book is what the card adds to the person's own reading.
-            <span
-              className={cx(
-                'mb-1 flex items-center gap-1.5 text-white/88',
-                company !== 'alone' && 'max-md:items-start max-md:text-xs',
-              )}
-            >
-              <Avatar user={friend.user} size="xs" />
-              <span
-                className={cx(
-                  'min-w-0 truncate',
-                  company !== 'alone' && 'max-md:line-clamp-2 max-md:whitespace-normal',
-                  company === 'many' && 'max-[479px]:sr-only',
-                )}
-              >
-                {alongsideSentence(friend)}
-              </span>
-            </span>
-          )}
           {progress ? (
             <ReadingProgress {...progress} company={company} />
           ) : (
@@ -155,11 +126,13 @@ function NothingReading() {
 
 export interface ReadingNowProps {
   reading: ReadingBook[]
-  feed: FeedItem[]
 }
 
-/** Almost nobody reads more than two or three books at a time, so all of them are in sight. */
-export function ReadingNow({ reading, feed }: ReadingNowProps) {
+/**
+ * Almost nobody reads more than two or three books at a time, so all of them are in sight. Each
+ * card shows only the person's own reading: what friends do goes in "Tus amigos", below.
+ */
+export function ReadingNow({ reading }: ReadingNowProps) {
   const many = reading.length >= THREE_COLUMNS
   const company: Company = many ? 'many' : reading.length === 2 ? 'pair' : 'alone'
   return (
@@ -176,11 +149,7 @@ export function ReadingNow({ reading, feed }: ReadingNowProps) {
         >
           {reading.map((item) => (
             <li key={item.book.id} className="min-w-0">
-              <ReadingCard
-                {...item}
-                company={company}
-                friend={feed.find(({ book }) => book.id === item.book.id)}
-              />
+              <ReadingCard {...item} company={company} />
             </li>
           ))}
         </ul>

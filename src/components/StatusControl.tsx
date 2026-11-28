@@ -1,6 +1,6 @@
 import { Pencil, Plus } from 'lucide-react'
 import { today } from '../lib/dates'
-import { STATUS_HINTS, STATUS_LABELS, STATUS_ORDER } from '../lib/status'
+import { STATUS_LABELS, STATUS_ORDER } from '../lib/status'
 import { selectBook, selectEntry, useStore } from '../store'
 import type { Book, BookId, ReadingStatus } from '../types'
 import { AnchoredMenu } from './AnchoredMenu'
@@ -62,8 +62,6 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
       options={STATUS_ORDER.map((status) => ({
         id: status,
         label: <StatusTag status={status} />,
-        // Lo tengo and Quiero leerlo were mixed up in testing: the menu says what each one means.
-        detail: STATUS_HINTS[status],
         checked: current === status,
         onSelect: () => choose(status),
       }))}
@@ -92,7 +90,7 @@ export function StatusControl({ bookId, book, className }: StatusControlProps) {
                 className={statusChanged ? 'animate-tag-in' : undefined}
               />
               {/* An action in a row, so it is drawn as a quiet compact Button. Under 360 px it is
-                  smaller and loses the pencil. "Quiero leerlo" is the longest tag: next to it the
+                  smaller and loses the pencil. "Lo quiero" is the longest tag: next to it the
                   pencil goes under 390 px, and under 375 px the text says "Cambiar". The row is
                   called Estado, and the name of the button still says it in full. */}
               <span className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-2.5 whitespace-nowrap transition-[background-color,scale] duration-150 group-aria-expanded:bg-sand hover:bg-sand active:scale-98 active:bg-sand-deep max-[359px]:pl-0 max-[359px]:text-sm">

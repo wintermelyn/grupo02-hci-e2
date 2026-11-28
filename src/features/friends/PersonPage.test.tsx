@@ -157,7 +157,7 @@ describe('PersonPage books', () => {
 
   it('does not show my tag or my stars, which could pass for theirs', () => {
     renderApp('/amigos/diego')
-    expect(titlesIn('Está leyendo').join()).not.toMatch(/Quiero leerlo|Lo tengo|Leyendo|Leído/)
+    expect(titlesIn('Está leyendo').join()).not.toMatch(/Lo quiero|Lo tengo|Leyendo|Leído/)
     expect(main().queryByRole('img', { name: /estrellas/ })).not.toBeInTheDocument()
   })
 
